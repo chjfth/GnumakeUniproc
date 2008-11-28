@@ -1,0 +1,119 @@
+.fws {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+	font-size: 145%;
+
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+	font-size: 130%;
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%;
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.boarder {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #606060;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.mswin {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 1em;
+    margin-right: 1em;
+	background-color: #DDFFFF;
+}
+
+.linux {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 1em;
+    margin-right: 1em;
+	background-color: #FFFF99;
+}
+
+.comment {
+	font-size: 90%;
+	background-color: #dcc8ff;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+.later-comment {
+	font-size: 100%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+	background-color:#D2F7AA;
+}
+
+.chj-embed {
+	color: #000066;
+	font-size: 90%;
+}
+
+.chj-mark-blue {
+	color: #0000a8;
+}
+
+.chj-mark-red {
+	color: #a80000;
+}
+
+.chj-proper-noun {
+	color: #006600;
+	background-color: #C0C0C0;
+	font-weight: bold;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#660066; }
+
+/*
+.bg-gray { background-color:#dcdedc; }
+.bg-yellow { background-color:#fefc9c; }
+.fg-brown { color:#840000; }
+.fg-blue { color:#0000fe; }
+.bg-pink { background-color:#FF99FF; }
+.bg-orange { background-color:#FF9900; }
+*/

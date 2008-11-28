@@ -1,0 +1,25 @@
+#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
+#### This file is only required if your project needs to checkout extra files
+#### to make it built. That is, when your project's source is scattered in
+#### many CVS/SVN repositories.
+
+
+############ For SVN checkout:
+
+gmu_uv_list_SVN_MODULES += # <svnco1-refname> <svnco2-refname> ...
+
+<svnco1-refname>_svnUrl = # SVN Url for the checkout
+	# Hint: $(call gmuf_MakeSvnRepositoryPath,<SVN-path-prefix-var>,<remaining-repository-path>)
+<svnco1-refname>_svnLocalDir = # Local dir corresponding to the whole SVN URL
+<svnco1-refname>_svnRev = # Revision to use(string after svn's -r switch)
+
+
+############ For CVS checkout:
+
+gmu_uv_list_CVS_MODULES += # <cvsco1-refname> <cvsco2-refname> ...
+
+<cvsco1-refname>_cvsRoot = # CVSROOT for the checkout
+	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
+<cvsco1-refname>_cvsModuleDir = # CVS module name or module dir to checkout
+<cvsco1-refname>_cvsLocalDir = # Local dir corresponding to CVSROOT
+<cvsco1-refname>_cvsTag = # Tag or branch to checkout(string after cvs's -r switch)

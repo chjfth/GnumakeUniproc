@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang=en>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>GMU var reference</title>
+
+</head>
+
+<body>
+<H1 align="center">GMU function reference </H1>
+<p>(under construction)</p>
+<ul>
+      <li><a href="#gmuf%20functions">gmuf functions</a> </li>
+      <li><a href="#gmpf%20functions">gmpf functions</a></li>
+</ul>
+<p>&nbsp;</p>
+<H2><a name="gmuf%20functions"></a>gmuf functions </H2>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Function name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_OutputInfo</td>
+    <td><p>Use this function to display some information(on screen). You can use this function to display some text to make user, or showing debugging information. </p>
+      <ul>
+        <li>$1: The info you'd like to output. NOTE: if there is comma in your text, you should use <code>(,)</code> instead. The reason is, a bare comma will be considered as function parameter separator.</li>
+      </ul>      
+      <p>On make 3.81 or above, internal function <code>$(info )</code> is used for displaying text. But on make 3.80, it resorts to lauching a echo command with <code>$(shell )</code> and redirects the output to stderr.</p>    </td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_MakeCvsRepositoryPath</td>
+    <td>Making a &quot;portable&quot; CVSROOT string. <a href="cvs-vars.htm">See here for detail.</a> </td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_MakeSvnRepositoryPath</td>
+    <td>Making a &quot;portable&quot; SVN URL string. It is defined as <code>$($1)$2</code> . </td>
+  </tr>
+  <tr>
+    <td valign="top"><p>gmuf_GetSubprjUpjnameByRefname<br>gmuf_GetSubprjPrjnameByRefname<br>
+        gmuf_GetSubprjOutputNameByRefname<br>
+        gmuf_GetSubprjOutputPathByRefname<br>
+      gmuf_GetSubprjUserOutputByRefname<br>
+      </p>    </td>
+    <td><p>These functions retrieve subprj's</p>
+      <ul>
+        <li>User input project name  (<code>gmu_PRJ_NAME</code>) </li>
+        <li>Final project name (<code>gmu_G_Final_PrjName</code>) </li>
+        <li>Output file  name (<code>gmu_Gf_Final_LinkOutput</code>) </li>
+        <li>Output file fullpath (<code>gmu_Gp_LINK_OUTPUT</code>). If the subprj is a container, this will be <code>_gmu_NoOutput</code>.</li>
+        <li>User defined output file path (<code>gmp_up_USER_OUTPUT_AFTER_LINK</code>). Null if this is not defined for the subprj. </li>
+      </ul>
+    <p>respectived, by giving subprj's refname as parameter $1 .</p>
+    <p>Multiple subprj refnames can be passed, and the result will be multiple names/paths separated by space.</p>
+    <p>NOTE: These functions will return correct result only after GnumakeUniproc.mki has been read by make. </p></td>
+  </tr>
+</table>
+<h2><a name="gmpf%20functions"></a>gmpf functions </h2>
+
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Function name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top"><p>gmpf_MakeExeName<br>
+        gmpf_MakeLibName<br>
+        gmpf_MakeDllName</p></td>
+    <td><p>Make a output name for EXE, LIB, DLL respectively.</p>
+        <ul>
+          <li>$1: output name trunk </li>
+        </ul>
+        <p>Different compiler config will give different filename extesions for a file type, e.g. </p>
+        <pre class="fws">$(call gmpf_MakeLibName,ZLIB1)</pre>
+        <p>will give <tt>ZLIB1.lib</tt> on Windows and <tt>ZLIB1.a</tt> on Linux. </p>
+        <p><code>gmu_uf_LINK_OUTPUT</code>'s value is usually constructed by these functions .</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmpf_MakeDllNameForLink</td>
+    <td><p>Make a output name for current DLL project.</p>
+        <ul>
+          <li>$1: output name trunk </li>
+        </ul>
+        <p>The purpose of this special function:</p>
+        <ul>
+          <li>On Linux, it will give an extension name of <tt>.so</tt>, which is not odd.</li>
+          <li>But on Windows, it will give an extension name of <tt>.lib</tt>, the ideas of which is: MSVC generates an import lib with a DLL, and in order for an EXE project to link to that DLL, it is the import lib that is allowed to be given to the linker command. By reporting a .lib as output, the current project 's output can serve as its parent project's link input. </li>
+      </ul></td>
+  </tr>
+  <tr>
+    <td valign="top">gmpf_AddCustomActionCount</td>
+    <td><p>Add a custom action count.</p>
+      <ul>
+        <li>$1: custom action name(action word), which is a user defined word. NOTE: Please do not use spaces in action word at this time. </li>
+    </ul>      
+    <p>Plugin author can use this function in a rule's command to count any custom actions. Example: For a action word <code>AlwaysCompile</code>, invoking </p>
+    <pre class="fws">$(call gmpf_AddCustomActionCount, AlwaysCompile) </pre>
+    <p>first time counts this action to one, a second call counts this action to two, etc. At end of make run, count of every custom action word will be displayed. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmpf_CombinePsSubdirs</td>
+    <td><p>Example: If you have:</p>
+      <pre class="fws">mydirs=/dir1 /dir2
+myps=wince mswin
+
+mylist = $(call gmpf_CombinePsSubdirs,$(mydirs),$(myps))</pre>
+      <p><code>mylist</code> will have the result: </p>
+      <pre class="fws">/dir1/wince /dir1/mswin /dir1 /dir2/wince /dir2/mswin /dir2</pre>
+      <p>This can be helpful for writing concise makefiles when you are writing a cross platform project, but with some &quot;platform-specific&quot; headers. </p>    </td>
+  </tr>
+</table>
+<p>~~~~~~~~ sample table:</p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_COMPILER_ID</td>
+    <td align="center" valign="top">I</td>
+    <td>Compiler ID.</td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+<p>=</p>
+</body>
+
+</html>

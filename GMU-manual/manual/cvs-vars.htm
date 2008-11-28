@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>CVS related gmuvars</title>
+
+</head>
+
+<body>
+<H1 align="center">CVS related gmuvars </H1>
+
+<p>This article presents a guide regarding the proper use of gmuvars when you wants to checkout CVS repositories from your GMU makefiles. </p>
+<p>You know, the makefiles you will encounter may contain cvs checkout directives, when doing cvs checkout from a repository of a specific server, a username for that repository is required. What's more, different people doing cvs checkout from the same repository of the same server may wish to use different usernames, even different access methods(local, pserver, ssh, etc.), but on the other hand, a certain makefile from a certain repository should/would be exactly the same to all users regardless of their different user names and different access methods. </p>
+<p>Then how different persons provide different cvs usernames and access methods while the makefiles are identical to all users. There is the way: </p>
+<p>For makefiles written for GnumakeUniproc, they should use a special format to assign the "CVS repository path":</p>
+<pre class="fws">$(call gmuf_MakeCvsRepositoryPath,<i><b>SERVER_STEM</b></i>,<i><b>REPS_PATH</b></i>) </pre>
+<p>For example, if you have the following statement in makfile:</p>
+<pre class="fws">MyPrj_cvsRoot_forMakefiles = $(call gmuf_MakeCvsRepositoryPath,NLSCVS,/cvsreps/CommonLib)</pre>
+<p>and the following gmuvar defined:</p>
+<pre class="fws">NLSCVS=:pserver:<b>--user--</b>@192.168.0.12:
+NLSCVS_USER_cvsreps_CommonLib=john</pre>
+<p>then the result will be:</p>
+<pre class="fws">MyPrj_cvsRoot_forMakefiles = :pserver:john@192.168.0.12:/cvsreps/CommonLib</pre>
+<p>You see, <code>MyPrj_cvsRoot_forMakefiles</code>'s value result in a string with CVSROOT format, -- that is our purpose.</p>
+<p>What the <code>gmuf_MakeCvsRepositoryPath</code> does here is:</p>
+<ol>
+  <li>On seeing a special sub-string <b>--user--</b> in its first parameter(we called it SERVER_STEM above, and its value is NLSCVS in our example) and <tt>/cvsreps/CommonLib</tt> as its second parameter, it checks to see whether variable <code>NLSCVS_USER_cvsreps_CommonLib</code> is defined, if there is, <b>--user--</b> is replaced with its value(in our example, john). </li>
+  <li>NLSCVS's value, with <b>--user--</b> replaced, and gmuf_MakeCvsRepositoryPath's second param's value are concatenated and returned. </li>
+</ol>
+<p>The overall rule is: </p>
+<ul>
+  <li>Substitute your username(if there is) in CVSROOT string with <b>--user--</b> , and assign the resulting string to an env-var with the same name as the first parameter of gmuf_MakeCvsRepositoryPath. In our example, this env-var has the name NLSCVS , and we call the NLSCVS here "server stem name".
+  <li>Construct another env-var whose name is concatenated with three component:
+        <ol>
+          <li>server stem name
+          <li>_USER
+          <li>repository path string under that CVSROOT, with all slashes replaced with underscores. </li>
+        </ol>
+  </li>
+</ul>
+<p>More to simplify your env-var setting: </p>
+<p>In the above example, if <code>NLSCVS_USER_cvsreps_CommonLib</code> is not defined, GnumakeUniproc will check whether <code>NLSCVS_USER</code> is defined, if it is, the value of <code>NLSCVS_USER</code> will be used as the username. Therefore, if your usernames for every repository of a specific CVS server are all or mostly identical, you can only set <i><code>SERVER_STEM</code></i><code>_USER</code> for that specific server, which avoids setting a bunch of username env-vars for a single server. </p>
+<p>Finally, if "server stem-name" itself is not defined, then access method will get null value, which results in CVS local access method to be used. For our example above, if both <code>NLSCVS_USER_cvsreps_CommonLib</code> nor <code>NLSCVS_USER</code> are null, then the CVSROOT string to use is just <tt>/cvsreps/CommonLib</tt> . </p>
+<p>-</p>
+</body>
+
+</html>

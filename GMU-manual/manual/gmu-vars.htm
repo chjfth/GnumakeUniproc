@@ -1,0 +1,899 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang=en>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>GMU var reference</title>
+
+</head>
+
+<body>
+<H1 align="center">GMU variable reference </H1>
+<p>(under construction)</p>
+<ul>
+  <li><a href="#Preface">Preface</a>    <ul>
+      <li><a href="#More%20gmuvar%20naming%20conventions">More gmuvar naming conventions</a></li>
+      <li><a href="#Table%20paradigm">Table paradigm</a></li>
+    </ul>
+  </li>
+  <li><a href="#GnumakeUniproc%20core%20layer%20vars">GnumakeUniproc core layer vars</a>    <ul>
+      <li><a href="#gmu_XXX%20vars%20cared%20by%20normal%20pattern1%20user">gmu_<i>XXX</i> vars cared by normal pattern1 user</a>        <ul>
+          <li><a href="#Normal%20input%20vars%20in%20makefiles">Normal input vars in makefiles</a></li>
+          <li><a href="#Input%20gmuvars%20suggested%20to%20be%20set%20in%20environment%20variable">Input gmuvars suggested to be set in environment variable</a></li>
+          <li><a href="#Gmuvars%20for%20special%20action">Gmuvars for special action</a></li>
+          <li><a href="#Gmuvars%20for%20debugging%20purpose">Gmuvars for debugging purpose</a></li>
+        </ul>
+      </li>
+      <li><a href="#Compound%20gmuvars">Compound gmuvars</a>        
+	    <ul>
+          <li><a href="#Compound%20gmuvars%20for%20sub-project%20assignment">Compound gmuvars for sub-project assignment</a></li>
+    <li><a href="#Compound%20gmuvars%20for%20in-project%20extra%20CVS%20SVN%20module%20assignment">Compound gmuvars for in-project extra CVS, SVN module assignment</a>  
+		</ul>
+    <li><a href="#gmu_XXX%20vars%20cared%20by%20pattern%20author,%20compiler-config%20author%20or%20plugin%20author">gmu_<i>XXX</i> vars cared by pattern author, compiler-config author or plugin author</a></li>
+    </ul>
+  </li>
+  <li><a href="#Pattern1%20defined%20gmuvars">Pattern1 defined gmuvars(gmp_<i>XXX</i>) </a>    <ul>
+      <li><a href="#gmp_XXX%20vars%20for%20pattern1%20user">gmp_<i>XXX</i> vars for pattern1 user</a> </li>
+    </ul>
+  </li>
+  <ul>
+    <li><a href="#gmp_XXX%20vars%20cared%20by%20pattern1%20compiler-config%20author%20or%20plugin%20author">gmp_<i>XXX</i> vars cared by pattern1 compiler-config author or plugin author</a></li>
+  </ul>
+</ul>
+<p>&nbsp;</p>
+<H2><a name="Preface"></a>Preface</H2>
+<p>GnumakeUniproc variables(gmuvars) can be categorized into three flavors:</p>
+<ul>
+  <li>gmu_<i>XXX</i>: These are defined by the GnumakeUniproc core layer .</li>
+  <li>gmp_<i>XXX</i>: These are defined by the pattern layer. Currently, there are only one (set of) pattern officially defined. This only pattern is defined by <tt>pattern1.mks</tt> and <tt>pattern-container1.mks</tt> (we'll later call them <b>pattern1</b>).</li>
+  <li>gmi_<i>XXX</i>: These are defined by the plugins.</li>
+</ul>
+<p>If you write your own patterns or plugins, it is highly suggested to follow these naming conventions.</p>
+<h3><a name="More%20gmuvar%20naming%20conventions"></a>More gmuvar naming conventions </h3>
+<p>Affer gmu_, gmp_, gmi_ prefix, there may be a second-level prefix in lower case letter, like <code>ud, uf, Gp, list</code> etc. There meaning is as follows. </p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">second level prefix </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">ud, uf, up </td>
+    <td><p>The letter u means user-provided input, and d,f,p means directory, filename, filepath, respectively.</p>
+      <ul>
+        <li>For <b>d</b>, it's a directory(dir for short), which can be an absolute dir or a relative dir. NOTE: Never append a trailing slash after such a variable value.</li>
+        <li>For <b>f</b>, it's a filename, not including any directory prefix. </li>
+        <li>For <b>p</b>, which is called filepath here, it's a directory followed by a slash and a filename. </li>
+    </ul>      <p>&nbsp; </p></td>
+  </tr>
+  <tr>
+    <td valign="top">Gd, Gf, Gp </td>
+    <td><p>The letter G means &quot;generated var&quot;. These vars are output vars, which is not given by the user but set by the GnumakeUniproc code. Users, typically plugin authors, can acquire important information from these variables. </p>
+    <p>The letters d,f,p have the same meaning as stated above. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">uv</td>
+    <td>u means user-provided. v means variable construction, that is, the value of the varibles is used to construct more variables. </td>
+  </tr>
+</table>
+<p>If a gmuvar name has substring <code>_list_</code>, it means that var's value can be a list of words, separated by spaces or tabs; if not having the substring <code>_list_</code>, its value can only be one word(no space or tabs allowed). </p>
+<h3><a name="Table%20paradigm"></a>Table paradigm </h3>
+<p>In the table listed in following sections, there are columns called &quot;In/Out&quot; which explicitly tells whether a variable is an input or an output. &quot;I&quot; means input and &quot;O&quot; means output.</p>
+<p>More over, an input variable may be marked an &quot;E&quot; which means it is suggested to set that variable in the environment instead of in makefiles.</p>
+<h2><a name="GnumakeUniproc%20core%20layer%20vars"></a>GnumakeUniproc core layer vars</h2>
+<p>If you construct your makefiles on pattern1(the case for most GMU user by now), you just care for part of gmu_XXX vars, the remaing part is &quot;hidden&quot; by pattern1's code.</p>
+<h3><a name="gmu_XXX%20vars%20cared%20by%20normal%20pattern1%20user"></a>gmu_<i>XXX</i> vars cared by normal pattern1 user </h3>
+<h4><a name="Normal%20input%20vars%20in%20makefiles"></a>Normal input vars in makefiles </h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmu_PRJ_NAME</td>
+    <td align="center">I</td>
+    <td><p>User provided roject name. You must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included.</p>
+      <p>Note: It's not the final project name. Final project name may be decorated by some prefix and suffix. The decorated name is output as gmuvar <a href="#gmu_G_Deco_PrjName"><code>gmu_G_Final_PrjName</code></a>. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_uf_LINK_OUTPUT</td>
+    <td align="center">I</td>
+    <td><p>Tells the output file name of the project(an EXE or an LIB, etc). </p>
+    <p>Note: It's not the final output filename. Final output name may be decorated by some prefix and suffix. The decorated name is <a href="#gmu_Gf_Deco_LinkOutput"><code>gmu_Gf_Final_LinkOutput</code></a>.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_ud_SRC_ROOT</td>
+    <td align="center">I</td>
+    <td>The root dir where source files resides. This can be a relative dir, which is relative to the startup directory, that is, the working directory you launch GNU make. </td>
+  </tr>
+  <tr>
+    <td valign="top"><a name="gmu_up_list_SRC_FROM_ROOT"></a>gmu_up_list_SRC_FROM_ROOT</td>
+    <td align="center">I</td>
+    <td><p>Source file list from <code>gmu_ud_SRC_ROOT</code>.</p>
+    <p>The filepaths listed here will be considered relative to <code>$(gmu_ud_SRC_ROOT)</code>, -- that is what &quot;<code>FROM_ROOT</code>&quot; mean. </p>
+    <p>Important Note: filepaths here cannot use <code>..</code> to wander out of <code>$(gmu_ud_SRC_ROOT)</code>, otherwise GMU will fail mysteriously. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_ud_list_PRJ_HEADER</td>
+    <td align="center">I</td>
+    <td><p>List header file dirs(include dirs).</p>
+      <p>Warning: If you have <tt>dira</tt> and <tt>dirb</tt> as include dirs, try not to set <tt>-I dira -I dirb</tt> in <tt>gmp_CFLAGS_INCLUDES</tt>, -- since only dirs set into <code>gmu_ud_list_PRJ_HEADER</code> will be passed to <tt>gcc -M</tt> to generate header file dependency. </p></td>
+  </tr>
+  <tr>
+    <td valign="top"><a name="gmu_uv_list_SUBPRJ_TO_LINK"></a>gmu_uv_list_SUBPRJ_TO_LINK</td>
+    <td align="center">I</td>
+    <td><p>List sub-projects to link. The output(LIB or DLL) of the sub-projects listed here will be automatically get linked to the current project. This mechanism eases parent-children project dependency statement in makefiles. </p>
+      <p>The tokens listed here are reference names(refname), each of which represent a sub project(subprj) to make. For each <i>refname</i>, you should define the following vars: </p>
+      <p>You must at least define:  </p>      <ul>
+        <li><code>&lt;<i>refname</i>&gt;_Makefile</code>:  Tells where the sub-project's makefile resides. </li>
+        </ul>      
+      <p>Optionally, you can define the following to do SVN check out for your subprjs:</p>
+      <ul>
+        <li> <code>&lt;<i>refname</i>&gt;_svnUrl_forMakefiles</code>: Tells the SVN URL to check out a subprj.</li>
+        <li><code>&lt;<i>refname</i>&gt;_svnLocalDir_forMakefiles</code>: Tells to which local dir you'd like to checkout.</li>
+        <li><code>&lt;<i>refname</i>&gt;_svnRev_forMakefiles</code>: (optional)Tells which revision to use(the number after svn's -r switch)</li>
+      </ul>      
+      <p>Optionally, define the following to do CVS check out for your subprjs:</p>
+      <ul>
+        <li><code>&lt;<i>refname</i>&gt;_cvsRoot_forMakefiles</code>:  CVSROOT for the checkout.</li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsModuleDir_forMakefiles</code>:  CVS module name or module dir(e.g <tt>some-mod/subdir1/subdir2</tt>) to checkout.</li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsLocalDir_forMakefiles</code>: To which local dir you'd like to checkout.</li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsTag_forMakefiles</code>: (optional) Tag or branch to use(token after cvs's -r switch)</li>
+      </ul>      
+      <p>NOTE: For checkout action for one <i>refname</i>, you must not choose both CVS and SVN, but different <i>refname</i> can choose CVS or SVN on their own. </p>
+      <p>HINT: For one <i>refname</i>, you can only do one checkout. For a subprj whose source files are distributed in multiple CVS/SVN repositories. You can take this solution: Organize your subprj so that all its makefiles(no need to consider C/C++ files) reside in one CVS/SVN repository, so you can check it out with <i>refname</i>; this checkout guarantees your subprj's makefile can run. On the other hand, in your subprj's makefile, define <a href="#gmu_uv_list_CVS_MODULES"><code>gmu_uv_list_CVS_MODULES</code></a> or <a href="#gmu_uv_list_SVN_MODULES"><code>gmu_uv_list_SVN_MODULES</code></a> to tell GMU to checkout remaining parts of your project source(C/C++ files etc). </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</td>
+    <td align="center">I</td>
+    <td>The super set of <a href="#gmu_uv_list_SUBPRJ_TO_LINK"><code>gmu_uv_list_SUBPRJ_TO_LINK</code></a>. Sub-projects listed here will automatically have their dependency libs linked into current project. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_uv_list_ALL_SUBPRJ</td>
+    <td align="center">I</td>
+    <td>This is similar to <code>gmu_uv_list_SUBPRJ_TO_LINK</code> and <code>gmu_uv_list_SUBPRJ_TO_LINK</code> . But if you do not intend some of your subprjs to be linked by current project, you should list them in <code>gmu_uv_list_ALL_SUBPRJ</code> instead of in the other two. </td>
+  </tr>
+  <tr>
+    <td>gmu_ud_OUTPUT_ROOT</td>
+    <td align="center">I</td>
+    <td><p>Output root dir for the whole build process, which is default to <tt>gf</tt> under current dir( <tt>$(CURDIR)/gf</tt> ). </p>
+    <p>User can override this value in make command link or in env-var to change the build output place.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_up_list_EXTRA_OBJ_TO_LINK</td>
+    <td align="center">I</td>
+    <td>Extra object files to link. Those objs are called &quot;extra &quot; because they are not compiled from source files listed in <a href="#gmu_up_list_SRC_FROM_ROOT"><code>gmu_up_list_SRC_FROM_ROOT</code></a>.</td>
+  </tr>
+  <tr>
+    <td valign="top"><a name="gmu_uv_list_CVS_MODULES"></a>gmu_uv_list_CVS_MODULES</td>
+    <td align="center">I</td>
+    <td><p>List of additional CVS modules to checkout for this project. The tokens listed here are reference names(refname), each of which represent a CVS module. For each <i>refname</i>, you should define the following vars:</p>
+      <ul>
+        <li><code>&lt;<i>refname</i>&gt;_cvsRoot</code>: Tells the CVSROOT to use. </li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsModuleDir</code>: Tells the CVS module name to use. </li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsLocalDir</code>: Tells your local dir to where you will check out the CVS module.</li>
+        <li><code>&lt;<i>refname</i>&gt;_cvsTag</code>: Tells which tag or branch to use(cvs -r option). This one is optional.        </li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td valign="top"><a name="gmu_uv_list_SVN_MODULES"></a>gmu_uv_list_SVN_MODULES</td>
+    <td align="center">I</td>
+    <td>List of additional SVN modules to checkout for this project. The tokens listed here are reference names(refname), each of which represent a SVN checkout action. For each <i>refname</i>, you should define the following vars:
+      <ul>
+        <li><code>&lt;<i>refname</i>&gt;_svnUrl</code>: Tells the SVN URL to use. </li>
+        <li><code>&lt;<i>refname</i>&gt;_svnLocalDir</code>: Tells your local dir to where you will check out the SVN content.</li>
+        <li><code>&lt;<i>refname</i>&gt;_svnRev</code>: Tells which revision to use(svn -r option). This one is optional. </li>
+      </ul>
+    <p>BTW: If you want to checkout with a specific data-time, assign the date-time in 
+
+
+    <a href="#gmu_SC_CHECKOUT_DATETIME"><code>gmu_SC_CHECKOUT_DATETIME</code></a> . </p></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DECO_PREFIX_PRJ_NAME</td>
+    <td align="center">I</td>
+    <td><p>Explicitly tells what prefix to be prepended to the final project name.</p>
+    <p>User can set this var by using <code>+=</code> operator and spaces and tabs in the var will finally be removed before prepending to final project name. GnumakeUniproc requires that you must not use <code>:=</code> to construct this var.</p></td>
+  </tr>
+  <tr>
+    <td>gmu_DECO_SUFFIX_PRJ_NAME</td>
+    <td align="center">I</td>
+    <td>Roughly the same as <code>gmu_DECO_PREFIX_PRJ_NAME</code>, except that the value here will be appended to final project name. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DECO_PREFIX_LINK_OUTPUT</td>
+    <td align="center">I</td>
+    <td><p>Explicitly tells what prefix to be prepended to the filename of link output. &quot;Link output&quot; normally means XXX.exe, YYY.lib or ZZZ.dll etc. </p>
+    <p>User can set this var by using <code>+=</code> operator and spaces and tabs in the var will finally be removed before prepending to the filename. GnumakeUniproc requires that you must not use <code>:=</code> to construct this var.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DECO_SUFFIX_LINK_OUTPUT</td>
+    <td align="center">I</td>
+    <td>Roughly the same as <code>gmu_DECO_PREFIX_LINK_OUTPUT</code>, except that the value here will be appended to the filename(but before file-extname), e.g., ABC.exe will become ABC<code>$(gmu_DECO_SUFFIX_LINK_OUTPUT)</code>.exe . </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_NO_GEN_HDEPEND</td>
+    <td align="center">I</td>
+    <td>If non-null, disable the `gcc -M' header dependency generation. (default to null) </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_IGNORE_SUBPRJS </td>
+    <td align="center">I</td>
+    <td>If non-null, totally ignore sub-projects. This is not desired most of the time, but it may be helpful if you use <code>gmu_ut_diagnose</code> target to diagnose some make-vars, -- this time, you probably want to ignore sub-projects. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_NO_MAKE_SUBPRJS</td>
+    <td align="center">I</td>
+    <td><p>Set this to non-null so that GMU will not try to build sub-projects, or say, not check sub-projects' up-to-date status.</p>
+      <p>When gmu_NO_MAKE_SUBPRJS=1, GMU retrieves immediate sub-projects' information(their project-name, output image path etc) then go on remaining root project's building. It is really useful when you build an EXE project a second time without any its sub-projects' code change. If you know you have not changed the subprjs, you can ignore checking them to speed up the build.</p>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DELIBERATE_NO_SUBPRJ</td>
+    <td align="center">I</td>
+    <td><p>Default value of this var is null.</p>
+    <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. SVN export bunches of files for other projects to use. If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirment. </p>
+    <p>The benefit of a free-style GMU makefile is you can give it a proejct-name(<code>gmu_PRJ_NAME</code>), so that it has a dedicated project output dir(<a href="#gmu_Gd_Final_PrjOutput"><code>gmu_Gd_Final_PrjOutput</code></a>) for end user to create files in it, and, it's build result appears in the statistic information of GMU pattern1 build model.</p>    <p>This var must be set before <tt>pattern-container1.mks</tt> is included. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_u_SHOW_PROGRESS_CMD</td>
+    <td align="center">I(E)</td>
+    <td> <p>This var is optional. It is used when GMU pattern1 is going to feed back it progress info, once each project is done. </p>
+      <p>This var is consider a shell command to execute, and if it contains <code>$(gmu_progress_info)</code> (note: retain in its unexpanded form), the  <code>$(gmu_progress_info)</code> will be dynamically expanded into GMU's progroess info(e.g. <tt>Projects=3 Container=1</tt>) </p></td>
+  </tr>
+</table>
+<h5>Example of gmu_u_SHOW_PROGRESS_CMD</h5>
+<p>Using Windows 2000/XP's default Command Prompt(cmd.exe), you can set it as follows:</p>
+<pre class="fws">SET gmu_u_SHOW_PROGRESS_CMD=cmd /C &quot;title GMU progress: $(gmu_progress_info)&quot;</pre>
+<p>It appears in <tt>gmu-goody.bat</tt> as an example.</p>
+<h4><a name="Input%20gmuvars%20suggested%20to%20be%20set%20in%20environment%20variable"></a>Input gmuvars suggested to be set in environment variable</h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmu_CVS_EXE</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>CVS executable filepath. </p>
+    <p>Default value is <tt>cvs</tt> . </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_SVN_EXE</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>SVN executable filepath. </p>
+    <p>Default value is <tt>svn</tt> . </p></td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+<h4><a name="Gmuvars%20for%20special%20action"></a>Gmuvars for special action </h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_CHECKOUT</td>
+    <td><p>This is normally set on command line. If set to non-null, check out for a project is performed first before compiling the project. </p>
+    <p>Note the chicken and egg problem here: To ensure the root project is up-to-date before issuing make on it, you have to manually update the root project before issuing make. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_EXPORT</td>
+    <td>Similar to <tt>gmu_DO_CHECKOUT</tt>, but do an export instead of checkout. </td>
+  </tr>
+  <tr>
+    <td valign="top"><a name="gmu_SC_CHECKOUT_DATETIME"></a>gmu_SC_CHECKOUT_DATETIME</td>
+    <td><p>Assign the date of checkout/export. It should have the format <code>YYYY-MM-DD HH:MM:SS</code> . </p>
+      <p>Note: Since there is a space in the date-time format, you should enclose it in quotes when assigning this from a shell command line(apply to both Linux and Windows). </p>
+      <p>In order to utilize this var with Subversion, you must have Subverion v1.4.2 or above. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_CVS_CHECKOUT_OPT<br>
+    gmu_SVN_CHECKOUT_OPT</td>
+    <td><p>Extra options for CVS and SVN's checkout/export command.</p>
+      <p>Note: If some options can be assigned with GMU-dedicated method(e.g. set CVS checkout tag, or CVS/SVN checkout date), you must do it using the dedicated say, not set them in these two variables. </p></td>
+  </tr>
+</table>
+<h4><a name="Gmuvars%20for%20debugging%20purpose"></a>Vars for debugging purpose</h4>
+<p>Since vars in this table are for debugging purpose, they should normally set from command line or env-var, not in makefiles. </p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_VERBOSE</td>
+    <td><p>Controls how verbose GnumakeUniproc will output its running info. There are three verbose level defined: 0, 1 and 2. The default is 0, the least verbose. If you encounter problems running GnumakeUniproc, try it or report it with <code>gmu_DO_SHOW_VERBOSE=2</code> . </p>    </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_COMPILE_CMD</td>
+    <td>Non-null means echo compile comand. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_LINK_CMD</td>
+    <td>Non-null means echo link comand.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_GENHDEPEND_CMD</td>
+    <td>Non-null means echo header dependancy generation comand.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_CHANGED_PREREQ</td>
+    <td><p>Non-null will echo the prerequisites that causes a target to be rebuilt (make's <code>$?</code> variable).</p>
+    <p>If you encounter the problem that a target is re-made every time even if you don't change any of your source files, you may define the gmu-var to know which files cause the re-made.</p></td>
+  </tr>
+</table>
+<p>This following two vars are only used when GMU is run with target <code>gmu_ut_diagnose</code>. For this target, the normal build process is not run.</p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmu_u_DIAGNOSE_VARS</td>
+    <td>List varnames that you'd like to see their value. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_u_DIAGNOSE_VARS_LIST</td>
+    <td>Like <code>gmu_u_DIAGNOSE_VARS</code>, but if some vars have value that is more than one word(space/tab separated token), each word will be listed in one line -- just for easy viewing. </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h3><a name="Compound%20gmuvars"></a>Compound gmuvars </h3>
+<p>Note: <i>refname</i> and <i>modname</i> below are just place holders that correspoind to user provided name. </p>
+<p>Gmuvars in this section are all input vars. </p>
+<h4><a name="Compound%20gmuvars%20for%20sub-project%20assignment"></a>Compound gmuvars for sub-project  assignment</h4>
+<p>These compound vars are used with the following gmuvars:</p>
+<ul>
+  <li>gmu_uv_list_SUBPRJ_TO_LINK</li>
+  <li>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</li>
+</ul>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><i>refname</i>_Makefile</td>
+    <td>Tells where a sub-project's startup makefile resides. </td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_svnUrl_forMakefiles</td>
+    <td>Tells what SVN URL to check out a sub-project's  makefiles. </td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_svnLocalDir_forMakefiles</td>
+    <td>Tells what local dir the SVN URL are to be checked out to. </td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_svnRev</td>
+    <td>Tells what revision to checkout. (svn -r param) </td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsRoot_forMakefiles</td>
+    <td><p>Tells what CVS repository  to check out a sub-project's  makefiles. </p>
+    <p>This value is suggested to be constructed with function gmuf_MakeCvsRepositoryPath, <a href="cvs-vars.htm">see here</a>. </p></td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsModuleDir_forMakefiles</td>
+    <td><p>Tells what CVS module to check out, with <i>refname</i>_cvsRoot_forMakefiles.</p>
+    <p>Actually, This can not only be a CVS module name, but also can be followed by sub-dirs under that module, so that you can request just a deeper path to checkout. </p></td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsLocalDir_forMakefiles</td>
+    <td><p>Tells what local dir the CVS module are to be checked out to.</p>
+    <p>The content within <i><code>refname</code></i><code>_cvsRoot_forMakefiles</code> will appear within local dir <code>$(<i>refname</i>_cvsLocalDir_forMakefiles)/$(<i>refname</i>_cvsModuleDir_forMakefiles)</code> . </p></td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsTag_forMakefiles</td>
+    <td>Tells what CVS tag or branch to use, with <i>refname</i>_cvsRoot_forMakefiles. (cvs -r param) </td>
+  </tr>
+</table>
+<h4><a name="Compound%20gmuvars%20for%20in-project%20extra%20CVS%20SVN%20module%20assignment"></a>Compound gmuvars for in-project extra CVS, SVN module assignment</h4>
+<p>These compound vars are used with the following gmuvars:</p>
+<ul>
+  <li>gmu_uv_list_CVS_MODULES</li>
+  <li>gmu_uv_list_SVN_MODULES</li>
+</ul>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><i>modname</i>_svnUrl</td>
+    <td>Tells a repository module's SVN URL, which are to be checked out. (The name &quot;module&quot; is borrowed from CVS) </td>
+  </tr>
+  <tr>
+    <td><i>modname</i>_svnLocalDir</td>
+    <td>Tells what local dir the SVN URL by <i>modname</i>_svnUrl are to be checked out to. </td>
+  </tr>
+  <tr>
+    <td><i>modname</i>_svnRev</td>
+    <td>Tells what revision to checkout. (svn -r param) </td>
+  </tr>
+  <tr>
+    <td><i>modname</i>_cvsRoot</td>
+    <td><p>Tells what CVS repository to check out. </p>
+    <p>This value has a special syntax [link]. </p></td>
+  </tr>
+  <tr>
+    <td><i>modname</i>_cvsModuleDir</td>
+    <td>Tells what CVS module to check out, with <i>refname</i>_cvsRoot. </td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsLocalDir_forMakefiles</td>
+    <td>Tells what local dir the CVS module are to be checked out to.</td>
+  </tr>
+  <tr>
+    <td><i>refname</i>_cvsTag_forMakefiles</td>
+    <td>Tells what CVS tag or branch to use, with <i>refname</i>_cvsRoot_forMakefiles. (cvs -r param) </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h3><a name="gmu_XXX%20vars%20cared%20by%20pattern%20author,%20compiler-config%20author%20or%20plugin%20author"></a>gmu_<i>XXX</i> vars cared by pattern author, compiler-config author or plugin author </h3>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>gmu_extn_OBJ<br>
+    gmu_extn_LIB<br>
+    gmu_extn_DLL<br>
+    gmu_extn_EXE</td>
+    <td align="center">I</td>
+    <td><p>extension name for the four kinds of file.</p>
+      <p>(compiler specific)</p></td>
+  </tr>
+  <tr>
+    <td>gmu_u_GCC_M_OPTIONS</td>
+    <td align="center">I</td>
+    <td><p>Options that should be explictly passed to ``gcc -M'' command. </p>
+    <p>Senario of usage: Some compilers pre-define some internal macros(e.g. Visual C++ pre-defines <code>_MSC_VER</code> ) for its user, however ``gcc -M'' does not know about these macros. So, under some circumstance you have to tell ``gcc -M'' about those macros so that the ``gcc -M'' runs well.</p></td>
+  </tr>
+  <tr>
+    <td><b>gmu_ud_list_SYS_HEADER</b></td>
+    <td align="center">I</td>
+    <td><p>System header dirs. These header dirs are normally set by compiler-config-mki and makefile writers don't have to care for it.</p>
+    <p>Normally, this list reflects those header dirs configured from environment variables(e.g. reflect the <code>INCLUDE</code> env-var content for Visual C++), but with all original dir separators replaced with spaces, and, if on Windows, replace all backward slashed to forward slashes. </p>
+    <p>The content in the make-var will <b>not</b> be passed to final compiler(adding <code>-I</code> prefix), however, it will be passed to ``gcc -M'' (with <code>-isystem</code> option) so that ``gcc -M'' has a chance to know about those header dirs then all system headers referred in C/C++ files can be found(that is, eliminate XXX.h not found problem). </p></td>
+  </tr>
+  <tr>
+    <td>gmu_exe_CC</td>
+    <td align="center">I</td>
+    <td>C compiler program name . </td>
+  </tr>
+  <tr>
+    <td>gmu_exe_CXX</td>
+    <td align="center">I</td>
+    <td>C++ compiler program name . </td>
+  </tr>
+  <tr>
+    <td>gmu_exe_LINK</td>
+    <td align="center">I</td>
+    <td>Linker program name . </td>
+  </tr>
+  <tr>
+    <td>gmu_exe_LIB</td>
+    <td align="center">I</td>
+    <td>Program name for linking a static lib. </td>
+  </tr>
+  <tr>
+    <td><a name="gmu_G_Deco_PrjName"></a>    gmu_G_Final_PrjName<br>
+      gmu_G_Deco_PrjName<br>
+    (the two are exactly the same) </td>
+    <td align="center">O</td>
+    <td><p>Decorated/Final project name. The decoration is determined by <code>$(gmu_DECO_PREFIX_PRJ_NAME)</code> and <code>$(gmu_DECO_SUFFIX_PRJ_NAME)</code> . Commonly used decorations are:</p>
+      <ul>
+        <li>_U suffix for a Unicode build</li>
+        <li>_D suffix for a debug build</li>
+        <li>decorate <code>$(gmp_COMPILER_ID)</code> as suffix </li>
+        <li>If $(gmp_COMPILER_VER) is not null, decorate it as suffix.</li>
+    </ul>      <p>NOTE: Project name decoration is applied when <code>gmp_DECO_PRJ_NAME=1</code> . Since project name decoration normally does not cause trouble for GMU users, we suggest always define <code>gmp_DECO_PRJ_NAME=1</code> in your env-var. </p></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_u_CC_CMD<br>
+    gmu_u_CXX_CMD</td>
+    <td align="center">I</td>
+    <td>The whole compile command for C and C++ respectively. (may be defined as canned command sequence)</td>
+  </tr>
+  <tr>
+    <td>gmu_u_LINK_CMD</td>
+    <td align="center">I</td>
+    <td>The whole link command. (may be defined as canned command sequence)</td>
+  </tr>
+  <tr>
+    <td><p><a name="gmu_Gd_Final_PrjOutput"></a>    gmu_Gd_Final_PrjOutput<br>
+    gmu_Gd_Deco_PrjOutput</p>    </td>
+    <td align="center" valign="top">O</td>
+    <td>These two are the same, the decorated project output dir. </td>
+  </tr>
+  <tr>
+    <td>gmu_Gd_OBJ_OUTPUT</td>
+    <td align="center">O</td>
+    <td><p>Decorated project object files output dir. </p>
+    <p>That is: <tt>$(gmu_Gd_Deco_PrjOutput)/_obj</tt> </p></td>
+  </tr>
+  <tr>
+    <td>    gmu_Gf_Final_LinkOutput<br>
+    gmu_Gf_Deco_LinkOutput</td>
+    <td align="center">O</td>
+    <td><p>Final link output filename. </p>
+    <p>The two variables are identical. </p></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_LINK_OUTPUT</td>
+    <td align="center">O</td>
+    <td><p>Final link output filepath(decorated).</p>
+    <p>That is: <tt>$(gmu_Gd_Deco_PrjOutput)/$(gmu_Gf_Deco_LinkOutput)</tt></p></td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_LINK_OUTPUT_ckt</td>
+    <td align="center">O</td>
+    <td>The time stamp file that signifies the current project has been made. </td>
+  </tr>
+  <tr>
+    <td>gmu_Gd_PRJ_GMUTMP</td>
+    <td align="center">O</td>
+    <td>GMU-arranged temp dir. Plugin author can output its temporary files in this dir. </td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_list_REQOBJS</td>
+    <td align="center">O</td>
+    <td>The list of objects files, converted from those source files listed in <a href="#gmu_up_list_SRC_FROM_ROOT"><tt>gmu_up_list_SRC_FROM_ROOT</tt></a>.</td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_COUNT_COMPILE</td>
+    <td align="center">O</td>
+    <td>The filepath counting how many files get compiled. </td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_list_SUBPRJ_TO_LINK</td>
+    <td align="center">O</td>
+    <td>List of sub-projects link output. These are the real filepaths that are generated by sub-projects' link command. </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_up_list_STARTUP_CLEAR_FILES</td>
+    <td align="center">I</td>
+    <td><p>Lists what files should be cleared on startup of a GMU make process. </p>
+    <p>This is also useful for normal GnumakeUniproc users.</p></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_GCC_M_PREFIX</td>
+    <td align="center">I</td>
+    <td><p>For <code>gcc -M</code> command, what prefix to use before gcc. If you'd like to use a specific gcc version to generate C source header dependency other than the one in your PATH env-var, this can be helpful, typicall on non-Unix like platforms. </p>
+      <p>This defaults to null.</p></td>
+  </tr>
+  <tr>
+    <td>gmu_u_GCC_M_OPTIONS</td>
+    <td align="center">I</td>
+    <td>Extra options given to <code>gcc -M</code> commands. </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_I_AM_A_LINK_COMPONENT</td>
+    <td align="center">I</td>
+    <td>profound</td>
+  </tr>
+  <tr>
+    <td>gmu_IS_SUBPRJ_AUTO_LINK_MERGE</td>
+    <td align="center">I</td>
+    <td>profound</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">I</td>
+    <td>profound</td>
+  </tr>
+  <tr>
+    <td>gmu_ts_MORE_HDEP_TARGETS</td>
+    <td align="center">I</td>
+    <td><p>(experimental, unused yet 2007-10-03) On executing genhdepend commands, if this var is defined, its value will be added to the target list of a genhdepend rule. </p>
+      <p>&quot;ts&quot; means make-Target Specific. </p></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td> gmu_u_list_C_EXTN</td>
+    <td align="center">I</td>
+    <td>C source file extension name list. Defaults to <code>c</code> . </td>
+  </tr>
+  <tr>
+    <td> gmu_u_list_CXX_EXTN </td>
+    <td align="center">I</td>
+    <td>C++ source file extension name list. Defaults to <code>cpp</code> . </td>
+  </tr>
+  <tr>
+    <td> gmu_u_list_ASM_EXTN </td>
+    <td align="center">I</td>
+    <td>Assembly source file extension name list. Defaults to <code>s</code> . </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>gmu_up_list_STARTUP_CLEAR_FILES</td>
+    <td align="center">I</td>
+    <td><p>Tells what files should be cleared(and file modification time updated to current time) just when a build process starts. </p>
+    <p>User should use <code>+=</code> to append to this list instead of using <code>=</code> to overwirte this list. </p></td>
+  </tr>
+</table>
+<h2><a name="Pattern1%20defined%20gmuvars"></a>Pattern1 defined gmuvars(gmp_<i>XXX</i>) </h2>
+<h3><a name="gmp_XXX%20vars%20for%20pattern1%20user"></a>gmp_<i>XXX</i> vars for pattern1 user </h3>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_COMPILER_ID</td>
+    <td align="center" valign="top">I+O</td>
+    <td><p>Compiler ID.</p>
+    <p>According to pattern1's convention, this is normally not set in your makefiles, but indicated by the directory's extesion-name(that dir holds your startup makefile). </p>
+    <p>You can use it to dynamically represent the current compiler-ID in your makefiles.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_COMPILER_VER</td>
+    <td align="center" valign="top">I</td>
+    <td><p>Tells the compiler version. Its format is determined by pattern1's compiler config author.</p>
+      <p>Mostly user don't have to set this. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_bc_IMAGE_TYPE</td>
+    <td align="center" valign="top">I</td>
+    <td><p>What type of image this project will generate. Common names are EXE, LIB, DLL. </p>
+        <p>Custom image types can be defined for pattern1. For this case, <code>gmp_LOAD_CUSTOM_IMAGE_IT</code> must be defined to non-null alongside <code>gmp_bc_IMAGE_TYPE</code>. </p>
+        <p>This var must defined before is included. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_LOAD_CUSTOM_IMAGE_IT</td>
+    <td align="center" valign="top">I</td>
+    <td><p>User must define this to non-null in order to load custom-image-type mki. The specific custom-image-type mki to load is determined by <code>gmp_bc_IMAGE_TYPE</code>'s value. </p>
+    <p>Note: custom-image-type mki itself can override <code>gmp_bc_IMAGE_TYPE</code> to be a common type(EXE, LIB or DLL). So, <code>gmp_LOAD_CUSTOM_IMAGE_IT</code> can be considered to be a virtual image-type. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_u_list_PLUGIN_TO_LOAD</td>
+    <td align="center" valign="top">I</td>
+    <td>Instruct what plugins to load. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_list_PLUGIN_TO_LOAD_ENV_PRE<br>
+    gmu_list_PLUGIN_TO_LOAD_ENV_POST</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>These two vars also instruct what plugins to load. </p>
+      <ul>
+        <li>They should be set as environment variables, so that they affect sub-projects and futher sub-projects.</li>
+        <li>Plugins list in <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE</code> is guarantee to load before <code>gmp_u_list_PLUGIN_TO_LOAD</code> and those in <code>gmu_list_PLUGIN_TO_LOAD_ENV_POST </code>are guaranteed to be after <code>gmp_u_list_PLUGIN_TO_LOAD</code>. </li>
+      </ul>
+    <p>A typical use: Assign <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE=PI_sync_devoutput</code> with <code>gmi_SYDO_ud_SYNC_HEADER_TO,gmi_SYDO_ud_SYNC_LIB_TO=&lt;some-dir&gt;</code> in make command line to summon a project to sync its output to somewhere.</p></td>
+  </tr>
+  <tr>
+    <td valign="top"><p>gmp_CFLAGS_CODE_GEN_ALL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gmp_CFLAGS_MACRO_DEFS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gmp_CFLAGS_INCLUDES<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gmp_CFLAGS_CODE_GEN<br>
+      gmp_CFLAGS_NON_CODE_GEN </p></td>
+    <td align="center" valign="top">I</td>
+    <td><p>It is suggested to set extra compiler options in these vars.</p>
+        <ul>
+          <li>_ CODE_GEN_ALL will finally consolidate _MACROS_DEFS, _INCLUDES and _CODE_GEN. In normal sense, these flags affects the binary code generated.</li>
+          <li>_NON_CODE_GEN should contain flags that does not affect binary code generation.</li>
+        </ul>
+        <p>The reason for separating compiler flags in so many categories: Some GMU plugin may expect to use only one or a few categories of these flags, but not all of them. So, for a specific compiler flag, choose the most appropriate var to set. </p></td>
+  </tr>
+  <tr>
+    <td>gmp_LINKFLAGS</td>
+    <td align="center" valign="top">I</td>
+    <td>Link flags . </td>
+  </tr>
+  <tr>
+    <td>gmp_ud_list_EXTRALIB</td>
+    <td align="center" valign="top">I</td>
+    <td><p>Extra libray dir for the link command. </p>
+        <p>Note: Only list the directories, don't add prefix like <code>-L</code> , -- since the compiler-config mki will do it for you. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_ud_list_CUSTOM_MKI</td>
+    <td align="center" valign="top">I(E)</td>
+    <td>List dirs where plugins and custom-image-type mki can be possibly found. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_PS_INCLUDE_SUBDIRS</td>
+    <td align="center" valign="top">I</td>
+    <td>It's a special one, in favor of cross platform projects. Used with <code>gmp_ud_list_PS_HEADER_PARENT</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_ud_list_PS_HEADER_PARENT</td>
+    <td align="center" valign="top">I</td>
+    <td><p>Used with <code>gmp_PS_INCLUDE_SUBDIRS</code> to construct more value for <code>gmu_ud_list_PRJ_HEADER</code>.</p>
+    <p>Example: If for a Windows compile, you have, </p>
+    <pre class="fws">gmp_ud_list_PS_HEADER_PARENT=/dir1 /dir2
+gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>    
+    <p>then, <code>gmu_ud_list_PRJ_HEADER</code> will be append with: </p>
+    <pre class="fws">/dir1/wince /dir1/mswin /dir1 /dir2/wince /dir2/mswin /dir2</pre>
+    <p>After you port your program to linux, you can change <code>$(gmp_PS_INCLUDE_SUBDIRS)</code> as follows:</p>
+    <pre class="fws">gmp_PS_INCLUDE_SUBDIRS=linux</pre>
+    <p>then you get this in <code>gmu_ud_list_PRJ_HEADER</code>:</p>
+    <pre class="fws">/dir1/linux /dir2/linux /dir1 /dir2</pre>
+    <p>In such way,   you put your platform specific headers in subdir <tt>wince, mswin or linux</tt>, and control the use of them by setting different value for env-var <code>gmp_PS_INCLUDE_SUBDIRS</code>, so that your makefiles can be the same across different platforms. </p>
+    <p class="chj-mark-blue">NOTE: Since GMU v0.94, the use of <code>gmp_PS_INCLUDE_SUBDIRS</code> and <code>gmu_ud_list_PRJ_HEADER</code> is considered old style and no longer suggested. You can use function gmpf_CombinePsSubdirs to achieve the same result with more flexibility. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_DECO_PRJ_NAME</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>Whether decorate the project-name, non-null = yes, null = no. The decoration will be applied to user-provided <code>gmu_PRJ_NAME</code> to make the final project name. </p>
+      <p>Project name decoration is typically used for separating output of different flavor of compilations, For example, different project name decoration for debug-build and release-build results in different output dir, so that you don't have to clean debug-build's output before doing release-build, and vice versa. </p>      <p>If yes, the following factor adds to the decoration:</p>
+      <ul>
+        <li><code>gmp_COMPILER_ID</code> and <code>gmp_COMPILER_VER</code> .</li>
+        <li> If <code>gmp_bc_UNICODE</code> is non-null, <code>_U</code> will be appended. </li>
+        <li>If <code>gmp_bc_DEBUG</code> is non-null, <code>_D</code> will be appended. </li>
+      </ul>
+    <p>What's more, compiler-config authors can determine what else to decorate, e.g. for linuxgcc, <code>gmp_GCC_PREFIX</code>'s value will be prepended to project name. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_bc_SYSLIBS</td>
+    <td align="center" valign="top">I</td>
+    <td><p>List extra system libs(provided by compiler or system SDK) to be linked to final image.</p>
+    <p>Libs listed in this var are put at the end of the whole lib list, that is, after <code>$(gmp_bc_EXTRALIBS1) $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS2)</code> . </p>
+    <p>TIP: User can use function <code>gmpf_MakeUpSysLibsToLink</code> to construct real tokens that can be accepted by the linker, e.g. for <code>$(call gmpf_MakeUpSysLibsToLink ABC XYZ)</code>:</p>
+    <ul>
+      <li>For MSVC, it becomes <tt>ABC.lib XYZ.lib</tt> . </li>
+      <li>For MinGW or gcc, it becomes <tt>-lABC -lXYZ</tt> . </li>
+    </ul></td>
+  </tr>
+</table>
+<h3><a name="gmp_XXX%20vars%20cared%20by%20pattern1%20compiler-config%20author%20or%20plugin%20author"></a>gmp_<i>XXX</i> vars cared by pattern1 compiler-config author or plugin author</h3>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_COMPILER_ID</td>
+    <td align="center" valign="top">I</td>
+    <td>Compiler ID.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_ALL_TO_LINK</td>
+    <td align="center" valign="top">I</td>
+    <td>All objs &amp; libs that will be fed to link command. (not of great importance) </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_ud_list_CUSTOM_COMPILER_CFG</td>
+    <td align="center" valign="top">I(E)</td>
+    <td>Directory list of compiler-config mki. These dirs are searched first for compiler-config mki(matching of <code>$(gmp_COMPILER_ID)</code>). If no matching found in these dirs, <code>$(gmu_DIR_GNUMAKEUNIPROC)\pattern1cfg\compiler_cfg</code> will be searched. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_Gd_COMPILER_CONFIG_USED</td>
+    <td align="center" valign="top">O</td>
+    <td>For a specific project, this is dir where the matching compiler-config mki reside. The &quot;match&quot; is done throughout searching <code>$(gmp_ud_list_CUSTOM_COMPILER_CFG)</code> and default path; the first sub-dir name that equals <code>$(gmp_COMPILER_ID)</code> is consider a match, and compiler-config mki from that sub-dir is used. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_G_list_PLUGIN_LOADED</td>
+    <td align="center" valign="top">O</td>
+    <td>List plugin names that are loaded (debugging purpose). </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_Gp_list_PLUGIN_LOADED</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td>List plugin mki paths. Plugin mki paths are listed by the order they are loaded into the whole makefile. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_up_list_PLUGIN_POSTCORE_TO_LOAD</td>
+    <td align="center" valign="top">I</td>
+    <td> <p>Plugin authors append in this var their paths of post-core mki to be loaded into the whole makefile. </p>
+    <p>If you follow the plugin mki filename's naming convention, there is a normalized way to set this value. [link] </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_Gp_CUSTOM_IT_MKI_USED</td>
+    <td align="center" valign="top">O</td>
+    <td>The filepath of custom-image-type mki. This value is determined by GMU after searching user provided custom-image-type mki path <code>$(gmp_ud_list_CUSTOM_MKI)</code> and the default custom-image-type mki path. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_Gd_CUSTOM_IT_MKI_USED</td>
+    <td align="center" valign="top">O</td>
+    <td>The directory of <code>$(gmp_Gp_CUSTOM_IT_MKI_USED)</code>. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_up_CUSTOM_IT_POSTCORE_MKI</td>
+    <td align="center" valign="top">I</td>
+    <td><p>Plugin authors append in this var their paths of post-core mki to be loaded into the whole makefile. </p>
+    <p>This value is normally set to a filepath under $(<code>gmp_Gd_CUSTOM_IT_MKI_USED</code>) . </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_USER_FIRST_TARGET</td>
+    <td align="center" valign="top">I</td>
+    <td><p>This overrides the &quot;first&quot; make target for pattern1.</p>
+    <p>It defaults to null, so pattern1 will by default use <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code> as first target, thus your source files listed in <code>$(gmu_up_list_SRC_FROM_ROOT)</code> get compiled and linked. </p>
+    <p>If you want to do something before the default compile-and-link process begins, you can define your custom target(only one target allowed) in <code>gmp_USER_FIRST_TARGET</code>, so that your custom target gets considered by make first. Note: Simply define this first target and write the rule for this target will not make the default compile-and-link process run. So in order to make it run, you must have <code>$(gmp_USER_FIRST_TARGET)</code> eventually depend on <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code>. The position of <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code>in your dependency chain determines when the compile-and-link process takes place &mdash; before or after your custom targets. </p>
+    <p>Conventionally, since this var allows only one target, it should be defined by a custom-image-type mki, to avoid conflict with end user makefiles. </p>
+    <p>NOTE: you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. This target, however, will always be built after all sub-projects are done. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_USER_PRE_TARGETS</td>
+    <td align="center" valign="top">I</td>
+    <td><p>This is a suppliment to <code>gmp_USER_FIRST_TARGET</code>(also default to null). It can be a list of targets(it means you and your end user can use <code>+=</code> to append to the list). These targets will get built before <code>$(gmp_USER_FIRST_TARGET)</code> is built. Since these target are done before <code>$(gmp_USER_FIRST_TARGET)</code> , so the name <code>gmp_USER_FIRST_TARGET</code> becomes not up to it literal meaning. </p>
+    <p>Like <code>gmp_USER_FIRST_TARGET</code>, you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. </p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_USER_POST_TARGETS</td>
+    <td align="center" valign="top">I</td>
+    <td><p>This is a suppliment to <code>gmp_USER_FIRST_TARGET</code>(also default to null). It can be a list of targets(it means you and your end user can use <code>+=</code> to append to the list). These targets will get built after <code>$(gmp_USER_FIRST_TARGET)</code> is built. </p>
+    <p>Like <code>gmp_USER_FIRST_TARGET</code>, you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. </p></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>~~~~~~~~ sample table:</p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th width="5%" scope="col">In/Out</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_COMPILER_ID</td>
+    <td align="center" valign="top">I</td>
+    <td>Compiler ID.</td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+<p>=</p>
+</body>
+
+</html>

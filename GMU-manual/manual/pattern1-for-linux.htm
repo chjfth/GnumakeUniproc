@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang=en>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>Pattern1 vars for linux</title>
+
+</head>
+
+<body>
+<H1 align="center">Pattern1 vars for linux gcc</H1>
+
+<p>Gmu-vars listed in this page affects compiling and linking behavior when building with GNU gcc. </p>
+<h4>Common vars </h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_GCC_PREFIX</td>
+    <td><p>Tell the prefix of gcc executable. </p>
+      <p>Example: If you want to run <code>arm-linux-gcc</code> instead of <code>gcc</code>, you set <code>gmp_GCC_PREFIX=arm-linux-</code> . At the same time, <code>arm-linux-g++</code>, <code>arm-linux-ar</code> etc will be used instead of their non-prefix counterpart. </p>    </td>
+  </tr>
+</table>
+<h4>Compatibility vars </h4>
+<p>In principles, if you're using latest gcc compiler, you don't have to set any of these vars. But if you're using older versions of gcc, the default pattern1 compiler option may contain some options that older gcc don't support, in this situation, you can look up the following table to see whether setting some gmp vars can make a work around. The benefit of setting these vars is you can hopefully avoid making changes to your makefiles </p>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_GCC_OLDVER_NO_FVISIBILITY</td>
+    <td><p>Since GMU v0.93, by default, <code>-fvisibility=hidden</code> is included in compile option, so that when linking shared objects(DLLs), symbols get hidden inside the .so files to reduce conflict with other .so . To make certain symbols external, decorate <code>__attribute__((visibility(&quot;default&quot;)))</code> to your functions or classes. </p>
+        <p>If you're using older gcc(e.g. v3.2) that don't support <code>-fvisibility</code> , you can define this var to non-null so that <code>-fvisibility</code> is not used by default. </p></td>
+  </tr>
+</table>
+<p>--</p>
+</body>
+
+</html>

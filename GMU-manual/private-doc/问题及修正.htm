@@ -1,0 +1,1475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>问题及修正</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+code { color:#660033; }
+tt { color:#003366; }
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+.c-comment { color:#009900; }
+.c-string { color:#660066; }
+
+.later-comment-in {color: #666666}
+.style1 {font-style: italic}
+.red { color: red; }
+.boldblue {
+	color: #0000FF;
+	font-weight: bold;
+}
+.style-font-small {font-size: small}
+
+</style>
+</head>
+
+<body>
+
+<H1 align="center">问题及修正</H1>
+
+<ol>
+<li><a href="#060216">060216: GNUmake 3.80 加 --debug=m 参数问题</a></li>
+<li><a href="#060217">060217: 某工程的 Makefile 中 cvs update 自己后，更新过的 Makefile 会有效吗？</a></li>
+<li><a href="#060227">060227: 要专门 <tt>touch _SubPrj.CheckTime</tt> 以免子工程在一轮的构建中被重复试图构建</a></li>
+<li><a href="#060304">060304: $(ud_OUTPUT_ROOT) 要不要用 $(u_DECO_PREFIX)和 $(u_DECO_SUFFIX) 来修饰？</a></li>
+<li><a href="#060605">060605: u_DECO_PREFIX 和 u_DECO_SUFFIX 的再思考（细化修饰变量）</a>
+  <ul>
+    <li><a href="#070111">070111: 那些 Deco prefix/suffix 可不用 := 进行累加了</a></li>
+  </ul>
+</li>
+<li><a href="#060606">060606: 仅用一个 DIR_SYNC_DEVOUTPUT 来表示构建结果（.h、.lib 等）的输出目录是不好的</a>  </li>
+<ul>
+  <li><a href="#070109">070109: sync devoutput 功能改为用插件实现</a></li>
+</ul>
+<li><a href="#060728">060728: GnumakeUniproc 用户在用 ps_TCHAR.h 时会被整疯的</a></li>
+  <ul>
+  <li><a href="#080731">080731: 该洗脑了，原先的方法有问题，终极解决方案在此</a></li>
+  </ul>
+<li>060630: 今天将 GnumakeUniproc 工程本身由 CVS 库转换成 SVN 库</li>
+<li><a href="#060807">060807: Linux 上软链接导致的同一目录多目录名引起的麻烦</a></li>
+<ul>
+    <li><a href="#061219">061219: 再次遭遇 sh.exe 陷阱，浪费 5 小时</a></li>
+</ul>
+<li><a href="#061102">061102: 根工程与子工程的工程名冲突得额外解决</a></li>
+<li><a href="#061103">061103: 加入工程依赖关系成环检测</a>
+  <ul>
+    <li><a href="#080907">080907: 观念修正！成环不是错误</a></li>
+  </ul>
+</li>
+<li><a href="#061108">061108: 加入了子工程跨层自动链接功能</a></li>
+<ul>
+    <li><a href="#061212">061212: 当前严重失误：一个 LIB/DLL 工程无法被多个父工程自动链接</a></li>
+    <li><a href="#070310">070310: 又发现一个失误，没必要的库链接动作</a></li>
+</ul>
+<li><a href="#061108-2">061108: 关于 <code>gmp_bc_IMAGE_TYPE</code> 的可扩展性</a></li>
+<li><a href="#061112">061112: 时光之旅——取出过去的源码版本并构建</a></li>
+<ul>
+    <li><a href="#deploy-interface-change">用两个 DLL 还是一个</a>
+    <li><a href="#061117-2">若想工作拷贝能灵活选用开发分支还是稳定分支，必须针对每个工程动用环境变量</a>
+</ul>
+<li><a href="#061112-2">061112: 同一本地路径中的源码来源冲突必须能够检测出</a></li>
+<li><a href="#061130">061130: 小心 make 用户使用非常规符号</a></li>
+<li><a href="#061202-1">061202: 发觉 pattern1.mks 中的编译开关(<code>gmp_CFLAGS</code>)得预分类了</a></li>
+<li><a href="#061202-2">061202: C/C++ 文件扩展名可由用户配置了</a></li>
+<li><a href="#061203">061203: 除了自定义 <code>gmp_bc_IMAGE_TYPE</code> 外，还应该有“插件”功能</a></li>
+<li><a href="#061216">061216: 设法显示被执行的 CVS/SVN 命令</a></li>
+<li><a href="#070109">070109: mame.net sh.exe 对 echo 的古怪调用行为</a></li>
+<li><a href="#070221">070221: 意想不到：Linux 共享库的引用问题</a></li>
+<li><a href="#071116">071116: 不再默认给 <code>gmp_CFLAGS_CODE_GEN</code> 等变量赋值</a></li>
+<li><a href="#071128">071128: <code>gmp_bc_IMAGE_TYPE</code> 现可以是一个抽象的映像类型</a></li>
+<li><a href="#071208">071208: 昨日重现，启用新变量，以便插件装载可以通过环境变量来指示</a></li>
+<li><a href="#080509">080509: 真正编译时用的编译开关和传给 <code>gcc -M</code> 的开关如何协调</a></li>
+<li><a href="#080719">080719: 有时候需要给用户对同一工程执行多次 make 的权利</a></li>
+<li><a href="#080813">080813: 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</a></li>
+<li>080819: <a href="win32-make-and-sh.htm">重要发现：Windows 上 make.exe 和 sh.exe 的互关联问题</a></li>
+</ol>
+
+<H2><a name="060216"></a>[2006-02-16 15:00]</H2>
+<p>之前，当父工程调用子工程的 _ut_GetPrjAttr 来获取子工程的属性时，子工程将自己的属性通过 stdout 写给父工程。但今天发现，若使用 --debug=m 这样的参数来调用 make 时，make 自己会往 stdout 输出一堆的“诊断信息”，导致 _SubprjAttr.mki 触发输出如下的错误：</p>
+<pre>E:/temp/cvstest/IsSyncLib/testIsMutex_win/make/msvc6/gf/testIsMutex_msvc/_Subprj
+Attr.mki:22: *** !Error Reason: Your makefile "../../../lib-win-make/msvc6/Makef
+ile" does not exist or does not correctly implement target `_ut_GetPrjAttr'. (Th
+e unexpected make return is: GNU Make 3.80 Copyright (C) 2002  Free Software Fou
+ndation, Inc. This is free software; see the source for copying conditions. Ther
+e is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPO
+SE. Reading makefiles... Updating makefiles.... Updating goal targets....  File
+`_ut_GetPrjAttr' does not exist.    File `Always' does not exist.   Must remake
+target `Always'.   Successfully remade target file `Always'. Must remake target
+`_ut_GetPrjAttr'. IsSyncLib_msvc IsSyncLib.lib Successfully remade target file `
+_ut_GetPrjAttr'. ).  Stop.</pre>
+<p>从屏幕输出信息中可以看到，当我指定 --debug=m 这样的开关时，make 3.80 执行后无论如何会先输出 <code>GNU Make 3.80 Copyright (C) 2002  Free Software...</code> 这样的信息（输出到 stdout），导致我的“父工程捕获子工程的 stdout 来获取子工程属性”的做法失败。</p>
+<h3>解决方法</h3>
+<p>只好改为将子工程的属性信息写到一个文件中，父工程稍后用 cat 来读取该文件的内容了。</p>
+<p>已在 GnumakeUniproc.mki v1.27 中解决。 </p>
+<H2><a name="060217"></a>[2006-02-17 09:11]</H2>
+<p>（这不是个问题，但写出来以作提醒之用。）</p>
+<p>我今天突然冒出这么个疑问：指定 DO_CVS_UPDATE=1 的情况下，当一个父工程的 makefile 调用子工程的 makefile 时，会发生如下过程：</p>
+<ul>
+  <li>父工程自动生成 _MakeSubPrjs.mk，并 make 此文件（或说“执行此文件”）。</li>
+  <li>_MakeSubPrjs.mk 通过 include 父工程先前生成的 _SubprjAttr.mki 得到相对于那个父工程的所有子工程的“属性”，其中包括每个子工程的 makefile 路径。有了每个子工程的 makefile 路径，就可以 make 那些 makefiles 来构建子工程了。</li>
+  <li>假设某个子工程的 makefile 名为 Subprj1mk，那么只有当 Subprj1mk 被执行后（或说执行过程中），Subprj1mk 这个工程相关的文件（包括 Subprj1mk 自身）才会因为 DO_CVS_UPDATE=1 的缘故受到 cvs update 的更新。 </li>
+</ul>
+<p>现在的问题是：Subprj1mk 这个 makefile 本身也处于 Subprj1mk 的 cvs update 更新范围中(ud_list_CVS_MODULES)，但父工程对 Subprj1mk 的执行却早于 Subprj1mk 中发起的 cvs update 操作，那么这不就会导致 Subprj1mk 被父工程执行时 Subprj1mk 以及它所 include 的文件是 cvs update 前的、但 Subprj1mk 中所 要编译的 C/C++ 文件却是 cvs update 后的吗？</p>
+<p>很幸运，目前实际上并不会发生这种“Makefile 和 Makefile 中所要编译的文件不一致”的现象，原因在于：当一个工程执行 _CvsUpdateDone 目标来进行其 cvs update 操作时，_CvsUpdateDone 的最后一个命令是 touch _CvsUpdateDone 这个文件，这个 touch 操作将导致该工程的整个 makefile 会被 GNUmake 重新装载一遍（装载时机是在处理完所有的 include 指令后）（如果用 --debug=m 来运行 make，则会出现 Re-executing: <i>&lt;make command-line&gt;</i>，表示那个 makefile 被重新装载了）。 好戏就在这儿，如果该工程的 makefile 以及此 makefile 所 include 的那些七七八八的东西都在本工程的 cvs update 所更新文件的范围中，那么当 makefile 被重新装载时，装载的就是已经被 cvs update 过的 makefile。</p>
+<h2><a name="060227"></a>[2006-02-27 09:00]</h2>
+<p>GnumakeUniproc.mki v1.36 之前的版本存在一个严重问题：</p>
+<blockquote>
+  <p>若有两个工程 EA 和 LA，且 EA 依赖于 LA（表示为 EA -&gt; LA），现在再建立一个主工程 M，M 本身不产生任何输出文件，而仅仅是依赖于 LA 和 EA（表示为 M -&gt; (LA, EA)）。那么，第一次构建 M 时很正常，但在 M 已经成功构建的情况下再次试图构建 M ，则会发现 LA 那个工程的 makefile 被调用了两次。虽然在第二次试图构建的过程中， LA 的两次构建其实并没有重新编译链接（最终可能是生成一个 lib）——因为第一次构建成功后、那个 lib 就已经比所有的 .c/.cpp 新了，但这仍不是我们需要的。我们需要的是：在一轮构建过程中，若 LA 的 makefile 已经被执行过（在我们的例子中是 M -&gt; LA 时执行的），那么稍后若有其他的工程也依赖于 LA （在我们的例子中是 M -&gt; LB -&gt; LA），则 LA 的 makefile 不应被再次执行。</p>
+</blockquote>
+<p>经检查，问题在于我生成的 _MakeSubPrjs.mk 上。原先生成的一个 _MakeSubPrjs.mk 例子如下：</p>
+<pre>_SubprjMakeCmdGoals = 
+
+include G:/sandbox/IsSyncLib/testIsMutex_win/make/msvc6/gf/testIsMutex_msvc/_SubprjAttr.mki
+
+$(LIB_IsSyncLib_Outdir)/$(LIB_IsSyncLib_Filename): $(_p_MainPrjStart)
+	@echo ==============================================================================
+	@echo "  Now, BuildLevel [0]. Making sub-project: $(LIB_IsSyncLib_Prjname)"
+	@echo "  CurDir: G:/sandbox/IsSyncLib/testIsMutex_win/make/msvc6"
+	@echo "  Makefile: $(LIB_IsSyncLib_Makefile)"
+	@echo "  Expected Output: $(LIB_IsSyncLib_Outdir)/$(LIB_IsSyncLib_Filename)"
+	@echo ==============================================================================
+	@echo ">>>>>>>>>> Sub-make to build the sub-project mentioned above starting... ( from autogen-ed makefile: G:/sandbox/IsSyncLib/testIsMutex_win/make/msvc6/gf/testIsMutex_msvc/_MakeSubPrjs.mk ) "
+	@<b>${MAKE}</b> $(_SubprjMakeCmdGoals) -C $(dir $(LIB_IsSyncLib_Makefile)) -f $(notdir $(LIB_IsSyncLib_Makefile)) $(LIB_IsSyncLib_Makeopt)
+	@echo "&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; Sub-make for sub-project [ $(LIB_IsSyncLib_Prjname) ] returned."
+	@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	@echo ^^^^^^^^^^BuildLevel[0] Done Sub-project[ $(LIB_IsSyncLib_Prjname) ]^^^^^^^^^^
+	@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+all_subprjs: \
+		$(LIB_IsSyncLib_Outdir)/$(LIB_IsSyncLib_Filename) \
+</pre>
+<p>注意加黑体的那个 <b>${MAKE}</b> 命令被执行的条件，条件是子工程（即 <code>$(LIB_IsSyncLib_Outdir)/$(LIB_IsSyncLib_Filename)</code>）的输出文件在构建开始时刻之前。想想看，若一个子工程（例如 LA）的输出在前一轮的构建中已经编译链接生成，那么 LA 的输出文件的时间在下一轮的构建中将永远在 $(_p_MainPrjStart) 之前——因为 LA 的源文件没有改变，LA 的 makefile 就不会重新生成 LA 的输出文件了。因此，在第二轮的构建中，任何一个含有针对 LA 的构建规则的 _MakeSubPrjs.mk 都会去执行 LA 的 makefile。</p>
+<p>因此，_MakeSubPrjs.mk 中调用子工程 makefile 的条件不应该涉及相应子工程的输出文件，而是标识“此子工程已经构建过” 的一个专门的文件。具体做法是生成如下的 _MakeSubPrjs.mk（只列出片断）：</p>
+<pre>$(LIB_IsSyncLib_Outdir)/<b>_SubPrj.CheckTime</b>: $(_p_MainPrjStart)
+	@echo ==============================================================================
+	@echo "  Now, BuildLevel [0]. Making sub-project: $(LIB_IsSyncLib_Prjname)"
+	@echo "  CurDir: G:/uBaseFramework/IsSyncLib/testIsMutex_win/make/msvc6"
+	@echo "  Makefile: $(LIB_IsSyncLib_Makefile)"
+	@echo "  Expected Output: $(LIB_IsSyncLib_Outdir)/$(LIB_IsSyncLib_Filename)"
+	@echo ==============================================================================
+	@echo ">>>>>>>>>> Sub-make to build [ $(LIB_IsSyncLib_Prjname) ] starting... ( from autogen-ed makefile: G:/uBaseFramework/IsSyncLib/testIsMutex_win/make/msvc6/gf/testIsMutex_msvc/_MakeSubPrjs.mk ) "
+	@${MAKE} $(_SubprjMakeCmdGoals) -C $(dir $(LIB_IsSyncLib_Makefile)) -f $(notdir $(LIB_IsSyncLib_Makefile)) $(LIB_IsSyncLib_Makeopt)
+	@echo "&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; Sub-make for sub-project [ $(LIB_IsSyncLib_Prjname) ] returned."
+	@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	@echo ^^^^^^^^^^BuildLevel[0] Done Sub-project[ $(LIB_IsSyncLib_Prjname) ]^^^^^^^^^^
+	@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	<b>@echo -n '' > $@ # touch it</b></pre>
+<p>解释：在工程输出目录（<code>$(<i>PRJ_NAME</i>_Outdir)</code>）下生成一个叫 _SubPrj.CheckTime 的文件，用于记录该工程在一轮构建中是否已被构建过。</p>
+<div class="footnoteb">能够这么做的隐含前提（我的 make 系统的要求）是：具有相同工程名（u_PRJ_NAME）的工程在某一轮的编译中输出的文件（或文件集合）总是相同的——意即：不能因为不同的编译开关、或不同的依赖者而生成不同的输出文件。</div>
+<p>该问题已在 GnumakeUniproc.mki v1.36 中修正。 </p>
+<h2><a name="060304"></a>[2006-03-04] $(ud_OUTPUT_ROOT) 要不要用 $(u_DECO_PREFIX )和 $(u_DECO_SUFFIX) 来修饰？</h2>
+<h3>正方理由（要修饰）： </h3>
+<ol>
+  <li>
+    <p>进行不同配置的 bc_DEBUG、bc_UNICODE 构建时，u_DECO_PREFIX 会起效果，使得四种不同配置的构建分别拥有不同的 ud_OUTPUT_ROOT，这样要 clean 四种配置中任一种的输出文件时就很简单，只需 rm -fr 相应的目录即可。若没有对 ud_OUTPUT_ROOT 进行修饰，则各种构建配置的输出文件默认就都混到 gf 中，要 clean 某一种配置的输出就很困难。这条理由的前提是：GnumakeUniproc 现已不赞成用 ut_clean 目标来递归 clean 某个工程。</p>
+	<p>要点：一个 makefile 在不同构建配置下会产生“多路”输出，不同路的输出当然应该有不同的 ud_OUTPUT_ROOT 值。若不同的 ud_OUTPUT_ROOT 值能够由 GnumakeUniproc 自动产生，用户就可以少操一份心了（自己去定义不同的 ud_OUTPUT_ROOT 值）。</p>
+  </li>
+</ol>
+<H3>反方理由（不要修饰）：</H3>
+<ol>
+  <li>
+    <p>对于 bc_DEBUG, bc_UNICODE 这样的配置类别产生不同的 ud_OUTPUT_ROOT 固然不错，但用户很可能会在 u_DECO_SUFFIX 中加入 COMPILER_ID 或 COMPILER_VER 后缀，此种后缀出现在 ud_OUTPUT_ROOT 之下的工程输出目录中也就够了，没必要加在 ud_OUTPUT_ROOT 的尾巴上吧。 </p>
+	<p>正方反驳：</p>
+	<blockquote>
+	  <p>反方只考虑了片面的情况。</p>
+	  <p>如果你的根工程本身确实是一个真正用来构建 LIB,DLL,EXE 的工程，那么该工程的确很可能为 u_DECO_SUFFIX 指定了 _msvc、_mingw 这样的内容，导致 ud_OUTPUT_ROOT 中出现它们。但这仅仅是难看了一点，并没什么坏处。</p>
+	  <p>再假设，若你想在一次构建中一并构建某个或某些工程的 msvc 版本和 mingw 版本，那么你就另起一个根工程，在这个根工程中将 msvc 版工程和 mingw 版工程作为子工程即可。因为对 ud_OUTPUT_ROOT 的赋值仅仅在根工程中进行（<code>ifeq ($(MAKELEVEL),0)</code>），所以，只要那个根工程不把 _msvc、_mingw 这样的东西设给 u_DECO_SUFFIX，ud_OUTPUT_ROOT 就会保持纯洁。 </p>
+	</blockquote>
+  </li>
+  <li>?</li>
+</ol>
+<p>[2006-03-04] 目前的结论是要。</p>
+<div class="footnoteb">!!! 2006-06-05 时否定了这个结论。见 <a href="#060605">060605: u_DECO_PREFIX 和 u_DECO_SUFFIX 的再思考</a> 。 </div>
+<h2><a name="060605"></a>[2006-06-05] u_DECO_PREFIX 和 u_DECO_SUFFIX 的再思考 </h2>
+<h3>起因</h3>
+<p>今天，我正在写一个给 PT900 用的串口转向程序（COM Redirector），该程序用 IUartBasic 来读写串口。因为是个 Linux 程序，因此很自然地我会先在 PC 上写好这个程序并在 PC 上调试后再用 arm-linux-gcc 编译成 PT900 上的。在对 ComRedir 程序作 PC 和 ARM平台上构建时又遇上了 u_DECO_PREFIX 和 u_DECO_SUFFIX 带来的不顺心的事。因此又有了更多的思考。</p>
+<h3>今天的构建过程</h3>
+<p>目前，IUartBasic 库已经是用 GnumakeUniproc 来构建了，但 ComRedir 程序暂时还不想用 GnumakeUniproc 来构建。在这样的前提下，构建 ComRedir 和 IUartBasic 这两个工程的依赖关系只能手动解决了。让我们看看这个前提和已有的条件下，编译出 PC 版的 ComRedir 和 ARM 版的 ComRedir 程序分别要经历哪些步骤。</p>
+<h4>构建 PC 版</h4>
+<ul>
+  <li>编译 IUartBasic 库 </li>
+  <ol>
+    <li>进入 ~/w/IUartBasic/make/lib.linuxgcc 目录。</li>
+    <li>敲 umake 。</li>
+    <li>生成库文件 gf/IUartBasic/IUartBasic.a</li>
+  </ol>
+  <li>编译 ComRedir 程序</li>
+  <ol>
+    <li>将上头生成的 IUartBasic.a 拷贝到所谓的“开发库目录”：~/w/dev-lib/pc ，接下来的链接 EXE 的 命令将把该目录指定于 -L 开关中。 </li>
+    <li>cd 到 ComRedir 源码所在目录，写一个基本的 makefile，敲 <code>make</code> 构建 ComRedir.ex。</li>
+  </ol>
+</ul>
+<h4>构建 ARM 版 </h4>
+<ul>
+  <li>编译 IUartBasic 库 </li>
+  <ol>
+    <li>进入 ~/w/IUartBasic/make/lib.linuxgcc 目录（对，和 PC 版相同）。</li>
+    <li>敲 <b><code>umake GMU_GCC_PREFIX=arm-linux- </code></b>。</li>
+    <li>生成库文件 arm-linux-gf/arm-linux-IUartBasic/arm-linux-IUartBasic.a</li>
+  </ol>
+  <li>编译 ComRedir 程序</li>
+  <ol>
+    <li>将上头生成的 arm-linux-IUartBasic.a 拷贝“开发库目录”：~/w/dev-lib/<b>arm</b>，<b>拷贝后的名称还原为 IUartBasic.a</b> 。 </li>
+    <li>删除编译 PC 版时产生的 .o 和 .ex 文件。</li>
+    <li>cd 到 ComRedir 源码所在目录，敲 <b><code>make GCC_PREFIX=arm-linux- </code></b> 构建 ARM 版的 ComRedir.ex。编译 PC 版和 ARM 版的 makefile 是相同的，只不过此 makefile 中用 <code>GCC_PREFIX</code> 变量来适应针对不同目标平台的 gcc 命令行。</li>
+  </ol>
+</ul>
+<p>以上构建过程有两个特点：</p>
+<ol>
+  <li>IUartBasic 构建 PC 版和 ARM 版用的是同一构建目录（执行 umake 时的当前工作目录），不像构建 msvc 版和 mingw 版那样要分出 lib.msvc 和 lib.mingw 两个目录。这个决定是正确的，因为构建 PC-Linux 和 ARM-Linux 版的唯一 差别（至少是我们期望的唯一差别）是 gcc 命令前缀的不同。</li>
+  <li>IUartBasic 的 PC 库和 ARM 库被拷到“开发库目录”中时，被命名为相同的名字 IUartBasic.a ，不过被分置于两个不同的开发库目录中。这样的话，ComRedir 的 makefile 中所要链接的库名就是一个，而链接库路径的不同可以用环境变量的方法来解决。</li>
+</ol>
+<h3>[2006-07-10] 补充</h3>
+<h4>确认的几点：</h4>
+<h5>1. 对“工程名”（u_PRJ_NAME）的修饰总不会引起麻烦。</h5>
+<p>理由：</p>
+<ul>
+  <li>工程名是 GnumakeUniproc 内部使用的一个名称，GnumakeUniproc 用修饰后的工程名在 ud_OUTPUT_ROOT 目录下建立针对各个工程的输出路径。如果工程 A 要链接工程 B 的输出的话，GnumakeUniproc 总能让 A 自动获得工程 B 输出映像的路径（不管 B 的工程名遭到怎样的修饰）。</li>
+</ul>
+<h5>2. 对“输出映像名”（uf_LINK_OUTPUT）的修饰会导致其使用者找不到它。</h5>
+<p>假定工程 A 依赖工程 B 的输出映像：</p>
+<ul>
+  <li>若 A 用 uv_list_LIB_TO_LINK 的方式建立对 B 的依赖（A 将 B 作为子工程），则 B 的 uf_LINK_OUTPUT 怎样修饰都无所谓。</li>
+  <li>但若 A 不将 B 作为子工程，而是希望 B 生成的映像已经存放在公共的库目录中（今后将用 gmp_ud_LIB_SYNC <span class="later-comment-in">([2006-11-12]最终用的是 <code>gmp_ud_SYNC_LIB_TO</code></span><span class="style1">)</span>），则 A 将不好预计 B 的映像名最终会是什么。 </li>
+</ul>
+<h5>3. 在工程名被充分修饰的情况下，ud_OUTPUT_ROOT 是否修饰是无关痛痒的。 </h5>
+<h4>目前的决定[2006-07-11]</h4>
+<h5>对 GnumakeUniproc 本身来说</h5>
+<p>对上头三者的修饰应该分别用三个不同的变量来指示（各者的修饰还要分前缀后缀，因此结果是六个变量）。我现在取的变量是：</p>
+<ul>
+  <li>gmu_DECO_PREFIX_OUTPUT_ROOT/gmu_DECO_SUFFIX_OUTPUT_ROOT</li>
+  <li>gmu_DECO_PREFIX_PRJ_NAME/gmu_DECO_SUFFIX_PRJ_NAME</li>
+  <li>gmu_DECO_PREFIX_LINK_OUTPUT/gmu_DECO_SUFFIX_LINK_OUTPUT</li>
+</ul>
+<h5>对 GnumakeUniproc 的外围 pattern 来说（pattern1.mks, pattern-container1.mks）</h5>
+<p>任何情况下都不定义 gmu_DECO_PREFIX_OUTPUT_ROOT/gmu_DECO_SUFFIX_OUTPUT_ROOT，即将其控制权完全留给最终用户。</p>
+<p>对于 u_PRJ_NAME。若定义了变量 <tt>gmp_DECO_PRJ_NAME</tt> ，则所有对 u_PRJ_NAME 可能的修饰都将出现，否则不对 u_PRJ_NAME 做任何修饰。即：<tt>gmp_DECO_PRJ_NAME</tt> 是否定义控制着工程名修饰的两个极端。我不想再分更细的变量来控制工程名修饰了，一是少些变量就可省些麻烦，二是工程名相当于内部数据，用户和不必太在意它们的具体取值。</p>
+<div class="footnoteb">
+  <p>[2006-10-31]补充：</p>
+  <p>“所有对 u_PRJ_NAME 可能的修饰都将出现”的一个例子是：</p>
+  <blockquote>
+    <p>当 gmp_DECO_PRJNAME 被指定、且 gmu_GCC_PREFIX 也为非空值时，“工程名(u_PRJ_NAME,现名gmu_PRJ_NAME)”将被 linuxgcc/build_config.mki 施加如下修饰：$(gmu_GCC_PREFIX) 将成为“最终工程名(gmu_G_Deco_PrjName)”的前缀的一部分。若 gmp_DECO_PRJNAME 未被指定，则 $(gmu_GCC_PREFIX) 默认不会成为最终工程名前缀。</p>
+    <p>因此，</p>
+  <ul>
+    <li>若一个工程同时要被 i586-linux-gcc 和 arm-linux-gcc 编译，则用 GnumakeUniproc(with pattern1.mks) 构建此工程时，分别都必须指定 gmu_GCC_PREFIX，以便两个目标平台的输出文件不会互相覆盖。</li>
+    <li>当然，若你只想用 arm-linux-gcc 来编译，则 gmu_GCC_PREFIX 可不指定，这样最终工程名会短一些 。 </li>
+  </ul>
+  </blockquote>
+</div>
+<p>对于 uf_LINK_OUTPUT。是否修饰取决于具体的 gmp_DECO_<i>XXX</i> 是否被定义，这样有助于最终用户更精细地控制输出映像名。</p>
+
+<h3><a name="070111">[2007-01-11] 那些 Deco prefix/suffix 可不用 := 进行累加了</a></h3>
+<p>现在要求用户：往 gmp_DECO_<span class="style1">XXX</span> 那些变量中追加内容时，必须用 += 号，将它们拼到 _Gd_Deco_PrjOutput 和 _Gf_Deco_LinkOutput 中时将 += 引入的空格 strip 掉。 </p>
+<p>用 += 的明显好处之一是在追加变量值时不用像 := 那样将变量写两遍。但今天作此决定还源于一个新要求：msvc/mingw 版的 compiler_config.mki 允许用户用变量 gmp_IMPLIB_SUFFIX 来指示生成的 DLL 工程的导入库主文件名后缀。比如：</p>
+<blockquote>
+  <p>用户指定 DLL 工程的 gmu_uf_LINK_OUTPUT=myprj.lib gmp_IMPLIB_SUFFIX=--imp 时：生成的 DLL 为 myprj.dll，生成的导入库为 myprj--implib.lib 。 </p>
+</blockquote>
+<p>这个过程要求 _Gf_Deco_LinkOutput 是被加了 gmp_IMPLIB_SUFFIX 后缀的（不能仅在生成 DLL 时改一下导入库的输出文件名），因为 DLL 工程必须向其父工程报告加了后缀的文件名，这样父工程才能链接到该 DLL 工程输出的真正导入库。改变 _Gf_Deco_LinkOutput 的最终值是通过在 compiler_config.mki 中修改 <code>gmu_DECO_SUFFIX_LINK_OUTPUT</code> 来实现的、且此修改需要用到 gmu_uf_LINK_OUTPUT 的值（gmu_uf_LINK_OUTPUT 的扩展名为 $(gmp_extn_LIB) 时才加），但用户如果将 gmu_uf_LINK_OUTPUT 设在 u_srccfg_post.mki 中的话，gmu_uf_LINK_OUTPUT 的定义是出现在 compiler_config.mki 之后的。以上因素使得 <code>gmu_DECO_SUFFIX_LINK_OUTPUT</code> 用延迟展开为好。</p>
+<h2><a name="060606"></a>[2006-06-06]</h2>
+<p> 仅用一个 DIR_SYNC_DEVOUTPUT 来表示构建结果（.h、.lib 等）的输出目录是不好的。因为你可能要为 debug 版、Release 版、Unicode 版的编译结果选择不同的库输出路径<b>以作临时测试之用</b>，不同库输出路径中的同一个库的库名可能是相同的（不希望使用 _U, _D 后缀）。</p>
+<p><b>[2006-07-10] 继续</b></p>
+<p>确实，原先的决定是不好的。原先决定将 .h 输出到 <tt>$(DIR_SYNC_DEVOUTPUT)/include</tt> 中、.lib 输出到 <tt>$(DIR_SYNC_DEVOUTPUT)/lib</tt> 中，那样将 .h 和 .lib 的位置绑得太死了。而且还要更糟糕的一点：没法同时存在 i386-linux-gcc 和 arm-linux-gcc 的输出目标库了！ </p>
+<p>因此，现在决定改用两个 make 变量：</p>
+<ul>
+  <li>gmp_ud_HEADER_SYNC: 用户头文件的输出目录（或叫同步目录）。</li>
+  <li>gmp_ud_LIB_SYNC: 用户库文件的输出目录。</li>
+</ul>
+<h4>实践指导</h4>
+<p>若要对一个工程进行 <u>Debug 版编译</u>、<u>非 Debug 版编译</u>，或 <u>Unicode 版编译</u>、<u>非 Unicode 版编译</u>，或是基于不同“配置”的编译（比如：使用 i386-linux-gcc 对 arm-linux-gcc）应该遵循一个实践原则：不同种的编译方式应该在不同的 shell 环境中进行，不同的 shell 环境给 gmp_ud_LIB_SYNC 设定不同的值即可达到链接不同的库的目的。</p>
+<p class="footnoteb">一般情况下，gmp_ud_HEADER_SYNC 不必随不同的编译种类而改，因为头文件是我们直接手工维护的，我们只希望“有一份” 。 </p>
+<p><b>[2006-07-28] 继续</b></p>
+<p>不过，若你能够事先预知不同的编译配置生成的输出文件名字肯定是不同的，则可以在同一个 shell 环境中编译（即可以使用同一个 <code>gmp_ud_LIB_SYNC</code> 值）。比如，若在指定 <code>gmp_bc_DEBUG=1</code> 的同时指定了 <code>gmp_DECO_DEBUG=1</code>，则 debug 版与非 debug 版的输出映像名字将不同，这两种编译配置可以使用同一环境。</p>
+<p>[2006-07-28] 以上决定已经付诸实施。</p>
+<h3>[2007-01-09] sync devoutput 功能改为用插件实现</h3>
+<p>这又是一个“功能模块应向外界提供完整信息”的案例。</p>
+<p>今天决定将 sync devoutput 的功能从 pattern1.mks 中（其实是各个 compiler_config.mki 中）解脱出来，形成一个插件（PI_sync_devoutput），这个决定作出后，立即需要回答的一个问题是：PI_sync_devoutput 如何知道那要拷贝哪些文件？有两种方案：</p>
+<ol>
+  <li>让插件用户自己指出本工程会生成哪些输出映像。</li>
+  <li>pattern1.mki 事先要定义一个变量名，compiler_config.mki 将输出的映像设在那个变量名中。这样，任何的插件用户都可以访问那个变量来知道本工程输出了什么。</li>
+</ol>
+<p>第一种方法不可取，又是信息重复的缘故，设想，某一种客户自定义类型的 mki 某天突然多生成了一个输出文件，或是：将生成的 Windows DLL 的导入库改了个名——那些改动目前在外部是无法得知的。</p>
+<p>因此我采取第二种方案，且将输出文件类型分为 4 种：</p>
+<ul>
+  <li>gmp_Gp_list_LIB_OUTPUT 工程输出的静态库</li>
+  <li>gmp_Gp_list_DLL_OUTPUT 工程输出的动态链接库</li>
+  <li>gmp_Gp_list_EXE_OUTPUT 工程输出的可执行文件</li>
+  <li>gmp_Gp_list_OTHER_OUTPUT 工程输出的其他类型文件</li>
+</ul>
+<p>这样，PI_sync_devoutput 插件代码就能将不同“类型”的输出文件 sync 到不同目录中。</p>
+<p>&nbsp;</p>
+<h2><a name="060728"></a>[2006-07-28] GnumakeUniproc 用户在用 ps_TCHAR.h 时会被整疯的</h2>
+<p>IUartBasic.h 目前这个重头头文件中 #include 了 <tt>ps_TCHAR.h</tt> ，要命的是这个 <tt>ps_TCHAR.h</tt> 是平台相关的。平台相关的有怎么样呢？麻烦大了。比如：</p>
+<p>如果没有那个 <tt>ps_TCHAR.h</tt>，用 IUartBasic 类写一些简单的字符界面程序（称 APP）的话，APP 本来要额外做的只是两件事：</p>
+<ol>
+  <li>将 IUartBasic 指定为子工程，且传递 make 变量 <code>gmp_DO_SYNC_DEVOUTPUT=1</code>。 </li>
+  <li> 将 <code>$(gmp_ud_SYNC_HEADER_TO)</code> 指定到 APP 工程的 <code>gmu_ud_list_PRJ_HEADER</code> 中。虽然有以上两件额外的事，但 APP 的 Windows 编译和 linux 编译所需的 Makefile 可以说是没差别的（虽然不是绝对），即称 Makefile 是“平台无关”的。 </li>
+</ol>
+<p>有了 <tt>ps_TCHAR.h</tt>，APP 工程的 Makefile 就麻烦了。麻烦在于 Makefile 这下要为 <code>gmu_ud_list_PRJ_HEADER</code> 指定 <tt>ps_TCHAR.h</tt> 所在的路径了，且这个路径是平台相关的——这也就意为着本来是“平台无关”的 Makefile 变得“平台相关”了，我又得小心地组织 Makefile，使得不同平台上的编译能够得到正确的 <tt>ps_TCHAR.h</tt>。</p>
+<p> -- It really makes me mad!</p>
+<h3>[2006-10-31] 解决方法</h3>
+<h4>此种混乱出现的必然性</h4>
+<p>在说解决方法之前，先得判断一下这种由 ps_TCHAR.h 引起的混乱是否是无法避免的。</p>
+<p>经过考虑，我认为它的确是无法避免的——虽然它很怪异，在我已经用过的各种各样的 SDK 中并不存在这种一个同名且作用相同的头文件有两份或更多份的案例。可以先回顾一下我已经用过的 SDK：</p>
+<ul>
+  <li>微软的 VC++，或说 Platform SDK</li>
+  <p>因为 SDK 中提供的头文件都使用于 Windows 平台，因此很少会遇到 ps_TCHAR.h 那样的差别。即使遇到了，微软的解决方法是：用预处理宏来区分不同的有差别的运行平台（虽然都是 Windows）。例子如（摘抄于 WinNT.h）：</p>
+  <pre class="fws">#if !defined(_MAC) && (defined(_M_MRX000) || defined(_M_AMD64) || defined(_M_IA64)) && (_MSC_VER >= 1100) && !(defined(MIDL_PASS) || defined(RC_INVOKED))
+#define POINTER_64 __ptr64
+typedef unsigned __int64 POINTER_64_INT;
+#if defined(_WIN64)
+#define POINTER_32 __ptr32
+#else
+#define POINTER_32
+#endif
+#else
+#if defined(_MAC) && defined(_MAC_INT_64)
+#define POINTER_64 __ptr64
+typedef unsigned __int64 POINTER_64_INT;
+#else
+#define POINTER_64
+typedef unsigned long POINTER_64_INT;
+#endif
+#define POINTER_32
+#endif
+</pre>
+  <p>采取这种用预处理宏区分不同平台的方法其实有一个重大缺点，即：每增加一个新平台后，WinNT.h 都得进行修改。而这要求 WinNT.h 这个文件由一个人来协调。微软对 WinNT.h 可以有这种权利，但我却不希望任何一个人对 ps_TCHAR.h 拥有这种权利。当没有一个人拥有这种权利时，其他的任何一个人都可以在任何一种专有的平台上来实现 ps_TCHAR.h，不必动到其他平台的 ps_TCHAR.h 。 </p>
+  <li>Linux 的 glibc （或许说 glibc 并不准确，待考证） </li>
+  <p>对于头文件中平台相关的内容，glibc 将平台相关的内容抽取出来，组织成一系列的头文件，放在一个叫 bits 的子目录中。&lt;bits/XXX.h&gt; 一半是由 XXX.h 来包含的，应用程序用户自己只要 #include &lt;XXX.h&gt; 即可，不应或不需直接 #include &lt;bits/XXX.h&gt;。</p>
+  <p>这样决定的结果是：在 PC-Linux 上，生成本机代码所需的头文件根目录中 &lt;bits/XXX.h&gt; 的内容和交叉编译到某目标平台（比如 ARM）时所需的头文件根目录中的 &lt;bits/XXX.h&gt; 的内容是不同的（例子如 &lt;bits/setjmp.h&gt;）。 </p>
+  <blockquote>
+    <p>这里得强调的是上一段话中的两个“头文件根目录”。在实践中，分别用于生成两个目标平台代码的两套 SDK <span class="style-font-small">（SDK 包括 针对具体目标平台的 gcc, glibc, 以及其他功能库(如 gtk)的头文件及预编译好的库）</span>的 glibc “头文件根目录”<span class="style-font-small">（但不包括 bits 子目录）</span>中的内容可以是相同的。但就是因为 bits 中的内容不同，导致“根目录”中的东西（虽然相同）也必须放两份。 </p>
+  </blockquote>
+  <p>-</p>
+</ul>
+<p>从以上讲述可以看出，Windows 和 Linux 上的 SDK 对“平台相关”头文件内容组织确实各有缺点，那些缺点是 IUartBasic.h 和 ps_TCHAR.h 不希望“拥有”的。正是那些缺点使得 Windows 和 Linux 用户在“指定头文件目录”时不必遇到目前 ps_TCHAR.h 那样的困扰。</p>
+<h4>让 Makefile 用户（即头文件用户）得到方便解决方法</h4>
+<p>还是那个老原则：使用环境变量来指示头文件目录。</p>
+<p>具体做法：</p>
+
+<ul>
+  <li>引入一个新的 makefile 变量（建议在 shell 环境中指定之）：gmp_PS_INCLUDE_SUBDIRS。</li>
+  <p>其取值的例子如(bash 语法)： </p>
+<pre class="pre">gmp_PS_INCLUDE_SUBDIRS=&quot;mswin windows Win32&quot;</pre>
+  <li>再引入一个新的、供 pattern1.mks 使用的 make 变量：gmp_ud_list_PS_HEADER_PARENT。</li>
+  <p>假设其取值为(bash 语法)：</p>
+<pre class="pre">gmp_ud_list_PS_HEADER_PARENT=&quot;ha hb&quot;</pre>
+  <li>这将使 gmu_ud_list_PRJ_HEADER 被加入如下的路径：</li>
+<pre class="fws">ha/mswin ha/windows ha/Win32 hb/mswin hb/windows hb/Win32</pre>  
+  <p>如此一来，针对应用程序使用“包含 ps_TCHAR.h 的 IUartBasic.h”的事宜就可以如下处理：</p>
+  <p>假定 IUartBasic.h 处于 ~/w-out/inc 目录中，ps_TCHAR.h 存在于：</p>
+  <UL>
+    <LI>~/w-out/inc/mswin/ps_TCHAR.h</LI>
+    <LI>~/w-out/inc/linux/ps_TCHAR.h</LI>
+  </UL>
+  <p>则用户不应将 ~/w-out/inc 赋予 <code>gmu_ud_list_PRJ_HEADER</code>，而应该赋予 <code>gmp_ud_list_PS_HEADER_PARENT</code>，并且，当用户在进行 Windows 编译和 Linux 编译时应分别设定不同的 gmp_PS_INCLUDE_SUBDIRS，前者设为 <tt>mswin</tt>，后者设为 <tt>linux</tt> 。 </p>
+</ul>
+
+<h4>[2006-11-06]</h4>
+<p>以上所提解决方法在 svnreps v231 中引入。 </p>
+<h3><a name="080731"></a>[2007-07-31] 该洗脑了，原先的方法有问题，终极解决方案在此</h3>
+<p>原先的方法是希望在环境变量中定义 <code>gmp_PS_INCLUDE_SUBDIRS</code>，然后在 makefile 中用 <span class="pre"><code>gmp_ud_list_PS_HEADER_PARENT</code></span> 指示那些 <i>SUBDIRS</i> 的基目录，这种做法很不妙，有如下问题。</p>
+<ul>
+  <li>若将设定环境变量 <code>gmp_PS_INCLUDE_SUBDIRS</code> 作为一种通用模型，那意味着所有工程都要遵循相同的 PS 子目录名称，比如目前的情况： Windows 工程要用 &quot;mswin&quot;、WinCE 用 &quot;mswin wince&quot;、Linux 用 linux。这过于野蛮，有违 GnumakeUniproc 自由开放的精神。况且，今后出新平台的话，由谁来定新的 PS 名称呢？</li>
+  <li>想像一下，若我们拥有某个Host平台（比如 PC Windows）上生成所有类型 Target 的交叉编译器，那我们就可以在一轮构建中将 Windows 程序、Linux 程序、uBase(ARM) 程序通通编出来，那么 <code>gmp_PS_INCLUDE_SUBDIRS</code> 的值要随着当前使用的交叉编译器的不同而变化。何时变呢？肯定是由某个衔接不同交叉编译器的 makefile 来变。这很别扭——<code>gmp_PS_INCLUDE_SUBDIRS</code> 即在环境变量中设，又会在 makefile 中被修改。 </li>
+</ul>
+<p>通过以上分析，我想通了，那两个 gmp_ 变量根本不应该作为 GnumakeUniproc pattern1 通用模型的一部分。新的思路是：</p>
+<p>具体一个工程(IMPPRJ)可随心定义它自己的 PS 目录名称；同时，其使用者(USERPRJ)有理由明确知道 IMPPRJ 所定义的各种平台的 PS 目录名称、并在自己的 makefile 中正确指出那些名称。那么，之前困扰我 的 IUartBasic 用户工程之 makefile 该如何方便的指示 ps_TCHAR.h 目录的位置呢？其实很容易，用户工程之 makefile 只需自己定义一个变量，比如 <code>psdirIUartBasic</code>，同时</p>
+<pre>gmu_ud_list_PRJ_HEADER += $(dirIUartBasic)/include/$(<code>psdirIUartBasic</code>) $(dirIUartBasic)/include</pre>
+<p>再同时，</p>
+<ul>
+  <li>编 Windows 版的启动 Makefile 中设定 <code>psdirIUartBasic=mswin</code></li>
+  <li>编 Linux 版的启动 Makefile 中设定 <code>psdirIUartBasic=linux</code></li>
+</ul>
+<p>就这样便替代了原先那两个龌龊 gmp_ 变量的作用。</p>
+<p>对于<code> psdirIUartBasic=wince mswin</code> 这样稍微复杂的情况，我准备了一个 gmpf_ 函数来方便使用者，使用者写法变为：</p>
+<pre>gmu_ud_list_PRJ_HEADER += $(call <b><code>gmpf_CombinePsSubdirs</code></b>,$(dirIUartBasic)/include,$(<code>psdirIUartBasic</code>))</pre>
+<h4>引伸出一个问题</h4>
+<p>原先 IUartBasic 用户引用头文件的写法是（ps-typedef.h 是假想的文件）：</p>
+<pre>#include &lt;IUartBasic.h&gt;
+#include &lt;<b>mswin</b>/ps-typedef.h&gt;
+<span class="c-comment">// 或是 #include &lt;<b>linux</b>/ps-typedef.h&gt; </span></pre>
+<p>刚刚定下的 <b>gmpf_CombinePsSubdirs</b> 模型可以适用此情况，但有的 SDK 将其接口头文件往深处挪了一层目录，其用户的写法变为：</p>
+<pre>#include &lt;iuartbasic/IUartBasic.h&gt;
+#include &lt;iuartbasic/<b>mswin</b>/ps-typedef.h&gt; 
+<span class="c-comment">// 或是 #include &lt;iuartbasic/<b>linux</b>/ps-typedef.h&gt; </span></pre>
+<p>此写法导致 <b>gmpf_CombinePsSubdirs</b> 的伎俩不好使了，因为 <b>mswin</b> 这个东西看起来必须写到源码(.h)中，而非原先那样可以在 makefile 中配置。不过还好，昨晚想出了让其可在 makefile 中配置的方法（wiki pageId=16416857），IUartBasic 用户代码改为如下： </p>
+<pre>#define  IUartBasic_ps_typedef(ps__) &lt;iuartbasic/ps__/ps-typedef.h&gt;
+#include IUartBasic_ps_typedef(PS) </pre>
+<p>配合之，在 makefile 中指定编译开关 <b><code>-D PS=mswin</code></b> 或 <b><code>-D PS=linux</code></b> ，就能达到期望的结果。</p>
+<p>- </p>
+<h2><a name="060807"></a>[2006-08-07] Linux 上软链接导致的同一目录多目录名引起的麻烦</h2>
+<p>先看一个提纯后的例子吧。在我的家目录（<tt>/home/chj</tt>）中执行如下命令：</p>
+
+<pre>$ mkdir truedir
+$ ln -s truedir symldir
+$ cd symldir</pre>
+<p>然后在 <tt>symldir</tt> 中 创建 Makefile，内容如下：</p>
+<pre>all:
+	@echo "CURDIR = $(CURDIR)"
+	@echo "CURDIR = $(shell pwd)"
+	@echo "CURDIR2= $(shell (pwd))"
+</pre>
+<p>此 Makefile 的运行结果为： </p>
+<pre>CURDIR = /home/chj/truedir
+CURDIR = /home/chj/truedir
+CURDIR2= /home/chj/symldir
+</pre>
+<p>引起麻烦的是最后两行：make 的 $(shell) 函数所执行的 pwd 命令若放在一个 sub-shell 中执行，pwd 输出的路径怎么就变了呢？</p>
+<p>目前的 GnumakeUniproc 撞到此种特性的场合是，CommonFunctions.mki 中有如下函数： </p>
+<pre>_GetAbsDirRelaToCurdir = $(shell ( cd $1; CmdRet=$$?; if [ $$CmdRet = 0 ];then pwd; else echo __cd_ERROR; fi; ))
+<span class="c-comment">    # $1, the dir to cd to. Returns the new dir abs-path if success, cd_ERROR if fail.</span>
+_GetAbsPathRelaToCurdir = $(call _GetAbsDirRelaToCurdir,$(dir $1))/$(notdir $1)</pre>
+<p>它们的作用是借助 shell 的 cd 命令和 pwd 命令来推导出基于当前路径的相对路径所对应的绝对路径。</p>
+<p>今天最终遇到的麻烦是：因为同一个 Makefile 在不同“环境”下的路径表达不同导致 GnumakeUniproc 误报“不同工程具有相同 gmu_PRJ_NAME”错误。</p>
+<p>今天所进行工程出错时的输出信息如下：</p>
+<pre>!GMU!Error: The following two Makefiles share the same GMU-project-name [ arm-linux-IUartBasic_linuxgcc ]:
+  Existed: /home/chj/w/Isyslib/IUartBasic/make/lib.linuxgcc/Makefile
+  ToMake : /mnt/hdc/chj/w/Isyslib/IUartBasic/make/lib.linuxgcc/Makefile
+  CurDir = /mnt/hdc/chj/w/CommuLib/WiPortTcpCli/make/lib-FM-300.linuxgcc
+/mnt/hdc/chj/w/CommuLib/WiPortTcpCli/examples/tcpecho_FM-300/make-FM-300.linuxgcc/gf/arm-linux-WiportTcp_linuxgcc/_SubprjAttr.mki:62: *** !GMU!Error occured. See error reason above!.  Stop.
+make[2]: *** [/mnt/hdc/chj/w/CommuLib/WiPortTcpCli/examples/tcpecho_FM-300/make-FM-300.linuxgcc/gf/arm-linux-WiportTcp_linuxgcc/_SubprjsMade] Error 2
+</pre>
+<p>注：<tt>/home/chj/w</tt> 和 <tt>/mnt/hdc/chj/w</tt> 是同一个目录，前者是软链接、指向后者。</p>
+<p>该怎么办呢？</p>
+<p>note: 必须先比较字符串 for sh.exe</p>
+<h3>[2006-11-07] 解决方法</h3>
+<p>解决思路是在表面的路径名不同时再判断两个路径名是否确实指向同一文件。今天拿这个问题请教蔡强，他给了提示：</p>
+<pre class="fws">if [ file1 -ef file2 ];</pre>
+<p>经试验，确实可以工作。稍后，我想到 man test 中应该会有对这个的说明，果真，man test 中有如下说法：</p>
+<pre class="fws">       FILE1 -ef FILE2
+              FILE1 and FILE2 have the same device and inode numbers
+</pre>
+<p>虽然使用 <code>-ef</code> 时、在 FILE1 和 FILE2 字串完全的情况下，肯定会返回“真”，但我还是让 GnumakeUniproc 在这个 <code>-ef</code> 判断前明确比较一下 FILE1 和 FILE2 两个字串，原因是：www.mame.net 提供的 Windows 上的 Bourne Shell 实现(sh.exe)不认 <code>-ef</code> 这个东西，<code>[ FILE1 -ef FILE2 ]</code> 无论如何总是返回成功（即返回 0）。</p>
+<h4>[2006-11-07]</h4>
+<p>在 svnreps v233 中修正了该问题。</p>
+<h3><a name="061219"></a>[2006-12-19] 再次遭遇 sh.exe 陷阱，浪费 5 小时</h3>
+<p>昨天晚上发现运行于 sh.exe 上的 GnumakeUniproc 子工程同名冲突检测不出来了，心神大乱。今天早上将 GnumakeUniproc 历史版本抽样取出测试，终于发现问题出在 svnreps v232 -&gt; v233 的修改上。</p>
+<p>svnreps v232 line 711～712 如下：</p>
+<pre class="fws">			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ]; \
+				then echo PrevCmdSuccess; \
+</pre>
+<p>svnreps v233 的如下：</p>
+<pre class="fws">			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] || [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]; \
+				then echo PrevCmdSuccess; \
+</pre>
+<p>加入的内容就是为了对付 Linux 上同文件不同目录名的情况的。但对于 sh.exe 却是完全错误的。2006-11-07 那天说 sh.exe 对于 -ef 总是返回成功——若确实如此，则 v233 的修改是完全错误的，将导致工程重名无法检测出。但可惜 v233 加完没有再在 sh.exe 环境中检测一遍。</p>
+<p>不过老实说，我发现该故障后头脑里记得的东西却是 sh.exe 是支持 -ef 的，因此看 GnumakeUniproc 的代码一直看不出问题来。</p>
+<p>今天再次试验了 sh.exe 的 -ef 行为：</p>
+<ul>
+  <li>若 FILE1 和 FILE2 两个文件都存在，则返回成功，即使字符串 FILE1 不等于 FILE2 。（[2007-01-04]补充：还必须同盘符） </li>
+  <li>若 FILE1 和 FILE2 其中之一不存在（文件系统上没那个文件），则返回失败，即使 FILE1, FILE2 两个字符串字面上相等。</li>
+</ul>
+<h3>Cygwin</h3>
+<p>今天在 Cygwin bash 3.0 上试验 -ef ，看来是完全有效的，比如</p>
+<pre class="fws">if [ g:/w -ef /cygdrive/g/w ];then echo ok; else echo bad; fi</pre>
+<p>若 G 盘存在，输出 ok；若 G 盘不存在则输出 bad。</p>
+<p>是否支持 junction 未试。</p>
+<h4>对策</h4>
+<p>看来要支持 sh.exe，只好另安排一个变量了：gmu_IS_USING_POOR_SH_EXE 。 </p>
+<h2><a name="061102"></a>[2006-11-02] 根工程与子工程的工程名冲突得额外解决</h2>
+<p>从 SVN 版本库中的 v186 开始，GnumakeUniproc 就已加入了子工程名（gmu_PRJ_NAME）冲突检测。但今天才意识到，若根工程的名字和子工程相同的话，原先的检测方法仍是检测不出来的。</p>
+<blockquote>
+  <p>原因在于：</p>
+  <p>原先的工程名冲突检测方法是：在某个父工程的 _MakeSubPrjs.mk 被 make 执行时，在 _MakeSubPrjs.mk 所 include 的 _SubprjAttr.mki 中检测冲突，具体行为是：</p>
+  <ul>
+    <li>是否自 make 执行一来已有工程安插了“工程名已用”标记（工程名即为工程输出文件路径）
+	  <ul><li>若有则报告工程名冲突
+      <li>若无则为自己安插“工程名已用”标记，记于文件 _HisMakefile.gmu.Attr （此处的 &quot;His&quot; 应理解为从其他工程角度看的 “his”）。	      
+	</ul>
+  </ul>
+  <p>而根工程因为他是“根”，因此本身不会在任何 _MakeSubPrjs.mk 被提及，结果是根工程的输出目录中找不到 _HisMakefile.gmu.Attr，这样，若有某个子工程与根工程同工程名，则检测不出。</p>
+</blockquote>
+<p>现在要为根工程与子工程的工程名冲突另外加 makefile 代码处理，方法是：</p>
+<blockquote>
+  <p>根工程将自己的工程名 export 成环境变量 gmu_ROOT_DECO_PRJNAME；在 _SubprjAttr.mki 中原有的检测子工程名间冲突的语句前加入“检测本 _SubprjAttr.mki 中每一个子工程名是否和 gmu_ROOT_DECO_PRJNAME 相同” 的语句，即可达到目的。 </p>
+</blockquote>
+<p>这个改进将出现于 svnreps v222。</p>
+<div class="footnoteb">
+  <p>今天，未作此改进前，在根工程和子工程同名的情况下，开始构建那个子工程时，出现了很奇怪的错误，确实让我调查了好几小时才找到这个原因：</p>
+  <pre class="fws">==============================================================================
+  Now, BuildLevel [2]. Making sub-project:
+  CurDir: G:/w/_tlsubprj/thelib/lib.msvc
+  Makefile:
+cd: HOME not set
+</pre>
+  <p>以上错误信息的特点：<tt>Making sub-project</tt> 后本应显示一个工程名，但现在却是空，因此下面的 <tt>Makefile:</tt> 后显示的东西也是空。</p>
+  <p>不在这儿详细记录未改进前出错的细节过程了——既然最根本的原因已经找到并已修正。</p>
+</div>
+<h2><a name="061103"></a>[2006-11-03] 加入工程依赖关系成环检测</h2>
+<p>若工程间的依赖关系形成一个环，则构建过程将陷入一个无限循环。若此种情形发生，用户最终应该会察觉到，但最好还是让 GnumakeUniproc 智能些，让其能自动检测此情况的出现。</p>
+<p>[2008-09-07]NOTE: 回环检测只需针对有子工程的那些工程即可，换言之，若一个工程没有子工程，那它是不可能产生回环的。</p>
+<p>该改进完成于 svnrpes v227。</p>
+<h3><a name="080907"></a>[2008-09-07] 观念修正！成环不是错误。</h3>
+<p>今天突然发现先前两个错误做法/观念（做 IFileLogging 的 Linux 实现时）。</p>
+<p>第一个：原先检测回环的方式有问题。原先是准备一个 _SubprjLoopDetect.gmu.txt 文件，其中记录了当前 makefile 的 <code>${MAKELEVEL}</code>。若工程 TPRJ 的某一级子工程又将自己引用为子工程，那么 TPRJ 被嵌套构建时 <code>${MAKELEVEL}</code> 的值必然不同，这样就检测出了回环。但是，在 2008-07-19 加入 force-post-processing 功能后，这种检测方式就行不通了，因为 TPRJ <code>${MAKELEVEL}</code> 不同的情况可能发生在非回环的情况下。</p>
+<p>第二个：工程依赖关系成环并不能认定其是错误的。IFileLogging 用到的两个库 gadgetlib 和 AnsiC_Tfuncs 有交叉依赖关系：</p>
+<ul>
+  <li>gadgetlib 用到了 AnsiC_Tfuncs 的 _wtoi 函数。</li>
+  <li> AnsiC_Tfuncs 用到了 gadgetlib 的 Unicode-&gt;MBCS 转换函数。</li>
+</ul>
+<p>因此它俩都把对方列为自己的子工程，这下就导致了回环的出现。有了这个案例后，我认为回环是合理的——但仅限于 LIB 工程间的回环。</p>
+<h4>修正方法</h4>
+<p> 现在，在获取子工程属性后立即进行成环检测（先前是子工程被执行时才检测其是否 loop 回某个已编过的工程），检测到成环时仅仅输出提示信息告知某个子工程(TPRJb)和之前的某个工程(TPRJa)成环了，</p>
+<pre>!GMU!Info: A sub-project with refname {<i>SubPrj</i>} loop against ancestor project[ <i>XXX-prj</i> ], whose makefile is: ...</pre>
+<p>并且不去启动 TPRJb 的构建。</p>
+<p>成环检测手段是：任一工程开始构建时，在临时目录生成 <tt>_ThisPrjBuildInProgress.gmu.txt</tt> 文件，工程构建结束时删除该文件，这样，将要构建某工程时检查其自身对应的 <tt>_ThisPrjBuildInProgress.gmu.txt</tt> 是否存在、且修改时间在构建起始时间之后，是则说明成环。</p>
+<p>此修正在 r618～620 。 </p>
+<h4>[2008-09-14] 一个附带问题，$(gmu_Gp_LINK_OUTPUT) 依赖列表得排除循环的子工程</h4>
+<p>原先，<code>$(gmu_Gp_LINK_OUTPUT)</code> 的依赖列表中有 <code>$(gmu_Gp_list_SUBPRJ_TO_LINK)</code> ，这使得各个子工程（包括跨层自动链接的）的输出映像（即子工程各自的 <code>$(gmu_Gp_LINK_OUTPUT)</code> ）更新后，父工程能重新链接。</p>
+<p>原先 <code>gmu_Gp_list_SUBPRJ_TO_LINK</code> 的定义为：</p>
+<pre>gmu_Gp_list_SUBPRJ_TO_LINK = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
+	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s),$(<b>_Gp_list_AutoLinkFromChildren</b>))
+</pre>
+<p>今天发现 <b><code>_Gp_list_AutoLinkFromChildren</code></b> 会出问题：当本工程(PT)之 <code>_Gp_list_AutoLinkFromChildren</code> 中的某个工程(PA)即是本工程的父工程时（这在 PT 和 PA 互相成环时发生），每次构建 PT 和 PA 都要被重新链接。</p>
+<p>解决方法是，<code>gmu_Gp_list_SUBPRJ_TO_LINK</code> 必须剔除掉导致成环的那些子工程（自动生成的变量 <i><code>&lt;refname&gt;</code></i><code>_IsLooped</code> 标示了某个子工程是否成环。</p>
+<p>本修正提交于 r631 。 </p>
+<h2><a name="061108"></a>[2006-11-08] 加入了子工程跨层自动链接功能</h2>
+<p>（[2007-03-11]英文称法：multi-level auto-linking）</p>
+<p>这是一项激动人心的改进。</p>
+<p>在构建一个很庞大的 EXE 工程的时候，会遇到依赖关系超过一层的情况，比如： A.exe -&gt; B.lib -&gt; C.lib 。</p>
+<blockquote>
+  <p>意思是 A 需要用到 B 提供的函数，而 B 的实现本身又要依赖 C 这个库提供的函数。不过，A 并没有直接调用 C 中的函数。 </p>
+</blockquote>
+<p>在这种依赖关系下，链接 A 时必须明确告诉链接器要链接 B,C 两个库。传统的做法是将 B,C 都指定为 A 的子工程，这样 A 就能自动链接 B,C 了。但仅仅是这种程度的自动还是不够的，因为“要在 A 工程中指定 C 为 A 的子工程”对 A 来说是个负担：</p>
+<blockquote>
+  <p>A 没有直接调用 C 提供的函数，因此 A 的 makefile 编写者没理由要意识到 C 这个子工程的存在，若他意识到了，则反而有有麻烦：若 B 的实现者以后不用 C 来实现自己了，而改用 D.lib，结果 A 的 makefile 得跟着改。 </p>
+</blockquote>
+<p>因此，最好的结果是：A 只要在 makefile 中告知 B 是它的子工程，并且指示 GnumakeUniproc 将 B 所依赖子工程（不管有多少级）自动添加到 A 最终的链接库列表中，这样 A 就能知道自己最终要链接的东西了。</p>
+<h4>[2006-11-08]</h4>
+<p>在 svnreps v235 完成（初步测试通过）了此功能。针对该功能的第一次提交在 v222，但 v235 时又做了一次修正。 </p>
+<p>相关变量：</p>
+<ul>
+  <li>gmu_REQ_AUTO_LINK_LIBS （EXE 工程定义此变量来指示自己要链接子工程的输出） </li>
+  <li>gmu_I_AM_A_LINK_COMPONENT （库工程定义此变量来指示[自己要成为一个被链接组件(若父工程需要的话)]） </li>
+  <li>gmu_p_AUTO_LINK_LIBS （内部，用作 shell 环境变量） </li>
+</ul>
+<p>实现方法：</p>
+<ul>
+  <li>GnumakeUniproc 对于定义了 <code>gmu_REQ_AUTO_LINK_LIBS</code> 的父工程，<code>export</code> 出环境变量 <code>gmu_p_AUTO_LINK_LIBS</code>（覆盖掉父进程的），该变量的内容是该父工程输出路径中的 _LibsToLinkByMe.txt 文件的全路径。</li>
+  <li>GnumakeUniproc 对于定义了 <code>gmu_I_AM_A_LINK_COMPONENT</code> 的工程，在父工程要求自动链接的情况下，会将其链接输出(一般是库文件)追加到环境变量 <code>gmu_p_AUTO_LINK_LIBS</code> 指示的文件中。</li>
+  <li>对于 <code>gmu_REQ_AUTO_LINK_LIBS</code> 和 <code>gmu_I_AM_A_LINK_COMPONENT</code> 都定义了的工程（既是被别人链接的对象，自己在链接时又要链别人的情形，比如 Linux 上的动态库），则以上两点都具备。——写到这里，发现 svnreps v235 还得再修改一下才能支持此种情况。 </li>
+  <div class="footnoteb">[2006-12-11]终于意识到：<code>gmu_REQ_AUTO_LINK_LIBS</code> 和 <code>gmu_I_AM_A_LINK_COMPONENT</code> 都定义了情况在制作所有平台的 DLL 时都将遇到，而不仅仅是 Linux 上的问题。DLL 的共同点是：自己生成时要链接别人，同时自己（或自己的生成物，比如 Windows 上所谓的导入库）也是被人链接的对象。<a href="#061211">见下面的详细描述。</a></div>
+</ul>
+<h3><a name="061211"></a>[2006-12-11] 完善先前的实现</h3>
+<p>2006-11-08 仍留下考虑不周之处，今天把它弄清楚。</p>
+<p>先列出表格总结一下三个因素的关系。</p>
+<ul>
+  <li>gmu_I_AM_A_LINK_COMPONENT</li>
+  <li>gmu_REQ_AUTO_LINK_LIBS</li>
+  <li>gmu_p_AUTO_LINK_LIBS （导出为环境变量） </li>
+</ul>
+<p>用三种类型的工程可以描述出以上三个因素的相互关系：</p>
+<ul>
+  <li>EXE。这种工程决不定义 gmu_I_AM_A_LINK_COMPONENT，但<b>可能</b>会定义 gmu_REQ_AUTO_LINK_LIBS。</li>
+  <li>LIB。这种工程<span class="boldblue">必须</span>定义 gmu_I_AM_A_LINK_COMPONENT，但决不定义 gmu_REQ_AUTO_LINK_LIBS。</li>
+  <li>DLL。这种工程<span class="boldblue">必须</span>定义 gmu_I_AM_A_LINK_COMPONENT，同时<b>可能</b>定义 gmu_REQ_AUTO_LINK_LIBS。</li>
+</ul>
+<p>以上三种工程类型、加上两个“可能”，结果形成五种 gmu_I_AM_A_LINK_COMPONENT 和 gmu_REQ_AUTO_LINK_LIBS 的搭配。</p>
+<p>注：以下表格中将各 gmu_ 变量的 gmu_ 前缀省略。</p>
+<ul>
+  <li></li>
+</ul>
+<table width="100%"  border="1" cellspacing="3" cellpadding="2">
+  <tr>
+    <th scope="col">&nbsp;</th>
+    <th scope="col">本工程用户不定义 <br>
+    gmu_I_AM_A_LINK_COMPONENT (I0) </th>
+    <th scope="col">本工程用户定义 <br>
+    gmu_I_AM_A_LINK_COMPONENT (I1) </th>
+  </tr>
+  <tr>
+    <th scope="row">本工程不定义<br>
+    gmu_REQ_AUTO_LINK_LIBS<br>
+    (R0)</th>
+    <td><p>本工程是自完善 EXE，或是个容器工程。（自完善的意思是自己明确指出所有要链接的 LIB/DLL、而不依赖 REQ_AUTO_LINK_LIBS）</p>
+    <p>GMU 要做的：export p_AUTO_LINK_LIBS 为 空值。</p></td>
+    <td><p>本工程可能是 LIB 或 DLL（自完善的），但因为 REQ_AUTO_LINK_LIBS 没有被定义，因此可以将 DLL 就当作 LIB 来看待。GMU 要做两件事：</p>
+    <p>第一件：</p>    <ul>
+      <li>若父环境 p_AUTO_LINK_LIBS 为空，什么都不做。</li>
+      <li>若父环境 p_AUTO_LINK_LIBS 非空，将输出映像追加到 $(p_AUTO_LINK_LIBS)。 </li>
+      </ul>
+    <p>第二件</p>
+    <ul>
+      <li>若当前工程为 DLL，GMU 必须 export 出一个新的、空的 p_AUTO_LINK_LIBS ，其原因与理由见稍后的更多说明。 </li>
+      <li>若当前工程为 LIB，则不必动 p_AUTO_LINK_LIBS，让他继续传给更深层的子工程。</li>
+      </ul>    
+    <p>当前工程是 LIB 还是 DLL 是无法仅仅从 I_AM_A_LINK_COMPONENT 和 REQ_AUTO_LINK_LIBS 这两个变量判断出的，因此必须动用额外的变量来指示。</p></td>
+  </tr>
+  <tr>
+    <th scope="row">本工程定义<br>
+gmu_REQ_AUTO_LINK_LIBS<br>
+(R1)</th>
+    <td><p>这是个 EXE 工程，但不是自完善的。GMU 要做的：</p>
+      <p>不理会环境来的 p_AUTO_LINK_LIBS ，export 出新的 p_AUTO_LINK_LIBS，其值为本工程输出目录中的 _LibsToLinkByMe.gmu.txt。</p></td>
+    <td><p>本工程是个 DLL（非自完善的）。GMU 要做两件事：</p>
+      <ol>
+        <li>若父环境 p_AUTO_LINK_LIBS 非空，将输出映像追加到 $(p_AUTO_LINK_LIBS)。</li>
+        <li>export 一个新的 p_AUTO_LINK_LIBS，其值为本工程输出目录中的 _LibsToLinkByMe.gmu.txt。</li>
+      </ol>
+    <p>这种情况最特别，make 运行过程 p_AUTO_LINK_LIBS 表现出两个不同的值，一个来自父环境、一个是本工程自己设的。因此，GMU 中应该建立一个临时变量 <b>gmu_p_AUTO_LINK_LIBS_FromEnv</b> 来保存父环境来的值，供追加输出映像时使用。</p></td>
+  </tr>
+</table>
+<p>干得好！五种 gmu_I_AM_A_LINK_COMPONENT 和 gmu_REQ_AUTO_LINK_LIBS 的搭配在上面的表格中全部提及了。</p>
+<div class="hint">
+  <p class="red">特别事项：DLL 工程无论如何必须 export 出空的 gmu_p_AUTO_LINK_LIBS 。</p>
+  <p>DLL 工程的 makefile 中必须在备份父环境的 gmu_p_AUTO_LINK_LIBS 取值后再将其 export 成空值。为了做到这点，我得引入一个新变量 <b>gmu_IS_KEEP_AUTO_LINK_LIBS_ENV</b>，该变量默认为空值，该变量为空则指示 GnumakeUniproc 去 export 出空的 gmu_p_AUTO_LINK_LIBS。只有 LIB 工程，和 pattern-container1.mks 会将此设为 1，这个动作是在 pattern1.mks 中进行的，省了最终用户的一点心思。这种默认值的决定对最终用户应该是最有利的，因为最终用户仅仅需要在自定义一个性质类似 LIB 的映像类型时才需要专门去设 gmu_IS_KEEP_AUTO_LINK_LIBS_ENV=1 ，而这种情况又是非常非常罕见的——因为性质类似 LIB 的工程没有什么可自定义的料（至少我目前的经验是这样的）。 </p>
+  <p>若不做此事，会有如下的后果：</p>
+  <blockquote>
+    <p>假设如下工程关系（箭头表示依赖）：ExeA -&gt; DllB -&gt; LibC。DllB 必须链接 LibC；ExeA 只要链接 DllB 就行，不能去链接 LibC。ExeA 中 export  gmu_REQ_AUTO_LINK_LIBS=ExeAOutput/_LibsToLinkByMe.gmu.txt，若 DllB 工程中不 export 出空的 gmu_REQ_AUTO_LINK_LIBS，则 LibC 工程被构建时将会把它的输出映像追加到 ExeAOutput/_LibsToLinkByMe.gmu.txt 中，那显然是错的。 </p>
+  </blockquote>
+</div>
+<h4>[2006-12-12]</h4>
+<p>按昨天的思路修正后，试验了“上下都 auto-link”的 DLL 工程，通过。</p>
+<h3><a name="061212"></a>[2006-12-12] 当前严重失误：一个 LIB/DLL 工程无法被多个父工程自动链接</h3>
+<p>今天终于意识到一个严重问题，按照当前的实现（svnreps v265），你没法让两个 EXE 工程自动链接同一个库工程（LIB/DLL 统称库工程），因为当某个库工程被第一个 EXE 自动链接后，该库工程就是 up-to-date 状态了（因为该库必定要被构建过才会被别人链接），而当第二个 EXE 想自动链接那个库工程时才发现它做不到，原因是那个库工程的 makefile 不会再被执行了——只有库工程的 makefile 被执行，其输出映像才会被追加到第二个 EXE 工程的 gmu_p_AUTO_LINK_LIBS 列表中。</p>
+<h4>解决方法</h4>
+<p>原先的失误在于，将自动链接列表安排在请求 gmu_REQ_AUTO_LINK_LIBS 的人(如EXE)的输出目录中；而正确的做法是将自动链接列表安排在被要求 gmu_REQ_AUTO_LINK_LIBS 的人(如LIB)的输出目录中。</p>
+<p>想像一下，对于工程 Z.LIB ，若自动链接列表存放在 Z.LIB 的输出目录中（比如叫 gf/z/_AutoLinkListForParent.gmu.txt），那么 Z.LIB 被构建后此文件是一直存在的，此后不管哪个 EXE 工程将 Z.LIB 作为子工程，总是可以访问到 gf/z/_AutoLinkListForParent.gmu.txt，如果我们再设法让 Z.LIB 的子工程的的输出映像名也追加在此文件中（不管多少级都要在此中）那么 Z.LIB 的“使用者”（不管使用者有几个）就可以得到最终完整的自动链接列表了。 </p>
+<p>假设有 A.EXE, B.LIB, C.LIB, D.LIB 四个工程，他们之间的父子关系如下：</p>
+<ul>
+  <li>A -&gt; B -&gt; C -&gt; D</li>
+  <li>B -&gt; D</li>
+</ul>
+<p>对 B 有两个子工程：C 和 D。</p>
+<p>当所有工程被成功构建后，这些工程各自输出目录中的 _AutoLinkListForParent.gmu.txt 分别为如下内容：</p>
+<table width="100%"  border="1" cellspacing="3" cellpadding="2">
+  <tr>
+    <td width="20%">A.EXE</td>
+    <td width="88%">空，因为 A.EXE 不是一个 link-component。</td>
+  </tr>
+  <tr>
+    <td>B.LIB</td>
+    <td><ul>
+      <li>若 C 比 D 先构建：B.LIB C.LIB D.LIB D.LIB </li>
+      <li>若 D 比 C 先构建：B.LIB D.LIB C.LIB D.LIB</li>
+      </ul>      
+      <p>列表中出现了重复的库，无所谓。</p></td>
+  </tr>
+  <tr>
+    <td>C.LIB</td>
+    <td>C.LIB D.LIB </td>
+  </tr>
+  <tr>
+    <td>D.LIB</td>
+    <td>D.LIB</td>
+  </tr>
+</table>
+<p>生成以上自动链接列表的方法是：</p>
+<blockquote>
+  <p>比如对于 B.LIB 来说，B 在满足目标 <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code> 的命令中，将两样东西写入 _AutoLinkListForParent.gmu.txt：</p>
+  <ol>
+  <li>B 自己的输出映像</li>
+  <li>B 所有的列于 <b><code>gmu_uv_list_AUTO_LINK</code></b> 中的工程的 _AutoLinkListForParent.gmu.txt 的内容。 </li>
+  </ol>
+  <p>对于 DLL 工程（本质是 <code>gmu_IS_KEEP_AUTO_LINK_LIBS_ENV</code> 为空的工程），则只能将自己的输出映像写入 _AutoLinkListForParent.gmu.txt ，不能写子工程的。 </p>
+  <p>确实，我又引入了一个新变量 <code>gmu_uv_list_AUTO_LINK</code>，而不是用已存在很久的 <code>gmu_uv_list_LIB_TO_LINK</code> 或 <code>gmu_uv_list_LIB_SUBPRJ</code> ，我想这样可以给 LIB 用户更大的灵活性吧，即 LIB 工程可以包含和自动链接无关的子工程，那些子工程被放到 <code>gmu_uv_list_LIB_SUBPRJ</code> 就不会成为自动链接列表了。</p>
+  <p>如此决定的影响是：先前已写的 LIB 工程必须修改以使能被人自动链接的功能：将其“隐式依赖子工程”的列表从 gmu_uv_list_SUBPRJ 转移到 gmu_uv_list_AUTO_LINK 中。 </p>
+</blockquote>
+<p>新改进方法废弃了 gmu_p_AUTO_LINK_LIBS。</p>
+<h4>[2006-12-13] 已修正。 </h4>
+<p>根据新的思路做了修正，不但多个父工程自动链接同一子工程的问题解决了，而且 GnumakeUniproc.mki 中的代码变得更简单了。</p>
+<p>将提交于 svnreps v266。 </p>
+<p>最终对一些变量名做了修改：</p>
+<ul>
+  <li>gmu_REQ_AUTO_LINK_LIBS =&gt; gmu_REQ_AUTO_LINK_SUBPRJS  </li>
+  <li>gmu_IS_KEEP_AUTO_LINK_LIBS_ENV =&gt; gmu_IS_SUBPRJ_AUTO_LINK_MERGE </li>
+</ul>
+<h4>[2007-01-05] 发现 gmu_REQ_AUTO_LINK_LIBS 变量可省略</h4>
+<p>其实，“gmu_REQ_AUTO_LINK_LIBS=1” 等价于 “gmu_uv_list_AUTO_LINK 非空”。换言之，如果某个定义了 gmu_uv_list_AUTO_LINK，但却不定义 gmu_REQ_AUTO_LINK_LIBS，那将是没有意义的，跨层自动链接也将不起作用。</p>
+<p><span class="red">变量更名：</span>现将 gmu_uv_list_AUTO_LINK 改名为 <b>gmu_uv_list_AUTO_LINK_ALL_LEVEL</b>。理由：GnumakeUniproc 本来就能自动链接列于 gmu_uv_list_LIB_TO_LINK 中的子工程，因此此名字应该强调其跨层链接的特性。</p>
+<p>今天的更改出现于 svnreps v288 。 </p>
+<h4>[2007-03-10] <b>gmu_uv_list_AUTO_LINK_ALL_LEVEL 再次改名</b></h4>
+<p>gmu_uv_list_AUTO_LINK_ALL_LEVEL 改名为 gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL 。对，该名字里应该有 SUBPRJ 字眼为好，表示这是个子工程列表。</p>
+<h3><a name="070310"></a>[2007-03-10] 又发现一个失误，没必要的库链接动作 </h3>
+<h4>问题描述</h4>
+<p>今天在运行昨天写的手册例子 FindEmptyDir 时，发现这样一个问题：</p>
+<blockquote>
+  <p>以下的 “-&gt;” 表示依赖关系，本例的依赖关系是：</p>
+  <p>demo_exe_1(EXE) -&gt; FindEmptyDir(LIB) -&gt; walkdir(LIB)</p>
+  <p>按照目前的 GMU 使用方法，为了让 demo_exe_1 自动链接 FindEmptyDir 所调用的库，处理方法是：</p>
+  <ul>
+    <li>demo_exe_1 工程将 FindEmptyDir 列到 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 中。</li>
+    <li>FindEmptyDir 工程将 walkdir 也 列到 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 中。 </li>
+  </ul>
+  <p>这样确实达到自动跨层自动链接的效果了。但是，在 demo_exe_1 已构建出来的情况下，若我改动 walkdir 库中的一个 C 文件后再调用 make，本例中 3 个工程全部被重链接过。——这不对！正确的行为是只有 walkdir 和 demo_exe_1 需要被重链接，FindEmptyDir 不必重链接。</p>
+</blockquote>
+<h4>查找原因</h4>
+<p>问题出在变量 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 上，该变量对于 FindEmptyDir 工程引发的动作有两个：</p>
+<ol>
+  <li>FindEmptyDir 工程链接映像完成后的后续工作——将 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 中子各个工程的 _AutoLinkListForParent.gmu.txt 的内容合并到本工程输出目录的 _AutoLinkListForParent.gmu.txt，供 FindEmptyDir 的父工程使用。 相关代码是（svnreps v369, line 1055）：</li>
+  <pre class="fws">$(gmu_Gp_LINK_OUTPUT_ckt): $(gmu_Gp_LINK_OUTPUT)
+<span class="c-comment">#[2006-12-12] Write auto-link list for parent, but only if this project is a link-component.</span>
+ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
+	@echo $(gmu_Gp_LINK_OUTPUT) > $(_p_AutoLinkListForParent)
+ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
+	<b>@for v in $(<span class="red">_Gp_list_AutoLinkFromChildren</span>); do echo $$v >> $(_p_AutoLinkListForParent);</b> done
+endif
+endif
+</pre>
+  <p>注：以上代码片断中的 <code>_Gp_list_AutoLinkFromChildren</code> 和 <code>_p_AutoLinkListForParent</code> 都由 <code>_AutoLinkListForParent.gmu.txt</code> 构成，请自查其是如何构成的。</p>
+  <li>对于 FindEmptyDir 本身的链接过程来说，<code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 形成了链接依赖物的一部分，这表现在（svnreps v369, line 1041）：</li>
+  <pre class="fws"><b>gmu_Gp_list_SUBPRJ_TO_LINK</b> = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
+	$(if $(strip $(<b>gmu_uv_list_AUTO_LINK_ALL_LEVEL</b>)),$(_Gp_list_AutoLinkFromChildren))
+	# libs to link by EXE/DLL project
+
+$(gmu_Gp_LINK_OUTPUT): $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) <b>$(gmu_Gp_list_SUBPRJ_TO_LINK)</b>
+ifdef gmu_DO_SHOW_LINK_CMD
+	$(_DO_LINK_CMD)
+else
+	@$(_DO_LINK_CMD)
+endif
+</pre>
+</ol>
+<p>若 FindEmptyDir 是个 EXE 工程，第 2 点确实是必要的，因为 <code>$(gmu_Gp_list_SUBPRJ_TO_LINK)</code> 中任何文件的更新必须导致 EXE 工程重新被链接。但 FindEmptyDir 是个库工程，它所依赖的 walkdir 更新后自己没必要重新链接（其实是库打包）。为了消除此多余的库链接问题，我自然想到的是让 walkdir 的生成映像不要出现在 FindEmptyDir 库工程的 <code>gmu_Gp_list_SUBPRJ_TO_LINK</code> 列表中、但 walkdir 又必须是 FindEmptyDir 的子工程，这样就行。</p>
+<h4>解决方法 </h4>
+<p>此次修改将出现于 svnreps v370 ，一个附加的改动是将 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 改名为 <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code>。</p>
+<p>增加一个新 GnumakeUniproc 变量：<b><code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code></b> 。FindEmptyDir 中将 walkdir 子工程列于 <b><code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code></b> 中，而不再列于 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 中了。 对于 FindEmptyDir 来说，walkdir 不再列于 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> 中使得 <code>gmu_Gp_list_SUBPRJ_TO_LINK</code> 中就不再包含 walkdir 生成的映像，这样 walkdir 的 lib 重编后就不会导致 FindEmptyDir 重编了。</p>
+<p>GnumakeUniproc.mki 中的具体动作：</p>
+<ul>
+  <li>将 $(<code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code>) 添加到 <code>gmu_uv_list_ALL_SUBPRJ</code>(即原先的 <code>gmu_uv_list_SUBPRJ</code>) 中，使得 <code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code> 中的东西表现为子工程。</li>
+  <li>添加一个和 <code>_Gp_list_AutoLinkFromChildren</code> “并排的”内部变量 <b><code>_Gp_list_AutoLinkForParent</code></b>：</li>
+  <pre class="fws">  _Gp_list_AutoLinkForParent = $(foreach v,$(<b>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</b>),$(shell (if [ -n "$$gmu_DIR_GMU_PRG" ];then PATH=$$gmu_DIR_GMU_PRG;fi; \
+	cat $($v_OutdirGMUTMP)/$(_f_AutoLinkListForParent) \
+	)))
+</pre>
+ <p>“查找原因”第 1 点中的 <span class="fws"><b><span class="red"><code>_Gp_list_AutoLinkFromChildren</code></span></b></span> 改为此处新加的 <b><code>_Gp_list_AutoLinkForParent</code></b>。 </p>
+</ul>
+<p>没错，虽然在“查找原因”中造成麻烦的是“第 2 点”，但我却是通过修改“第 1 点” 涉及的代码来解决的。 </p>
+<p>总结一下：</p>
+<ul>
+  <li>若当前工程希望某个子工程(暂称 SPMLTS)以及那个子工程的所有子工程能被自己链接，则设子工程(SPMLTS) 到 <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code>（即新的 <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code>）。</li>
+  <li>若当前工程希望某个子工程(暂称 SPMLTP)以及那个子工程的所有子工程能被自己的父工程链接，则设子工程(SPMLTP) 到 <code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code> 。 </li>
+</ul>
+<p>可以想像，应该不会出现当前工程既希望一个子工程要被自己链接又希望要被自己的父工程链接的情况，这反映了使用 <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL、gmu_uv_list_SUBPRJ_LINK_FOR_PARENT </code>两个变量的合理性。</p>
+<p>＝</p>
+<h2><a name="061108-2"></a>[2006-11-08] 关于 gmp_bc_IMAGE_TYPE 的可扩展性 </h2>
+<p>在 2006 初让 GnumakeUniproc 构建 PT-850 应用程序时就遇到这个问题，并想出了解决方法。现在意识到其实所有的目标平台都有这样的问题，比如：</p>
+<ul>
+  <li>Windows 上编写 MFC 程序、内核模式驱动程序等。</li>
+  <li>Linux 上编写 GTK 程序、KDE 程序等。</li>
+</ul>
+<p>这些“不同类型”程序的构建过程的差别可归纳为：</p>
+<ol>
+  <li>编译开关不同，比如：
+    <ul>
+      <li>需要用 -D 开关指定一些宏定义</li>
+      <li>需要用 -I 指定额外的头文件目录</li>
+    </ul>
+  </li>
+  <li>链接开关不同，这个的名目就太多了，不列举了。</li>
+  <li>编译或链接前需要创建一些额外的文件供编译或链接使用，比如：   
+    <ul>
+      <li>Windows GUI 程序总是需要用 rc.exe 将一个资源描述文件(.rc)编译成 .res 文件，供链接器链接。</li>
+      <li>PT-850 的应用程序要用 uwarp.exe 来处理 .rc，生成 uToolsRes.cpp 供 armcpp 编译。</li>
+    </ul>
+  </li>
+</ol>
+<p>显然，以上的易变要求是无法仅仅依赖 GnumakeUniproc 提供的固定不变的那坨 .mki 文件来达成的，因此，GnumakeUniproc 用户需要有一种方法来扩展自定义的“程序类型”。2006 初对这个目标的努力取得了成效（用在构建 PT-850 UFC 程序上），但有个重大失误：没有用环境变量来指示用户自己的 .mki 所在的位置，而是要求用户的 .mki 出现在 GnumakeUniproc 本身所在目录的一个子目录中（armcpp/build_config.mki）。</p>
+<p>原先那种要求对用户管理自己的 .mki 极不方便，比如，用户开发自己的 .mki 是会将其纳入 SVN 管理，而 GnumakeUniproc 本身可能也是用户 checkout 出来的，结果，两个 SVN 工作拷贝就混在一起了，这是很糟糕的工作实践。</p>
+<p>要自由，王道还是利用环境变量。</p>
+<h4>[2006-11-08]</h4>
+<p>已在 svnreps v237 做了改进。涉及的变量：</p>
+<ul>
+  <li>gmp_ud_list_CUSTOM_IMAGE_TYPE （环境变量，指示 pattern1.mks 到那些目录中寻找符合 gmp_bc_IMAGE_TYPE 的客户 mki 文件） </li>
+  <li>gmp_DIR_CUSTOM_IMAGE_TYPE （由 pattern1.mks 输出，以便 pattern1 用户在 postlink 过程引用那个目录） </li>
+</ul>
+<p>假定：</p>
+<ul>
+  <li> gmp_ud_list_CUSTOM_IMAGE_TYPE=/dir1 /dir2 </li>
+  <li>gmp_bc_IMAGE_TYPE=IT_850APP</li>
+</ul>
+<p>则：</p>
+<ul>
+  <li>若 /dir1/IT_850APP/IT_850APP.mki 存在，则 inlcude 之，gmp_DIR_CUSTOM_IMAGE_TYPE 被设为 /dir1/IT_850APP ，不再检查 /dir2 目录了。</li>
+  <li>若 /dir2/IT_850APP/IT_850APP.mki 存在，则 include 之，gmp_DIR_CUSTOM_IMAGE_TYPE 被设为 /dir2/IT_850APP 。 </li>
+  <li>若以上两处的 IT_850APP.mki 都不存在，则报错。</li>
+</ul>
+<h2><a name="061112"></a>[2006-11-12] 时光之旅——取出过去的源码版本并构建</h2>
+<p>这将会是一项神奇的功能，它能够让你在未来的任意时刻构建过去任意时刻的一个软件项目——这个软件项目可以非常复杂，即可以有非常多层次的库构成。</p>
+<p>为了使这个愿望成为现实，我们得先定义好它的操作模型。这里所谓操作模型的含义是：定义什么样的规则来 checkout 出各个 make 工程所需的代码，使得 checkout 出的代码能构建出某个软件项目的某一个历史版本。 </p>
+<div class="footnoteb">
+  <p>注意：我这里有意区分了两个名词：</p>
+  <ul>
+    <li>make 工程</li>
+    <li>软件项目</li>
+  </ul>
+  <p>它们的关系是：</p>
+  <ul>
+    <li>一个软件项目由多个模块构成，</li>
+    <li>一个模块通常是一个库，对于一个库肯定要写一个 makefile 来构建之，这样的一个 makefile（包括其 include 进来的各个片断 makefile）表现为一个 “make 工程”。</li>
+    <li>对于一个 make 工程，有可能要 checkout 出多个 CVS/SVN 源码库中的内容才能使该 make 工程被成功构建。</li>
+  </ul>
+</div>
+<p>总体来说，为了达到 checkout 出历史(historical)源码版本的目的，有两个 checkout 步骤：</p>
+<ol>
+  <li>手动阶段。手动 checkout 出一个 makefile，该 makefile 是个引子，其中记录着它被执行时应该再 checkout 出其他哪些源码库的哪些历史版本。</li>
+  <li>自动阶段。手动阶段 checkout 出的引子 makefile 被执行，它将自动 checkout 出为构建历史版本所应该再 checkout 出的其他源码（包括更多的 makefiles）。而且，被自动 checkout 出的 makefiles 还可以递归进行这一阶段（递归地被执行并 checkout 出更深一层的 makefiles），直到所有需要的源码都被 checkout 出为止。 ——让这第二阶段能“自动地”进行，就是 GnumakeUniproc 的任务。 </li>
+</ol>
+<p>虽然以上过程归纳为两个阶段，事实上要完成并没那么简单，这需要 GnumakeUniproc 定义一套操作模型，且 GnumakeUniproc 的用户遵循这个模型来编写 makefile。</p>
+<h3>操作模型</h3>
+<p>经过几个月的思考，我意识到存在两种模型，我给其取名“封闭回溯模型”和“开放回溯模型”，简称“封闭模型”和“开发模型”吧。</p>
+<h4>封闭模型</h4>
+<p>目前的 uBase-III 内核就是一个封闭模型的例子。封闭模型的意思是：构成一整个软件项目的各个代码模块仅仅供那个工程使用，比如：</p>
+<ul>
+  <li>uBase 内核的 uBase850.alf, dev850.alf 这些模块就仅仅给供 850 内核使用。</li>
+  <li>至于 FontLib.alf, RPCLIB.alf, uffs.alf ucip.alf 这些模块，若你将 850 内核当做一整个软件项目的话，它们不属于封闭模型中的模块——因为这些模块 041、031 也可以用得到；但若将整个 uBase 当做一个软件项目的话，它们就都属于封闭模型了——封闭在 uBase 源代码中。</li>
+</ul>
+<p>下面拿 uBase （整个，包括 850、041、031）作为封闭模型的例子。</p>
+<p>对于属于封闭模型的工程来说，其引子 makefile 在指示要 checkout 出子工程的 makefiles 时（<i>SubprjRefname</i>_Makefile），应该明确指示所要 checkout 的版本（<i>SubprjRefname</i>_cvsTag_forMakefiles 或 <i>SubprjRefname</i>_svnRev_forMakefiles），当然，若被自动 checkout 出的 makefiles 又要 checkout 出更深一层的子工程，它也得明确指出要 checkout 出其子工程所在源码库的何版本。 这样一环扣一环，最终就能将某个属于封闭模型的软件项目涉及的历史源码版本全部 checkout 出，若整个 checkout 过程没有发生<a href="#061112-2">来源冲突</a>的话，构建历史版本的目的就达成了。</p>
+<p>对于采用封闭模型的软件项目来说，为标识一个具体源码版本所采取的做法可以是很随意的（比“开放模型”要随意）。当你必须标识一个软件项目的版本时：</p>
+<ul>
+  <li>你可以对该项目涉及的各个源码库分别打上 tag 名完全相同的新 tag（借用 CVS 的术语，比如给 uBase 的各个模块都打上 uBase_3-04-015 这个 tag），来表示该软件项目一个新版本的诞生；</li>
+  <li>若原先各个库已有它们各自的 tag 来标识其各自的版本了，那么也可以不打新 tag，只要父工程懂得 checkout 出 子工程正确的 tag 即可。拿 uBase 举例：
+    <ul>
+      <li>RPClib 可以有它自己的版本标识(tag)，比如 rpc_v3, rpc_v4 等等。</li>
+      <li>uffs 可以有它自己的一套版本标识，比如 uffs-v1, uffs_v1-1 等等。</li>
+      <li>而构建 uBase850 的引子 makefile 自己则可以打上 uBase_3-04-015 这样的 tag。</li>
+    </ul>
+  </li>
+</ul>
+<p>-</p>
+<h4>开放模型</h4>
+<p>开放模型的操作比封闭模型复杂，我数周前才想到其解决方法的，有待在实践中检验。</p>
+<p>开放模型的提出来源于这样一种要求：你编写了一个库（下面用 UVL 指代(universal lib)），这个库会被无限多的其他软件项目使用、被你认识和不认识的无限多的人使用。这样，那些软件项目应该如何定义对 UVL 的依赖关系呢？套用封闭模型的做法会出问题的，如下：</p>
+<blockquote>
+  <p>假定你写了一个 UVL v1.0 ，该 UVL 被链接成一个 DLL 在系统中使用。</p>
+  <p>你马上有一个 EXE 工程（称 ExPrjA）要使用这个 DLL，ExPrjA 工程完成后成为 v1.0 版（当然，这个 v1.0 和 UVL 的 v1.0 是独立的两个版本号）。那么，为了今后能够编译 ExPrjA v1.0，你可能会这么做：</p>
+  <ul>
+    <li>给 1.0 版的 UVL 打上 v1-0 的 tag。</li>
+    <li>给 1.0 版的 ExPrjA 打上 v1-0 的 tag，并且在该 v1-0 的 tag 的 makefile 中指示要去 checkout UVL 的 v1-0 tag。</li>
+  </ul>
+  <p>到此看起来没什么问题。但问题很快就要来了，假定你一周后要开发一个 ExPrjB 的项目，该项目也用到 UVL v1.0，但你在开发 ExPrjB 的过程发现 UVL v1.0 的实现有 bug，必须修改后 ExPrjB 才能使用。不过这个修改并不导致对 ExPrjA 的兼容性，也即 UVL 的接口保持不变。</p>
+  <p>好了，接下来你自然想做的是：</p>
+  <ul>
+    <li>将修正了 bug 的 UVL 打上 v1-1 的 tag，表示它已经是 v1.1 了。</li>
+    <li>给 ExPrjB 打上 v1-0 的 tag，表示 ExPrjB 的 1.0 版出炉了，在 ExPrjB v1-0 的 makefile 中说自己要 checkout UVL 的 v1-1 tag。 </li>
+  </ul>
+  <p>问题现在来了。假设接下来的某一天你要将 ExPrjA 和 ExPrjB <b>一并</b>构建出来，而且构建的是它们的“稳定发行版”，即 ExPrjA v1.0 和 ExPrjB v1.0，而非它们主干上的最新版本。那么……<b>我们是否要为此改动 ExPrjA 的源码库呢 </b>？</p>
+  <ul>
+    <li>如果不改动，我们面临一个矛盾：ExPrjA 的稳定版当前要 checkout 出 UVL 的 v1.0，而 ExPrjB 则要 UVL 的 v1.1。UVL 的 v1.0 &amp; v1.1 是决不可能共存在同一个系统中。“不可共存”的两层含义：
+      <ul>
+        <li>同一个文件系统目录中无法做到即存 UVL 1.0 的代码，又存 UVL 1.1 的代码。</li>
+        <li>即便你将 UVL 1.0 和 1.1 的代码 checkout 到不同的目录中，构建出两个 DLL 版本，但最终还是只能拷贝其中之一到系统目录中（如 Windows 的 SYSTEM32 目录）供所有需要它的 EXE 链接。</li>
+      </ul>
+	  <p>这种矛盾使得我们在 UVL 的两个版本中必须二选一。在必须二选一的情况下，没有人会反对应该选 UVL 的新版本，即 v1.1。因此不改动是不符合现实的。 </p>
+    </li>
+    <li>如果改动（“更新一下” ExPrjA 的 v1-0 源码，将其 makefile 中写的要 checkout 出的 UVL 版本改为 v1-1）则我们又面临着一种糟糕的操作模型：倘若当我们要作这种改动时，已经有 10 个其他的工程依赖于 UVL v1-0 了，那么那 10 个项目岂不要统统改过？这将是非常累人的！</li>
+  </ul>
+  <p>因此，为了解决 UVL 那种场景带来的麻烦，我们需要为“取出软件项目的历史版本”定义一种新的操作模型，就是我所谓的“开放模型”。</p>
+</blockquote>
+<p>开放模型用两个要素来标识一个历史版本：<u>时间点</u> 和 <u>接口稳定的分支</u>。</p>
+<p>以上两要素中的“时间”很容易理解，因为对于很多具体的库工程来说，给定某个具体的时间点，那个时间点上该库肯定有一个稳定版本（当然这个时间点要在该库发行了第一个稳定(被发行者认为是稳定的)版本后）。</p>
+<p>单有时间点还不够，因为有时候会有这样的场景：</p>
+<blockquote>
+  <p>一个库（还是称其为 UVL）经历了 v1.x 了 v2.x 两个大的版本号，v1.x 之间的接口是兼容的，但 v2.x 接口和 v1.x 是不兼容的。在这种情况下，我们有必要让该库的 v1.x 的最高版本和 v2.x 的最高版本共存于系统中（当然，这两种版本表现出的 DLL 文件名将是不同的(<a href="#deploy-interface-change">[2006-11-17]用两个 DLL 还是一个？</a>)）。我们不能消灭 v1.x，因为系统中可能还有某些软件是在该库的 v2.0 之前开发出来的，它们希望使用 UVL v1.1。</p>
+  <p>这样的话，该库 v2.0 发行后的某个时间点其实对应着该库的两套版本，并且是应该共存的两套版本，因此单有时间点这个要素并不能让我们决定该取用该库的 v1.x 还是 v2.x。</p>
+</blockquote>
+<p>现在引入“接口稳定的分支”这个要素。要给它一个“它是×××”的定义并不容易，还是从例子入手讲解吧。</p>
+<blockquote>
+  <p>为了达成取出任意历史版本的目的，并且不受上头“封闭模型”案例的那种困扰，我们对源码库的组织有如下要求：（这种要求针对的是要被其他工程依赖的库，对于普通 EXE 这样的不被谁依赖的工程则无所谓）</p>
+  <p>当一个模块出现第一个发行版时，我们认为该库的第一个接口版本已经公布于世了，我们要在 CVS/SVN 中为其做一个分支（称其为 v1.x-is 分支(is 指代 interface-stable)），该分支的特点是：在今后的任意时刻看该分支，该分支都应该是可构建的，并且构建出的东西提供完全一样的接口（称接口 v1）。这个分支的存在是为使用（或说依赖） v1 接口的其他工程负责的，因此它是向全世界公布的、且公布后就不应更改的。</p>
+  <p>这意味着你在发行 v1.0 时很可能需要做两个分支出来：</p>
+  <ul>
+    <li>一个是刚刚说的 v1.x-is 分支。</li>
+    <li>另一个是 v1.x-dev 分支。该分支是我们在开发 v1.1 时使用的（v1.1 是 v1.0 的实现改进、或修正 v1.0 的 bug） ，该分支的内容并非随时是可构建的，因为它处在开发过程的变动中。当然，你想不做该分支、而用 trunk 来代替也是可以的；不过，若 trunk 已进入 v2.0 的开发中，则该分支是非做不可了。 </li>
+  </ul>
+  <p>此后，</p>
+  <ul>
+    <li>对于继续开发 UVL v1.x 的人来说，当 v1.1 在 v1.x-dev 分支上测试通过、可以发布时，开发者将 v1.x-dev 分支上自 v1.0 以来的改进内容合并到 v1.x-is 分支上（这步做得越“原子”越好）。</li>
+    <li>对于使用 UVL v1.x 的工程（比如 ExPrjC）来说，又分两个阶段：
+      <ul>
+        <li>ExPrjC 开发过程： 若 ExPrjC 在开发时本就打算对当前 UVL 最新的 v1.x 实现进行改进，则 ExPrjC 在开发过程中可以依赖 UVL v1.x-dev 分支；若 ExPrjC 在开发时不打算对 UVL 的最新 v1.x 版作改动，则 ExPrjC 依赖 UVL v1.x-is 会更好——那可以排除其他开发者在 UVL v1.x-dev 分支上进行变动的干扰。</li>
+        <li>ExPrjC 第一个版本发行时：比如 ExPrjC v1.0 诞生，ExPrjC 这时按习惯也得做一个分支来表达其 v1.0 版， 现在，这个 ExPrjC v1.0 分支中的 makefile 就应该指示它必须依赖 UVL v1.x-is 分支、而决不能是 UVL v1.x-dev。</li>
+      </ul>
+    </li>
+  </ul>
+</blockquote>
+<p>现在，回到前头的那个麻烦场景：当使用 UVL v1.1 的 ExPrjB v1.0 出炉后，如何在不改变 ExPrjA v1.0 的 makefile 的情况下，同时构建出以下三样东西呢？</p>
+<ol>
+  <li>UVL v1.1 </li>
+  <li>链接了 UVLv1.1 的 ExPrjA v1.0 </li>
+  <li>链接了 UVLv1.1 的 ExPrjB v1.0 </li>
+</ol>
+<p>现在的关键点在 ExPrjA 的 makefile 上，我们要使它能够适应未来的需要。</p>
+<ul>
+  <li>UVL 在 v1.0 发布时，必须做 v1.x-is 这个分支 （v1.x-is 的含义前面已经讲述）。 </li>
+  <li>ExPrjA v1.0 发布时，它的 makefile 必须指出去 UVL 源码库的 v1.x-is 分支取出 UVL 的代码。UVL 的 v1.x-is 是分支、不是 tag，因此 ExPrjA v1.0 的 makefile 在未来并不会改变，但该 makefile 指示取出的 UVL 代码却是会变的——这就是所谓“能够适应未来的需要”。</li>
+  <li>当 ExPrjB v1.0 出炉前一刻，UVL v1.x-is 分支的 HEAD 版本应更新为 v1.1 的内容。 </li>
+  <li>最后，当用户想 checkout 出 ExPrjA 和 ExPrjB 的代码时，必须指定一个 make 变量（目前已定为 <b><code>gmu_SC_CHECKOUT_DATETIME</code></b>），该变量是个全局时间点指示，它指示 GnumakeUniproc 要 checkout 出 makefile 中指定的分支（如 UVL v1.x-is）上哪一个时间点的内容。对于我们的案例，将该时间点指定为 ExPrjB v1.0 发布的那一时刻，那么 ExPrjA 和 ExPrjB 的 makefile checkout 出的 UVL 就都是 v1.1 的了。 </li>
+</ul>
+<p>总结一下，对软件项目涉及的某个源码库来说，<u>时间点</u> 和 <u>接口稳定的分支</u> 这两个要素中，</p>
+<ul>
+  <li>接口稳定的分支必定是在 makefile 中指定的，一旦软件模块的某个版本发布，它就永远不变了。</li>
+  <li>而时间点则必定是由调用 makefile 的用户动态指定的。 </li>
+</ul>
+
+<h3><a name="#deploy-interface-change"></a>[2006-11-17]用两个 DLL 还是一个</h3>
+<p>此处有两种选择：</p>
+<ul>
+  <li>对于库的 v1.0 和 v2.0 各生成一个 DLL（DLL 文件名不同），分别提供 1.0 和 2.0 的接口 。</li>
+  <li>保持一个 DLL，但在这个 DLL 中提供 v1.0 和 v2.0 两个版本的接口。</li>
+</ul>
+<p>保持单一 DLL 的做法应该更有优势。</p>
+<p>在如下场合中更是非要用一个 DLL 不可：</p>
+<ul>
+  <li>若该库运行过程中，需要维护唯一一份全局对象——比如一个链表，串起所有该库所创建对象的指针，而不管那些对象是用 v1.0 的接口还是 v2.0 的接口来创建/操作的。 </li>
+</ul>
+<h3><a name="061117-2"></a>[2006-11-17]若想工作拷贝能灵活选用开发分支还是稳定分支，必须针对每个工程动用环境变量</h3>
+<p>2006-11-12 提出：在开放回溯模型下，“接口稳定的分支”必定在 makefile 中指定；“构建时间点”必定由用户动态指定。这种提法没错，但需要有所补充，因为还有一个疑惑未解开：当我们需要使用开发分支(*-dev)时，该分支该在何处指定为好？下面就是答案：</p>
+<blockquote>
+  <p>一个稳定分支的 makefile 中若涉及 checkout 的场合，不应该写死要 checkout 的“接口稳定分支”，而是要提供如下灵活性：</p>
+  <ul>
+  <li>若用户的环境变量指示要 checkout 相应工程的具体某个分支，则应该用用户要求的那个分支。因此，用户可以用环境变量来指示要 checkout 某个工程的某个开发分支。</li>
+  <li>若用户的环境变量没有指示，则使用写于 makefile 中的那个分支（这当然应是个“接口稳定的分支”）。 </li>
+  </ul>
+</blockquote>
+<p>以上做法的理由何在？再祭出一个例子来说明（该例子未行使以上决定，最终将看到其麻烦所在）：</p>
+<blockquote>
+  <p>假定： </p>
+  <ul>
+  <li>UVLd 是个库工程、被 EXE 工程 ExPrjE 和 ExPrjF 当作子工程使用（ExPrjE,ExPrjF 的 makefile 中指示依赖 UVLd 并链接其输出）。</li>
+  <li>某天 UVLd 1.0、ExPrjE 1.0、ExPrjF 1.0 同时发布，并对 UVLd 1.0 做了 UVLd v1.x-is 和 v1.x-dev 分支。</li>
+  <li><a name="061118-minor"></a>为了今后能够取出 ExPrjE、ExPrjF 的 1.0 版构建， 同时也为他们做了 v1.x-is 和 v1.x-dev 分支。
+    <ul>
+      <li>！细节！在 ExPrjE v1.x-is 分支中，ExPrjE 的 makefile 指示 checkout 出 UVLd 的哪个分支呢？当然是 UVLD v1.x-is，因为“稳定版”的 makefile 当然也应该 checkout 出它所依赖子工程的稳定版分支。</li>
+    </ul>
+  </li>
+  </ul>
+  <p>现在，我们打算开发 ExPrjF 的 v1.1 版，此过程中要对 UVLd 的 v1.0 做改进（但不动接口）。显然，我们接下来的开发会使用 ExPrjF v1.x-dev 和 UVLd v1.x-dev 这两个分支——这没错，不过这个例子的关键之处还在于需要下面这个条件：</p>
+  <ul>
+  <li>为了 ExPrjF 能够运行，我们需要 ExPrjE 的参与。换句话说，虽然 ExPrjF 在链接时不需要 ExPrjE 的存在，但运行时 需要 ExPrjE，比方说它们两个间要干一些进程间通信的事。</li>
+  </ul>
+  <p>为了这个附加条件，我们会再建立一个 makefile 工程（称 CtnA (container A 之意)），该工程本身不产生链接输出、仅仅是将 ExPrjE 和 ExPrjF 作为其子工程罢了，这样我们才可以在一台空机上将 ExPrjE 和 ExPrjF 一并编出来运行。现实中，CtnA 这个 makefile 工程可能在 UVLd、ExPrjE、ExPrjF v1.0 发布的那天就已经存在了，但放在这里才提出能凸现其必要性。</p>
+  <p>好了，现在问题来了。在 ExPrjF v1.1 的开发过程中，CtnA 工程的 makefile 现在要分别 checkout ExPrjE 和 ExPrjF 的哪个分支呢？ </p>
+  <p>如果只是考虑到 ExPrjF 要用开发分支、ExPrjE 仍用稳定分支的话：</p>
+	<p>CtnA 的 makefile 中会 checkout 出 ExPrjF v1.x-dev 和 ExPrjE v1.x-is。但这将导致一个矛盾：</p>
+	  <ul>
+	    <li> ExPrjF v1.x-dev 上的 makefile 要求 checkout 出 UVLd v1.x-dev 。</li>
+	    <li> ExPrjE v1.x-is 上的 makefile 要求 checkout 出 UVLd v1.x-is 。 </li>
+	  </ul>
+	  <p>要构建出唯一一个版本的 UVLd，但 checkout UVLd 的来源却有两个，这显然是我们不希望的。我们当前希望用的是 UVL v1.x-dev 分支。</p>
+</blockquote>
+	  <p>以上案例又留给我们一个矛盾，如何解决这个矛盾呢——即让本案例中的 ExPrjE 和 ExPrjF 的 makefile 都一致地 checkout UVLd 的 v1.x-dev 分支？</p>
+	  <p>我将在一个失败的尝试阶段后分析其失败原因，然后给出最终的解决方案。 </p>
+	  <h5>尝试阶段：在 ExPrjE 的 makefile 上动手脚</h5>
+	  <blockquote>
+	    <p>尝试阶段的想法是简单的：我们设法让 ExPrjE 去 checkout 出 UVLd v1.x-dev 不就行了吗？具体做法是，对 ExPrjE 的 v1.x-dev 分支上的 makefile 作修改，让该 makefile 去 checkout UVLd v1.x-dev 分支。</p>
+		<div class="footnoteb">你可能会说，这个步骤在我们发布 UVLd、ExPrjE、ExPrjF 的 v1.0 版时不是已经做了吗（<a href="#061118-minor">这里做的</a>）？确实，根据我前面的文字，确实是做了，但当时做 ExPrjE v1.x-dev 分支这个操作不是发布那三个工程的 1.0 版所必须的，但这里却是非做不可了——因此这里将这个操作复述了一遍。</div>
+	    <p>这样的话，CntA 同样得变动一下了，它不能去 checkout ExPrjE 的 v1.x-is 分支，得改为 checkout ExPrjE 的 v1.x-dev 分支，如此才能达到 UVLd v1.x 来源统一的要求。</p>
+	  </blockquote>
+	  <h5>对“尝试阶段”做法的分析——那种做法仍是失败的</h5>
+	  <blockquote>
+	    <p>“尝试阶段”的做法表面上看达到了 UVLd v1.x 源码来源统一的要求，但我最后还要给出一个苛刻的场景，该场景将使得尝试阶段的做法不再适用。</p>
+	    <p>苛刻的场景：</p>
+	    <blockquote>
+	      <p>现在起假设要开发 ExPrjF v1.1 的人叫做 Fred，同时，Eric 这个人要开发 ExPrjE 的 v1.1 版，不过 ExPrjE v1.1 的开发和 ExPrjF v1.1 的有些不同：ExPrjE 的开发仅局限于该工程自身代码的改进，不需要修改 UVLd 。</p>
+	      <p>而且，我们希望 Fred 和 Eric 的开发尽量不互相干扰。 说得更仔细些：</p>
+	      <ul>
+		  <li>Fred 的开发过程总是应该看到 ExPrjE 的稳定分支。若 Fred 的开发过程看到 ExPrjE 的开发分支，那么他就有可能受到 Eric 开发工作的干扰——比如 Eric 临时提交了一些无法编译通过的代码，却恰好被 Fred 给 checkout 了（对，Fred 会随时在一台空机上自动 checkout 所有他需要的源码）。反之亦然。 </li>
+		  </ul>
+	    </blockquote>
+	    <p>现在发现了吗？根据尝试阶段的做法，Fred 的开发过程 checkout 的是 ExPrjE 的 v1.x-dev ，这正是 Eric 应该使用的开发分支，Fred 将会受到 Eric 的干扰。 </p>
+</blockquote>
+  <h5>终极解决之道：为每个模块安排一个环境变量，用环境变量来决定选用稳定分支还是开发分支</h5>
+  <p>解决方法的说明在<a href="#061117-2">本节一开始</a>就已揭示了，现在针对本案例来具体说明。</p>
+  <p>假定例子中的三个工程的源码都是用 SVN 来管理的，每个工程对应一个 SVN 源码库，则：</p>
+  <blockquote>
+  <ul>
+	<li>对于 UVLd，我们准备环境变量：
+	  <ul>
+		<li>GMUM_UVLd_SvnUrl</li>
+		<li>GMUM_UVLd_SvnRev</li>
+	  </ul>
+	</li>
+	<li>对于 ExPrjE：
+	  <ul>
+		<li>GMUM_ExPrjE_SvnUrl</li>
+		<li>GMUM_ExPrjE_SvnRev</li>
+	  </ul>
+	</li>
+	<li>对于 ExPrjF：
+	  <ul>
+		<li>GMUM_ExPrjF_SvnUrl</li>
+		<li>GMUM_ExPrjF_SvnRev</li>
+	  </ul>
+	</li>
+  </ul>
+  <p>所有以上三个工程的 v1.1-dev 和 v1.1-is 分支的所有 makefiles 中，当要指明 checkout <b>别的</b>某一个工程源码时，必须如下指定 checkout 分支（下面用 &lt;Prj&gt; 来作要被 checkout 的工程名的占位符）：</p>
+  <pre class="fws">$(if $(GMUM_&lt;Prj&gt;_SvnUrl),$(GMUM_&lt;Prj&gt;_SvnUrl),svn://&lt;svn-path-prefix-to-&lt;Prj&gt;&gt;/branches/v1.x-is)</pre>
+  <p>没错，当 GMUM_&lt;Prj&gt;_SvnUrl 没有指定时，即使要求 checkout &lt;Prj&gt; 的那个工程（再次提示：&lt;Prj&gt; 非该工程自己！）本身使用<b>开发分支</b>，该工程要求 checkout 出的其他工程却默认采用<b>稳定分支</b>。</p>
+  <p>这种决定的合理性表现于：</p>
+  <blockquote>
+    <p>在一个软件项目由很多很多工程（或说模块）构成的情况下，一个开发者若想对其中某些模块作开发（比如例子中 Fred 对 ExPrjF 和 UVLd 开发 v1.1）：</p>
+    <ul>
+	 <li>他当然有义务按照软件构建框架的要求对他所涉及的模块采取一些特殊操作 ，即定义 GMUM_&lt;Prj&gt;_SvnUrl 变量。</li>
+     <li>而对于和他的开发工作没有关系的模块，他不应该去修改那些模块的 makefile，甚至不必意识到那些模块的存在。</li>
+	 <div class="footnoteb">“不必意识到别的模块的存在”是一个非常令人愉快的结果，因为对整个软件项目的 checkout 过程是由 GnumakeUniproc 根据 makefile 中定义的父子工程 checkout 关系自动进行的。软件项目的某个模块的开发者只需要关心他自己涉及的模块源码在何处且被 checkout 到哪个本地目录中了，至于有哪些其他的源码库被 checkout 到其他的本地目录中则完全可以视而不见。</div>
+    </ul>
+  </blockquote>
+  </blockquote>
+	  <p>&nbsp;</p>
+	  <h4>关于“模块”和“工程”的关系：</h4>
+	  <p>自 2006-11-12 以来的文字中，“工程”和“模块”这两个词经常是被混用的，但它们间还是有区别的。</p>
+	  <p>一个“工程”就是指一个 Makefile 工程，该工程由一些 C/C++ 源码和一个主 makefile 构成（那些被人 include 的不算主(primary) makefile），主 makefile 被 GNUmake 执行后产生一个链接输出（库或可执行文件）。不过对于 GnumakeUniproc 来说，有一种工程比较特殊，那就是容器(container)工程：容器工程本身不产生链接输出，而仅仅是指出有哪些子工程要构建。</p>
+	  <p>至于“模块”，则是软件项目组织上的一个概念。一个模块反映为一个功能实体，一个模块可以由一个库文件构成，也可以由多个库文件构成。对于由多个库文件构成的一个模块，可以想像其有如下特点：      
+	  <ul>
+	    <li>由几个库文件共同提供一套接口，缺少其中一个库则接口的实现就是不完整的。</li>
+        <li>那几个库文件不各自定立版本号，而是使用同一套版本号。</li>
+        <li>每个库文件都由一个独立的主 makefile 来构建，即每个库文件对应一个 makefile 工程。</li>
+        <li>当我们要构建此模块时，总是要同时构建所有构成该模块的库。</li>
+</ul>
+	  <p>在有了上面“模块”的概念后，对于创建分支这样的操作，当然是针对“模块”来说比针对“工程”来说更为准确了。</p>
+	  <h2><a name="061112-2"></a>[2006-11-12]同一本地路径中的源码来源冲突必须能够检测出</h2>
+<p>在确立了取出历史版本用于构建的方法后，用户很可能会遇到这样的情况：用户不小心地将不同来源的代码（比如不同的 CVSROOT/SVN-Url，或 CVSROOT/SVN-Url 相同、但指定的分支或 tag 不同）checkout 到同一个本地路径中。在这种情况下 </p>
+<ul>
+  <li>CVS/SVN 有可能会报错（比如 SVN 在 SVN Url 来源不同的情况下会报错）， </li>
+  <li>但在有些情况下并不报错（比如 CVSROOT/SVN-Url 相同，但 revision 不同的情况） </li>
+</ul>
+<p>来源有冲突，但 CVS/SVN 本身不报错的结果是不同版本的本地拷贝互相覆盖，而用户只有在真正开始编译源码甚至运行构建出的程序时才会发现出问题了，这种问题可能会相当难定位。因此，GnumakeUniproc 有义务帮助用户检查这种冲突的发生。</p>
+<p>检查的方法是：在接受 checkout 内容的本地目录中生成两个文件：</p>
+<ul>
+  <li>_ScCheckTime.gmu.ckt 记录这个本地目录的源码库来源。
+    <ul>
+      <li>对于 CVS，记录 CVSROOT、module、revision 这三个参数</li>
+      <li>对于 SVN，记录 SVN-Url、revision 这两个参数 </li>
+    </ul>
+  </li>
+  <li>_ScByMakefile.gmu.txt 记录自工程开始构建以来第一个将源码 checkout 到这个目录的那个 Makefile 的全路径，以便在“检查到另一个 Makefile 企图 checkout 不同的源到此本地目录时”能够告知是哪两个 Makefile 的 checkout 行为冲突了。</li>
+</ul>
+<h2><a name="061130"></a>[2006-11-30]小心 make 用户使用非常规符号</h2>
+<h3>[2006-11-30] 使用 make 选项 <code>--debug=m,v</code> 暴露出的问题</h3>
+<p>若使用此选项，则在 GMU 生成的 _SubprjsAttr.gmu.mki 中会出现如下的语句片断（在一个很长的语句中）： </p>
+<pre class="fws">_temp := $(shell <b>(</b>... ${MAKE} _gmu_ut_GetPrjAttr ... $<span class="red">(</span>if $(call _IsStringEqual,${MAKELEVEL},0), --debug=m,v,<span class="red">)</span> ...<b>)</b>)
+</pre>
+<p>因此 <code>--debug=m,v</code> 中的逗号成了 <code>$(if )</code> 函数的参数分隔符，进而，<code>v,</code> 成了被 <code>$(shell )</code> 调用的 make 命令的一个 target。</p>
+<p>要解决此问题，目前想到的方法是将 --debug=m,v 这坨东西先赋给一个 _SubprjsAttr.gmu.mki 中定义的变量，需要时再展开之。</p>
+<p>svnreps v255 解决了此问题。</p>
+<h2><a name="061202-1"></a>[2006-12-02] 发觉 pattern1.mks 中的编译开关(gmp_CFLAGS)得预分类了</h2>
+<p>原先，pattern1.mks 中根据 GnumakeUniproc 用户提供的变量来设置 gmp_CFLAGS，然后 gmu_u_LINK_CMD 中将 gmp_CFLAGS 的内容作为编译命令选项的一部分，GnumakeUniproc 用户可以根据需要在任何地方往gmp_CFLAGS 中添加自己额外的内容。</p>
+<p>这可以说是没问题的，直到我昨天开始写一个自定义映像类型（IT_usepch）来达成对 MSVC 程序的预编译头（precompiled header）的支持时。</p>
+<div class="footnoteb">在写 IT_usepch 的过程中，我发现像添加预编译头支持这样的构建功能扩展不应该把做成个“自定义映像类型”，而是要做成“插件”为好——GnumakeUniproc 要进行修改以支持这个“插件”功能。因此，今后的预编译头支持将被做成插件。见下一节的详细描述。</div>
+<p>若为工程指定一个预编译头，则构建过程多了一件事，即创建一个 .pch 文件，pch 文件的创建也是通过调用 cl 来完成的。 </p>
+<p>澄清概念：</p>
+<blockquote>
+  <p>生成预编译头的最佳实践是：自己创建一个头文件（该头文件被我称为“样板头(文件)”(templet header)），由这个样板头来 #include 你真正希望预编译的一大框头文件。此后，在你的 C/C++ 源文件中的第一句话就是 #include 你的样板头。再后，你告诉编译器为你的样板头中的所有内容生成一个 .pch 文件，该 pch 文件才是所谓的“预编译头”。</p>
+  <p>MFC 程序使用的 StdAfx.h 就是一个样板头文件。</p>
+</blockquote>
+<p>现在的问题是：你在生成预编译头和真正编译 C/C++ 源码这两个阶段，你必须使用完全相同的会影响代码生成的编译参数，否则会产生麻烦，轻则编译器给出一些警告，重则程序运行崩溃。道理很简单：若两个阶段的编译开关不同，则在真正编译时，反映 .h 内容的 .pch 中的代码和 .c/.cpp 中的代码所分别生成的机器代码可能是不匹配的。 </p>
+<blockquote>
+  <p>一个非常明了的例子如：预编译时指定开关 /DMYBUFSIZE=100、而真正编译时 /DMYBUFSIZE=200，.h 和 .cpp 中都用了 MYBUFSIZE 这个常数，则不难想像该程序运行时很可能会崩溃。</p>
+</blockquote>
+<p>然而现在的 pattern1.mks 中没有明确地划分出一个变量、用于专门存放会影响代码生成的那些编译开关，这导致提供预编译头支持的语句无法（至少是很难保证）使用和真正编译时使用相同的那些开关。</p>
+<p>因此，pattern1.mks 必须规定出这样一个变量！</p>
+<div class="footnoteb">
+  <p>让预编译时直接使用 gmp_CFLAGS 是不行的，因为我们得做好准备，其中有些选项和预编译是不兼容的。 </p>
+  <p>例如：/Yc 和 /Yu 就是互斥的一对。虽然 cl 文档说当他们字面上完全一致时 /Yu 被忽略，但我的插件代码中让它们字面上一致似乎很难。要知道，这实际上是三者的完全字面一致：</p>
+  <ul>
+    <li>/Yc 后的 <i>filename</i> </li>
+    <li>/Yu 后的 <i>filename</i> </li>
+    <li>C/C++ 源文件中 #include 的那个文件名</li>
+  </ul>
+</div>
+<p>因此，打算在 build_config.mki 中： </p>
+<pre class="fws">gmp_CFLAGS += $(gmp_CFLAGS_CODE_GEN_ALL) $(gmp_CFLAGS_NON_CODE_GEN)
+gmp_CFLAGS_CODE_GEN_ALL += $(gmp_CFLAGS_CODE_GEN) $(gmp_CFLAGS_MACRO_DEFS) $(gmp_CFLAGS_INCLUDES)</pre>
+
+<p>预编译头生成命令中用 <code>$(<span class="fws">gmp_CFLAGS_CODE_GEN_ALL</span>)</code> 作为其编译开关的一部分。</p>
+<p>对于用户来说，若他不打算使用预编译头插件，他可以像以前一样将任何编译开关往 gmp_CFLAGS 中加，但他若要使用这个插件，则他必须按照这个插件的要求，将“会影响代码生成的开关”加入到 <code>$(gmp_CFLAGS_CODE_GEN_ALL)</code> 中或 <code> $(gmp_CFLAGS_CODE_GEN) , $(gmp_CFLAGS_MACRO_DEFS) , $(gmp_CFLAGS_INCLUDES)</code> 中。</span></p>
+<h2><a name="061202-2"></a>[2006-12-02] C/C++ 文件扩展名可由用户配置了</h2>
+<p>原先 GnumakeUniproc 要求 C 文件的扩展名为 c、C++ 文件的扩展名为 cpp，这样的话生成静态模板规则会方便些，如：</p>
+<pre class="fws">$(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%.cpp
+	$(_DO_CXX_COMPILE)
+</pre>
+<p>原先没有允许用户自己指定 C/C++ 扩展名的确是为了简单起见，但现在 GnumakeUniproc 进展得这么顺利，应该让其适用面更广一些，因此就不得不考虑用户自定义源文件扩展名的功能了。</p>
+<p>最好的做法是让用户能够为 C 指定不止一种的扩展名、为 C++ 也能够指定不止一种的扩展名，比如用户的工程里可能有些文件用 cpp 作扩展名，有些用 .cxx 。 </p>
+<p>若允许多扩展名的话，，那么上面那个静态模板规则中的 .cpp 该写为什么好呢？这似乎不容易处理，因为原先生成 _REGOBJS_CXX 列表时，源文件的 cpp 或 cxx 扩展名已被剥除，即 abc.cpp 对应于 abc.obj，现在从 abc.obj 又怎么能找回原先是 .cpp 还是 .cxx 呢？</p>
+<p>还好有解决方法，即让 _REGOBJS_CXX 列表中的文件名保留原始扩展名的信息，即 abc.cpp 对应于 abc.cpp.obj，同样，对于 .d 的生成则对应于 abc.cpp.d 。这样，那个静态模板规则就相应变为： </p>
+<pre class="fws">$(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+	$(_DO_CXX_COMPILE)
+</pre>
+<p>虽然生成的 obj 名字不符合习惯，但那是小节，不必迁就。</p>
+<p>当然 GnumakeUniproc 还有其他一些相应的 make 语句要修改。</p>
+<p>另外引入了三个变量，用户用这些变量来指示 C/C++/ASM 文件的扩展名，不指定则用默认的：</p>
+<pre class="fws">ifeq (,$(gmu_u_list_C_EXTN))
+  gmu_u_list_C_EXTN = c
+endif
+ifeq (,$(gmu_u_list_CXX_EXTN))
+  gmu_u_list_CXX_EXTN = cpp
+endif
+ifeq (,$(gmu_u_list_ASM_EXTN))
+  gmu_u_list_ASM_EXTN = s
+endif
+</pre>
+<p>以上改进在 svnreps v259 完成。</p>
+
+<h2><a name="061203"></a>[2006-12-03] 除了自定义 gmp_bc_IMAGE_TYPE 外，还应该有“插件”功能</h2>
+<p>考虑以下两个要求：</p>
+<ul>
+  <li>要求 1：用户想构建带资源 （.rc -&gt; .res）的 Windows 程序，且要求做到 .rc 中 include 的 各个 .h 发生改变时 .rc 也能重新生成。
+  <li>要求 2：在构建一个工程时，用户想使用 VC++ 编译器的预编译头（precompiled header）功能。 </li>
+</ul>
+<p>根据设计，GnumakeUniproc 核心肯定是做不到了，pattern1.mks 也不能直接做到，但可以利用 pattern1.mks 的自定义映像类型机制来做到。如果单独考虑以上两个要求，那么确实可以分别写两个自定义映像类型 mki 来达成，但用户若想同时达成以上两个要求呢？</p>
+<p>按照目前 pattern1.mks 提供的机制，我们得再准备一个自定义映像类型 mki(custom-image-mki)，将两个要求都包容起来。但这显然是不好的。因为要求 1 和 2 不是互斥的关系、而是累加的关系，然而 custom-image-mki 的本质却是互斥的——一个具体的构建只对应一种唯一的映像类型（gmp_bc_IMAGE_TYPE）。</p>
+<p>因此，应该给 pattern1.mks 加一个“插件” 功能，一个插件即是一组自定义的 makefile 部分文件，将被 include 进整个 makefile 中。插件可以有两种方式被装载：</p>
+<ol>
+  <li>用户定义变量 gmp_u_list_PLUGIN_TO_LOAD。比如 <code>gmp_LOAD_PLUGINS = PI_USE_WIN_RESOURCE PI_USE_MSVC_PCH</code>，则 pattern1.mks 在装载 custom-image-mki 的同一地方将 PI_USE_WIN_RESOURCE.mki 和 PI_USE_MSVC_PCH.mki 一并装载。</li>
+  <li>一个插件 mki 本身或一个 custom-image-mki 从自己的 mki 代码中也可直接装载某个插件。</li>
+</ol>
+<p>因为插件有以上两种装载途径，所以插件 mki 本身应该有防止自己的真正内容被多次包含的防御措施（就是 ifndef XXX / define XXX / &lt;真正内容&gt; / endif 这套东西）。</p>
+<p>该功能在 svnreps v262 完成。</p>
+<h4>如何决定将一个扩展功能做成自定义映像还是插件</h4>
+<p>～形式上无差别，差别体现在内容中...(to be continued)</p>
+<h2><a name="061216"></a>[2006-12-16] 设法显示被执行的 CVS/SVN 命令</h2>
+<p>这乍听起来根本就不是问题，你为 make 规则执行的命令前面不用 @ 罩住不就行了？但事实确实没那么简单。原因是：</p>
+<ul>
+  <li>我执行 CVS/SVN 命令前会先切换当前工作目录，切到那个工作目录有利于执行 CVS/SVN checkout/diff/commit 操作。必须切换工作目录的理由有很多，有些是迫不得已的，不细说了。</li>
+  <li>既然要先有 cd 操作，那么你的 cd 和 cvs/svn 就必须在一个子 shell 中执行，这个子 shell 在 GNUmake 眼中就是一个 shell 命令调用。这样的话，若你想去掉 @ 让 GNUmake 显示 CVS/SVN 命令，则那个 cd 命令也必须被显示。</li>
+  <li>事实上，那个 subshell 中要额外执行的东西远不止 cd 这一条，还要判断 cd 和 CVS/SVN 命令是否失败，在失败时显示 <tt>!GMU!Error: ...</tt> 信息。还有，要趁着 cd 入某个本地目录时用 pwd 命令告知用户当前的绝对路径是什么（这个信息很有用，因为用户的 makefile 中的本地 checkout 目录很可能仅仅是用相对目录来指示的）。</li>
+</ul>
+<p>因此，整个服务于 CVS/SVN 的 subshell 命令必须用 @ 压制住，若想给 GnumakeUniproc 用户显示正在执行的 CVS/SVN 命令的话只能自己用 echo 来达成了。事实上，直到昨天上午时才开始考虑如何来自己 echo 出 CVS/SVN 命令，之前没有做的原因是其复杂性，怕出乱子——要做的话有两重的 echo 嵌套（执行 CVS/SVN 命令的 makefile 就已经是用 echo 生成的了）。</p>
+<p>在其他大局问题差不多都搞定的情况下，是时候考虑这个了，毕竟 CVS/SVN 执行失败应该是很常见的，用户有权利知道原始的导致失败的“命令行”是什么。</p>
+<p>但在捣腾了一天后，才终于发现，要想忠实地呈现 CVS/SVN 命令行是不可能的。</p>
+<p>忠实呈现命令有两种方式：</p>
+<ol>
+  <li>你直接调用了某个 cvs/svn 的可执行文件，因此你能够明确知道 argv[1], argv[2], argv[3] 各是什么。</li>
+  <li>你是 bash 本身，当 GNUmake 调用你来执行一个命令时（ bash -c ...），你能够向用户报告 bash -c 后的 bash 层面的命令内容，用户由此推断出 argv[1], argv[3], argv[3] 各是什么。</li>
+</ol>
+<p>对于 GNUmake 来说，以上两种方式都无法明明白白做到（但第二种能够做得很接近），因为 GNUmake 在将从其命令行接收的稍后用于 CVS/SVN 的参数时，就丢失了参数边界信息。因此我们期望所有传给 CVS/SVN 的参数的真正内容中，都不包含 shell 元字符（比如空格、引号、反斜杠、甚至美元号等），要是有那些元字符存在，则会产生两种结果：</p>
+<ol>
+  <li>你让 make 调用 shell 命令时将 CVS/SVN 参数直接传给 shell ，那些元字符就真的被 shell 解释为元字符了，执行结果非错不可。</li>
+  <li>你（Makefile 作者）意识到 CVS/SVN 参数中可能存在 shell 元字符，因此将参数中的元字符进行转义处理后再传给 bash。比如：实际参数中有个引号字符，那么 Makefile 中就在其前面加上反斜杠后再传给 bash。</li>
+</ol>
+<h3>可行的解决方法</h3>
+<p>我现在的决定是：用 echo 显示 CVS/SVN 命令时，尽可能地以 bash 命令呈现（真难表达！<span class="red">即用户将屏幕上看到的那串东西拷贝粘贴到 bash 命令行上、按回车，执行结果将和从 make 中调用的一致。</span>），换言之，将这串东西拷贝粘贴在 makefile 规则中的命令部分，由 make 调用后也将得到同样的结果。下面将这串东西的格式称为 bash-c 格式（这么称呼当然是因为 bash 有个 -c 参数来执行如此功能的原因）。</p>
+<div class="footnoteb">以下 bash 命令（连续 16 个反斜杠符）
+  <pre class="fws">sh -c "echo -e \"[\\\\\\\\\\\\\\\\]\""</pre>
+  <p>输出的结果中只会有 16/8=2 个反斜杠。
+  原因是经过了 3 层反斜杠减半：</p>
+  <ul>
+    <li>第一层：bash 扫描整个命令时减半。</li>
+    <li>第二层：bash 将 <code>echo -e &quot;\\\\\\\\&quot;</code> 当做 bash 命令来执行时进行了减半。</li>
+    <li>echo 的 -e 开关导致其 argv[2] 中的 4 个反斜杠再次减半，最终输出两个反斜杠。</li>
+  </ul>
+</div>
+<p>为了达到以上要求，GnumakeUniproc 必须作出一些规定：</p>
+<blockquote>
+  <p>若某个 CVS/SVN 参数中会存在 bash 元字符，则这种 CVS/SVN 参数必须传递给专门的 make 变量，以便 GnumakeUniproc 能够在它们外面加双引号、且对其中元字符进行转义后再传给 bash。</p>
+  <p>例子如：</p>
+  <ul>
+  <li>SVN 指定日期 checkout 时，日期 <code>{2006-12-16 08:00}</code> 中间必须有个空格来分开日和时。</li>
+  <li>CVS/SVN commit 时要求写的 log 信息中可能会有多种 bash 元字符。</li>
+  </ul>
+</blockquote>
+<p>需要专门处理的 GnumakeUniproc 变量有：</p>
+<ul>
+  <li>gmu_COMMIT_MESSAGE</li>
+  <li>gmu_SC_CHECKOUT_DATETIME</li>
+</ul>
+<p>为了对付双层、甚至三层的 echo 嵌套，我写了两个 make 函数来帮我处理烦人的元字符转义工作（见 CommonFunctions.mki）：</p>
+<pre class="fws">_TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
+_TrShcmd4echo_4bs = $(subst `,\`,$(subst ",\",$(subst \,\\\\,$1)))
+</pre>
+<p>使用到三层 _TrShcmd4echo 的场合有一个：GnumakeUniproc.mki 的 Do source-control work-in-module 部分，生成显示 CVS/SVN 命令处（本句中有两层，若构建目标 gmu_ut_commit，<span class="fws"><code>_CmdCvsWorkInModule</code></span> 中还有一层 ）：</p>
+<pre class="fws">	echo -e "\t$(call _TrShcmd4echo_4bs,echo "+++Command: $(call _TrShcmd4echo,$(_CmdCvsWorkInModule))") ;\\" >> $(_p_mk_DoScWorkInModule) ;\
+</pre>
+<p>目前，gmu_COMMIT_MESSAGE 确实利用了<span class="fws"> _TrShcmd4echo，因为 commit log 信息中存在引号、反斜杠是绝对可能的；而 gmu_SC_CHECKOUT_DATETIME 则没有用 _TrShcmd4echo 处理，因为他的格式被定死了、只能是 <tt>YYYY-MM-DD HH:MM:SS</tt> 这样的格式、没有任何的问题元字符。</span></p>
+<p>目前的限制：</p>
+<blockquote>
+  <p>gmu_COMMIT_MESSAGE 这类变量被允许包含的 bash 元字符有</p>
+  <ul>
+    <li>空格</li>
+    <li>反斜杠</li>
+    <li>双引号</li>
+    <li>反引号</li>
+    <li>其他在双引号中能够保持字符原义的字符</li>
+  </ul>
+  <p class="red">特别地：</p>
+  <ul class="red">
+  <li>美元号 <code>$</code> 决不允许出现。</li>
+  <li>逗号可能是危险的，因为逗号是 GNUmake 函数的参数分隔符。我现在可以明确一些允许使用逗号的场合：gmu_COMMIT_MESSAGE 中允许。</li>
+  </ul>
+</blockquote>
+<p>svnreps v272 已按以上方法修改，使得所有进行 CVS/SVN 操作的场合都能显示出 bash-c 风格的命令。</p>
+<h4>例子1（2006-12-16 12:55, 对应 svnreps 272）</h4>
+<p>若你在 Linux bash 提示符下执行如下命令：</p>
+<pre class="fws">umake gmu_ut_commit gmu_COMMIT_MESSAGE=&quot;[fromlinux\\\\]&quot;</pre>
+<p>你的意图是将 <code>[fromlinux\\]</code> 作为 log 信息，GnumakeUniproc 确实会如你所愿。在这种情况下，GnumakeUniproc 反馈在屏幕上的 SVN 命令会是：</p>
+<pre class="fws">umake gmu_ut_commit gmu_COMMIT_MESSAGE="[fromlinux\\\\]"</pre>
+<p>和你敲在 bash 命令行上的一模一样。同时，可以看看 GnumakeUniproc 生成的 _DoScWorkInModule.gmu.mk 的样子： </p>
+<pre class="fws">$(CommonInclude_svnLocalDir)/_ScCheckTime.gmu.ckt: $(_p_MainPrjStart)
+	@(\
+	cd $(CommonInclude_svnLocalDir) ;\
+	CmdRet=$$?; if [ $$CmdRet != 0 ]; then echo "!GMU!Error: One of gmu_uv_list_SVN_MODULES(CommonInclude) refers to that dir, but it does not exist or cannot be entered."; exit $$CmdRet; fi ;\
+	echo +++++++++++++++++++++++++ SVN work-in-module: ++++++++++++++++++++++++;\
+	echo +++ In dir: `pwd`;\
+	echo "+++Command: svn commit  -m \"[fromlinux\\\\\\\\]\"" ;\
+	echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;\
+	svn commit  -m "[fromlinux\\\\]"  2>&1; \
+	CmdRet=$$?; \
+	if [ $$CmdRet != 0 ]; then echo "!GMU!Error: SVN execution failure."; exit $$CmdRet; fi ;\
+	)
+	@echo -n '' > $@ # touch it to make it newer than `_MainPrjBuildStart.gmu.ckt'
+</pre>
+<p>Windows 用户注意：若是从 Windows 的命令行启动本例中的 umake 命令，则 GnumakeUniproc 反馈在屏幕上的和真正成为 log 内容的反斜杠数量都会加倍，因为 Windows 的 Command Prompt 命令行并不把反斜杠当做一个元字符。</p>
+<h2><a name="070109"></a>[2007-01-09] mame.net sh.exe 对 echo 的古怪调用行为</h2>
+<p>今天才意识到这个问题，是我故意将 sh.exe 同目录中的 echo.exe 删掉后发现的。</p>
+<p>用如下的一个小 makefile 即可验证：</p>
+<pre class="fws">all:
+	-@echo "====="
+	-@echo '-----'
+	-@echo +++++</pre>
+<p>在 echo.exe 不存在时的运行输出：</p>
+<pre class="fws">=====
+process_begin: CreateProcess(NULL, echo -----, ...) failed.
+make (e=2): 系统找不到指定的文件。
+make: [all] Error 2 (ignored)
+process_begin: CreateProcess(NULL, echo +++++, ...) failed.
+make (e=2): 系统找不到指定的文件。
+make: [all] Error 2 (ignored)
+</pre>
+<p>换言之，若 echo 后的参数是用双引号包住的，则 sh.exe 调用内置的 echo 功能，否则调用外部的 echo.exe。</p>
+<h2><a name="070221"></a>[2007-02-21] 意想不到：Linux 共享库的引用问题</h2>
+
+<p>当要让一个 EXE 隐式链接一个共享库（.so）时，我们会将那个共享库的名字加在 EXE 的链接列表中。但今天发现一个恼人的地方：<b>链接列表中的共享库是否带路径结果大不相同</b>。</p>
+<p>看一个对比案例，在此案例中，libIUartBasic.so 已存在于当前目录中。</p>
+<p>链接命令的第一种写法： </p>
+<blockquote>
+  <pre class="fws">g++ -o testrw.ndp testrw.o libIUartBasic.so</pre>
+  <p>（ndp 表示 no dir prefix）</p>
+  <p>在没有 GnumakeUniproc 这样的构建工具的情况下，这种写法应是最常见的—— .so 文件不带路径。这样生成的 testrw.ndp 在运行时会去环境变量 LD_LIBRARY_PATH 指示的路径中寻找 libIUartBasic.so 。</p>
+  <p>若我将 libIUartBasic.so 移至 /soft 中，并将 /soft 设入 LD_LIBRARY_PATH 的情况下，用 ldd 查看 testrw.ndp 显示：</p>
+  <pre class="fws">        linux-gate.so.1 =>  (0xffffe000)
+        <b>libIUartBasic.so =&gt; /soft/libIUartBasic.so (0xb7ee6000)</b>
+        libstdc++.so.6 => /usr/lib/libstdc++.so.6 (0xb7e32000)
+        libm.so.6 => /lib/libm.so.6 (0xb7e0d000)
+        libgcc_s.so.1 => /lib/libgcc_s.so.1 (0xb7e02000)
+        libc.so.6 => /lib/libc.so.6 (0xb7ce2000)
+        /lib/ld-linux.so.2 (0xb7f2c000)
+</pre>
+  <p>这确实不奇怪。</p>
+</blockquote>
+<p>链接命令的第二种写法： </p>
+<blockquote>
+  <pre class="fws">g++ -o testrw.dp testrw.o ./libIUartBasic.so</pre>
+  <p>此次我只不过在 libIUartBasic.so 前加了个路径前缀。</p>
+  <p>该链接命令当然会成功，但成功后将 libIUartBasic.so 移至 /soft 并将 /soft 设入 LD_LIBRARY_PATH 的情况下，testrw.dp 却无法运行。在 SuSE 10.1 上试图运行时得到错误信息：</p>
+  <blockquote>
+    <p>./testrw.dp: error while loading shared libraries: ./libIUartBasic.so: cannot open shared object file: No such file or directory
+    </p>
+  </blockquote>
+  <p>用 ldd 查看：</p>
+  <pre class="fws">        linux-gate.so.1 =>  (0xffffe000)
+        <b>./libIUartBasic.so => not found</b>
+        libstdc++.so.6 => /usr/lib/libstdc++.so.6 (0xb7e3d000)
+        libm.so.6 => /lib/libm.so.6 (0xb7e18000)
+        libgcc_s.so.1 => /lib/libgcc_s.so.1 (0xb7e0d000)
+        libc.so.6 => /lib/libc.so.6 (0xb7ced000)
+        /lib/ld-linux.so.2 (0xb7f37000)
+</pre>
+  <p>注意到 ldd 输出中的 libIUartBasic.so 前同样加了 <b><code>./</code></b> ，这看来已经说明问题了：链接列表中 .so 加前缀的话，那个 .so 就绑死在那个路径上了（虽然可以是一个相对路径） 。 </p>
+</blockquote>
+<p>第二种写法展现出的行为确实出乎我的意料，这导致的麻烦是：若用 GnumakeUniproc 构建 EXE，且这个 EXE 工程用 <code>gmu_uv_list_LIB_TO_LINK</code> 来自动依赖 DLL 工程，结果是就是那种麻烦的情况。</p>
+<h3>暂时的解决方法</h3>
+<p>就我目前掌握的 linux 知识，我能想到的方法是：对于原本要执行的链接命令</p>
+<pre class="fws">g++ -o testrw testrw.o ./gf/prjname/libIUartBasic.so</pre>
+<p>将其转变为：</p>
+<pre class="fws">g++ -L ./gf/prjname/ -o testrw testrw.o -l IUartBasic</pre>
+<p>我想这样可以暂时解决此问题。注意，从共享库路径中分离出的 -L 开关应该摆在所有 g++ 开关的最前面、而不能仅摆在 .so 列表的前面，原因是：用户原先可能就指定了一些 -L 路径，比如 <code>-L /mylib</code> ，我们应该让链接器先到 <code>./gf/prjname</code> 中去找 libIUartBasic.so，而不是先到 <code>/mylib</code> 中找。</p>
+<p>此修改出现于 svnreps v352。 </p>
+
+<h2><a name="071116"></a>[2007-11-16]  不再默认给 gmp_CFLAGS_CODE_GEN 等变量赋值</h2>
+<p>先前，我的的 compiler config 配置文件中，会给 gmp_CFLAGS_CODE_GEN、gmp_CFLAGS_MACRO_DEFS 等设置成想当然的默认值，比如对于 msvc 编译器，</p>
+<ul>
+  <li>gmp_bc_DEBUG 有值时：<code>gmp_CFLAGS_CODE_GEN += /MDd /Od /Zi</code>， <code>gmp_CFLAGS_MACRO_DEFS=/D_DEBUG</code> 。 </li>
+  <li>gmp_bc_DEBUG 为空时：<code>gmp_CFLAGS_CODE_GEN += /MD /O2 </code>， <code>gmp_CFLAGS_MACRO_DEFS=/DNDEBUG</code> 。 </li>
+</ul>
+<p>今天有一个案例让我发现那个做不妙了。（本案例详细记录见 wiki pageId=8352）uToolsWiz 工程的 Debug 配置实际是个 Pseudo-Debug，此配置不能用 /MDd，而必须用 /MD。这下麻烦了，你指导 GNU make 提供 <code>+=</code> 操作符可以追加变量值，但没有 <code>-=</code> 来删除部分变量值。因此 gmp_CFLAGS_MACRO_DEFS, 
+gmp_CFLAGS_INCLUDES, 
+gmp_CFLAGS_CODE_GEN 这些变量默认应留空（除非绝对需要，如 /c），作为补偿，我将编译器配置文件提供的默认值设在另外一些变量中，让用户按需取用。新变量即是在原变量名后加 <code>_preset</code> ：</p>
+<ul>
+  <li>gmp_CFLAGS_MACRO_DEFS_preset</li>
+  <li>gmp_CFLAGS_INCLUDES_preset</li>
+  <li> gmp_CFLAGS_CODE_GEN_preset</li>
+  <li>gmp_CXXFLAGS_CODE_GEN_preset</li>
+  <li>gmp_CFLAGS_NON_CODE_GEN_preset</li>
+</ul>
+<p>同时修改工程 templates，默认将那些 _preset 变量赋给最终变量。</p>
+<p>同样，gmp_LINK_FLAGS 也同样处理。</p>
+<p>另，为了让以前的 makefile 尽量可以不修改就适应此次的 GMU 改变，再补充一个决定，如果执行编译或链接命令时发现最终的 _gmp_C_CXX_FLAGS_ALL 为空，那么就抓 _preset 的来用。链接开关同理。 </p>
+<p>因此引入两个新变量供最终的编译和链接命令使用：</p>
+<pre>_gmp_CFLAGS_final = $(if $(strip $(_gmp_C_CXX_FLAGS_ALL)),$(_gmp_C_CXX_FLAGS_ALL),$(gmp_C_CXX_ALL_preset))
+
+_gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LINKFLAGS_preset))
+</pre>
+<h4>！今天决定将 gmp_CFLAGS_INCLUDES 排除在 gmp_CFLAGS_CODE_GEN 之外</h4>
+<p>直接原因，就算大多数工程可以用 _preset 的选项编译，但几乎逃不了要用 -I 来指定 include 路径，结果是，此次改变前的工程 _gmp_C_CXX_FLAGS_ALL 几乎不会为空（里头有 -I xxx）。</p>
+<p>同时，gmp_CFLAGS_INCLUDES 改名为 <b>gmp_FLAGS_INCLUDES</b> 以示和其他 gmp_CFLAGS_XXX 的区别。——还好这是个内部变量。 </p>
+<p><span class="red"><b>此决定的影响：</b></span>像 PI_use_pch_msvc, PI_use_pch_gcc 这样原先要用到 <code>gmp_CFLAGS_CODE_GEN_ALL</code> 的插件，现在在预处理命令行得额外补上 <code>$(gmp_CFLAGS_CODE_GEN)</code> 了。 </p>
+
+<H2><a name="071128"></a>[2007-11-28] gmp_bc_IMAGE_TYPE 现可以是一个虚拟的映像类型</a></H2>
+
+<p>上周，开始改进构建 uBase App/Lib 的 GMU 插件（其实是两个插件，PI_850APP_lib 用于编 alf 库、IT_850APP_uBaseIII 用于编 .ue 应用程序），目的要让这两个插件即能生成 ARM 的映像、也能生成模拟器映像（之前之能生成 ARM 的映像）。拿 IT_850APP_uBaseIII 来说，之前不足的地方是，设定 gmp_bc_IMAGE_TYPE=IT_850APP_uBaseIII 才会使得 IT_850APP_uBaseIII custom-image-type mki 被加载，然后该 mki 中定义 <code>gmu_u_LINK_CMD</code> 和 <code>gmp_USER_FIRST_TARGET</code> 来执行特殊的链接命令。但构建模拟器程序时需要的是 <code>gmp_bc_IMAGE_TYPE=EXE_GUI</code>，因此 gmp_bc_IMAGE_TYPE 取什么值就出现矛盾了。</p>
+<p>现在改进 GnumakeUniproc，给出解决方法。</p>
+<ul>
+  <li>首先，是否装载 custom-image-type mki 的规则改变了。原先是 gmp_bc_IMAGE_TYPE 的取值在 compiler_config.mki 中找不到时才去找 custom-image-type mki。现在，新增一个输入变量 <span class="red">gmp_LOAD_CUSTOM_IMAGE_IT</span> ，该变量非空的情况下（由最终用户主动设置、建议就在设 gmp_bc_IMAGE_TYPE 的旁边设置），在 include compiler_config.mki 之前就试图 include custom-image-type mki。 </li>
+  <li> custom-image-type mki 实现文件根据当前的 gmp_bc_IMAGE_TYPE（可以是虚拟的，如 IT_850APP_uBaseIII）来改写其为真实的 gmp_bc_IMAGE_TYPE（如 EXE_GUI）。</li>
+  <li>当然，为了保持向前兼容，在 <span class="red">gmp_LOAD_CUSTOM_IMAGE_IT</span> 未定义的情况下，若 <code>gmp_bc_IMAGE_TYPE</code> 的取值在 compiler_config.mki 中找不到，仍将按原先规则试图装载 custom-image-type mki。</li>
+</ul>
+<p>该改进在 svnreps v456 。 </p>
+<h2><a name="071208"></a>[2007-12-08] 昨日重现，启用新变量，以便插件装载可以通过环境变量来指示</h2>
+
+<p>目前，装载插件是通过设置环境变量 <code>gmp_u_list_PLUGIN_TO_LOAD</code>。前昨天设计了新插件 PI_sync_debug_info，用于拷贝编译器为输出映像附带生成的调试文件（比如 MSVC 生成的 pdb 文件）。在 makefile 中明确装载该插件不划算，因为所有的 MSVC 工程潜在地都可能在未来某个时候想用此插件——因为 Debug build 总是会生成 pdb 文件。因此，如果能由工程的调用者（其父工程）来决定是否装载此插件，那么 makefile 自身的负担没有了，而且又能做到按需加载。</p>
+<p>当我试图将 PI_sync_debug_info 设到环境变量 <code>gmp_u_list_PLUGIN_TO_LOAD</code> 中、并开始构建 uTools 时，出问题了。问题本身并不出在 PI_sync_debug_info 本身，而是因为 <code>gmp_u_list_PLUGIN_TO_LOAD</code> 被设在了环境变量中。GNUmake 规定，来自环境变量的 make 变量默认会被 export ，结果是：uToolsAddin 工程装载了 PI_MIDL 插件，该工程的所有子工程看到的 <code>gmp_u_list_PLUGIN_TO_LOAD</code> 都带有 PI_MIDL ，PI_MIDL 会要求 makefile 中必须定义某些变量，你没法期望 uToolsAddin 子工程也定义那些 PI_MIDL 要求的变量，因此那些子工程的 Makefile 将失败。</p>
+<p>解决方法是：增加 make 变量 <code class="red">gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE</code> 和 <code class="red">gmp_u_list_PLUGIN_TO_LOAD_ENV_POST </code>。若某个父工程（或最终用户）希望其子工程统统都装载一个插件，则可以将插件标识符设在这两个环境变量中。_PRE 和 _POST 的差别是：_PRE 的在 <code>gmp_u_list_PLUGIN_TO_LOAD</code> 之前装载，_POST 则在它之后装载。 </p>
+<p>这两个 _PRE, _POST 变量的出现，不是很像我以前为了解决工程名、输出映像名加修饰而使用的 <code>gmu_DECO_PREFIX_PRJ_NAME</code>, <code>gmu_DECO_SUFFIX_PRJ_NAME</code>, <code>gmu_DECO_PREFIX_LINK_OUTPUT</code>, <code>gmu_DECO_SUFFIX_LINK_OUTPUT</code> 吗？</p>
+<p>该改进在 svnreps v484 。 </p>
+<h2><a name="080509"></a>[2008-05-09] 真正编译时用的编译开关和传给 <code>gcc -M</code> 的开关如何协调</h2>
+<p>因为用了 gcc -M 来分析 C/C++ 文件，不可避免地引入一个问题：用户在很多时候必须意识到哪些编译开关要让 <code>gcc -M</code> 看到，而哪些不要。这加大了用户的负担，但暂时无法避免。</p>
+<p>今天之前，已明确让 gcc -M 使用的 gmu_ 变量有：</p>
+<ul>
+  <li>gmu_u_GCC_M_OPTIONS</li>
+  <li>gmu_ud_list_PRJ_HEADER、gmu_ud_list_SYS_HEADER、gmu_ud_list_STABLE_HEADER</li>
+</ul>
+<p>大多数情况下 <code>gmu_u_GCC_M_OPTIONS</code> 留空即可，但今天明确了一个案例，该案例要求用户必须设置该变量了，因此决定将 <code>gmu_u_GCC_M_OPTIONS</code> 的提示加入 template 。</p>
+<p>今天将 TinyXML 与 WebComm 库分离，为此引入了一个新宏 <code>_BUILD_WEBCOMM_LIB</code> ，使用场合如下: </p>
+<pre><span class="c-comment">// in WebComm.h</span>
+#ifdef _BUILD_WEBCOMM_LIB
+# include &lt;tinystr.h&gt;
+#else
+# include &lt;util/tinystr.h&gt; <span class="c-comment">// For building uBase app using uTools</span>
+#endif</pre>
+<p>在编译 WebComm 库本身时要求定义 <code>_BUILD_WEBCOMM_LIB</code>，这意味着 <code>-D_BUILD_WEBCOMM_LIB</code> 必须传给 gcc -M，否则 gcc -M 时会找不到 <tt>tinystr.h</tt> 。 </p>
+<h4>[2008-07-22] 又一案例</h4>
+<p>前些天规范了使用 <tt>ps_TCHAR.h</tt> 的接口头文件的一个书写规范：</p>
+<pre>#ifdef DONT_WANT_PS_TCHAR
+# ifdef WIN32
+#  include &lt;tchar.h&gt; // The Microsoft way
+# else
+   typedef char TCHAR;
+# endif
+#else
+# include &lt;ps_TCHAR.h&gt;
+#endif
+
+</pre>
+<p>我们希望定义 <code>DONT_WANT_PS_TCHAR</code> 的工程将此定义也让 <code>gcc -M</code> 看到，否则 gcc -M 处理时将找不到 <tt>ps_TCHAR.h</tt> 。</p>
+<h2><a name="080719"></a>[2008-07-19] 有时候需要给用户对同一工程执行多次 make 的权利</h2>
+<p>先前，在一轮的 GMU 构建中，一个工程(以 final-project-name 标识)一旦被构建过一次，它就不过被再次构建，意即：即使之后有其他工程将此工程列为子工程，此工程的 makefile 也不会被再次执行。</p>
+<p>但现在发现有时这种要求会阻碍我们完成一些事，比如，我们要在一次构建中生成两套 SDK，这两套 SDK 中 都要包含一个库，比如说 walkdir 库。Walkdir 库作为那轮构建中的一个 GMU 工程被编出，其头文件和生成的二进制库要被拷贝到两个地方供打包——因为我们要做两套 SDK、即有两个 SDK 输出目录。根据目前 GMU 提供的 SDK 制作模型，walkdir 工程的父工程通过给 walkdir 加载 PI_sync_devoutput 插件来让 walkdir 工程拷贝 SDK 输出。现在的问题是：当 walkdir 第一次被 make 时，它按期望将 SDK 输出拷贝给第一套 SDK ，但第二套 SDK 不会被拷贝，因为 walkdir 已经被 make 过一次，针对它的 make 不会跑第二次了。</p>
+<h4>目前的解决方法</h4>
+<p>增加一个子工程构建属性 <i><code>subprjrefname</code></i><code>_IsForcePostProc</code> ，其默认为空。若被设为非空，则表示要求此子工程的 make 再执行一遍，这样就可以它就可以再次装载 PI_sync_devoutput 插件，将 SDK 输出同步给第二套 SDK 了。 </p>
+<p>一些附带的改变：</p>
+<ul>
+  <li>一个工程被强制 make 多遍，最终统计的工程计数仍仅算一个。</li>
+  <li>在 building_list.gmu.txt 中，一个工程若因为 <code>_IsForcePostProc</code> 而被第二次或更多次执行，将用 如下格式表示（前缀是个 <code>-</code> ）：</li>
+   <pre>-       [<span class="style1">project-name</span>] POSTPROC
+</pre>
+</ul>
+<p>以上修改位于 v576～583 。 </p>
+<h4>另外的思路</h4>
+<p>[2008-07-19] 今天又想到，若没有引入 force-post-processing 模型，可以让 walkdir 的父工程在 <code>gmp_USER_POST_TARGETS</code> 中加载一个额外的 target，在此 target 中手动来执行 walkdir 的 makefile，以此强迫子工程的再次执行。当然，此法对于工程自身的 makefile 来说比 force-post-processing 要麻烦。（此法未实地确认）</p>
+<h4>[2008-09-07] force-post-processing 功能引发原先“工程成环检测”的重新思考</h4>
+<p>详细记录见 ... </p>
+<h2><a name="080813"></a>[2008-08-13] 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</h2>
+<p><code>gmp_COMPILER_VER</code> 用于指示编译器的版本，其值可由 GMU 用户可自由设置，若其值非空，则在 gmp_DECO_PRJ_NAME=1 及 gmp_DECO_COMPILER_VER=1 的情况下，$(<code>gmp_COMPILER_VER</code>) 会被加到工程名上。</p>
+<div class="footnoteb">gmp_COMPILER_VER 自由设置的含义是：GnumakeUniproc 不关心此值的具体内容(不是 gmu_ 前缀) 。但具体的编译器配置文件（compiler config mki）可以定义 gmp_COMPILER_VER 的合法取值，用处是从 gmp_COMPILER_VER 的取值中判断用户当前用的是哪个编译器版本，以便对编译开关做出一些调整。 </div>
+<p>让工程名加入 <code>gmp_COMPILER_VER</code> 修饰的用途是若有人希望用同编译器的不同版本来编同一工程，<code>gmp_COMPILER_VER</code> 就可以让工程名不同，这样不同编译器版本的输出可以分处于不同目录、互不影响。</p>
+<p>以上思想最初时（2006）就已确定，但另有个相关东西则未确定，即是否能在同一轮构建中构建[使用不同版本编译器的]工程，换言之，对于 <code>gmp_COMPILER_VER</code> 在一轮构建过程是否能变化并未明确。</p>
+<p>最初，只期望在同一轮构建中 <code>gmp_COMPILER_VER</code> 保持不变，若要变，则必须手动重开一轮构建。后来(2007底)，要用 GMU 编 uTools 了，这要求同一轮构建中使用两种编译器，VC6 和 armcpp ，这还没“严重”到“同一编译器的两种版本”的情况，不过却导致当时(2007-11-25)做了一个<b>错误决定</b>，当时留下的 comment 摘录如下(bc_deco_prjname.mki)：</p>
+<blockquote>
+  <pre># [2007-11-25] No longer force deco <code>$(gmp_COMPILER_VER)</code> globally. Reason: 
+# From today on, gmp_COMPILER_VER may be a mix of multiple compiler versions,
+# e.g. 
+#	<b>gmp_COMPILER_VER = vc6 sdt</b>
+# means the environment may use VC6 and ARM SDT to compile programs, so it is
+# not suitable to decorate _vc6_sdt to all project-names, instead, the 
+# compiler-config-mki determine what to decorate to prjname according to the
+# contents in $(gmp_COMPILER_VER) -- i.e. compiler-config-mki controls what
+# to append to gmu_DECO_SUFFIX_PRJ_NAME or prepend to gmu_DECO_PREFIX_PRJ_NAME. 
+# But be aware, only do the decoration only when user wants it(i.e. gmp_DECO_PRJ_NAME=1).</pre>
+</blockquote>
+<p>当时那么决定的想法是： <code>gmp_COMPILER_VER</code> 在环境变量中设为 <code>vc6 sdt</code> ，启动 uTools 构建后就不再修改 <code>gmp_COMPILER_VER</code> 了，这样能应付同一轮构建使用两种编译器的情况。当时那么决定确实带来一些短期的好处，即 uTools 的构建过程不需切换编译环境。编译环境指：</p>
+<ul>
+  <li>对于 VC，要设置 INCLUDE, LIB, 这两个环境变量；还要将 cl.exe 等加到 PATH 中。这些工作可由微软附带的 vcvars32.bat 来完成。 </li>
+  <li>对于 armcpp，要设置 ARMINC、ARMROOT 等环境变量（armcpp 的不同版本所涉及的变量差异很大）。该如何设由实现调查及试验得知。</li>
+</ul>
+<p>由于 VC 和 armcpp 要求的环境变量和编译器 EXE 名字刚好没有冲突，使得我当时可以将它们一起设掉然后再启动 uTools 构建。</p>
+<p>当时的眼光并没有放远到同一轮构建中[使用同编译器的不同版本]的情况，因为那确实挺麻烦，想想看，从 VC6 切换到 VC8 需要完全重设 VCInstallDir, INCLUDE, LIB 等环境变量，这种切换先前都是手动执行微软提供的 .bat 来做的，那些 .bat 在不同人的机器上位置又是不同的。 </p>
+<p>现在该是再次放远眼光的时候了，——我已经感觉到今后某一天会有那种要求的。</p>
+<p>因此决定如下：</p>
+<ul>
+  <li>同一进程的任一个特定时间点看到的 <code>gmp_COMPILER_VER</code> 应该只表示一种编译器。</li>
+  <li><code>$(gmp_COMPILER_VER)</code> 是否加入工程名由是否设了 gmp_DECO_PRJ_NAME=1  决定，和具体的 compiler-config-mki 无关，此动作在 <tt>bc_deco_prjname.mki</tt> 中进行。</li>
+  <li>compiler-config-mki 可以判断当前 <code>gmp_COMPILER_VER</code> 的有效性并做错误提示，也可以往工程名中加入其他前后缀，但它自己别把 <code>$(gmp_COMPILER_VER)</code> 加入工程名。</li>
+  <div class="footnoteb">
+    <p>注意，我<span class="red">废除了 gmp_DECO_COMPILER_VER</span> ，理由是：将工程名修饰长一点总不会造成伤害，毕竟工程名的本质仅仅是将不同工程的输出目录分开。当用户只想用单编译器、单版本的情况下，可以让 gmp_DECO_COMPILER_VER 保持为空，这就可以保持原先的“眼根清静”。</p>
+    <p>另一方面，输出文件名(gmu_uf_LINK_OUTPUT)是否要加入 compiler id/ver 的修饰则必须完全由用户决定（理由：如果 DLL 名字被任意修饰，那么用 LoadLibrary 装载此 DLL 的人就没法找到它了）。GMU pattern1 代码可以完全不管对于 gmu_fu_LINK_OUTPUT 的修饰，不过为了用户方便，我还是提供了两个宏（在 <tt>bc_deco_prjname.mki</tt> 中会对其处理）：</p>
+    <ul>
+	  <li>gmp_DECO_COMPILER_ID_FOR_LINK_OUTPUT</li>
+	  <li>gmp_DECO_COMPILER_VER_FOR_LINK_OUTPUT</li>
+    </ul>
+    <p>将它们设为 1 可让 $(gmp_COMPILER_ID) 和/或 $(gmp_COMPILER_VER) 加入输出文件名。</p>
+    <p>这轮搞完 <tt>bc_deco_prjname.mki</tt> 总算变得清爽了。</p>
+  </div>
+  <li>若同一轮构建要用到同编译器的两个版本（如 VC6 和 VC8），则采取如下做法：
+    <ul>
+      <li>从一个干净的环境启动根工程，让一个一级子工程进行 VC6 编译，另一个一级子工程进行 VC8 构建。</li>
+      <li>根工程启动一级子工程时为其设置编译环境，包括设置不同的 <code>gmp_COMPILER_VER</code> 值。</li>
+    </ul>
+  </li>
+</ul>
+<h4>体贴性考虑</h4>
+<p>不过话说回来，如果两种编译器的编译环境可以共存（像 ARMCPP 和 MSVC），允许在 GMU 运行前将两者的环境同时设好、再 umake、即免除了 GMU 运行过程切换编译环境的麻烦——这样不是更体贴用户吗？刚试过，要不允许这种共存的话，uTools 的 makefile 得改多了。 </p>
+<p>要允许共存的话，得解决一个问题，即当 <code>gmp_COMPILER_VER=sdt250 vc60</code> 时，编 VC 程序时只能将 <code>vc60</code> 加入工程名，编 ARM 程序时只能将 <code>sdt250</code> 加入工程名。</p>
+<p>想出个办法：</p>
+<ul>
+  <li>compiler-config-mki 中决定哪些是有效的 compiler-id 字串，比如 MSVC 的有效字串目前为 <tt>vc60 vc70 vc71 vc80</tt> 。 同时要提供一个输出变量（<b>gmp_G_CompilerVerToDeco</b>），用于从 <code>gmp_COMPILER_VER</code> 中抽出有效的 compiler-id 字串（若 <code>gmp_COMPILER_VER</code> 为空，它也为空）。</li>
+  <li>把 <tt>bc_deco_prjname.mki</tt> 挪到 compiler-config-mki 之后（原先是在其之前）。此步并非必要——若 <tt>bc_deco_prjname.mki</tt> 里头不用 make-var immediate expansion 的话。挪到 compiler-config-mki 后就可以对 <b>gmp_G_CompilerVerToDeco</b> 的值做 immediate expansion 了。 </li>
+</ul>
+<p>以上改进在 v601 基本完成，初步测试通过（见 mix-compiler-ver 中的例子 ）。</p>
+<p>==</p>
+</body>
+
+</html>

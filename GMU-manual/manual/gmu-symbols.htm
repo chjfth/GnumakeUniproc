@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>gmu-symbols</title>
+
+</head>
+
+<body>
+<H1 align="center">GMU symbols </H1>
+
+<h3>Symbols for _CountCompile.gmu.cnt ($(gmu_Gp_COUNT_COMPILE)) </h3>
+<p>The chars logged in this file is used to report the compile &amp; link summary at the end of GMU run -- that is:</p>
+<pre class="fws">[[[END]]]                                        Projects:16,Containers:30+1
+Files compiled: C++:107 C:3 ASM:0 linked:15
+CVS-action:0+0,SVN-action:11+4 
+</pre>
+<table width="100%"  border="1" cellspacing="3" cellpadding="2">
+  <tr>
+    <th scope="col" width="10%">symbol</th>
+    <th scope="col">meaning</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">c</td>
+    <td>compiled a C file </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">x</td>
+    <td>compiled a C++ file </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">a</td>
+    <td>compiled an assembler file </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">l</td>
+    <td>linked a EXE, DLL, or LIB </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">+</td>
+    <td> a non-container project is done and something is linked in that project. Currently, an 'l' will be followed by a '+'. </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">=</td>
+    <td>a non-container project is done and nothing is linked(i.e. up-to-date) in that project</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">R</td>
+    <td>done a container project, which has GMU sub-projects</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">r</td>
+    <td>done a container project, which has no GMU sub-projects (<code>gmu_DELIBERATE_NO_SUBPRJ=1</code>)</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">V</td>
+    <td>done a CVS checkout/export of sub-project makefiles</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">v</td>
+    <td>done an additional CVS checkout /export within a project (<code>gmu_uv_list_CVS_MODULES</code>) </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">S</td>
+    <td>done a SVN checkout/export of sub-project makefiles</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">s</td>
+    <td>done an additional SVN checkout /export within a project (<code>gmu_uv_list_SVN_MODULES</code>)</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h3>Symbol-prefix in built_list.gmu.txt ($(_p_BuildListOutput)) </h3>
+<table width="100%"  border="1" cellspacing="3" cellpadding="2">
+  <tr>
+    <th scope="col" width="10%">symbol</th>
+    <th scope="col">meaning</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">+</td>
+    <td>bulit a project, something compiled and linked </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">=</td>
+    <td>checked a project and it is up-to-date </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">*</td>
+    <td>done a container project, who has GMU sub-projects</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">@</td>
+    <td>done a container project, who has no GMU sub-project (<code>gmu_DELIBERATE_NO_SUBPRJ=1</code>)</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">R</td>
+    <td>done a container project, which has GMU sub-projects</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">r</td>
+    <td>done a container project, which has no GMU sub-projects (<code>gmu_DELIBERATE_NO_SUBPRJ=1</code>)</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">V</td>
+    <td>done a CVS checkout/export of sub-project makefiles</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">v</td>
+    <td>done an additional CVS checkout /export within a project (<code>gmu_uv_list_CVS_MODULES</code>) </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">S</td>
+    <td>done a SNV checkout/export of sub-project makefiles</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">s</td>
+    <td>done an additional SVN checkout /export within a project (<code>gmu_uv_list_SVN_MODULES</code>)</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>-</p>
+</body>
+
+</html>

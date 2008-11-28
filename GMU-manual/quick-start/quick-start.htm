@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>GnumakeUniproc Quick Start Guide</title>
+
+</head>
+
+<body>
+<H1 align="center">GnumakeUniproc Quick Start Guide </H1>
+
+<p>This quick start guide intends to tell you how to setup the environment to work with GnumakeUniproc. Our goal is to build our first sample program(including a LIB project and an EXE project) with GnumakeUniproc.</p>
+<p>This guide is based on GnumakeUniproc v0.94. GnumakeUniproc is sometimes abbreviated as GMU.</p>
+<h3>Installation</h3>
+<p>No matter you're using Windows or Linux, you always need GNUmake version 3.80 or above. Currently(2008-10-22) latest GNUmake version is 3.81, which is strongly recommended over 3.80, since 3.81 contains quite some enhancements and bug fixes that GnumakeUniproc expects. </p>
+<p>The installation process varies quite a lot for Windows and Linux, therefore, I'll describe them separately.</p>
+<p></p>
+<ul>
+  <li><a href="install-windows.htm">Installation for Windows user</a></li>
+  <li><a href="install-linux.htm">Installation for Linux user</a>  </li>
+</ul>
+<h3>Build the example program </h3>
+<p><a href="build-walkdir.htm">Read it  here.</a> </p>
+<h4>More about the example program </h4>
+<p>The example program in the quick start guide only exhibits a small portion of GnumakeUniproc's capability. To fully exploit GnumakeUniproc's functionality, refer to its manual please(give a link later). </p>
+<p>If you have decided to deploy GnumakeUniproc for your own C/C++ projects, you may start writing your own makefiles based on some makefile templates. Those templates reside in:</p>
+<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template</pre>
+<div class="hint">Here, I use <tt>$gmu_DIR_ROOT</tt> to repesent where GnumakeUniproc is installed. And actually <tt>gmu_DIR_ROOT</tt> is a real environment variable(env-var for short) you can use after GnumakeUniproc's installation. </div>
+<p>The walkdir LIB project is based on template in: </p>
+<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-lib</pre>
+<p>and the walkdir EXE project is based on template in: </p>
+<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-exe</pre>
+<p>More information can be found on GnumakeUniproc's <a href="http://gnumakeuniproc.sourceforge.net">website</a> .</p>
+<p>Good luck.</p>
+
+<hr	/>
+<div>
+<a href="http://sourceforge.net/donate/index.php?group_id=185954"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="2" alt="Support This Project" align="left" /></a>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=185954&amp;type=4" alt="Project hosted on SourceForge.net" width="125" height="37" border="0" align="right" /></a> 
+</div>
+</body>
+
+</html>

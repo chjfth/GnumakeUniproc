@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang=en>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" type="text/css" href="chj.css">
+<link rel="STYLESHEET" type="text/css" href="../chj.css">
+<title>Pattern1 vars for mswin</title>
+
+</head>
+
+<body>
+<H1 align="center">Pattern1 vars for mswin </H1>
+
+<p>Gmu-vars listed in this page affects compiling and linking behavior when building Microsoft Windows programs. </p>
+<ul>
+  <li>Some vars are compiler independent, that is, they can be used for MSVC compiler or MinGW compiler.</li>
+  <li>But some other vars are only specific to one compiler. </li>
+</ul>
+<p>These vars all have <code>gmp_</code> as prefix, and alternatively, some of them has a sub-prefix like <code>MSVC_</code> etc. </p>
+<h4>gmp_ vars related to DLL building </h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Apply to </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_mswin_IMPLIB_SUFFIX</td>
+    <td align="center" valign="top">all</td>
+    <td><p>Import-lib's suffix. (default to null) </p>
+      <p>Assume your DLL to generate has the name <tt>ABC.dll</tt>; when this var is null, the default implib generated is named <tt>ABC.lib</tt> . But if you'd like to name the implib a little bit different, you can use this var. If this var is set to <code>--implib</code>, your resulting implib will be named <tt>ABC--implib.lib</tt> . </p>    </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</td>
+    <td align="center" valign="top">all</td>
+    <td>If your DLL needs a .def file to build, you set the def file's path in this var. The var-name suffix <code>_FROM_ROOT</code> implies that this path is a relative path to <code>$(gmu_ud_SRC_ROOT)</code> . </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_u_list_DLL_EXPORT_SYM</td>
+    <td align="center" valign="top">all</td>
+    <td><p>List symbols that  instruct what symbols to export from a DLL.</p>
+    <p>Take MSVC compiler for example: if this var have value &quot;<code>EXPORT_FOO EXPORT_BAR</code>&quot;, it results in a make statement:</p>
+    <pre class="fws">gmp_CFLAGS_MACRO_DEFS_preset += \
+  /D&quot;EXPORT_FOO=__declspec(dllexport)&quot; \
+  /D&quot;EXPORT_BAR=__declspec(dllexport)&quot;</pre>    
+    <p>-- so that you can write <code>EXPORT_FOO</code> and <code>EXPORT_BAR</code> as decoration for your C/C++ function declaration . </p>
+    <p>Note: this var does not have a sub-prefix <code>_mswin</code> etc, because I think its meaning is universal on all platforms.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_bc_CRT</td>
+    <td align="center" valign="top">MSVC</td>
+    <td><p>In history of Microsoft Windows, there have been three different C Runtime Libraries (CRT) that can be linked by an application. This var is used for this. It value can be set to: </p>
+      <ul>
+        <li>Null(default): Use MSVCRT(D).DLL as CRT, compiler option <code>/MD </code>or <code>/MDd</code> . </li>
+        <li><code>CRT_MULTI_THREADED_LIB</code>: Use multithreaded static CRT, compiler option <code>/MT</code> or <code>/MTd</code> . </li>
+        <li><code>CRT_SINGLE_THREADED</code>: Use single-threaded static CRT, compiler option <code>/ML</code> or <code>/MLd</code>. Single-threaded CRT has been obsolete since Visual Studio 2005. </li>
+    </ul></td>
+  </tr>
+</table>
+<p>--</p>
+</body>
+
+</html>

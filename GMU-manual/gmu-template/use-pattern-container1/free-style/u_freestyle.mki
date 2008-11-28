@@ -1,0 +1,17 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks 
+# as u_freestyle.mki 
+# 	You define your own make target here by replacing <your-custom-target>
+# with your custom target name are supply make rule for it.
+#	By calling it "free-style", it means you can not define GMU-style sub-projects
+# here, nor can you assign source files in gmu_up_list_SRC_FROM_ROOT to make them
+# get compiled and linked.
+#---------------------------------------------------------------------------
+
+<your-custom-target>: #<prerequisites ...>
+	@echo "Custom target is being built as defined in u_freestyle.mki ."
