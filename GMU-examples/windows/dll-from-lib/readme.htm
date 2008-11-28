@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>dll-from-lib example project readme</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+</style>
+</head>
+
+<body>
+
+<H1 align="center">dll-from-lib demo project </H1>
+<p>[2008-06-27] created </p>
+<h2>Summary</h2>
+<p>The example projects in this directory demonstrates how to use the <b>PI_windll_from_lib</b> plugin to construct a DLL from a LIB project. This project applies to Visual C++ compiler only. </p>
+<p>Purpose: You may have the situation that you have a set of library code; sometimes you want them to be compiled into a static LIB, while some other times you want them to be compiled into a DLL. In traditional way, you have to write two sets of makefiles, one for making LIB and the other for making DLL. You may invent some improvements that uses GNU makefile's <code>ifdef/endif</code> features to do conditional build, but that complicates your makefile. Furthermore, if you come up the great idea of packing ten small LIBs into one big DLL for easy distribution, you'll get stunned maintaining your &quot;traditional&quot; makefiles. </p>
+<p>Now using <b>PI_windll_from_lib</b> plugin with GnumakeUniproc, you can have a relief. Detailed working features as follows:</p>
+<p>By saying dll-from-lib, we mean that:</p>
+<ul>
+  <li>You can build a DLL by linking(packing) multiple LIBs as sub-projects. </li>
+  <li>The DLL project is not restricted in any way, e.g, it can still compile in C/C++ files, use Windows resources etc.</li>
+  <li>For those stock LIB projects that are to be packed, only little and harmless update to the makefiles are required -- that is, let them load the dll-from-lib plugin. </li>
+</ul>
+<p>Rationale:</p>
+<ul>
+  <li>Aside from  providing real C/C++ code implementing library functions, its LIB projects' duty to tell what symbols should be exported by the resulting DLL. This export symbol list should be maintain by LIB projects themselves instead of by DLL project, so when the LIB code add or change functions to export, they take care of the export list themselves and the resulting DLL projects automatically receive the export list. </li>
+  <li>DLL and LIB projects both must load <b>PI_windll_from_lib</b> plugin in order for them to cooperate. </li>
+</ul>
+<h2>Example dissecting </h2>
+<p>The example is at <tt>$gmu_DIR_ROOT/GMU-examples/windows/dll-from-lib</tt> . Now we refer to that dir as <tt>$dirDemo</tt> . </p>
+<ul>
+  <li><tt>libsrc-walkdir</tt> contains the walkdir LIB project. It is copied from the walkdir code introduced in quick-start guide. We make a copy because some change(although very little) has to be made to its makefiles.</li>
+  <li><tt>dll-walkdir</tt> contains the project to make DLL, using <tt>libsrc-walkdir</tt> as its sub-project . Functions in the LIB project will be exported in the resulting DLL -- of course, only exporting those you want to export. </li>
+</ul>
+<h4>What is added to the original LIB project? </h4>
+<p>Actually, only two things added.</p>
+<p>First, in <tt>$dirDemo/libsrc-walkdir/lib.mki</tt> , we load the plugin and set require parameters for that plugin.</p>
+<pre>gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
+gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt
+</pre>
+<p>Second, we create the file <tt>ExportDefs.txt</tt> just refered as the <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> parameter(make-var). The file has the content:</p>
+<pre>walkdir_start
+walkdir_extname
+</pre>
+<p>It's just listing the export symbols which will be exported by the resulting DLL. More precisely, current PI_windll_from_lib implementation will append these lines to the .def file(used by Microsoft linker later when linking the final DLL) below the <code>EXPORTS</code> directive . </p>
+<p>That's all for &quot;upgrading&quot; the LIB project, not cumbersome, right?</p>
+<h4>How to write the DLL project? </h4>
+<p>Again, it is not difficult as well. After copying the template files for DLL project(from <tt>$gmu_ROOT/GMU-manual/gmu-template/use-pattern1/make-dll</tt>) , it boils down to the following steps:</p>
+<ol>
+  <li>Load PI_windll_from_lib plugin in <tt>dll.mki</tt> . </li>
+  <li>Assign the .def file to use in <tt>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</tt> . (This is not absolutely must.) </li>
+  <li>List walkdir as  sub-project.</li>
+</ol>
+<p>Your .def need to contain only one line that reads <code>EXPORTS</code> . If you want to write other .def file directives, that's OK. But be sure to leave the <code>EXPORT</code> directive at the tail, because PI_windll_from_lib's code will append the text in <tt>ExportDefs.txt</tt> to your .def file to construct a complete .def file for the linker . </p>
+<p>That's all. Quite convenient, isn't it? </p>
+<p>If you are interested what's going on there, just enable verbose output to know more, e.g. add option <code>gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> when invoking umake. </p>
+<p>In this DLL project, some extra action are demonstrated:</p>
+<ul>
+  <li><b>PI_winres_msvc</b> plugin is loaded to compile <tt>walkdir.rc</tt> into the DLL. A <code>VERSIONINFO</code> statement in the .rc describe the DLL's version info.</li>
+  <li>In <tt>u_srccfg_post.mki</tt>, an extra variable assignment <code>gmp_mswin_IMPLIB_SUFFIX=--imp</code> is introduced which causes the import library for the DLL to have the suffix <code>--imp</code> . The benifit of this is in case you intend to give both the static LIB and the DLL to your user so that they can choose a preferred one to use, the static <tt>walkdir.lib</tt> and the import-lib <tt>walkdir--imp .lib</tt> have distinguished names. </li>
+</ul>
+<h2>Other facts </h2>
+<p>In the above example, we prepare a .def file for the linker, but you know that only very old Visual C++(maybe v2.0 back in 1995) take .def as a must. Nowadays, you can declare a function or even a whole C++ class with <code>__declspec(dllexport)</code> to have those functions exported, then, is a .def file a must when using PI_windll_from_lib? The answer can be yes or no.</p>
+<p>If you declare a C function with <code>__stdcall</code> or <code>WINAPI</code> ,  and you want other language(like Delphi) to call into your DLL, the answer is no. You have to prepare a .def to explicitly state the names to export, otherwise, your real exported function name will be like <code>_myfunc@4</code>, which is probably unsuitable for your client.</p>
+<p>But if you know you only have C/C++ clients, can you omit the .def file? This time, no or yes. If you try not assigning a .def file, the link can succeed, but you'll find no symbols exported from DLL -- even if you have declared all your functions <code>__declspec(dllexport)</code> . In order to see symbols exported, you may link in those .objs instead of .libs(this is at least true for Microsoft Visual C++ 6 compiler), but this violates our spirit of dll-from-lib. To work around this, you have two ways:</p>
+<ul>
+  <li>Write a .def file explicitly stating what you want to export.</li>
+  <li>Not giving a .def file, you write a stub C/C++ file, and a function(any name is OK) in it. In this stub-function, call one or more of your to-be-export functions until all to-be-export functions are covered in the call chain. Finally, compile this C/C++ file in your DLL project then you're done. </li>
+</ul>
+<p>- </p>
+</body>
+
+</html>

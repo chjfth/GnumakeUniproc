@@ -1,0 +1,3 @@
+DESCRIPTION "This DLL is made from linking a LIB, building process driven by GnumakeUniproc."
+
+EXPORTS

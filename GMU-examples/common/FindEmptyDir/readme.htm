@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>FindEmptyDir example readme</title>
+
+<style type="text/css">
+.fws {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+</style>
+</head>
+
+<body>
+
+<H1 align="center">FindEmptyDir demo project</H1>
+<p>[2007-03-10] created </p>
+<p>The example projects in this directory demonstrate a special feature of GnumakeUniproc, called 
+
+
+ &quot;multi-level auto-linking&quot;. 
+  This feature is related to the GnumakeUniproc variable(gmuvar) <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code>. </p>
+<p>This is exhibited by building project demoFindEmptyDir, which has the following dependency:</p>
+<ul>
+  <li>demoFindEmptyDir accepts a dir as parameter, and prints out all empty subdirs(dirs containing no files or subdirs) in it. It accompishes the &quot;find-empty-dir&quot; functionality by calling function <code>FindEmptyDir</code> in FindEmptyDir library.</li>
+  <li>FindEmptyDir library yet depends on(calls) function <code>walkdir_start</code> in walkdir library in turn. </li>
+</ul>
+<p><img src="FindEmptyDir.gif" width="529" height="214"></p>
+<p>With traditional makefile style, demoFindEmptyDir's makefile would need to explicitly state that he depends on two libraries, FindEmptyDir and walkdir. However, there is a flaw with this style: demoFindEmptyDir calls function(s) from FindEmptyDir lib, but not from walkdir lib, but he has the burden of knowing FindEmptydir depends on walkdir so that demoFindEmptyDir's makefile can know what extra libs need to be linked. That's really not good. If FindEmptyDir changes his implementation to depend on other libs, then demoFindEmptyDir's makefile has to be changed accordingly.</p>
+<p>Now, GnumakeUniproc's <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> can give you a relief. What you have to do now is:</p>
+<ul>
+  <li>In demoFindEmptyDir, you list sub-project FindEmptyDir in <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> . Makefiles of demoFindEmptyDir does not have to refer to walkdir. </li>
+  <li>In FindEmptyDir, you list sub-project walkdir in <code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT </code>.</li>
+</ul>
+<p>Yes, in the above process, for demoFindEmptyDir project, you list sub-projects in gmuvar  <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> instead of the traditional <code>gmu_uv_list_SUBPRJ_TO_LINK</code> . This constitutes the multi-level auto-linking feature. </p>
+<p>When making demoFindEmptyDir, you'll see all three projects built. What's more, if you modify some C source file in walkdir and make again, you'll see only walkdir and demoFindEmptyDir updated.</p>
+<h2>Q &amp; A</h2>
+<h3>Is there any substantial difference to the two names <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> and <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> ? </h3>
+<p>Yes, they serves different purposes. To make it clearer, I tell you that there is (at least) one circumstance that you have to use the two vars both, that is, when building a special Windows DLL.</p>
+<p>(pending)</p>
+<p>&nbsp; </p>
+<p>-- </p>
+</body>
+
+</html>

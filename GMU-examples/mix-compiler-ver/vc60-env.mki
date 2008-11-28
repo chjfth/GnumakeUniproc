@@ -1,0 +1,12 @@
+ifndef __vc60-env_included_
+__vc60-env_included_ := 1
+
+
+LoadVc60Env = MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(if $2,$2/Include;)$1/VC98/INCLUDE;$1/VC98/ATL/INCLUDE;$1/VC98/MFC/INCLUDE;"\
+	LIB="$(if $2,$2/Lib;)$1/VC98/LIB;$1/VC98/MFC/LIB;"\
+	PATH="$(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;$(subst \,/,$(PATH))"
+
+# Adding Common\MSDev98\Bin into PATH for MSPDB60.DLL.
+
+endif

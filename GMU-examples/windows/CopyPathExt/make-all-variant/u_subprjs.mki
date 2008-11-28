@@ -1,0 +1,26 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+
+gmu_uv_list_ALL_SUBPRJ = a u d ud
+	# a: Ansi , u: Unicode , d: debug
+
+dllMakefile = ../../make/dll.msvc/Makefile
+
+a_Makefile = $(dllMakefile)
+u_Makefile = $(dllMakefile)
+d_Makefile = $(dllMakefile)
+ud_Makefile = $(dllMakefile)
+
+a_MakeVarDefines = gmp_bc_DEBUG=  gmp_bc_UNICODE=
+	# Override gmp_bc_DEBUG & gmp_bc_UNICODE in case parent project set them to 1
+u_MakeVarDefines = gmp_bc_DEBUG=  gmp_bc_UNICODE=1
+d_MakeVarDefines = gmp_bc_DEBUG=1 gmp_bc_UNICODE=
+ud_MakeVarDefines = gmp_bc_DEBUG=1 gmp_bc_UNICODE=1

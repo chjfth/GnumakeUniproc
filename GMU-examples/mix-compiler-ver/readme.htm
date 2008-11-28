@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>GMU demo - Using Multiple versions of a Same Compiler</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+.blue { color:#0000FF; }
+.red { color:#FF0000; }
+
+</style>
+</head>
+
+<body>
+<H1 align="center">Using Multiple versions of a Same Compiler</H1>
+<p>[2008-08-17] Created. (written for GnumakeUniproc v0.94) </p>
+<H2>Task Summary</H2>
+<p>Many developers use only one compiler to develop their programs in one period, then GMU is just fine for them; and among other people using more than one compiler, GMU is still fine for them, they can use multiple compilers(e.g MSVC and ARM C++) in one GMU run(one session). As long as command line environment for those compilers have all set up correctly, you just start a GMU build session, then during the build session, &quot;choosing&quot; or defining different <code>gmp_COMPILER_ID</code> on starting a child project makes you switch between different compilers. </p>
+<p>So far, so good. But in case some day you have to confront any of the following situations: </p>
+<ul>
+  <li>Some code changes require you to use a new version of a compiler(e.g. upgrade from Visual C++ 6 to Visual C++ 2005, VC6 to VC8 for short), but some of your legacy code still need VC6. </li>
+  <li>You desire to build your code into 32-bit binary as well as 64-bit binary. </li>
+  <li>You want to use a newer compiler, whose environment setting can not co-exist with some of your old compilers. For example: Both of them use <code>INCLUDE</code> env-var to indicate the system header directories, while the actual system headers used are different for the two compilers. </li>
+</ul>
+<p>Then how can you  build ALL your projects in one GMU run? </p>
+<p>Fortunately, GMU has considered this for you, and this is what this demo will show you. </p>
+<h2>Solution example: walkdir-msvc-multiver</h2>
+<p>In order to succesfully run this example, your PC must have two version of Visual C++ compiler installed. Here, VC6 &amp; VC8 is used. If you have other combination, e.g. VC7 &amp; VC8, you have to tune the makefiles a bit.</p>
+<div class="footnoteb">HINT: Just in case, confirm that you have set env-var <code>gmp_DECO_PRJ_NAME=1</code> (it is set by default on GMU installation) to make this example success. </div>
+<h3>General Idea </h3>
+<p>Let's assume we would use VC6 and VC8 in one GMU run. The solution is:</p>
+<ol>
+  <li>Start your root project in a clean environment. &quot;Clean&quot; means not setting environment for any compiler involved.</li>
+  <li>Your root project acts as a container project serving two sub-projects(child projects), one for building all your VC6 programs, the other for building all your VC8 programs. These two sub-projects are called 1st-level sub-projects. </li>
+  <li>On root project's launching its sub-project, the root project sets compiler environment for the sub-project. So, the two 1st-level sub-projects can receive different environment without conflict. -- because, for GMU, starting a sub-project actually starts a new process. </li>
+</ol>
+<p>Now introducing our example <b>walkdir-msvc-multiver</b>. Remember the walkdir example in the quick start guide? It builds a LIB project and an EXE project. Now, we'll build them again, but this time, build them twice, once with VC6 compiler, once with VC8 compiler.</p>
+<p>Among the above three steps, you probably have got the idea how to do the first two. So the key point this example will show you is how to do step 3.</p>
+<p>As for using Microsoft Visual C++ compiler, the essence of step 3 is setting the following environment variables(env-var):</p>
+<ul>
+  <li>Set <code>INCLUDE</code> to indicate system header file directories. </li>
+  <li>Set <code>LIB</code> to indicate system header file directories. </li>
+  <li>Add the directory containing <tt>cl.exe</tt> into <code>PATH</code> env-var so that the compiler executable can be found.</li>
+</ul>
+<p>Normally, we call the stock <tt>vcvars32.bat</tt> or <tt>vcvarsall.bat</tt> to set them up. But is it feasible to call those .bat during a GMU run? The answer is no, because the child make process spawn is hidden by GnumakeUniproc core. So, we have to use another way, that is, a special mechanism provided by GnumakeUniproc.</p>
+<p>When GMU user defines a subprj in <code>gmu_uv_list_SUBPRJ_LINK</code> or <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code>, he can define environment variable assignment for that very subprj. For example:</p>
+<pre>gmu_uv_list_SUBPRJ_TO_LINK = subprja
+&nbsp;
+subprja_Makefile = <span class="c-comment">/subprja/make.msvc/Makefile</span>
+<subprj1-refname>subprja_MakeVarDefines = myvar1=val1 mylist=<span class="c-string">&quot;item1 item2&quot;</span></pre>
+<p>This will result in such a make command to be executed:</p>
+<pre>export myvar1=val1 mylist=<span class="c-string">&quot;item1 item2&quot; ;</span> make -f <span class="c-comment">/subprja/make.msvc/Makefile</span></pre>
+<p>So you can set those <code>INCLUDE, LIB, PATH</code> env-vars this way to forge distinctive environment for any of your sub-projects. </p>
+<h3>Review the example makefile </h3>
+<p>Now come back to our example, check <tt>walkdir-msvc-multiver/u_subprj.mki . </tt></p>
+<pre>ifeq (,$(gmp_MSVC60_ROOT))
+  $(error Visual C++ 6 (VS98) root directory not defined in gmp_MSVC60_ROOT, so I don't know how to setup VC6 compile environment)
+endif
+
+ifeq (,$(gmp_MSVC60_PSDK_ROOT))
+  $(warning Microsoft Platform SDK root directory not defined in gmp_MSVC60_PSDK_ROOT, so you may be using too old headers and libraries)
+  # GMU author is using Platform SDK Feb 2003 with VC6.
+endif
+
+
+ifeq (,$(gmp_MSVC80_ROOT))
+  $(error Visual C++ 8 (VS2005) root directory not defined in gmp_MSVC80_ROOT, so I don't know how to setup VC8 compile environment)
+endif
+
+
+dirThisDemoRoot = ../..
+dirExampleRoot = ../../..
+dirWalkdir = $(dirExampleRoot)/common/walkdir
+
+include $(dirThisDemoRoot)/vc60-env.mki <span class="c-comment"># for LoadVc60Env</span>
+include $(dirThisDemoRoot)/vc80-env.mki <span class="c-comment"># for LoadVc80Env</span>
+
+
+gmu_uv_list_ALL_SUBPRJ = walkdir_vc60 walkdir_vc80
+
+
+shared_makefile = $(dirWalkdir)/make-all/all.$(gmp_COMPILER_ID)/Makefile
+
+walkdir_vc60_Makefile = $(shared_makefile)
+walkdir_vc60_MakeVarDefines = gmp_COMPILER_VER=<span class="blue">vc60</span> $(call <span class="blue">LoadVc60Env</span>,$(gmp_MSVC60_ROOT),$(gmp_MSVC60_PSDK_ROOT))
+
+walkdir_vc80_Makefile = $(shared_makefile)
+walkdir_vc80_MakeVarDefines = gmp_COMPILER_VER=<span class="red">vc80</span> $(call <span class="red">LoadVc80Env</span>,$(gmp_MSVC80_ROOT),$(gmp_MSVC80_PSDK_ROOT))
+
+</pre>
+<p>The two subprjs(refname <code>walkdir_vc60</code> &amp; <code>walkdir_vc80</code>) use the same makefile <code>$(shared_makefile)</code> with different env-var settings. Actually, two sets of differences:</p>
+<ol>
+  <li><code>LoadVc60Env</code> and <code>LoadVc80Env</code> result in different <code>INCLUDE=...</code> , <code>LIB=...</code> , <code>PATH=...</code> env-var assignment.</li>
+  <li>Different gmp_COMPILER_VER assignment is important as well, which makes the two subprjs result in different final project name(<code>gmu_G_Final_PrjName</code>) so that their output files are separated. </li>
+</ol>
+<p>Now we're going to run the example. But there is still one thing to explain. What are those <code>gmp_MSVC60_ROOT, gmp_MSVC60_PSDK_ROOT, gmp_MSVC80_ROOT</code> for? They are considered input of this make example, since this example project needs to know where your VC6 and VC8 compilers are installed. We'd better make them dynamic instead of hardcoded, thus give our user the freedom to install their compiler in any directory they like. <tt>sample-vc-gmp-env.bat</tt> present an sample .bat file to set these environment variables. </p>
+<p>Now start <tt>umake</tt>. The outputs in <tt>gf</tt> dir is illustrated below:</p>
+<p><img src="output-vc60-and-vc80.gif" /></p>
+<p>You can see the <tt>vc60</tt> and <tt>vc80</tt> suffix append to the project names. That is one of the effects of setting <code>gmp_COMPILER_VER</code>. One word to mention, other effects of <code>gmp_COMPILER_VER</code> is: If the value of <code>gmp_COMPILER_VER</code> is recognizable by compiler-config-mki, default compiler flags will be tuned for that very compiler. </p>
+<h3>Trivial Queststions </h3>
+<h4>An experiment, what if missing <code>gmp_COMPILER_VER</code> assignment? </h4>
+<p>In the above example, if you don't pass <code>gmp_COMPILER_VER</code> to both sub-projects, only one compiler(VC6) will be invoked, the output like this:</p>
+<p><img src="output-no-compiler-ver-deco.gif" /></p>
+<p>The root project does try to build <code>walkdir_vc80</code> subprj, however, <code>walkdir_vc80</code> results in reporting the same final project name (<code>gmu_G_Final_PrjName</code>) as that of <code>walkdir_vc60</code>'s, so, GMU thinks <code>walkdir_vc60</code> and <code>walkdir_vc80</code> refer to actually the same project. Since building of <code>walkdir_vc60</code> makes the project up-to-date, which causes <code>walkdir_vc80</code> do nothing more. </p>
+<h4>In  vc60-env.mki and vc80-env.mki, must I use forward slash as dir separator? </h4>
+<p>It's not a must to use forward slash(/). If you insist using backslash(\), you must write double backslashes. The reason is those assignments in vc80-env.mki will act as part of Bourne Shell commands, not Windows cmd.exe commands. </p>
+<p>=</p>
+<p>&nbsp;</p>
+</body>
+
+</html>

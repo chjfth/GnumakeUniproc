@@ -1,0 +1,23 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+gmu_uv_list_ALL_SUBPRJ =  all-common  demo-auto-checkout
+gmu_uv_list_ALL_SUBPRJ += cross-lib-ref
+
+dir_ex_root = ../../..
+dir_internal-test = $(dir_ex_root)/internal-test
+
+all-common_Makefile = $(dir_ex_root)/common/make-all/all.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile resides
+
+demo-auto-checkout_Makefile = $(dir_ex_root)/auto-checkout/root1-svn/make.$(gmp_COMPILER_ID)/Makefile
+
+cross-lib-ref_Makefile = $(dir_internal-test)/cross-lib-ref/cntr-one/Makefile
+cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)

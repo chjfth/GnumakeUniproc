@@ -1,0 +1,91 @@
+#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks 
+# after the "compiler-config" files have been included. Commonly, you write
+# your source files and compiler/linker options in this file.
+#---------------------------------------------------------------------------
+
+############################################################################
+# GMU-var: gmu_uf_LINK_OUTPUT
+#	Define the link ouput filename for this project.
+# Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
+# Using function gmpf_MakeExeName to construct output name makes the name more portable.
+############################################################################
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,file_spec_cflags)
+
+############################################################################
+# GMU-var: gmu_ud_SRC_ROOT
+#	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
+# You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
+# not to this mki file.
+############################################################################
+gmu_ud_SRC_ROOT = $(gmu_d_StartupParent)
+
+############################################################################
+# GMU-var: gmu_up_list_SRC_FROM_ROOT
+#	Define your source files to compile, source files(dir prefix allowed) separated by spaces or tabs.
+# You MUST use relative paths here, which are relative to $(gmu_ud_SRC_ROOT), 
+# however, any of the resulting absolute path should not go up beyond $(gmu_ud_SRC_ROOT),
+# e.g.
+# * You cannot use ``../myfunc.c'', which actually resides in $(gmu_ud_SRC_ROOT)'s parent dir.
+# * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
+#	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
+############################################################################
+gmu_up_list_SRC_FROM_ROOT += 1.c 2.c
+
+############################################################################
+# GMU-var: gmu_ud_list_PRJ_HEADER
+#	Define header file dirs, multiple dirs should be separated by spaces or tabs.
+# You can use relative dirs here, but note, they are relative to make-var $(CURDIR),
+# not to this mki file.
+#	This var serves two purposes:
+#	1. They'll be passed to the compiler through ``-I <dir1> -I <dir2> ...'' .
+#	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
+############################################################################
+gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
+	# Don't write ``-I'' in this var; it will be prependded automatically.
+# or
+#gmp_ud_list_PS_HEADER_PARENT += (within gmp_PS_INCLUDE_SUBDIRS)
+
+gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
+	# those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
+	# You must explicitly write ``-I'' before every dir in gmp_CFLAGS_INCLUDES
+
+############################################################################
+# GMU-vars: gmp_CFLAGS_XXX
+#	Set specific compiler options for this project in the following vars:
+# gmp_CFLAGS_CODE_GEN_ALL:
+#	Any options that affect the generated binary code should be listed in it.
+# gmp_CFLAGS_NON_CODE_GEN:
+#	Any options that do not affect the generated binary code should be listed in it.
+############################################################################
+
+gmp_CFLAGS_CODE_GEN_ALL +=
+  # You may want to dispense options for gmp_CFLAGS_CODE_GEN_ALL into following 2 categories:
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # those macro defines, e.g. -Dxxx=yyy
+  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # other code generation related options
+
+gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
+
+# If some compiler options(.e.g -Dxxx ) must be passed to `gcc -M' command, set them here:
+# (Note: Those include-dir options(-I xxx) don't have to be set here.)
+gmu_u_GCC_M_OPTIONS +=
+
+
+############################################################################
+# GMU-vars: gmp_LINKFLAGS
+#	Set linker options for this project in this var.
+############################################################################
+gmp_LINKFLAGS += $(gmp_LINKFLAGS_preset)
+  # There are some other make-vars for easy setting linker flags:
+  gmp_ud_list_EXTRALIB += 
+  	# list library paths here, compiler_config.mki will help you prepend(for example) 
+  	# * -L for linuxgcc
+  	# * /LIBPATH: for msvc
+
+
+

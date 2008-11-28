@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>GMU example: cross-lib-ref</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+tt { color:#000066; }
+
+code { color:#660000; }
+
+.blue {color: #0000FF}
+</style>
+</head>
+
+<body>
+<H1 align="center">GMU example: cross-lib-ref </H1>
+
+<H2>Summary</H2>
+<p>The example here depicts a great and comforting aspect of GnumakeUniproc's &quot;multi-level auto-linking&quot; feature, that is, when some lib projects cross-refer to each other(cross dependency), the multi-level auto-linking feature works as we expect. </p>
+<p>The projects involved in this hypothetic example has the following relationship:</p>
+<p><img src="cross-lib-ref.gif" width="682" height="314"></p>
+<p>There are 7 projects, </p>
+<ul>
+  <li>On the right side, 4 lib projects: libA, libB, libC, libD.</li>
+  <li>Two EXE projects: use1 and use2. Although the call path from the two main()s are not identical,  both EXEs have to call through(link) all 4 libs.</li>
+  <li>One container project: cntr-one. </li>
+</ul>
+<p>As you can see, there are some cross dependences:</p>
+<ul>
+  <li>libB and libC cross depends each other.</li>
+  <li> libA, libB, and libD exhibits a triangular dependency chain. </li>
+</ul>
+<p>Something complex relation among those lib, right? Fortunately, this complexity adds nothing to GMU makefile complexity. You makefile writers just stick to the two rules: </p>
+<ol>
+  <li>An EXE project lists its direct called-into libraries as sub-project in <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> .</li>
+  <li>A LIB project lists its direct called-into libraries as sub-project in <code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code> .</li>
+</ol>
+<h2>Running result explained</h2>
+<p>When you run cntr-one project, 2 EXEs and 4 LIBs will be built as we expect. What's more, makefiles for the 2 EXEs and 4 LIBs each are still launched only once, no duplicate make of the same project, -- that's the principle of &quot;make&quot;. </p>
+<p>A loop is not an error, but worth informing the end-user, so, during the build progress, you can see special info output like this:</p>
+<pre>D:\GMU\GMU-examples\internal-test\cross-lib-ref\cntr-one>umake gmu_DO_SHOW_VERBOSE=1 gmp_COMPILER_ID=msvc
+
+......
+
+==============================================================================
+  Now, BuildLevel [6]. Making sub-project: itclr-libC_msvc
+  CurDir: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libB
+  Makefile: ../libC/Makefile
+       => D:/GMU/GMU-examples/internal-test/cross-lib-ref/libC/Makefile
+  Expected Output: %/itclr-libC_msvc/c.lib
+  MakeVarDefs:
+==============================================================================
+<b>!GMU!Info: A sub-project with refname {libb} loop against ancestor project[ itclr-libB_msvc ], whose
+ makefile is:</b>
+    ../libB/Makefile
+  i.e.
+    <span class="blue">D:/GMU/GMU-examples/internal-test/cross-lib-ref/libB/Makefile</span>
+&nbsp; </pre>
+<p>A special &quot;A sub-project with refname {<i>refname-in-makefile</i>} loop against ancestor project ...&quot; info is shown to tell you the looping situation. It tells us: Project <tt>itclr-libC_msvc(libC)</tt> lists <tt>libb</tt>(libb is just a refname to libB in libC's makefile) as sub-project, however, the project referred to as libb is an ancestor project(libb's parent project, or grandparent project, etc) &quot;enwrapping&quot; libC, so that libb cannot be built now at this moment(otherwise, a real dead loop will occur).</p>
+<div class="hint">Note: In our makefiles, true project name(<code>gmu_PRJ_NAME</code>) of libB is <tt>itclr-libB</tt>, true name of libC is <tt>itclr-libC</tt>. Adding the <tt>itclr-</tt> prefix in our makefiles is try to eliminating project-name conflicts in the future in case some other example projects use libB, libC etc as their project name. </div>
+<p>A small question is, when seeing the above info, how to check who has demanded libB at the first place so that libB turns out to cause a loop when making libC? Answer: you can check the <tt>building_list.gmu.txt</tt> file to know it. Content of <tt>building_list.gmu.txt</tt> for this example: </p>
+<pre>
+>[itclr-cntr-one_msvc(itclr-cntr-one)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/cntr-one/Makefile  
+>   [itclr-use1_msvc(itclr-use1)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/use1/Makefile  use1.exe
+>       [itclr-libA_msvc(itclr-libA)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libA/Makefile  a.lib
+>           [itclr-libB_msvc(itclr-libB)] STRT: <span class="blue">D:/GMU/GMU-examples/internal-test/cross-lib-ref/libB/Makefile</span>  b.lib
+>               [itclr-libC_msvc(itclr-libC)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libC/Makefile  c.lib
+=               [itclr-libC_msvc(itclr-libC)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libC/Makefile  c.lib   --
+>               [itclr-libD_msvc(itclr-libD)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libD/Makefile  d.lib
+=               [itclr-libD_msvc(itclr-libD)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libD/Makefile  d.lib   --
+=           [itclr-libB_msvc(itclr-libB)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libB/Makefile  b.lib   --
+=       [itclr-libA_msvc(itclr-libA)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/libA/Makefile  a.lib   --
+=   [itclr-use1_msvc(itclr-use1)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/use1/Makefile  use1.exe   --
+>   [itclr-use2_msvc(itclr-use2)] STRT: D:/GMU/GMU-examples/internal-test/cross-lib-ref/use2/Makefile  use2.exe
+=   [itclr-use2_msvc(itclr-use2)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/use2/Makefile  use2.exe   --
+*[itclr-cntr-one_msvc(itclr-cntr-one)] DONE: D:/GMU/GMU-examples/internal-test/cross-lib-ref/cntr-one/Makefile  -   --
+</pre>
+<p>Find the line telling libB's (marked in blue for you), and you know its &quot;call path&quot;, that is: </p>
+<pre>libB &lt;- libA &lt;- use1 &lt;- cntr-one</pre>
+<h2>Misc</h2>
+<h3>Note for gcc/mingw user:</h3>
+<p>Due to GNU ld linker's &quot;haste to drop objs on LIB scanning&quot; behavior, you can get error on linking use1.exe:</p>
+<pre>libd.a(d1.c.o.b)(.text+0x37):d1.c: undefined reference to `a2' </pre>
+<p>To workaround, pass <code>gmp_LINK_DuplicateLibList=1</code> to GMU so that the LIB list is duplicated on link command line to make ld happy.</p>
+<p>--</p>
+</body>
+
+</html>

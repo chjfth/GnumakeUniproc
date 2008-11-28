@@ -1,0 +1,11 @@
+
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,d)
+
+gmu_ud_SRC_ROOT = .
+
+gmu_up_list_SRC_FROM_ROOT += \
+	d1.c \
+
+gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += liba
+
+liba_Makefile = ../libA/Makefile

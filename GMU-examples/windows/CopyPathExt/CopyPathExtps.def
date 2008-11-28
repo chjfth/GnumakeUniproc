@@ -1,0 +1,11 @@
+
+LIBRARY      "CopyPathExtPS"
+
+DESCRIPTION  'Proxy/Stub DLL'
+
+EXPORTS
+	DllGetClassObject
+	DllCanUnloadNow
+	GetProxyDllInfo
+	DllRegisterServer
+	DllUnregisterServer

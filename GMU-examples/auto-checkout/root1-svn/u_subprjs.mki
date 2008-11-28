@@ -1,0 +1,37 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+d_WCRoot = ../../root1-svn-wc
+	# For this demo, We'd like our whole working copy(WC) to be in this dir
+
+gmu_uv_list_ALL_SUBPRJ = zlib-example zlib-minigzip
+
+zlib-example_Makefile = $(d_WCRoot)/zlib-example/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile will be(should be)
+# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
+# >>>> For SVN checkout
+zlib-example_svnUrl_forMakefiles = \
+	file:///$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/svnreps-zlib-example/trunk
+	# note: Don't worry about the $(gmu_DEMO_CO_BRANCH), it is null for you average user.
+zlib-example_svnLocalDir_forMakefiles = $(d_WCRoot)/zlib-example
+	# Local dir corresponding to the whole SVN URL
+zlib-example_svnRev = # Revision to use(string after svn's -r switch)
+# <<<< For SVN checkout
+
+zlib-minigzip_Makefile = $(d_WCRoot)/zlib-minigzip/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile will be(should be)
+# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
+# >>>> For SVN checkout
+zlib-minigzip_svnUrl_forMakefiles = \
+	file:///$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/svnreps-zlib-minigzip/trunk
+zlib-minigzip_svnLocalDir_forMakefiles = $(d_WCRoot)/zlib-minigzip
+	# Local dir corresponding to the whole SVN URL
+zlib-minigzip_svnRev = # Revision to use(string after svn's -r switch)
+# <<<< For SVN checkout

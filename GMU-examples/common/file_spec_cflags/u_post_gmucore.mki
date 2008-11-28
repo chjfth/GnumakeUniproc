@@ -1,0 +1,5 @@
+
+
+# For 2.c, add -DINPUT_NUM=7 compiler option:
+$(call gmuf_CnCXX_ListToObjList,2.c): gmp_CFLAGS_MACRO_DEFS += -DINPUT_NUM=7
+

@@ -1,0 +1,47 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>KeyView2 example readme</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+TT { color:#000066; }
+CODE { color:#660000; }
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+</style>
+</head>
+
+<body>
+<H1 align="center">KeyView2 example readme </H1>
+
+<p>This KeyView2 program is provided by Charles Petzold's famous book <i>Programming Windows 5th-ed</i>.</p>
+
+
+<p>KeyView2 shows you <code>WM_KEYUP</code>,<code> WM_KEYDOWN</code>, <code>WM_CHAR </code>messages received by your Windows GUI application.</p>
+<p>User hint: If you want to see non-English characters in <code>WM_CHAR</code> message, you have to compile this program in Unicode mode. Using GnumakeUniproc, use <tt>umakeU.bat</tt> to do the Unicode compile.</p>
+<p>KeyView2 is included as an GMU example to demonstrate the use of GMU user input var <code>gmp_up_USER_OUTPUT_AFTER_LINK </code>. We want to zip the EXE output <tt>KeyView2.exe</tt> into <tt>KeyView2.exe.zip</tt> every time the exe image is updated, that is:</p>
+<ul>
+  <li>In a GMU run, if the source file is up-to-date and the EXE output is intact, the zip operation should not be run. </li>
+  <li>In a GMU run, if the source file has been changed and the EXE output is re-generated, the zip operation should be run to generate a new zip file.</li>
+</ul>
+<p>In order to accomplish this goal, you should write your makefiles as follows:</p>
+<ol>
+  <li>Before GMU core(in <tt>exe.mki</tt>), define <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> to your customed output filename(most time, should be a fullpath) .</li>
+  <li>After GMU core(in <tt>u_post_gmucore.mki</tt>), define your rule for target <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> . In this rule, you launch the zip command to zip the EXE output.</li>
+</ol>
+<p>&nbsp;</p>
+<p>NOTE: If you do a full install of GMU's Windows installer, zip.exe(from Info-ZIP website) is ready for you in the same dir as umakeU.bat, otherwise, you have to prepare a zip command in your PATH env-var yourself. </p>
+<p>--</p>
+</body>
+
+</html>

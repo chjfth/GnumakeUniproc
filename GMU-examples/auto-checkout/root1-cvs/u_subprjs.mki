@@ -1,0 +1,40 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+d_WCRoot = ../../root1-cvs-wc
+	# For this demo, We'd like our whole working copy(WC) to be in this dir
+
+gmu_uv_list_ALL_SUBPRJ = zlib-example zlib-minigzip
+
+zlib-example_Makefile = $(d_WCRoot)/zlib-example/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile will be(should be)
+# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
+# >>>> For CVS checkout
+zlib-example_cvsRoot_forMakefiles = $(call gmuf_MakeCvsRepositoryPath,,$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/cvsreps-zlib-demo)
+	# CVSROOT for the checkout
+	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
+zlib-example_cvsModuleDir_forMakefiles = zlib-example
+	# CVS module name or module dir to checkout
+zlib-example_cvsLocalDir_forMakefiles = $(d_WCRoot)
+zlib-example_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
+# <<<< For CVS checkout
+
+zlib-minigzip_Makefile = $(d_WCRoot)/zlib-minigzip/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile will be(should be)
+# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
+# >>>> For CVS checkout
+zlib-minigzip_cvsRoot_forMakefiles = $(call gmuf_MakeCvsRepositoryPath,,$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/cvsreps-zlib-demo)
+	# CVSROOT for the checkout, same as $(Zlib_cvsRoot_forMakefiles) in this example.
+	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
+zlib-minigzip_cvsModuleDir_forMakefiles = zlib-minigzip
+	# CVS module name or module dir to checkout
+zlib-minigzip_cvsLocalDir_forMakefiles = $(d_WCRoot)
+zlib-minigzip_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
+# <<<< For CVS checkout

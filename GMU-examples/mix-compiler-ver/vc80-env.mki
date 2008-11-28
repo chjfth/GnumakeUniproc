@@ -1,0 +1,11 @@
+ifndef __vc80-env_included_
+__vc80-env_included_ := 1
+
+
+LoadVc80Env = MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(if $2,$2/Include;)$1/VC/INCLUDE;$1/VC/PlatformSDK/include;$1/VC/ATLMFC/INCLUDE;"\
+	LIB="$(if $2,$2/Lib;)$1/VC/LIB;$1/VC/PlatformSDK/lib;$1/VC/ATLMFC/LIB;$1/SDK/v2.0/lib;"\
+	PATH="$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))"
+
+
+endif

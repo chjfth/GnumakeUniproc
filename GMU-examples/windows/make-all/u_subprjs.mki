@@ -1,0 +1,28 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+gmu_uv_list_ALL_SUBPRJ = dllfromlib MFC-with-pch CopyPathExt-all \
+	KeyView2_ansi KeyView2_unicode \
+
+dir_windows = ../..
+
+dllfromlib_Makefile = $(dir_windows)/dll-from-lib/dll-walkdir/dll.$(gmp_COMPILER_ID)/Makefile
+
+MFC-with-pch_Makefile = $(dir_windows)/MFC-with-pch/make/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile resides
+
+CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/all.msvc/Makefile
+
+
+KeyView2_ansi_Makefile = $(dir_windows)/KeyView2/exe.$(gmp_COMPILER_ID)/Makefile
+KeyView2_ansi_MakeVarDefines = gmp_bc_UNICODE=
+
+KeyView2_unicode_Makefile = $(dir_windows)/KeyView2/exe.$(gmp_COMPILER_ID)/Makefile
+KeyView2_unicode_MakeVarDefines = gmp_bc_UNICODE=1

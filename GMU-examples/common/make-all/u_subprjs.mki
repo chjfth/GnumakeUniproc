@@ -1,0 +1,27 @@
+#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks .
+# You should list sub-projects for this container in this file.
+#---------------------------------------------------------------------------
+
+gmu_uv_list_ALL_SUBPRJ = walkdir use_PI_always_compile zlib_dll \
+	FindEmptyDir file_spec_cflags force-postproc
+
+dir_common = ../..
+
+walkdir_Makefile = $(dir_common)/walkdir/make-all/all.$(gmp_COMPILER_ID)/Makefile
+
+use_PI_always_compile_Makefile = $(dir_common)/use_PI_always_compile/exe.$(gmp_COMPILER_ID)/Makefile
+	# where the sub-project's makefile resides
+
+zlib_dll_Makefile = $(dir_common)/zlib_dll/makelib/dll.$(gmp_COMPILER_ID)/Makefile
+
+FindEmptyDir_Makefile = $(dir_common)/FindEmptyDir/demoFindEmptyDir/exe.$(gmp_COMPILER_ID)/Makefile
+
+file_spec_cflags_Makefile = $(dir_common)/file_spec_cflags/exe.$(gmp_COMPILER_ID)/Makefile
+
+force-postproc_Makefile = $(dir_common)/force-postprocess/make-sdk-all/all.$(gmp_COMPILER_ID)/Makefile
