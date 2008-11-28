@@ -1,0 +1,51 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  trelease:1.1.1.1 tvendor:1.1.1;
+locks    ; strict;
+comment  @ * @;
+
+
+1.1
+date     2007.10.03.12.50.54;  author chj;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        74224703902e4567;
+
+1.1.1.1
+date     2007.10.03.12.50.54;  author chj;  state Exp;
+branches ;
+next     ;
+commitid        74224703902e4567;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/* inffast.h -- header to use inffast.c
+ * Copyright (C) 1995-2003 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */
+
+/* WARNING: this file should *not* be used by applications. It is
+   part of the implementation of the compression library and is
+   subject to change. Applications should only use zlib.h.
+ */
+
+void inflate_fast OF((z_streamp strm, unsigned start));
+@
+
+
+1.1.1.1
+log
+@import cvs module zlib
+@
+text
+@@

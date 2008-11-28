@@ -1,0 +1,50 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  trelease:1.1.1.1 tvendor:1.1.1;
+locks    ; strict;
+comment  @ * @;
+
+
+1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        7864704a5c74567;
+
+1.1.1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches ;
+next     ;
+commitid        7864704a5c74567;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#include <stdio.h>
+
+extern const char g_compile_data[];
+
+int main()
+{
+	printf("Program compile data: %s\n", g_compile_data);
+
+	return 0;
+}
+@
+
+
+1.1.1.1
+log
+@
+@
+text
+@@

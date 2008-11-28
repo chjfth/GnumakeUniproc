@@ -1,0 +1,94 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  trelease:1.1.1.1 tvendor:1.1.1;
+locks    ; strict;
+comment  @# @;
+
+
+1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        7864704a5c74567;
+
+1.1.1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches ;
+next     ;
+commitid        7864704a5c74567;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks 
+# after the "compiler-config" files have been included. Commonly, you write
+# your source files and compiler/linker options in this file.
+#---------------------------------------------------------------------------
+
+############################################################################
+# GMU-var: gmu_uf_LINK_OUTPUT
+#	Define the link ouput filename for this project.
+# Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
+# Using function gmpf_MakeExeName to construct output name makes the name more portable.
+############################################################################
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,demo)
+
+############################################################################
+# GMU-var: gmu_ud_SRC_ROOT
+#	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
+# You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
+# not to this mki file.
+############################################################################
+gmu_ud_SRC_ROOT = ..
+
+############################################################################
+# GMU-var: gmu_up_list_SRC_FROM_ROOT
+#	Define your source files to compile, source files(dir prefix allowed) separated by spaces or tabs.
+# You MUST use relative paths here, which are relative to $(gmu_ud_SRC_ROOT), 
+# however, any of the resulting absolute path should not go up beyond $(gmu_ud_SRC_ROOT),
+# e.g.
+# * You cannot use ``../myfunc.c'', which actually resides in $(gmu_ud_SRC_ROOT)'s parent dir.
+# * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
+#	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
+############################################################################
+gmu_up_list_SRC_FROM_ROOT += main.c \
+	$(gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT)
+
+gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT = nowdate.c
+
+############################################################################
+# GMU-var: gmu_ud_list_PRJ_HEADER
+#	Define header file dirs, multiple dirs should be separated by spaces or tabs.
+# You can use relative dirs here, but note, they are relative to make-var $(CURDIR),
+# not to this mki file.
+#	This var serves two purposes:
+#	1. They'll be passed to the compiler through ``-I <dir1> -I <dir2> ...'' .
+#	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
+############################################################################
+gmu_ud_list_PRJ_HEADER += 
+
+
+@
+
+
+1.1.1.1
+log
+@
+@
+text
+@@

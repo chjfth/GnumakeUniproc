@@ -1,0 +1,13 @@
+K 10
+svn:author
+V 3
+chj
+K 8
+svn:date
+V 27
+2007-09-30T02:21:06.062500Z
+K 7
+svn:log
+V 91
+Add mingw compiling, but dropped zlib1.rc(don't know how to deal with resource in mingw) . 
+END

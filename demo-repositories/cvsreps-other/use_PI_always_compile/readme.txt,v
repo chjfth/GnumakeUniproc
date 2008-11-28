@@ -1,0 +1,58 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  trelease:1.1.1.1 tvendor:1.1.1;
+locks    ; strict;
+comment  @# @;
+
+
+1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        7864704a5c74567;
+
+1.1.1.1
+date     2007.10.04.08.35.19;  author chj;  state Exp;
+branches ;
+next     ;
+commitid        7864704a5c74567;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@This project demonstrates how to use a plugin. The plugin used in this example
+is PI_always_compile.
+
+This project consists of two C source files: main.c and nowdate.c , and 
+we'd like nowdate.c to be always compiled. In order to do this, we need 
+the extra two steps:
+
+1. Load the plugin PI_always_compile in exe.mki:
+=======
+gmp_u_list_PLUGIN_TO_LOAD += PI_always_compile
+=======
+
+2. In u_srccfg_post.mki, tell which files should be always compiled:
+=======
+gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT = nowdate.c
+=======
+
+That's it.
+@
+
+
+1.1.1.1
+log
+@
+@
+text
+@@

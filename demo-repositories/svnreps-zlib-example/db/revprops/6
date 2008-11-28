@@ -1,0 +1,13 @@
+K 10
+svn:author
+V 3
+chj
+K 8
+svn:date
+V 27
+2008-06-28T02:20:56.890625Z
+K 7
+svn:log
+V 78
+Rename gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT to gmi_SYDO_up_list_SYNC_HEADERS
+END

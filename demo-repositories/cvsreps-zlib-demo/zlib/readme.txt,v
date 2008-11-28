@@ -1,0 +1,41 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  trelease:1.1.1.1 tvendor:1.1.1;
+locks    ; strict;
+comment  @# @;
+
+
+1.1
+date     2007.10.03.12.50.54;  author chj;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        74224703902e4567;
+
+1.1.1.1
+date     2007.10.03.12.50.54;  author chj;  state Exp;
+branches ;
+next     ;
+commitid        74224703902e4567;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@Code from zlib-1.2.3
+@
+
+
+1.1.1.1
+log
+@import cvs module zlib
+@
+text
+@@

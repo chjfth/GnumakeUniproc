@@ -1,0 +1,58 @@
+head	1.2;
+access;
+symbols
+	trelease:1.1.1.1 tvendor:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.10.03.14.11.44;	author chj;	state Exp;
+branches;
+next	1.1;
+commitid	7f214703a3204567;
+
+1.1
+date	2007.10.03.12.52.15;	author chj;	state Exp;
+branches
+	1.1.1.1;
+next	;
+commitid	74254703907f4567;
+
+1.1.1.1
+date	2007.10.03.12.52.15;	author chj;	state Exp;
+branches;
+next	;
+commitid	74254703907f4567;
+
+
+desc
+@@
+
+
+1.2
+log
+@dos2unix
+@
+text
+@include ../exe.mki
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+include ../exe.mki
+@
+
+
+1.1.1.1
+log
+@import cvs module zlib-example
+@
+text
+@@

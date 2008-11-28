@@ -1,0 +1,68 @@
+id: 4.1.r3/0
+type: dir
+pred: 4.0.r2/7034
+count: 1
+text: 2 6982 39 39 934d09adca2996f90eb6b9430ea6b440
+cpath: /trunk/exe.linuxgcc
+copyfrom: 2 /trunk/exe.linux
+
+PLAIN
+K 12
+exe.linuxgcc
+V 12
+dir 4.1.r3/0
+K 7
+exe.mki
+V 16
+file 6.0.r2/7296
+K 8
+exe.msvc
+V 15
+dir 7.0.r2/7743
+K 10
+minigzip.c
+V 16
+file 9.0.r2/7424
+K 17
+u_srccfg_post.mki
+V 16
+file a.0.r2/7160
+END
+ENDREP
+id: 3.0.r3/363
+type: dir
+pred: 3.0.r2/8071
+count: 2
+text: 3 159 191 191 f47f741bb2704fe80db39eb19e55391d
+cpath: /trunk
+copyroot: 0 /
+
+PLAIN
+K 8
+branches
+V 13
+dir 1.0.r1/61
+K 4
+tags
+V 14
+dir 2.0.r1/126
+K 5
+trunk
+V 14
+dir 3.0.r3/363
+END
+ENDREP
+id: 0.0.r3/605
+type: dir
+pred: 0.0.r2/8313
+count: 3
+text: 3 497 95 95 e24005f9f1157eee5c042b8e3fd47326
+cpath: /
+copyroot: 0 /
+
+4.0.r2/7034 delete false false /trunk/exe.linux
+
+4._0.t2-1 add false false /trunk/exe.linuxgcc
+2 /trunk/exe.linux
+
+605 732

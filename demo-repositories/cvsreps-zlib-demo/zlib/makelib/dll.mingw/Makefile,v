@@ -1,0 +1,78 @@
+head	1.2;
+access;
+symbols
+	trelease:1.1.1.1 tvendor:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.10.03.14.11.36;	author chj;	state Exp;
+branches;
+next	1.1;
+commitid	7f1c4703a3184567;
+
+1.1
+date	2007.10.03.12.50.54;	author chj;	state Exp;
+branches
+	1.1.1.1;
+next	;
+commitid	74224703902e4567;
+
+1.1.1.1
+date	2007.10.03.12.50.54;	author chj;	state Exp;
+branches;
+next	;
+commitid	74224703902e4567;
+
+
+desc
+@@
+
+
+1.2
+log
+@dos2unix
+@
+text
+@
+gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = zlib.def
+
+gmp_mswin_IMPLIB_SUFFIX = --imp
+
+# //[2007-09-30] For MinGW, I don't know how to compile resource by now
+#gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc
+# PI_winres_msvc vars:
+#gmi_RCVC_up_list_WINRC_FROM_ROOT = zlib1.rc
+
+include ../dll.mki
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 11
+a11 11
+
+gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = zlib.def
+
+gmp_mswin_IMPLIB_SUFFIX = --imp
+
+# //[2007-09-30] For MinGW, I don't know how to compile resource by now
+#gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc
+# PI_winres_msvc vars:
+#gmi_RCVC_up_list_WINRC_FROM_ROOT = zlib1.rc
+
+include ../dll.mki
+@
+
+
+1.1.1.1
+log
+@import cvs module zlib
+@
+text
+@@
