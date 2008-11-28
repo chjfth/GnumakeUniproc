@@ -1,0 +1,40 @@
+ifndef __PLUGIN_MIDL_LOADED
+__PLUGIN_MIDL_LOADED = 1
+
+_pluginId_MIDL := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: RCVC
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_MIDL),postcore)
+
+
+
+# User input vars:
+#	gmi_MIDL_up_IDL_FILE (must)
+		# The interface definition file(.idl, .odl etc) to compile by midl.
+
+#	gmi_MIDL_up_IDL_EXPECTED_OUTPUT (must)
+
+#	gmi_MIDL_options (optional)
+		# options used for midl command
+
+#	gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT (optional)
+		# List of source files that depend on the output of MIDL compilation.
+		# If null, all files in $(gmu_up_list_SRC_FROM_ROOT) are considered to be dependent
+		# except those listed in gmi_MIDL_up_list_SRC_DONT_DEP_MIDL_FROM_ROOT.
+
+#	gmi_MIDL_up_list_SRC_DONT_DEP_MIDL_FROM_ROOT (optional)
+		# This cannot be set when gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT is non-null.
+		# List of source files that don't depend on the output of MIDL compilation.
+	# If you're unsure, just leave the above two gmi_MIDL_up_list_XXX vars null, so that
+	# all $(gmu_up_list_SRC_FROM_ROOT) depend on the idl file, --although not the most
+	# efficient, it's not harmful.
+
+gmi_MIDL_options += $(if $(_IsVerboseLevel2),,/nologo)
+
+ifneq (,$(gmp_bc_DEBUG))
+	gmi_MIDL_options += /D_DEBUG
+else
+	gmi_MIDL_options += /DNDEBUG
+endif
+
+
+endif #__PLUGIN_WINRES_LOADED

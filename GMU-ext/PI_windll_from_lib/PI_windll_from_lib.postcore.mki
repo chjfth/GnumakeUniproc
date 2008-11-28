@@ -1,0 +1,64 @@
+
+ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+############################################################################
+### Code for DLL project >>>>>>
+############################################################################
+
+ifeq ($(gmi_WDFL_THISPRJ_LIB_OR_DLL),DLL)
+  ifeq (,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
+    $(error !Error from PI_windll_from_lib: You do not provided a .def file in make-var gmp_up_WINDLL_MODULE_DEF_FROM_ROOT )
+  endif
+endif
+
+$(gmu_Gp_LINK_OUTPUT): _p_WINDLL_MODULE_DEF_FromCurDir = $(_WDFL_p_FinalDefForDll)
+# make _p_WINDLL_MODULE_DEF_FromCurDir(required by compiler_config.mki) target-specific variable
+
+$(gmu_Gp_LINK_OUTPUT): $(_WDFL_p_FinalDefForDll)
+
+$(_WDFL_p_FinalDefForDll): $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $(gmu_Gp_list_SUBPRJ_TO_LINK)
+	@$(call _MkdirIfNotExist,$(@D))
+	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
+	@for OneFile in "$(patsubst %,%/$(_WDFL_p_LibExportsDef_fpo),$(gmuf_GetAllSubprjNameForLink))"; do \
+		OneAbsPath=$${gmu_ud_OUTPUT_ROOT}/$$OneFile; \
+		if [ -f "$$OneAbsPath" ]; then cat $$OneAbsPath >> $@; fi; \
+	done
+# Special Note: In the above rule, don't substitue 
+#	$(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT)
+# with
+#	$(_p_WINDLL_MODULE_DEF_FromCurDir) ,
+# because _p_WINDLL_MODULE_DEF_FromCurDir has been overridden to be $(_WDFL_p_FinalDefForDll),
+# when this rule is executed.
+
+############################################################################
+### Code for DLL project <<<<<<
+############################################################################
+else
+############################################################################
+### Code for LIB project >>>>>>
+############################################################################
+
+#	[2007-01-16] NOTE: Even if _WDFL_p_LibExportDefs_fcd is null, $(_WDFL_p_Abs_ExportDefsForDll)
+# should be created anyway, since this LIB project's sub-projects may present some 
+# export definition.
+
+$(_WDFL_p_Abs_ExportDefsForDll): $(_WDFL_p_LibExportDefs_fcd) $(gmu_Gp_list_SUBPRJ_TO_LINK)
+	@$(call _MkdirIfNotExist,$(@D))
+	@$(if $(_WDFL_p_LibExportDefs_fcd),cp $(_WDFL_p_LibExportDefs_fcd) $@,echo -n "" > $@)
+ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
+	@for OneFile in "$(patsubst %,%/$(_WDFL_p_LibExportsDef_fpo),$(gmuf_GetAllSubprjNameForLink))"; do \
+		OneAbsPath=$${gmu_ud_OUTPUT_ROOT}/$$OneFile; \
+		if [ -f "$$OneAbsPath" ]; then cat $$OneAbsPath >> $@; fi; \
+	done
+endif
+
+
+$(gmu_Gp_LINK_OUTPUT): $(_WDFL_p_Abs_ExportDefsForDll)
+# $(_WDFL_p_LibExportDefs_fcd)'s change should make the LIB project to re-link.
+# since $(_WDFL_p_Abs_ExportDefsForDll) should be re-created when 
+# $(_WDFL_p_LibExportDefs_fcd), changes, we should should depend on 
+# $(_WDFL_p_Abs_ExportDefsForDll) here.
+
+############################################################################
+### Code for LIB project <<<<<<
+############################################################################
+endif

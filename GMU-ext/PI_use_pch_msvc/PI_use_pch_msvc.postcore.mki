@@ -1,0 +1,84 @@
+
+ifeq (,$(strip $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT)))
+  $(error !Error from $(_pluginId_use_pch_msvc): You did not assign a file for gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT)
+endif
+ifneq (1,$(words $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT)))
+  $(error !Error from $(_pluginId_use_pch_msvc): You cannot assign more than one header file for `gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT')
+endif
+
+_list_objs_on_pch = $(if $(gmi_PCHVC_up_list_SRC_DEPPCH_FROM_ROOT),\
+		$(call gmuf_CnCXX_ListToObjList,$(gmi_PCHVC_up_list_SRC_DEPPCH_FROM_ROOT)),\
+		$(if $(gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT),\
+			$(call gmuf_CnCXX_ListToObjList,$(filter-out $(gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT),$(gmu_up_list_SRC_FROM_ROOT))),\
+			$(gmu_Gp_list_REQOBJS)\
+		) \
+	)
+
+$(_list_objs_on_pch): gmp_CFLAGS_NON_CODE_GEN := $(gmp_CFLAGS_NON_CODE_GEN) \
+	/Yu"$(gmi_PCHVC_up_HEADER_FOR_PCH_IN_YOUR_SRC)" /Fp"$(_p_PCH_GENERATED)"
+	# This adds "target-specific variable values" for those .objs that needs pch .
+	#	[2006-12-03] When compiling a source file utilizing a precompiled header file,
+	# /Fd"<dir-name>/" is used to indicate where the vc60.pdb file resides which
+	# was generated when generating the precompiled header. If you do not explicitly assign /Fd ,
+	# vc60.pdb will be generated(when generating .pch) and searched(when using it in a real
+	# compiling) in current working dir. (In VC5, the named vc50.pdb is used instead of vc60.pdb)
+	#	[2007-01-16] Since /Fd"xxx" has turned into a "standard" option in 
+	# gmp_CFLAGS_NON_CODE_GEN today, we have to use $(patsubst ) to change it explicitly.
+
+$(_list_objs_on_pch) $(_p_PCH_GENERATED_obj): $(_p_PCH_GENERATED)
+#	We must have those objs depend on the generated pch file, so that the pch file
+# will be updated(and updated before those objs) when/before those objs should be updated.
+# (Note for GNUmake 3.81,3.80: You cannot insert a tab preceding the above command lines, which causes `overriding commands for target' error.)
+_temp:=
+
+define _MSVC_GEN_PCH
+	@echo " Precompiling $(gmu_ud_SRC_ROOT)/$(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) to $(call _StripOutputRootPrefix,$@) ... "
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	cl $(gmp_CFLAGS_CODE_GEN_ALL) $(gmp_CFLAGS_INCLUDES) /nologo /c /Yc"$(_p_AbsPath_USER_HEADER_for_PCH)" /Fp"$(_p_PCH_GENERATED)" /Fo"$(_p_PCH_GENERATED_obj)" /Fd"$(gmp_MSVC_Gp_VCx0_pdb)" $<
+	$(call gmpf_AddCustomActionCount,MSVC-PCH-generated)
+endef
+	#	NOTE: With VC6 compiler, we have to use an absolute path for /Yc,
+	# which is considered a limitation of the compiler. That is, if you use 
+	# /Yc"../StdAfx.h" and the source to "compile" has the statement
+	# `#include G:/test/StdAfx.h' , then the compiler will however assert 
+	# error C2857 even if ../StdAfx.h and G:/test/StdAfx.h actually refer
+	# to the same file.
+
+$(_p_PCH_GENERATED): _p_ts_HDepend = $(@:.pch=.pch.d)# `ts' means target specific variable
+
+$(_p_PCH_GENERATED): $(_p_PhantomSrc) # $@ is XXX.h.pch
+ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
+	$(_GEN_HDEPEND_FOR_MSVC_PCH)
+else
+	@$(_GEN_HDEPEND_FOR_MSVC_PCH)
+endif
+ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
+	$(_MSVC_GEN_PCH)
+else
+	@$(_MSVC_GEN_PCH)
+endif
+
+$(_p_PhantomSrc): $(_p_USER_HEADER_for_PCH)
+	@$(call _MkdirIfNotExist,$(@D))
+	@echo "#include \"$(_p_AbsPath_USER_HEADER_for_PCH)\"" > $@
+
+
+############################################################################
+
+ifeq (,$(gmu_NO_GEN_HDEPEND))
+
+  #include the .h header depend(.d) files for that pch file
+  -include $(_p_HDEPEND_FOR_PCH)
+
+  define _GEN_HDEPEND_FOR_MSVC_PCH # $@ is XXX.h.pch
+	@echo " GenHdepend for precompiled-header from: $(_p_USER_HEADER_for_PCH) "
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	@$(call _MkdirIfNotExist,$(@D))
+	$(gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< > $(_p_ts_HDepend)_ \
+		# $@ is the .pch file, which must be dependent on those .h files that are included by $(_p_PhantomSrc),
+		# and what $(_p_PhantomSrc) includes are [ $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) and 
+		# all $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) includes ].
+	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+  endef
+
+endif # ifneq (,$(gmu_NO_GEN_HDEPEND))

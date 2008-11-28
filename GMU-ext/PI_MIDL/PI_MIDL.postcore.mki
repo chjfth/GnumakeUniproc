@@ -1,0 +1,44 @@
+
+ifeq (,$(strip $(gmi_MIDL_up_IDL_FILE)))
+  $(error !Error from $(_pluginId_MIDL): You did not assign a file to compile in `gmi_MIDL_up_IDL_FILE')
+endif
+ifeq (,$(strip $(gmi_MIDL_up_IDL_EXPECTED_OUTPUT)))
+  $(error !Error from $(_pluginId_MIDL): You did not assign a file `gmi_MIDL_up_IDL_EXPECTED_OUTPUT' telling what output you're expecting)
+endif
+
+_list_src_on_midl_from_root = $(if $(gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT),\
+		$(gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT),\
+		$(if $(gmi_MIDL_up_list_SRC_DONT_DEP_MIDL_FROM_ROOT),\
+			$(filter-out $(gmi_MIDL_up_list_SRC_DONT_DEP_MIDL_FROM_ROOT),$(gmu_up_list_SRC_FROM_ROOT)),\
+			$(gmu_up_list_SRC_FROM_ROOT)\
+		) \
+	)
+
+_list_src_on_midl = $(addprefix $(gmu_ud_SRC_ROOT)/,$(_list_src_on_midl_from_root))
+
+_list_objs_on_midl = $(call gmuf_CnCXX_ListToObjList,$(_list_src_on_midl_from_root))
+
+$(_list_objs_on_midl): $(gmi_MIDL_up_IDL_EXPECTED_OUTPUT)
+# Baffle clarification: Since $(_list_objs_on_midl) literally says it depends on "midl"
+# it should of course depends on the output files from midl command.
+#WRONG: $(_list_objs_on_midl): $(gmi_MIDL_up_IDL_FILE)
+#
+# THE PRINCIPLE: You must have $(_list_objs_on_midl), not $(_list_src_on_midl), depend on 
+# the idl output file. Otherwise, Update of the .idl file will cause the 
+# interface-definition XXX.h to be re-generated, but those .cpp who #include that XXX.h
+# (i.e. files in $(gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT)) will not be re-generated.
+
+define _MIDL_COMPILE_CMD
+	@echo "MIDL compiling $< for $@ ..."
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	midl $(gmi_MIDL_options) $(gmi_MIDL_up_IDL_FILE)
+	@$(call gmpf_AddCustomActionCount,MSVC-MIDL-compiled)
+endef
+
+$(gmi_MIDL_up_IDL_EXPECTED_OUTPUT): $(gmi_MIDL_up_IDL_FILE)
+ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
+	$(_MIDL_COMPILE_CMD)
+else
+	@$(_MIDL_COMPILE_CMD)
+endif
+

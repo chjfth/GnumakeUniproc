@@ -1,0 +1,87 @@
+ifndef __PLUGIN_WINDLL_FROM_LIB_LOADED
+__PLUGIN_WINDLL_FROM_LIB_LOADED = 1
+
+_pluginId_windll_from_lib := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: WDFL
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_windll_from_lib),postcore)
+
+# Summary
+	# 	This plugin enables you to link a Windows DLL from LIB projects. Sometimes, you'd like
+	# to combine lots of static LIBs into a single DLL, then this plugin is what you need.
+	# The key point to accomplish this is: A LIB project outputs a export definition list
+	# to a file named LibExportDefs.gmi.txt, later the DLL project will merge the content of
+	# LibExportDefs.gmi.txt from every LIB projects(as DLL's subprjs) into DLL's real .def file .
+	#	With this plugin, exported functions/variables from a LIB is described in LIB project
+	# itself, not in the DLL project, thus the LIB projects can be more self-sustained.
+	#	Oh yes, for this plugin to work, the DLL makefile's author should place the EXPORTS
+	# definition at the end of the .def file, so that the pure appending of LIB projects'
+	# LibExportDefs.gmi.txt will make the final .def good.
+
+# User input vars:
+
+#	gmi_WDFL_THISPRJ_LIB_OR_DLL = 
+		# Is current project a LIB or a DLL project. Its value is `LIB' or `DLL'.
+		# If not explicitly assigned, this plugin will deduce it from $(gmp_bc_IMAGE_TYPE).
+
+#	gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = 
+		# (only for LIB project)
+		# Indicate the text file that contains export definitions. These "export definition"
+		# lines will later be appended to DLL project's .def file to make a complete
+		# export definition for that DLL.
+
+# Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
+# msvc/compiler_config.mki or mingw/compiler_config.mki)
+
+# Deduce gmi_WDFL_THISPRJ_LIB_OR_DLL, if it's defined to neither LIB nor DLL
+
+ifeq (,$(findstring $(gmi_WDFL_THISPRJ_LIB_OR_DLL),LIB DLL))
+  ifeq ($(_gmu_true),$(call _IsStringEqual,LIB,$(gmp_bc_IMAGE_TYPE)))
+    gmi_WDFL_THISPRJ_LIB_OR_DLL = LIB
+  else
+  ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+    gmi_WDFL_THISPRJ_LIB_OR_DLL = DLL
+  else
+    $(error !Error from $(_pluginId_windll_from_lib): gmi_WDFL_THISPRJ_LIB_OR_DLL is not defined by user, nor can it be deduced)
+  endif
+  endif
+endif
+
+# Define some vars required by this plugin:
+
+_WDFL_dirTmp = _gmu_tmp/$(_pluginId_windll_from_lib)
+
+_WDFL_f_LibExportsDef = _LibExportDefs.gmi.txt
+_WDFL_p_LibExportsDef_fpo = $(_WDFL_dirTmp)/$(_WDFL_f_LibExportsDef)#fpo: from prj-output dir
+
+_WDFL_p_FinalDefForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_dirTmp)/FinalDefForDll.def
+	# [2007-02-19] We'll make it an absolute path. This cannot result in a relative dir to cur-dir,
+	# because it will be generated in $(gmu_Gd_Final_PrjOutput) -- which probably not resides within cur-dir.
+
+_WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT))#fcd: from current dir
+	# Although $(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT) can only be one word(one file),
+	# we use $(addprefix ) instead of concatenating so that [ _WDFL_p_LibExportDefs_fcd
+	# will be null if gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT is null ].
+
+
+ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+############################################################################
+### Code for DLL project >>>>>>
+############################################################################
+
+############################################################################
+### Code for DLL project <<<<<<
+############################################################################
+else
+############################################################################
+### Code for LIB project >>>>>>
+############################################################################
+
+_WDFL_p_Abs_ExportDefsForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibExportsDef_fpo)
+
+############################################################################
+### Code for LIB project <<<<<<
+############################################################################
+endif
+
+
+endif #__PLUGIN_WINDLL_FROM_LIB_LOADED

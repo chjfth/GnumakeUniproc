@@ -1,0 +1,54 @@
+ifndef __PLUGIN_WINRES_LOADED
+__PLUGIN_WINRES_LOADED = 1
+
+_pluginId_use_winres_msvc := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: RCVC
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_winres_msvc),postcore)
+
+
+# User input vars:
+
+# gmi_RCVC_up_list_WINRC_FROM_ROOT = (must)
+	# List the .rc files that you want to compile into .res .
+
+# gmi_RCVC_RC_FLAGS = 
+	# Flags to passed to rc.exe command
+
+# gmi_RCVC_DONT_WANT_AUTO_RC_HDEP = 
+	#(default to null)
+	# 	Using default, you request header files dependency generation
+	# for the .res files, so that if some .h included by your .rc changes, 
+	# the .rc will be recompiled.
+	#	If you set this var to 1, header files dependency will not be generated
+	# and not be checked for .rc files. 
+
+# gmi_RCVC_DEFEND_C_MACRO_GCC_M_RC =
+	# (default value is _GMI_RCVC_GEN_HDEP_FOR_PC)
+	# The value for this var becomes a predefined C macro when `gcc -M' is 
+	# invoked for .rc. You can use this C macro in your .rc files to 
+	# prevent `gcc -M' from seeing some portions of your .rc files.
+	# Example:
+	#	#ifndef _GMI_RCVC_GEN_HDEP_FOR_PC
+	#	// some .RC statements that will cause `gcc -M' to fail.
+	#	#endif
+
+# gmi_RCVC_Gp_list_RES (output var)
+	# The path of the resulting .res files.
+
+
+gmif_RCVC_RC_to_RES = $(patsubst %.rc,$(gmu_Gd_OBJ_OUTPUT)/%.res,$1)
+
+_RCVC_RCdotD_extn = rc.d
+
+_RCVC_REQRES_TO_LINK = $(call gmif_RCVC_RC_to_RES,$(gmi_RCVC_up_list_WINRC_FROM_ROOT))
+
+_RCVC_p_HDEPEND_FOR_WINRC = $(_RCVC_REQRES_TO_LINK:.res=.$(_RCVC_RCdotD_extn))
+
+gmu_up_list_EXTRA_OBJ_TO_LINK += $(_RCVC_REQRES_TO_LINK)
+
+gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,$(gmp_bc_syslib_GUI))
+
+gmi_RCVC_Gp_list_RES = $(_RCVC_REQRES_TO_LINK)
+
+
+endif #__PLUGIN_WINRES_LOADED

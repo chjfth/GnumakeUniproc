@@ -1,0 +1,85 @@
+ifndef __PLUGIN_USE_PCH_GCC_LOADED
+__PLUGIN_USE_PCH_GCC_LOADED = 1
+
+_pluginId_use_pch_gcc = := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: PCHG
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_pch_gcc),postcore)
+
+
+# User input vars:
+#	gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT = # the header file used for precompiling
+		# Of course, if this header file or files included by this file changes, 
+		# the .pch file will be regenerated before compiling any source that
+		# includes this header file.
+
+#	gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX = # set it to `gcc' or `g++' (default to g++)
+		# Tells whether use gcc or g++ to pre-compile a header file.
+		# You know, if you just execute ``gcc test.h'', gcc(not g++) is used,
+		# the generated .h.gch will be rejected if you later g++ compile test.cpp 
+		# which includes test.h .
+
+#	gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT = 
+#	gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT = 
+	#	These two vars control which source files should use pch and which should not.
+	# The first, gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT(abbr. srcDepPch) tells which source files
+	# should use pch. If null, it is as if all $(gmu_up_list_SRC_FROM_ROOT) is listed in.
+	# The second, gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT(abbr. srcDontDep) is used to exclude
+	# some source files listed in srcDepPch from using pch. If some file in srcDontDep
+	# is not listed in srcDepPch, that file is just ignored, no error asserted.
+	#	In most cases when pch is prefered, source files requiring pch is the majority, 
+	# then you'd like to take this strategy: Let srcDepPch be null, and list those minor
+	# files that don't use precompiled header into srcDontDep.
+
+# User's NOTE:
+#	If you want to add your own compiler flags for a project and that flags effect
+# code generation, you must have it appear in gmp_CFLAGS_CODE_GEN_ALL
+#	gmp_CFLAGS_CODE_GEN_ALL += $(gmp_CFLAGS_CODE_GEN) $(gmp_CXXFLAGS_CODE_GEN) $(gmp_CFLAGS_MACRO_DEFS) $(gmp_CFLAGS_INCLUDES)
+# -- because this plugin use $(gmp_CFLAGS_CODE_GEN_ALL) as compiler flags when precompiling. 
+# You know, you must have precompiling and real compiling use the same set of code generation flags.
+#
+#	In order to use this plugin properly, user should 
+# 	* have one and only on header file (gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) within his 
+# gmu_ud_SRC_ROOT dir.
+#	and
+#	* within those C/C++ files that includes gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT, angel brackets
+# should be used to include that header file, because this plugin generates the .gch file
+# in prj-output-dir and add gcc option ``-I <prj-output-dir>'' in order for the .gch
+# file to be found prior to the original gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT . More over, 
+# if your gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=subdir/my.h , don't write in your C/C++ source
+# ``#include <_subdir_/my.h>, instead, write ``#include <my.h>'' and no need to list 
+# _subdir_ in gmu_ud_list_PRJ_HEADER -- this plugin will do it for you.
+
+
+ifeq (,$(gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX))
+  gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX = g++
+endif
+
+_GccCmd_for_pch = $(gmp_GCC_PREFIX)$(gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX)
+
+ifeq (,$(_dirPchTmpOutputDir_))
+  _dirPchTmpOutputDir_ = _gmu_tmp/$(_pluginId_use_pch_gcc)/
+endif
+
+_p_PCH_GENERATED = $(patsubst %,$(gmu_Gd_Deco_PrjOutput)/$(_dirPchTmpOutputDir_)%.gch,$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT))
+
+_PCHG_GCHdotD_extn = gch.d
+
+_p_HDEPEND_FOR_PCH = $(_p_PCH_GENERATED:.gch=.$(_PCHG_GCHdotD_extn))
+
+_p_USER_HEADER_for_PCH = $(gmu_ud_SRC_ROOT)/$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
+	# Note: This dir may be relative to current dir(if $(gmu_ud_SRC_ROOT) is a relative dir).
+#_p_AbsPath_USER_HEADER_for_PCH = $(call _GetAbsPathRelaToCurdir,$(_p_USER_HEADER_for_PCH))
+
+_dir_gch_generated = $(dir $(_p_PCH_GENERATED))
+gmu_ud_list_PRJ_HEADER += $(dir $(_p_USER_HEADER_for_PCH))
+
+
+endif #ifndef __PLUGIN_USE_PCH_GCC_LOADED
+
+# Implementor's Note:
+# Q-1: Where to put the .h.gch file? 
+# A-1: I decide to put the gch file in the project output dir instead of placing it
+# with the .h side by side. There're two reasons for this.
+#	Reason 1: The dir where the .h resides may not be writable.
+#	Reason 2: If the user wants to clean the gch file in a quick manner, placing the
+# gch is more convenient for the user to clean it.

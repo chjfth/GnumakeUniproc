@@ -1,0 +1,67 @@
+
+ifeq (,$(strip $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)))
+  $(error !Error from $(_pluginId_use_pch_gcc): You did not assign a file for gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
+endif
+ifneq (1,$(words $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)))
+  $(error !Error from $(_pluginId_use_pch_gcc): You cannot assign more than one header file for `gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT')
+endif
+
+_list_objs_on_pch = $(if $(gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT),\
+		$(call gmuf_CnCXX_ListToObjList,$(gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT)),\
+		$(if $(gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT),\
+			$(call gmuf_CnCXX_ListToObjList,$(filter-out $(gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT),$(gmu_up_list_SRC_FROM_ROOT))),\
+			$(gmu_Gp_list_REQOBJS)\
+		) \
+	)
+
+$(_list_objs_on_pch): gmp_CFLAGS_CODE_GEN_ALL := -I "$(_dir_gch_generated)" $(gmp_CFLAGS_CODE_GEN_ALL)
+	#	We must use := to make the gch's dir appears prior to all other include-dirs,
+	# so that the gch will be used instead of the original .h .
+	#	And we have to make this -I "$(_dir_gch_generated)" assignment target-specific,
+	# because we should not let those source files list in gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT
+	# see this dir.
+	#	[2007-01-14] Tested on SuSE Linux 10.1, gcc 4.1.0, GNUmake 3.80 .
+
+$(_list_objs_on_pch): $(_p_PCH_GENERATED)
+
+$(_p_PCH_GENERATED): _p_ts_HDepend = $(@:.gch=.$(_PCHG_GCHdotD_extn))# `ts' means target specific variable
+
+$(_p_PCH_GENERATED): $(_p_USER_HEADER_for_PCH) # $@ is XXX.gch
+ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
+	$(_GEN_HDEPEND_FOR_GCC_PCH)
+else
+	@$(_GEN_HDEPEND_FOR_GCC_PCH)
+endif
+ifdef gmu_DO_SHOW_COMPILE_CMD
+	$(_GCC_GEN_PCH)
+else
+	@$(_GCC_GEN_PCH)
+endif
+
+
+define _GCC_GEN_PCH
+	@echo " Precompiling $(gmu_ud_SRC_ROOT)/$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) to $(call _StripOutputRootPrefix,$@) ... "
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	$(_GccCmd_for_pch) -o $@ $(gmp_CFLAGS_CODE_GEN_ALL) $(gmp_CFLAGS_INCLUDES) $<
+	$(call gmpf_AddCustomActionCount,GCC-PCH-generated)
+endef
+
+
+############################################################################
+
+ifeq (,$(gmu_NO_GEN_HDEPEND))
+
+  #include the .h header depend(.d) files for that gch file
+  -include $(_p_HDEPEND_FOR_PCH)
+
+  define _GEN_HDEPEND_FOR_GCC_PCH # $@ is XXX.gch
+	@echo " GenHdepend for precompiled-header from: $(_p_USER_HEADER_for_PCH) "
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	@$(call _MkdirIfNotExist,$(@D))
+	$(gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< > $(_p_ts_HDepend)_ \
+		# $@ is the .gch file, which must be dependent on $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
+		# and all $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) includes.
+	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+  endef
+
+endif # ifeq (,$(gmu_NO_GEN_HDEPEND))
