@@ -1,0 +1,108 @@
+# ====== pattern1-container.mks , 's' means "stem". =========
+# This stem file is different from pattern1.mks in that it does not link output,
+# i.e. not making target $(gmu_Gp_LINK_OUTPUT) or $(gmu_Gp_LINK_OUTPUT_ckt) .
+
+# INCLUSION ORDER:
+# * u_subprjs.mki            (must, sub-projects definition)
+# * GnumakeUniproc.mki       (the GnumakeUniproc core layer)
+# * u_post_gmucore.mki       (optional)
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.PHONY: _gmp_first_target
+.PHONY: __pattern1_default_first_target
+_gmp_first_target: __pattern1_default_first_target # at rear part of this file
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
+
+
+ifneq (,$(gmp_CONTAINER_EXTRACT_COMPILER_ID))
+
+  ifneq (,$(gmp_COMPILER_ID))
+    $(warning !GMP!Warning: From pattern-container1.mks: gmp_COMPILER_ID already defined when you request gmp_CONTAINER_EXTRACT_COMPILER_ID)
+  endif
+
+  gmp_COMPILER_ID := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
+	# u_subprjs.mki may use this to determine the compiler to use
+	#	[2007-01-22] Note: If the use does not define gmp_CONTAINER_EXTRACT_COMPILER_ID,
+	# he may choose to assign gmp_COMPILER_ID explicitly from make command line.
+
+endif
+
+
+###########################################################
+
+_gmp_PickUserMki = $(if $(gmp_CONTAINER_EXTRACT_COMPILER_ID),..,.)/$1
+
+_f_subprjdesc = u_subprjs$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_subprjdesc = $(call _gmp_PickUserMki,$(_f_subprjdesc))
+
+_f_freestyle_mki = u_freestyle$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_freestyle_mki = $(call _gmp_PickUserMki,$(_f_freestyle_mki))
+
+_f_post_gmucore = u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_post_gmucore = $(call _gmp_PickUserMki,$(_f_post_gmucore))
+
+ifneq (,$(wildcard $(_p_subprjdesc)))
+  include $(_p_subprjdesc)
+else
+ifneq (,$(wildcard $(_p_freestyle_mki)))
+  include $(_p_freestyle_mki)
+else
+  $(error !GMP!Error: From pattern-container1.mks: Neither Sub-projects description file `$(_p_subprjdesc)' nor free-style mki `$(_p_freestyle_mki)' is present)
+endif
+endif
+
+
+gmp_G_CompilerVerToDeco = $(if $(gmp_COMPILER_VER),_$(gmp_COMPILER_VER))
+	# [2008-08-15] bc_deco_prjname.mki requires this.
+	# Although this is a container project, gmp_COMPILER_VER decoration is still desired, 
+	# because user may want to use different gmp_COMPILER_VER to go through the same container
+	# project(wish to result in different final prjname) so that all the container's subprjs
+	# can be built twice or more with differrent versions of the same compiler.
+include $(gmp_p_mki_DecoPrjname) # This should appear after gmp_COMPILER_ID is defined.
+include $(gmp_p_mki_DecoUnicodeDebug) # bc_deco_UNICODE_DEBUG.mki [2008-08-14] add it, since most time it does not cause harm.
+
+
+gmu_I_AM_A_LINK_COMPONENT = 1 
+gmu_IS_SUBPRJ_AUTO_LINK_MERGE = 1
+	#[2006-12-18] Tested. The output from its(the container's) subprjs can be passed to its parent.
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/GnumakeUniproc.mki
+
+
+ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
+  include $(_p_post_gmucore)
+endif
+
+
+.PHONY: __pattern1_inc_project_count
+__pattern1_inc_project_count:
+	@$(call _AppendLogCountCompile,$(if $(gmu_DELIBERATE_NO_SUBPRJ),r,R)) \
+		# a 'R' or 'r' means a container project, 'r' is for $(gmu_DELIBERATE_NO_SUBPRJ)
+	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_USER_FIRST_TARGET),$(gmp_USER_FIRST_TARGET),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
+	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_USER_FIRST_TARGET),$(gmp_USER_FIRST_TARGET),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+
+__pattern1_default_first_target: \
+		$(gmp_USER_PRE_TARGETS) \
+		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK)) \
+		$(gmp_USER_POST_TARGETS) \
+		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
+ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
+# Write sub-prj outputs for its parent. Always doing this does not cause harm.
+	@echo "" > $(_p_AutoLinkListForParent)
+	@for v in $(_Gp_list_AutoLinkFromChildren); do echo $$v >> $(_p_AutoLinkListForParent); done
+endif
+#
+ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ)) # Show the following only it really contains subprjs.
+	@echo -e "[DONE sub-projects:] $(foreach s,$(gmu_uv_list_ALL_SUBPRJ),\n  {$s}: %/$($s_Prjname)/$(subst _gmu_NoOutput,(none),$($s_Filename))$(if $($s_UserOutputAfterLink),\n    U: $(call _StripOutputRootPrefix,$($s_UserOutputAfterLink))))"
+endif
+	@$(_GmpShowDoneUserOutputAfterLink)
+	@$(_Gmp1SharedFinishingCmds)
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common-postcore.mki
+

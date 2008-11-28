@@ -1,0 +1,143 @@
+_THIS_COMPILER_ID := msvc
+
+ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
+  $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
+endif
+#gmp_COMPILER_VER = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+
+
+
+_msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER))
+_msvc_IsUsing_vc60 := $(if $(_msvc_vc60ver),1,)
+
+_msvc_vc70ver := $(filter vc70%,$(gmp_COMPILER_VER))
+_msvc_IsUsing_vc70 := $(if $(_msvc_vc70ver),1,)
+
+_msvc_vc71ver := $(filter vc71%,$(gmp_COMPILER_VER))
+_msvc_IsUsing_vc71 := $(if $(_msvc_vc71ver),1,)
+
+_msvc_vc80ver := $(filter vc80%,$(gmp_COMPILER_VER))
+_msvc_IsUsing_vc80 := $(if $(_msvc_vc80ver),1,)
+
+_msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc70ver) $(_msvc_vc71ver) $(_msvc_vc80ver))
+
+	#(old:)
+	#_msvc_SupportedVers = vc60 vc70 vc71 vc80
+	#_msvc_CompilerVers = $(firstword $(call _FindStrings,$(_msvc_SupportedVers),$(gmp_COMPILER_VER)))
+
+
+# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER))
+  ifeq (,$(_msvc_CompilerVers))
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for MSVC compiler)
+  endif
+endif
+
+ifeq (,$(strip $(_msvc_CompilerVers)))
+  # Set the default:
+  _msvc_CompilerVerUse = vc60
+else
+  ifneq (1,$(call _IsAllWordsSame,$(_msvc_CompilerVers)))
+    $(error !GMP!Error: Multiple MSVC compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _msvc_CompilerVers=$(_msvc_CompilerVers))
+  endif
+  _msvc_CompilerVerUse = $(firstword $(_msvc_CompilerVers))
+
+  #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
+  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings.
+  gmp_G_CompilerVerToDeco := _$(_msvc_CompilerVerUse)
+endif
+
+
+_gmp_isAboveVC70 = $(if $(_msvc_vc80ver)$(_msvc_vc71ver)$(_msvc_vc70ver),1)
+_gmp_isAboveVC71 = $(if $(_msvc_vc80ver)$(_msvc_vc71ver),1)
+_gmp_isAboveVC80 = $(if $(_msvc_vc80ver),1)
+
+
+
+gmu_extn_OBJ = obj
+
+gmp_extn_LIB = lib
+gmp_extn_DLL = dll
+gmp_extn_EXE = exe
+
+gmpf_MakeLibName = $(patsubst %,%.$(gmp_extn_LIB),$1)
+gmpf_MakeExeName = $(patsubst %,%.$(gmp_extn_EXE),$1)
+gmpf_MakeDllName = $(patsubst %,%.$(gmp_extn_DLL),$1)
+gmpf_MakeDllNameForLink = $(gmpf_MakeLibName)
+
+gmpf_MakeUpSysLibsToLink = $(addsuffix .$(gmp_extn_LIB),$1)
+
+gmu_u_GCC_M_OPTIONS_preset += $(addprefix -D,_M_IX86=500 WIN32 _WIN32) # different for Win32 and Win64?
+gmu_u_GCC_M_OPTIONS += $(gmu_u_GCC_M_OPTIONS_preset) #temp decision
+
+INCLUDE += $(Include) $(include)
+LIB += $(Lib) $(lib)
+# [2007-01-20] About $(INCLUDE) and $(Include), $(LIB) and $(Lib):
+#	In Microsoft Platform SDK for Windows Server 2003 SP1(year 2005), those Build Environment
+# bat files set env-var Include and Lib instead of traditionally used INCLUDE and LIB. 
+# Since GNUmake is varname-case-sensitive, checking only `INCLUDE' will miss `Include', 
+# therefore, I think combining them into INCLUDE is a good way to solve this.
+
+_msvc_env_vars := $(filter INCLUDE LIB MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(call gmuf_ToCapital,$(.VARIABLES)))
+
+# Check whether the env-vars for running Visual C++ command line compiler are OK.
+ifeq '' '$(filter INCLUDE,$(_msvc_env_vars))'
+  $(error !Env-var `INCLUDE' not defined! Please setup the Visual C++ compiler environment first)
+    #[2007-03-11] On a WinXP with VC6 installed, exeuting VCVARS32.BAT cause env-var `include' to appear instead of `INCLUDE', strange!
+endif
+ifeq '' '$(filter LIB,$(_msvc_env_vars))'
+  $(error !Env-var `LIB' not defined! Please setup the Visual C++ compiler environment first)
+endif
+ifeq '' '$(filter MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(_msvc_env_vars))'
+  $(error !Neither MSVSDIR, MSVCDir, MSVCVer nor VCINSTALLDIR is defined! Please setup the Visual C++ compiler environment first)
+    #[2007-03-11] VS2005 sets env-var VCINSTALLDIR, not MSVCDir.
+endif
+
+
+# This INCLUDE variable used by VC++ contains include-dirs separated by semicolons,
+#therefore, we have to change all semicolons to spaces. And, since user's VC++ direcotories
+#may have spaces in it, we prepare _gmu_isystem_DIRS_WRAP_QUOTES here instead of gmu_ud_list_SYS_HEADER .
+
+_INCLUDE_HIDE_DIR_SPACE := $(subst $(_GmuSpace),@,$(subst \,/,$(strip $(INCLUDE))))
+	# e.g.
+	#	C:\my\inc;E:\vs 2005\inc;
+	# turn into
+	#	C:/my/inc;E:/vs@2005/inc;
+
+_gmu_isystem_DIRS_WRAP_QUOTES := $(subst @, ,$(patsubst %,-isystem '%',$(subst ;, ,$(_INCLUDE_HIDE_DIR_SPACE))))
+	# e.g (result)
+	#	-I 'C:/my/inc' -I 'E:/vs 2005/inc'
+
+gmu_ud_list_SYS_HEADER += 
+
+
+gmu_exe_CC = cl
+gmu_exe_CXX = cl
+gmu_exe_LINK = link
+gmu_exe_LIB = lib
+
+#gmp_CFLAGS_NON_CODE_GEN += /c # moved to cl command
+
+gmp_CFLAGS_NON_CODE_GEN_preset += /nologo
+
+#c_flags_Link_Common = /nologo #no use now
+
+################################################################################
+# For each compiler or link flag category below, you must choose one that suits 
+# your need.
+#	`cfc' means compiler-flag-category
+#	`lfc' means linker-flag-category
+#################################################################################
+
+# Category(dor): Debug-Build or Release-Build
+cfc_for_Debug_codegen = /Od /Zi
+cfc_for_Debug_defs = /D_DEBUG
+cfc_for_Release_codegen = /O2
+cfc_for_Release_defs = /DNDEBUG
+
+# Category(chr): MBCS or Unicode
+cfc_chr_Mbcs_defs = /D_MBCS
+cfc_chr_Unicode_defs = /DUNICODE /D_UNICODE
+	#[2008-09-03]GMU author note: cfc_chr_Mbcs_defs is used in mm_snprintf's makefile.
+

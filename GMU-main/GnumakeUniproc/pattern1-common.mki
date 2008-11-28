@@ -1,0 +1,81 @@
+# This file hold the content required by pattern1.mks and pattern-container1.mks.
+
+unexport gmp_u_list_PLUGIN_TO_LOAD
+	# Avoid user's setting gmp_u_list_PLUGIN_TO_LOAD in env-var resulting in
+	# influencing sub-projects. If required for all subprjs, set
+	# gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE or gmp_u_list_PLUGIN_TO_LOAD_ENV_POST instead.
+
+_dirPattern1Cfg = pattern1cfg
+gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
+gmp_p_mki_DecoUnicodeDebug = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_UNICODE_DEBUG.mki
+
+# >>>>>> Custom action count functionality [2006-12-05]
+
+_d_CustomActionList = $(_d_OUTPUT_ROOT_GMUTMP)/CustomActionCount
+_p_CustomActionList = $(_d_CustomActionList)/ActionList.txt
+
+#_ActnameToFilename = $1.gmu.cnt
+_ActnameToFilepath = $(_d_CustomActionList)/$1.gmu.cnt
+
+gmu_up_list_STARTUP_CLEAR_FILES += $(_p_CustomActionList)
+
+# The function here:
+gmpf_AddCustomActionCount = $(shell \
+	gmuAddActionWord $(_p_CustomActionList) $1; \
+	$(if $(call _IsOlderThanBuildStart,$(call _ActnameToFilepath,$1)),echo -n "" > $(call _ActnameToFilepath,$1);) \
+    echo C >> $(call _ActnameToFilepath,$1)\
+    )
+	# $1: custom action name(action word). Don't use space/tab and other sensitive chars.
+
+# <<<<<< Custom action count functionality [2006-12-05]
+
+### Define internal function: _GmpMakeLevel0ShowEnd
+
+ifeq ($(MAKELEVEL),0)
+  define _GmpMakeLevel0ShowEnd
+	echo "[[[END]]]                                        $(subst $(_GmuSpace),,$(call _JoinResultCharCount,Projects: $(_GmuComma)Containers: +,+= R r))"
+	echo "Files compiled: $(call _JoinResultCharCount,C++: C: ASM: linked:,x c a l)"
+	$(if $(call _IsStringEqual,$(strip $(call _CountCompileChar,V v S s)),0 0 0 0),,echo "$(subst $(_GmuSpace),,$(call _JoinResultCharCount,CVS-action: + $(_GmuComma)SVN-action: +,V v S s))")
+# Now show custom-compile action count
+	if [ -n "$(_p_CustomActionList)" ] && [ -s "$(_p_CustomActionList)" ]; then \
+		echo "Custom action count:"; \
+		_ActList=`cat $(_p_CustomActionList)`; \
+		for OneFile in $$_ActList; do echo "    $$OneFile: "`gmuCountChar $(call _ActnameToFilepath,$$OneFile) C`; done; \
+	fi
+# Write count summary to 
+	echo "$(subst $(_GmuSpace),,$(call _JoinResultCharCount,Projects: ;(update: $(_GmuComma)up-to-date: )...Containers: +,p + = R r))" >> $(_p_BuiltListOutput)
+  endef
+else # ^^^^ ifeq ($(MAKELEVEL),0) ^^^^
+  define _GmpMakeLevel0ShowEnd
+	echo "" # show a new line
+  endef
+endif
+
+define _Gmp1SharedFinishingCmds
+	$(_RM) $(_p_ThisPrjBuildInProgress)
+	$(gmu_u_SHOW_PROGRESS_CMD)
+	$(_GmpMakeLevel0ShowEnd)
+endef
+
+# Still referring to the old 'gmp_USER_FIRST_TARGET' for backward compatibility.
+ifdef gmp_USER_FIRST_TARGET
+  gmp_up_USER_OUTPUT_AFTER_LINK = $(gmp_USER_FIRST_TARGET)
+    # I use := here so that user can use only one of 'gmp_up_USER_OUTPUT_AFTER_LINK and gmp_USER_FIRST_TARGET',
+    # This helps, I think, user discover mix using situation.
+endif
+_gmp_up_USER_OUTPUT_AFTER_LINK_s = $(strip $(gmp_up_USER_OUTPUT_AFTER_LINK))
+
+define _GmpShowDoneUserOutputAfterLink
+#  $(if $(_Stripped_USER_FIRST_TARGET),echo "[DONE(gmp_USER_FIRST_TARGET):] $(call _StripOutputRootPrefix,$(_Stripped_USER_FIRST_TARGET))")
+  $(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),echo "[DONE(gmp_up_USER_OUTPUT_AFTER_LINK):] $(call _StripOutputRootPrefix,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))")
+endef
+
+
+_IsInBuildSelfStage = $(if $(gmu_uv_list_ALL_SUBPRJ_s),$(if $(_NowCheckIsSubprjsDone),1),1)
+
+_gmu_dyn_title_count = $(shell gmuCountChar $(gmu_Gp_COUNT_COMPILE) += Rr)
+gmu_progress_info = $(join Projects= Containers=,$(_gmu_dyn_title_count))  Now: $(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))$(if $(_IsInBuildSelfStage),,...)
+
+_gmuBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmuDotList)))
+
+_PrjnameShowInList = [$(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))]

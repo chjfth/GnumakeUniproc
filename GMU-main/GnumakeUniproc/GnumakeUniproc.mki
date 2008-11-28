@@ -1,0 +1,1340 @@
+# GnumakUniproc.mki, this single file implements the core layer of GnumakeUniproc.
+# -- Authored by Chen Jun(chjfth@gmail.com, chenjun@mail.nlscan.com) since Feb 2006.
+
+gmu_PRJ_NAME_s = $(strip $(gmu_PRJ_NAME))
+ifeq (,$(gmu_PRJ_NAME_s))
+  $(error !GMU!Error: Make-var: `gmu_PRJ_NAME' not defined or it is empty)
+endif
+
+_StartupSignatureFile = _MainPrjBuildStart.gmu.ckt
+
+unexport gmu_DECO_PREFIX_PRJ_NAME gmu_DECO_SUFFIX_PRJ_NAME gmu_DECO_PREFIX_LINK_OUTPUT gmu_DECO_SUFFIX_LINK_OUTPUT
+	# unexport them because [ user can += to these gmu-vars, but the altered value should not be seen by sub-projects ].
+
+_StripSpacesInDeco = $(subst $(_GmuSpace),,$1)
+_DECO_SUFFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_PRJ_NAME))
+_DECO_PREFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_PRJ_NAME))
+_DECO_SUFFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_LINK_OUTPUT))
+_DECO_PREFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_LINK_OUTPUT))
+
+gmu_G_Deco_PrjName = $(_DECO_PREFIX_PRJ_NAME_NoSp)$(gmu_PRJ_NAME_s)$(_DECO_SUFFIX_PRJ_NAME_NoSp)
+gmu_G_Final_PrjName = $(gmu_G_Deco_PrjName)
+_Gd_Deco_PrjOutput = $(gmu_ud_OUTPUT_ROOT)/$(gmu_G_Deco_PrjName)
+
+_d_OUTPUT_ROOT_GMUTMP = $(gmu_ud_OUTPUT_ROOT)/_gmu_tmp
+gmu_Gd_PRJ_GMUTMP = $(_Gd_Deco_PrjOutput)/_gmu_tmp
+
+# Some files to clear on start-up, -- should be in front of ``ifeq ($(MAKELEVEL),0)'' check.
+_p_BuiltListOutput = $(gmu_ud_OUTPUT_ROOT)/built_list.gmu.txt
+_p_BuildingListOutput = $(gmu_ud_OUTPUT_ROOT)/building_list.gmu.txt
+
+_gmu_isFirstMakeRestart = $(if $(_gmu_isAboveGnumake381),$(if $(MAKE_RESTARTS),,1),$(if $(wildcard $(gmu_p_BuildStartCkt)),,1))
+
+_p_tempSccmdOutput = $(_d_OUTPUT_ROOT_GMUTMP)/_tempSccmdOutput.gmu.txt
+_Gp_CountSccmdFailure = $(_d_OUTPUT_ROOT_GMUTMP)/_SccmdFailure.gmu.cnt
+export gmu_Gp_COUNT_COMPILE = $(_d_OUTPUT_ROOT_GMUTMP)/_CountCompile.gmu.cnt
+_Gp_ScWorkInModuleOutput = $(_d_OUTPUT_ROOT_GMUTMP)/_ScWorkInModuleOutput.gmu.txt
+
+
+ifeq ($(MAKELEVEL),0)
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+  ifeq (,$(gmu_ud_OUTPUT_ROOT)) # If user does not set gmu_ud_OUTPUT_ROOT explictly, we set it
+    # gmu_ud_OUTPUT_ROOT is blank now, and we assign a default value to it:
+    CURDIR_TEMP := $(if $(call _IsStringEqual,$(OSTYPE),cygwin),$(subst \,/,$(shell cygpath -w $(CURDIR))),$(CURDIR))
+      # The usage of `cygpath -w' is important for invoking non "cygwin-dll" compilers such as VC++.
+      #If not doing this, make.exe in cygwin will give VC++ a filepath like /cygdrive/e/prgroot.
+    gmu_ud_OUTPUT_ROOT := $(CURDIR_TEMP)/gf
+    gmu_d_BuildStartCkt := $(CURDIR)
+  else
+    _tmp_dir := $(call gmuf_GetAbsDirRelaToCurdir,$(gmu_ud_OUTPUT_ROOT))
+    ifeq (__GMU_cd_ERROR,$(_tmp_dir))
+      $(error !GMU!Error: You assigned a bad dir(not exist or not accessible) for gmu_ud_OUTPUT_ROOT: $(_tmp) )
+    endif
+    # Finally, ensure $(gmu_ud_OUTPUT_ROOT) is an absolute dir
+    ifeq (,$(call gmuf_IsAbsDir,$(gmu_ud_OUTPUT_ROOT)))
+      $(error You assigned gmu_ud_OUTPUT_ROOT=$(gmu_ud_OUTPUT_ROOT) , which is not an absolute dir)
+    endif
+    gmu_d_BuildStartCkt := $(gmu_ud_OUTPUT_ROOT)
+  endif
+
+  export gmu_p_BuildStartCkt = $(gmu_d_BuildStartCkt)/$(_StartupSignatureFile)
+  	# Important! For GNU make 3.80, user should first delete it before invoking the makefile of the main-project!
+  	#Otherwise, the build can be incomplete. GNU make 3.81 don't have this problem.
+
+#  export gmu_ud_OUTPUT_ROOT_AbsPath := $(gmu_ud_OUTPUT_ROOT)
+
+  ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "first restart" state.
+
+	# The first thing here is to create the root-prj-start signature, so that the code
+	# in this  if/endif will only execute once during one whole build process.
+    _temp := $(shell if [ ! -d $(gmu_d_BuildStartCkt) ]; then $(_MD) -p $(gmu_d_BuildStartCkt); fi; \
+    	if (echo -n "" > $(gmu_p_BuildStartCkt)) ; then true; \
+    	else echo __GMU_ex_ERROR; fi; )
+    ifneq (,$(_temp))
+      $(error !GMU!Error: Cannot create start-up signature file $(gmu_p_BuildStartCkt) )
+    endif
+    	#[2006-12-05] For reason why an extra subshell in `if' statement, see IMNOTE1.
+    
+    # Check whether the gmuXXX programs exist.
+    _temp := $(shell gmuExtractVarDefines "v1=1")
+    ifneq (v1=1,$(_temp))
+      $(error !GMU!Error: The critical program `gmuExtractVarDefines' does not exist or not work as expected. I cannot work)
+    endif
+
+    _temp := $(shell \
+    	echo "GnumakeUniproc started (GNUmake v$(MAKE_VERSION))." 1>&2 ;\
+    	echo "gmu_ud_OUTPUT_ROOT(%) = $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
+    	$(_MD) $(_d_OUTPUT_ROOT_GMUTMP); \
+    	echo -n "" >$(gmu_Gp_COUNT_COMPILE) >$(_Gp_ScWorkInModuleOutput) >$(_Gp_CountSccmdFailure) \
+    		>$(_p_BuiltListOutput) >$(_p_BuildingListOutput) \
+    	)
+    	# Clear some files in above ``echo '' command.
+    	# We should clear $(gmu_Gp_COUNT_COMPILE) whether or not the main-project has some C/C++ file to compile,
+    	#because the sub-projects will have some to compile.
+
+    # Clear more files requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
+    # Using absolute path is suggested.
+    _temp := $(shell \
+    	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
+    		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
+    		if [ ! -d $${_shDirToCreate} ]; then $(_MD) $${_shDirToCreate}; fi; \
+    		if (echo -n "" > $$v); then echo -n ''; else echo $$v; exit; fi; \
+    	done; )
+    ifneq (,$(_temp))
+      $(error !GMU!Error: Fail to clear requested `gmu_up_list_STARTUP_CLEAR_FILES': $(_temp))
+    endif
+
+	_temp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(_MD) $(gmu_Gd_PRJ_GMUTMP); fi;\
+		echo "$(_p_ThisMakefile)" > $(gmu_Gd_PRJ_GMUTMP)/_HisMakefile.gmu.Attr )
+
+  endif # ifeq ($(_gmu_isFirstMakeRestart),1)
+
+  ifndef gmu_DO_SHOW_VERBOSE
+    export gmu_DO_SHOW_VERBOSE = 0
+  endif
+
+endif
+endif # ifeq ($(MAKELEVEL),0)
+
+export gmu_ud_OUTPUT_ROOT
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
+
+
+_gmu_uv_list_AllSubprjsForLink = $(gmu_uv_list_SUBPRJ_TO_LINK) $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL)
+
+gmu_uv_list_ALL_SUBPRJ += $(_gmu_uv_list_AllSubprjsForLink) \
+	$(filter-out $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL),$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT))
+	# [2006-12-14] Note: If both gmu_uv_list_SUBPRJ_TO_LINK and gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL are null,
+	#then gmu_uv_list_ALL_SUBPRJ is not null, instead, it contain a space. Therefore,  $(strip ) it
+	#first before null checking.
+	# [2008-07-31] I used $(filter-out ) above in favor of nlssvn-prjs.mki's simplicity. 
+gmu_uv_list_SUBPRJ_TO_LINK += $(gmu_uv_list_LIB_TO_LINK)
+	# [2007-03-10] I decide to make gmu_uv_list_LIB_TO_LINK obsolete, now use gmu_uv_list_SUBPRJ_TO_LINK instead.
+	# Since gmu_uv_list_LIB_TO_LINK has been used by nearly all non-LIB projects, I should keep its compatibility.
+
+gmu_uv_list_ALL_SUBPRJ_s = $(strip $(gmu_uv_list_ALL_SUBPRJ))
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL))
+
+gmu_uv_list_SUBPRJ_LINK_FOR_PARENT_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT))
+
+gmu_uv_list_SUBPRJ_LOOPED = $(foreach v,$(gmu_uv_list_ALL_SUBPRJ),$(if $($v_IsLooped),$v))
+gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped = $(filter-out $(gmu_uv_list_SUBPRJ_LOOPED),$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT))
+
+gmu_u_EXTRA_LINK_MERGE_s = $(strip $(gmu_u_EXTRA_LINK_MERGE))
+	# The suffix _s imples "stripped".
+
+ifeq (,$(strip $(gmu_up_list_SRC_FROM_ROOT) $(gmu_uv_list_ALL_SUBPRJ) $(gmu_DELIBERATE_NO_SUBPRJ)))
+  $(error !GMU!Error: Neither `gmu_up_list_SRC_FROM_ROOT' nor `gmu_uv_list_ALL_SUBPRJ' is defined, nothing meaningful can be done)
+endif
+
+_NullUser1stTarget = --
+
+ifneq (,$(strip $(gmu_up_list_SRC_FROM_ROOT)))
+  ifeq (,$(strip $(gmu_uf_LINK_OUTPUT)))
+    $(error !GMU!Error: You give me source files(`gmu_up_list_SRC_FROM_ROOT') to compile, but `gmu_uf_LINK_OUTPUT' not defined)
+  endif
+  ifndef gmu_u_LINK_CMD
+    $(error !GMU!Error: You give me source files(`gmu_up_list_SRC_FROM_ROOT') to compile, but `gmu_u_LINK_CMD' not defined)
+  endif
+endif
+
+ifeq (,$(gmu_extn_OBJ))
+  gmu_extn_OBJ = o
+endif
+
+ifeq (,$(gmu_u_list_C_EXTN))
+  gmu_u_list_C_EXTN = c
+endif
+ifeq (,$(gmu_u_list_CXX_EXTN))
+  gmu_u_list_CXX_EXTN = cpp
+endif
+ifeq (,$(gmu_u_list_ASM_EXTN))
+  gmu_u_list_ASM_EXTN = s
+endif
+
+_gmu_CmdEchoBeginMark = >>>
+_gmu_CmdEchoEndMark = <<<
+
+_fnameLogCheckoutCmd = _CheckoutCmd.gmu.txt
+	# Actually, it may store checkout or export command.
+
+unexport _gmu_cmdopt_NowPostProc
+
+
+gmu_Gf_Deco_LinkOutput = $(if $(gmu_uf_LINK_OUTPUT),$(call _AddToBasename_fname,$(gmu_uf_LINK_OUTPUT),$(_DECO_PREFIX_LINK_OUTPUT_NoSp),$(_DECO_SUFFIX_LINK_OUTPUT_NoSp)),)
+gmu_Gf_Final_LinkOutput = $(gmu_Gf_Deco_LinkOutput)
+gmu_Gf_LINK_OUTPUT      = $(gmu_Gf_Deco_LinkOutput)
+gmu_Gp_LINK_OUTPUT = $(if $(gmu_uf_LINK_OUTPUT),$(_Gd_Deco_PrjOutput)/$(gmu_Gf_Deco_LinkOutput),)
+gmu_Gd_LINK_OUTPUT = $(_Gd_Deco_PrjOutput)
+
+
+_Gd_OBJ_OUTPUT = $(_Gd_Deco_PrjOutput)/_obj
+
+gmu_Gd_Deco_PrjOutput = $(_Gd_Deco_PrjOutput)
+gmu_Gd_Final_PrjOutput = $(_Gd_Deco_PrjOutput)
+gmu_Gd_OBJ_OUTPUT = $(_Gd_OBJ_OUTPUT)
+	#[2006-07-24] User may use this value.
+
+gmuf_GetPrjTmpDir = $(gmu_ud_OUTPUT_ROOT)/$1/_gmu_tmp
+	# $1: final prjname 
+
+
+
+_p_ThisPrjBuildInProgress = $(gmu_Gd_PRJ_GMUTMP)/_ThisPrjBuildInProgress.gmu.txt
+	# [2008-09-07] Just an empty file for detecting project loop.
+_p_ThisPrjAttr = $(gmu_Gd_PRJ_GMUTMP)/_ThisPrjAttr.gmu.txt
+
+_gmu_strPrjAttr := $(gmu_PRJ_NAME) $(gmu_G_Deco_PrjName) $(if $(gmu_Gf_Deco_LinkOutput),$(gmu_Gf_Deco_LinkOutput),_gmu_NoOutput) $(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(_NullUser1stTarget))
+	# Four elements, separated by space: 
+	# 1. $(gmu_PRJ_NAME)
+	# 2. $(gmu_G_Deco_PrjName)
+	# 3. $(gmu_Gf_Deco_LinkOutput) or _gmu_NoOutput
+	# 4. $(gmp_up_USER_OUTPUT_AFTER_LINK) or --
+_gmu_strPrjAttr_LF := $(subst $(_GmuSpace),\n,$(_gmu_strPrjAttr))
+
+ifeq (,$(MAKE_RESTARTS))
+  # Things to do on each project's start.
+  # NOTE: For GNU make 3.81, this is truely done once, but for GNU make 3.80, it can be done multiple times. 
+  # To keep make 3.80 compatibility, you should design your make code well so that doing multiple times
+  # here don't cause problem.
+
+  ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+    # Create the "ThisPrjBuildInProgress" indication file.
+    # - and "_ThisPrjAttr.gmu.txt"
+    _tmp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(_MD) $(gmu_Gd_PRJ_GMUTMP); fi; \
+		echo -n "" > $(_p_ThisPrjBuildInProgress) ;\
+		echo -e "$(_gmu_strPrjAttr_LF)" > $(_p_ThisPrjAttr) \
+		)
+  endif
+
+endif
+
+
+_isPrjNeedExtraCheckout = $(if $(strip $(gmu_uv_list_CVS_MODULES)$(gmu_uv_list_SVN_MODULES)),1,)
+
+# determine whether currently in checkout phase which will influence many things.
+_p_CheckoutDone = $(gmu_Gd_PRJ_GMUTMP)/_CheckoutDone.gmu.ckt
+
+ifneq (,$(gmu_DO_CHECKOUT)$(gmu_DO_EXPORT)$(call _FindStrings,$(MAKECMDGOALS),gmu_ut_checkout gmu_ut_export)) 
+	# if gmu_DO_CHECKOUT/gmu_DO_EXPORT is set or make-target is gmu_ut_checkout/gmu_ut_export
+
+  _WantScCheckout = 1
+	# It means "whether the environment(by env-var or by command-line) wants checkout or export"
+
+  ifeq (1,$(_isPrjNeedExtraCheckout))
+  ifeq ($(call _IsOlderThanBuildStart,$(_p_CheckoutDone)),1)
+    _isInCheckoutPhase = 1# else, it is(should be) null
+		# It means whether this project itself is in its additional check-out phase(by gmu_uv_list_CVS_MODULES, gmu_uv_list_SVN_MODULES)
+  endif
+  endif
+
+  _checkout_or_export = checkout
+  ifneq (,$(gmu_DO_CHECKOUT)$(call _IsStringEqual,$(MAKECMDGOALS),gmu_ut_checkout))
+    _checkout_or_export = checkout
+  else
+    _checkout_or_export = export
+  endif
+endif
+
+
+#################### 
+_SubprjMakeCmdGoals = $(if $(gmu_NO_SUBPRJ_CMDGOALS_PASSING),,$(MAKECMDGOALS))
+	#[2007-01-21] It seems today using gmu_NO_SUBPRJ_CMDGOALS_PASSING is no longer meaningful.
+
+
+
+#------------------
+# configure actions (canned command sequence)
+#------------------
+
+ifneq (,$(gmu_DO_SHOW_CHANGED_PREREQ))
+define gmu_shcmd_DO_SHOW_PREREQ_DEFAULT
+    echo "    Due to(\$$?):" 
+    @$(foreach v,$?,echo "    $(call _StripPrjOutputDirPrefix,$v)";)
+endef
+endif
+
+define _DO_C_COMPILE
+	@$(call _MkdirIfNotExist,$(@D))
+	@echo " $(if $(gmu_exe_CC),[$(gmu_exe_CC)],C Compiling) $<"
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	$(gmu_u_CC_CMD)
+	@$(call _AppendLogCountCompile,c)
+endef
+
+define _DO_CXX_COMPILE
+	@$(call _MkdirIfNotExist,$(@D))
+	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $<"
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	$(gmu_u_CXX_CMD)
+	@$(call _AppendLogCountCompile,x)
+endef
+
+define _DO_ASM_COMPILE
+	@$(call _MkdirIfNotExist,$(@D))
+	@echo " $(if $(gmu_exe_ASM),[$(gmu_exe_ASM)],Assembling) $<"
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	$(gmu_u_ASM_CMD)
+	@$(call _AppendLogCountCompile,a)
+endef
+
+define _DO_LINK_CMD
+	@echo "***** Linking$(if $(gmu_SHOW_LINKING_IMAGE_TYPE),($(gmu_SHOW_LINKING_IMAGE_TYPE))): $(call _StripOutputRootPrefix,$@) ..."
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	@$(call _MkdirIfNotExist,$(@D))
+	@$(call _MkdirIfNotExist,$(gmu_Gd_PRJ_GMUTMP)) # considering that gmu_u_LINK_CMD may output something into that dir
+	$(gmu_u_LINK_CMD)
+	@$(call _AppendLogCountCompile,l)
+endef
+
+#################################################
+
+gmuf_SrcListToOutputList_addsuffix = $(patsubst %,$(_Gd_OBJ_OUTPUT)/%$2,$1)
+	# $1: source list from source-root-dir, $2: suffix to append in output path( note: dot required )
+
+gmuf_SrcListToOutputList_exf = $(foreach _extn,$2,$(call gmuf_SrcListToOutputList_addsuffix,$(filter %.$(_extn),$1),.$3))
+	# $1: source list from source-root-dir, $2: ext-name list, $3: ext-name to append for output file
+	# `exf' means ext-name filter.
+
+gmuf_SrcListToObjList_exf = $(call gmuf_SrcListToOutputList_exf,$1,$2,$(gmu_extn_OBJ))
+	# $1: source list from source-root-dir, $2: ext-name list
+gmuf_C_ListToObjList = $(call gmuf_SrcListToObjList_exf,$1,$(gmu_u_list_C_EXTN))
+gmuf_CXX_ListToObjList = $(call gmuf_SrcListToObjList_exf,$1,$(gmu_u_list_CXX_EXTN))
+gmuf_ASM_ListToObjList = $(call gmuf_SrcListToObjList_exf,$1,$(gmu_u_list_ASM_EXTN))
+
+gmuf_SrcListToHdepList = $(call gmuf_SrcListToOutputList_exf,$1,$2,d)
+	# $1: source list from source-root-dir, $2: ext-name list
+gmuf_C_ListToHdepList = $(call gmuf_SrcListToHdepList,$1,$(gmu_u_list_C_EXTN))
+gmuf_CXX_ListToHdepList = $(call gmuf_SrcListToHdepList,$1,$(gmu_u_list_CXX_EXTN))
+#gmuf_ASM_ListToObjList = $(call gmuf_SrcListToObjList_exf,$1,$(gmu_u_list_ASM_EXTN))
+
+gmuf_CnCXX_ListToObjList = $(call gmuf_C_ListToObjList,$1) $(call gmuf_CXX_ListToObjList,$1)
+	#[2006-12-02] This is defined for user's convenient, e.g. when writing the MSVC pch plug-in.
+gmuf_CnCXX_ListToHdepList = $(call gmuf_C_ListToHdepList,$1) $(call gmuf_CXX_ListToHdepList,$1)
+
+gmuf_SrcListToHdepList_FreeStyleExtn = $(call gmuf_SrcListToOutputList_addsuffix,$1,d)
+	#[2007-01-14] when improving MSVC pch plugin
+
+#Construct a temporary REQOBJS var with temporary meaning:
+
+_REQOBJS_C = $(call gmuf_C_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT))
+_HDEPEND_FOR_C = $(call gmuf_C_ListToHdepList,$(gmu_up_list_SRC_FROM_ROOT))
+
+_REQOBJS_CXX = $(call gmuf_CXX_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT))
+_HDEPEND_FOR_CXX = $(call gmuf_CXX_ListToHdepList,$(gmu_up_list_SRC_FROM_ROOT))
+
+_REQOBJS_ASM = $(call gmuf_ASM_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT))
+
+gmu_Gp_list_REQOBJS = $(_REQOBJS_C) $(_REQOBJS_CXX) $(_REQOBJS_ASM)
+
+gmu_Gp_list_AllSource = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmu_up_list_SRC_FROM_ROOT))
+	#[2007-03-28] Path of all source files, starting with $(gmu_ud_SRC_ROOT). If the user wants
+	#all his source files to depend on something, he can use this.
+
+# some goodies for user, plugin author perhaps:
+gmuf_SrcListToObjList = $(call gmuf_SrcListToOutputList_addsuffix,$1,.$(gmu_extn_OBJ))
+	# $1: source list from $(gmu_ud_SRC_ROOT)
+gmu_Gp_AllSrcListToObjList = $(call gmuf_SrcListToOutputList_addsuffix,$(gmu_up_list_SRC_FROM_ROOT),.$(gmu_extn_OBJ))
+	
+#gmu_Gp_list_HDEPENDS = $(_HDEPEND_FOR_C) $(_HDEPEND_FOR_CXX) # No idea whether useful for user.
+
+
+# Now, make sure gmu_Gp_list_REQOBJS contains the same file as _list_REQ_tmp.
+# If not, it means there are some unrecognized file extensions in user's source list. 
+# We'll show these unregonized files if they exist.
+_list_REQ_tmp := $(patsubst %,$(_Gd_OBJ_OUTPUT)/%,$(gmu_up_list_SRC_FROM_ROOT))
+_list_ExtUnrecognized := $(foreach file,$(_list_REQ_tmp),$(if $(findstring $(file).$(gmu_extn_OBJ),$(gmu_Gp_list_REQOBJS)),,$(file)))
+ifneq (,$(strip $(_list_ExtUnrecognized))) # there will be as many spaces in $(_list_ExtUnrecognized) as there are source files, therefore, we have to use strip.
+  _list_ExtUnrecognized := $(patsubst $(_Gd_OBJ_OUTPUT)/%,%,$(_list_ExtUnrecognized)) # strip the $(_Gd_Deco_PrjOutput) prefix
+  _temp := $(shell echo "The following source files(gmu_up_list_SRC_FROM_ROOT) have unrecognized extension:" 1>&2)
+  $(foreach file,$(_list_ExtUnrecognized),$(shell echo "  $(file)" 1>&2))
+  	  #You know, $(shell ...)'s output to stdout with be captured by Make if we do not redirect is to stderr.
+  $(error !GMU!Error: The above source files do not have valid extension-name, valid ext-names are: $(strip $(gmu_u_list_C_EXTN) $(gmu_u_list_CXX_EXTN) $(gmu_u_list_ASM_EXTN)))
+endif
+
+ifneq (,$(_REQOBJS_C))
+ifndef gmu_u_CC_CMD
+  $(error !GMU!Error: You want to compile $(addprefix .,$(gmu_u_list_C_EXTN)) files, but `gmu_u_CC_CMD' not defined)
+endif
+endif
+
+ifneq (,$(_REQOBJS_CXX))
+ifndef gmu_u_CXX_CMD
+  $(error !GMU!Error: You want to compile $(addprefix .,$(gmu_u_list_CXX_EXTN)) files, but `gmu_u_CXX_CMD' not defined)
+endif
+endif
+
+ifneq (,$(_REQOBJS_ASM))
+ifndef gmu_u_ASM_CMD
+  $(error !GMU!Error: You want to compile $(addprefix .,$(gmu_u_list_ASM_EXTN)) files, but `gmu_u_ASM_CMD' not defined)
+endif
+endif
+
+
+_HDEPEND_ALL_FILES = $(_HDEPEND_FOR_C) $(_HDEPEND_FOR_CXX) # Sorry not for ASM now.
+
+
+_isMakeTarget_LinkImage = $(if $(call _FindStrings,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr gmu_ut_update gmu_ut_diff gmu_ut_commit gmu_ut_checkout gmu_ut_export gmu_ut_diagnose),,1)
+gmu_G_isThisPass_LinkImage = $(_isMakeTarget_LinkImage)
+
+
+ifeq (,$(gmu_NO_GEN_HDEPEND))
+	#[2007-01-21] If Something prevents you(user) from correctly gen-hdepend, you have
+	#to compromise by defining gmu_NO_GEN_HDEPEND=1 in advance.
+
+#include the .h header depend(.d) files for all the source files
+-include $(_HDEPEND_ALL_FILES)
+
+#give the rules for generating .d from .c(.cpp)
+_GCC_GEN_HDEPEND_OPTION = -D_GMU_GCC_M_GEN_HDEPEND -M -MM -MP $(gmu_u_GCC_M_OPTIONS) \
+	$(addprefix -I ,$(gmu_ud_list_PRJ_HEADER)) \
+	$(addprefix -isystem ,$(gmu_ud_list_SYS_HEADER) $(gmu_ud_list_STABLE_HEADER)) $(_gmu_isystem_DIRS_WRAP_QUOTES) 
+	# [2006-12-21]Note: We use -MM to indicate that those dirs listed with -isystem
+	# should not appear in dependency rules. This is gcc's behaviour since v3.1 .
+	
+
+define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
+	@echo " GenHdepend: $(if $(_IsNotVerbose),($(notdir $(_p_ts_HDepend))),$(call _StripOutputRootPrefix,$(_p_ts_HDepend)) $(if $(gmu_ts_MORE_HDEP_TARGETS),(extra targets: $(gmu_ts_MORE_HDEP_TARGETS))) )"
+	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	@$(call _MkdirIfNotExist,$(@D))
+@# Add user-supplied targets to target list of the hdepend rule:
+	@echo -n "" > $(_p_ts_HDepend)_ # clear the temporary .d_ file first
+	@for OneFile in "$(gmu_ts_MORE_HDEP_TARGETS)"; do echo -e "$$OneFile \\" >> $(_p_ts_HDepend)_; done;
+	$(gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< >> $(_p_ts_HDepend)_
+	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+endef
+	# What I do here is to generate a temporary `.d_' file first; if `gcc -M'
+	#succeeds, then rename it to `.d'. The reason for not generating .d directly
+	#is that the .d genration process may fail in the middle and leave an
+	#incomplete .d file -- we don't want an incomplete .d file to be included
+	#in next make start.
+
+endif # ifneq (,$(gmu_NO_GEN_HDEPEND))
+
+# List of common rules for compiling .c .cpp & .s
+
+$(gmu_Gp_list_REQOBJS): _p_ts_HDepend = $(@:.$(gmu_extn_OBJ)=.d)# `ts' means target specific variable
+
+$(_REQOBJS_C): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
+	$(_GEN_HDEPEND_DOT_D)
+else
+	@$(_GEN_HDEPEND_DOT_D)
+endif
+ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
+	$(_DO_C_COMPILE)
+else
+	@$(_DO_C_COMPILE)
+endif
+
+$(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
+	$(_GEN_HDEPEND_DOT_D)
+else
+	@$(_GEN_HDEPEND_DOT_D)
+endif
+ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
+	$(_DO_CXX_COMPILE)
+else
+	@$(_DO_CXX_COMPILE)
+endif
+
+$(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+ifdef gmu_DO_SHOW_COMPILE_CMD
+	$(_DO_ASM_COMPILE)
+else
+	@$(_DO_ASM_COMPILE)
+endif
+
+
+########## ***** Prepare for CVS/SVN work-in-module or CVS/SVN checkout ***** ###########
+# In the following code: SC, sc or Sc means source-control.
+# work-in-module means update, diff, checkin etc.
+
+ifeq (,$(gmu_CVS_EXE))
+  export gmu_CVS_EXE = cvs
+endif
+ifeq (,$(gmu_SVN_EXE))
+  export gmu_SVN_EXE = svn
+endif
+
+#_WantScWorkInModule = # default to No
+#_WantScCheckout = # default to No #[2007-10-04] Don't clear it, it may have been set earlier
+
+
+ifeq '$(MAKECMDGOALS)' 'gmu_ut_update'
+  _CmdCvsWorkInModule = $(gmu_CVS_EXE) -q update -d -P $(gmu_CVS_UPDATE_OPT)
+  _CmdSvnWorkInModule = $(gmu_SVN_EXE) update $(gmu_SVN_UPDATE_OPT)
+endif
+ifeq '$(MAKECMDGOALS)' 'gmu_ut_diff'
+  _CmdCvsWorkInModule = $(gmu_CVS_EXE) -Q diff -R $(gmu_CVS_DIFF_OPT) # -r <rev1> is intended to be set in $(CVS_DIFF_OPT) by user
+  _CmdSvnWorkInModule = $(gmu_SVN_EXE) diff $(gmu_SVN_DIFF_OPT)
+endif
+ifeq '$(MAKECMDGOALS)' 'gmu_ut_commit'
+  _CmdCvsWorkInModule = $(gmu_CVS_EXE) -q commit -R $(gmu_CVS_COMMIT_OPT) -m "$(call _TrShcmd4echo,$(gmu_COMMIT_MESSAGE))"
+  _CmdSvnWorkInModule = $(gmu_SVN_EXE) commit $(gmu_SVN_COMMIT_OPT) -m "$(call _TrShcmd4echo,$(gmu_COMMIT_MESSAGE))"
+endif
+ifneq (,$(call _FindStrings,$(MAKECMDGOALS),clean diagnose ut_clean _gmu_ut_GetPrjAttr)) # for these goals, don't do cvs update. 
+  _CmdCvsWorkInModule =
+  _CmdSvnWorkInModule =
+  _WantScCheckout =
+endif
+
+ifneq (,$(_CmdCvsWorkInModule)$(_CmdSvnWorkInModule))
+ifdef _WantScCheckout
+  $(error !You cannot request both 'checkout' and any 'source-control work-in-module' action)
+endif
+endif
+
+
+_svn--force = $(if $(call _IsStringEqual,$(_checkout_or_export),export),--force)
+
+_f_ScByMakefile = _ScByMakefile.gmu.txt
+
+_f_ScCheckTime = _ScCheckTime.gmu.ckt
+
+CvsmakeEvCvsRoot = \$$($${OneMod}_cvsRoot)
+CvsmakeEvTag = \$$($${OneMod}_cvsTag)
+CvsmakeEvLocalDir = \$$($${OneMod}_cvsLocalDir)
+CvsmakeEvModuleDir = \$$($${OneMod}_cvsModuleDir)
+CvsmakeEvLocalModuleDir = $(CvsmakeEvLocalDir)/$(CvsmakeEvModuleDir)
+
+SvnmakeEvSvnUrl = \$$($${OneMod}_svnUrl)
+SvnmakeEvLocalDir = \$$($${OneMod}_svnLocalDir)
+SvnmakeEvRev = \$$($${OneMod}_svnRev)
+
+_p_SelfCoEvCheckTime = \$$($${OneMod}_SelfCoEvCheckTime)
+
+#_CvsmakeEvTag_nn = \$$(if $(CvsmakeEvTag),$(CvsmakeEvTag),HEAD)# nn means "not null"
+#_SvnmakeEvRev_nn = \$$(if $(SvnmakeEvRev),$(SvnmakeEvRev),HEAD)
+_CvsmakeEvCheckoutTagOpt = $(if $(gmu_SC_CHECKOUT_DATETIME),-D \"$(gmu_SC_CHECKOUT_DATETIME)\",-r $(CvsmakeEvTag))
+_SvnmakeEvCheckoutRevOpt = -r $(if $(gmu_SC_CHECKOUT_DATETIME),\"{$(gmu_SC_CHECKOUT_DATETIME)}\",$(SvnmakeEvRev))
+
+_SvnAppendPegDateTime := $(if $(gmu_SC_CHECKOUT_DATETIME),$(if $(gmu_SVN_VER_REVISION),$(shell if [ ! "$(gmu_SVN_VER_REVISION)" -lt 22139 ];then echo -n "\\\"@{$(gmu_SC_CHECKOUT_DATETIME)}\\\""; fi),\"@{$(gmu_SC_CHECKOUT_DATETIME)}\"))
+	#	[2007-01-21] From now on, if gmu_SC_CHECKOUT_DATETIME is defined, I'll use it as 
+	# peg-revision for checkout which I think is more reasonable than not using peg-revision.
+	#	And there is a slight SVN problem however: before Subversion 1.4.2 (r22139), using
+	# date-time as peg-revision is not supported. Therefore I have to invent a compromise
+	# method: for user's using svn prior to 1.4.2, he must define a special variable 
+	# gmu_SVN_VER_REVISION to be the SVN_VER_REVISION value(from svn_version.h), e.g. 
+	# for svn 1.4.0, user should define gmu_SVN_VER_REVISION=21228.
+	# If that value is lower than 22139, I will not add peg-revision when doing checkout.
+
+#################<<<<<<< Do source-control work-in-module >>>>>>>#################
+
+ifneq (,$(_CmdCvsWorkInModule)$(_CmdSvnWorkInModule))
+ifneq (,$(strip $(gmu_uv_list_CVS_MODULES)$(gmu_uv_list_SVN_MODULES)))
+ifeq (,$(_isNowGmuGetPrjAttr)) # for these goals, don't care for it [2007-11-21]
+
+_p_mk_DoScWorkInModule = $(gmu_Gd_PRJ_GMUTMP)/_DoScWorkInModule.gmu.mk
+_p_ScWorkInModuleDone = $(gmu_Gd_PRJ_GMUTMP)/_ScWorkInModuleDone.gmu.ckt
+
+_p_mk_DoScWorkInModule_shsubst = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$${gmu_ud_OUTPUT_ROOT}/%,$(_p_mk_DoScWorkInModule))
+
+include $(_p_ScWorkInModuleDone)
+
+$(_p_ScWorkInModuleDone): $(gmu_p_BuildStartCkt)
+	@$(call _MkdirIfNotExist,$(dir $(_p_mk_DoScWorkInModule)))
+	@$(call _ClearFile,$(_p_mk_DoScWorkInModule))
+	@echo -e "$(foreach OneMod,$(gmu_uv_list_CVS_MODULES),\n\
+$(OneMod)_cvsLocalDir = $($(OneMod)_cvsLocalDir)\n\
+$(OneMod)_cvsModuleDir = $($(OneMod)_cvsModuleDir)\n\
+)\n" >> $(_p_mk_DoScWorkInModule_shsubst)
+
+	@echo -e "$(foreach OneMod,$(gmu_uv_list_SVN_MODULES),\n\
+$(OneMod)_svnLocalDir = $($(OneMod)_svnLocalDir)\n\
+)\n" >> $(_p_mk_DoScWorkInModule_shsubst)
+
+	@for OneMod in $(gmu_uv_list_CVS_MODULES); do \
+		echo "$(CvsmakeEvLocalModuleDir)/$(_f_ScCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t@(\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tcd $(CvsmakeEvLocalModuleDir) ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_CVS_MODULES($${OneMod}) refers to that dir, but it does not exist or cannot be entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo +++++++++++++++++++++++++ CVS work-in-module: ++++++++++++++++++++++++;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo +++ In dir: \`pwd\`;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t$(call _TrShcmd4echo_4bs,echo "+++Command: $(call _TrShcmd4echo,$(_CmdCvsWorkInModule))") ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t$(call _TrShcmd4echo_4bs,$(_CmdCvsWorkInModule)) $(if $(gmu_DO_ACCUM_SCCMD_FAILURE),>$(_p_tempSccmdOutput)) 2>&1; \\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; \\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	$(if $(gmu_DO_ACCUM_SCCMD_FAILURE),\
+		echo -e "\tcat $(_p_tempSccmdOutput) | tee -a $(_Gp_ScWorkInModuleOutput);\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tif [ \$$\$$CmdRet != 0 ]; then echo -n 'f' >> $(_Gp_CountSccmdFailure); fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	,\
+		echo -e "\tif [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: CVS execution failure.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	)\
+		echo -e "\t)" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t@echo -n '' > \$$@ # touch it to make it newer than \`_MainPrjBuildStart.gmu.ckt'" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo "" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		done
+
+	@for OneMod in $(gmu_uv_list_SVN_MODULES); do \
+		echo "$(SvnmakeEvLocalDir)/$(_f_ScCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t@(\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tcd $(SvnmakeEvLocalDir) ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_SVN_MODULES($${OneMod}) refers to that dir, but it does not exist or cannot be entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo +++++++++++++++++++++++++ SVN work-in-module: ++++++++++++++++++++++++;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo +++ In dir: \`pwd\`;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t$(call _TrShcmd4echo_4bs,echo "+++Command: $(call _TrShcmd4echo,$(_CmdSvnWorkInModule))") ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\techo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t$(call _TrShcmd4echo_4bs,$(_CmdSvnWorkInModule)) $(if $(gmu_DO_ACCUM_SCCMD_FAILURE),>$(_p_tempSccmdOutput)) 2>&1; \\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; \\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	$(if $(gmu_DO_ACCUM_SCCMD_FAILURE),\
+		echo -e "\tcat $(_p_tempSccmdOutput) | tee -a $(_Gp_ScWorkInModuleOutput);\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\tif [ \$$\$$CmdRet != 0 ]; then echo -n 'f' >> $(_Gp_CountSccmdFailure); fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	,\
+		echo -e "\tif [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: SVN execution failure.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+	)\
+		echo -e "\t)" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo -e "\t@echo -n '' > \$$@ # touch it to make it newer than \`_MainPrjBuildStart.gmu.ckt'" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		echo "" >> $(_p_mk_DoScWorkInModule_shsubst) ;\
+		done
+	@echo "ScWorkInModule_all: \\" >> $(_p_mk_DoScWorkInModule_shsubst)
+	@for OneMod in $(gmu_uv_list_CVS_MODULES); do echo -e "\t\t$(CvsmakeEvLocalModuleDir)/$(_f_ScCheckTime) \\" >> $(_p_mk_DoScWorkInModule_shsubst); done
+	@for OneMod in $(gmu_uv_list_SVN_MODULES); do echo -e "\t\t$(SvnmakeEvLocalDir)/$(_f_ScCheckTime) \\" >> $(_p_mk_DoScWorkInModule_shsubst); done
+	$(call _DoVerbose2,@echo ">>>>>>>> Sub-make doing SCCMD work-in-module [ $(gmu_G_Deco_PrjName) ].")
+#
+	@$(MAKE) ScWorkInModule_all -f $(_p_mk_DoScWorkInModule) --no-print-directory
+#
+	$(call _DoVerbose2,@echo "<<<<<<<< Sub-make ended SCCMD work-in-module [ $(gmu_G_Deco_PrjName) ].")
+	@echo -n "" > $@ # touch it
+
+# Note above: In the generated _DoScWorkInModule.gmu.mk, we must execute `cd ... ; $(gmu_CVS_EXE) ...' 
+#in a sub-shell, so that the `cd' command takes effect on the follow cvs command.
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
+endif # ifneq (,$(strip $(gmu_uv_list_CVS_MODULES)$(gmu_uv_list_SVN_MODULES))
+endif # ifneq (,$(_CmdCvsWorkInModule)$(_CmdSvnWorkInModule))
+
+#################<<<<<<< Do source-control checkout >>>>>>>#################
+
+ifeq ($(_isInCheckoutPhase),1) # [2006-03-12 13:05] can be changed to _isInCheckoutPhase checking ![2007-11-21]Strange Result
+ifeq (1,$(_isPrjNeedExtraCheckout))
+ifeq (,$(_isNowGmuGetPrjAttr)) # for these goals, don't care for extra checkouts
+
+_p_mk_DoCheckout = $(gmu_Gd_PRJ_GMUTMP)/_DoCheckout.gmu.mk
+
+_SelfCoEvScSource = \$$(strip \$$($${OneMod}_ScSource))
+
+_CvsCheckoutShcmdEvEcho1 = \$$(gmu_CVS_EXE) -q -d $(CvsmakeEvCvsRoot) $(_checkout_or_export) \
+	$(call _TrShcmd4echo,$(gmu_CVS_CHECKOUT_OPT)) -P $(_CvsmakeEvCheckoutTagOpt) $(CvsmakeEvModuleDir)
+_CvsCheckoutShcmdEvEcho2 = \$$($${OneMod}_CvsCoShcmd)
+
+_SvnCheckoutShcmdEvEcho1 = \$$(gmu_SVN_EXE) $(_checkout_or_export) $(_svn--force)\
+	$(call _TrShcmd4echo,$(gmu_SVN_CHECKOUT_OPT)) $(SvnmakeEvSvnUrl)$(_SvnAppendPegDateTime) . $(_SvnmakeEvCheckoutRevOpt)
+_SvnCheckoutShcmdEvEcho2 = \$$($${OneMod}_SvnCoShcmd)
+
+_p_mk_DoCheckout_shsubst = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$${gmu_ud_OUTPUT_ROOT}/%,$(_p_mk_DoCheckout))
+
+include $(_p_CheckoutDone)
+
+$(_p_CheckoutDone): $(gmu_p_BuildStartCkt)
+	@$(call _MkdirIfNotExist,$(dir $(_p_mk_DoCheckout)))
+	@$(call _ClearFile,$(_p_mk_DoCheckout))
+	
+	@echo "include \$$(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki" >> $(_p_mk_DoCheckout_shsubst)
+	@$(foreach OneMod,$(gmu_uv_list_CVS_MODULES),\
+		$(if $($(OneMod)_cvsRoot),,$(error !GMU!Error: `$(OneMod)' is in your gmu_uv_list_CVS_MODULES, but `$(OneMod)_cvsRoot' is not defined.))\
+		$(if $($(OneMod)_cvsLocalDir),,$(error !GMU!Error: `$(OneMod)' is in your gmu_uv_list_CVS_MODULES, but `$(OneMod)_cvsLocalDir' is not defined.)))
+	@echo -e "$(foreach OneMod,$(gmu_uv_list_CVS_MODULES),\n\
+$(OneMod)_cvsRoot = $($(OneMod)_cvsRoot)\n\
+$(OneMod)_cvsModuleDir = $($(OneMod)_cvsModuleDir)\n\
+$(OneMod)_cvsLocalDir = $($(OneMod)_cvsLocalDir)\n\
+$(OneMod)_cvsTag = $(if $($(OneMod)_cvsTag),$($(OneMod)_cvsTag),HEAD)\n\
+$(OneMod)_ScSource = \$$(_GmuSharp)CVS $($(OneMod)_cvsRoot) $($(OneMod)_cvsModuleDir) \$$($(OneMod)_cvsTag)\n\
+$(OneMod)_SelfCoEvCheckTime = \$$($(OneMod)_cvsLocalDir)/\$$($(OneMod)_cvsModuleDir)/$(_f_ScCheckTime)\n\
+)\n" >> $(_p_mk_DoCheckout_shsubst)
+
+	@$(foreach OneMod,$(gmu_uv_list_SVN_MODULES),\
+		$(if $($(OneMod)_svnUrl),,$(error !GMU!Error: `$(OneMod)' is in your gmu_uv_list_SVN_MODULES, but `$(OneMod)_svnUrl' is not defined.))\
+		$(if $($(OneMod)_svnLocalDir),,$(error !GMU!Error: `$(OneMod)' is in your gmu_uv_list_SVN_MODULES, but `$(OneMod)_svnLocalDir' is not defined.)))
+	@echo -e "$(foreach OneMod,$(gmu_uv_list_SVN_MODULES),\n\
+$(OneMod)_svnUrl = $($(OneMod)_svnUrl)\n\
+$(OneMod)_svnLocalDir = $($(OneMod)_svnLocalDir)\n\
+$(OneMod)_svnRev = $(if $($(OneMod)_svnRev),$($(OneMod)_svnRev),HEAD)\n\
+$(OneMod)_ScSource = \$$(_GmuSharp)SVN $($(OneMod)_svnUrl) \$$($(OneMod)_svnRev)\n\
+$(OneMod)_SelfCoEvCheckTime = \$$($(OneMod)_svnLocalDir)/$(_f_ScCheckTime)\n\
+)\n" >> $(_p_mk_DoCheckout_shsubst)
+	
+	@echo -e "$(foreach OneMod,$(gmu_uv_list_CVS_MODULES) $(gmu_uv_list_SVN_MODULES),\
+$(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakefile)\n)\n" >> $(_p_mk_DoCheckout_shsubst)
+
+	@for OneMod in $(gmu_uv_list_CVS_MODULES); do \
+		echo "$${OneMod}_CvsCoShcmd = $(_CvsCheckoutShcmdEvEcho1)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo "$(_p_SelfCoEvCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo +++++++++++++++++++++++  Doing CVS checkout: +++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using tag: $(CvsmakeEvTag))\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  CVSROOT = $(CvsmakeEvCvsRoot)\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  ModuleDir = $(CvsmakeEvModuleDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  LocalDir = $(CvsmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@(\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t\$$(if \$$(wildcard $(CvsmakeEvLocalDir)),,\$$(_MD) $(CvsmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\tcd $(CvsmakeEvLocalDir) ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_CVS_MODULES($${OneMod}) refers to that dir, but it cannot be created or entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_CvsCheckoutShcmdEvEcho2))\" ;\\" >> $(_p_mk_DoCheckout_shsubst) ; \
+		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_CvsCheckoutShcmdEvEcho2))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_DoCheckout_shsubst) ;) \
+		echo -e "\t$(_CvsCheckoutShcmdEvEcho2) ;\\" >> $(_p_mk_DoCheckout_shsubst) ; \
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: CVS execution failure.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@\$$(call _AppendLogCountCompile,v)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo '$(_SelfCoEvScSource)' > \$$@ # touch it to make it newer than \`_MainPrjBuildStart.gmu.ckt'" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo '$(_p_ThisMakefile)' > \$$($${OneMod}_ScByMakefile)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo "" >> $(_p_mk_DoCheckout_shsubst) ;\
+		done
+	@for OneMod in $(gmu_uv_list_SVN_MODULES); do \
+		echo "$${OneMod}_SvnCoShcmd = $(_SvnCheckoutShcmdEvEcho1)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo "$(_p_SelfCoEvCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo +++++++++++++++++++++++  Doing SVN checkout: +++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SvnmakeEvRev))\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  From = $(SvnmakeEvSvnUrl)\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  To   = $(SvnmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@(\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t\$$(if \$$(wildcard $(SvnmakeEvLocalDir)),,\$$(_MD) $(SvnmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\tcd $(SvnmakeEvLocalDir) ;\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_SVN_MODULES($${OneMod}) refers to that dir, but it cannot be created or entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\techo \"    => \`pwd\`\" ;\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\techo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SvnCheckoutShcmdEvEcho2))\" ;\\" >> $(_p_mk_DoCheckout_shsubst) ; \
+		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SvnCheckoutShcmdEvEcho2))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_DoCheckout_shsubst) ;) \
+		echo -e "\t$(_SvnCheckoutShcmdEvEcho2) ;\\" >> $(_p_mk_DoCheckout_shsubst) ; \
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: SVN execution failure.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@\$$(call _AppendLogCountCompile,s)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo '$(_SelfCoEvScSource)' > \$$@ # touch it to make it newer than \`_MainPrjBuildStart.gmu.ckt'" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo -e "\t@echo '$(_p_ThisMakefile)' > \$$($${OneMod}_ScByMakefile)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo "" >> $(_p_mk_DoCheckout_shsubst) ;\
+		done
+
+	@echo -e "# Checking checkout source conflicts: \n" >> $(_p_mk_DoCheckout_shsubst)
+
+	@for OneMod in $(gmu_uv_list_CVS_MODULES) $(gmu_uv_list_SVN_MODULES); do \
+		echo  "  ifneq (\$$(call _IsP1OlderThanP2,$(_p_SelfCoEvCheckTime),\$$(gmu_p_BuildStartCkt)),1) #if it has been updated since build start" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "    _temp := \$$(shell \
+			if [ \"$(_SelfCoEvScSource)\" = \"\$$\$$(cat $(_p_SelfCoEvCheckTime))\" ]; \
+				then echo PrevCmdSuccess; \
+			else echo \"\$$\$$(cat \$$($${OneMod}_ScByMakefile))\"; fi; )\
+			    " >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "    ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "      _mkvPrevSc:=\$$(shell \
+				cat $(_p_SelfCoEvCheckTime) )" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "      _temp2 :=   \$$(shell ( \
+				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\"; \
+				echo \"  Previous: \$$(_temp)\"; \
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\"; \
+				echo \"  Current:  $(_p_ThisMakefile)\"; \
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(_SelfCoEvScSource)),\$$(word 2,$(_SelfCoEvScSource)),\$$(word 3,$(_SelfCoEvScSource)),\$$(word 4,$(_SelfCoEvScSource)))\"; \
+				echo \"  Both to local dir: \$$(dir $(_p_SelfCoEvCheckTime))\"; \
+				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_p_SelfCoEvCheckTime)))\"; \
+				) 1>&2 )" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "    endif # NOT PrevCmdSuccess" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "  endif # $(_p_SelfCoEvCheckTime) not older than bulid start" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo "" >> $(_p_mk_DoCheckout_shsubst) ;\
+		done
+	@echo "sc_checkout_all: \\" >> $(_p_mk_DoCheckout_shsubst)
+	@for OneMod in $(gmu_uv_list_CVS_MODULES) $(gmu_uv_list_SVN_MODULES); do echo -e "\t\t$(_p_SelfCoEvCheckTime) \\" >> $(_p_mk_DoCheckout_shsubst); done
+	$(call _DoVerbose2,@echo ">>>>>>>> Launching intermediate-make doing source checkout [ $(gmu_G_Deco_PrjName) ].")
+#
+	@$(MAKE) sc_checkout_all -f $(_p_mk_DoCheckout) --no-print-directory --silent
+#
+	$(call _DoVerbose2,@echo "<<<<<<<< Finished intermediate-make doing source checkout [ $(gmu_G_Deco_PrjName) ].")
+	@echo -n "" > $@ # touch it
+
+# Note above: In the generated _DoCheckout.gmu.mk, we must execute `cd ... ; $(gmu_CVS_EXE) ...' 
+#in a sub-shell, so that the `cd' command takes effect on the follow cvs command.
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
+endif # ifneq (,$(strip $(gmu_uv_list_CVS_MODULES)$(gmu_uv_list_SVN_MODULES)))
+endif # <<< ifeq ($(_WantScCheckout),1)
+
+
+###############################################################################
+############## General stuff related to making sub-projects. ##################
+ifeq (,$(gmu_IGNORE_SUBPRJS))
+ifneq (,$(strip $(gmu_uv_list_ALL_SUBPRJ)))
+ifeq (,$(_isNowGmuGetPrjAttr)) # for these goals, don't care for sub-prjs
+###############################################################################
+
+
+###############################################################################
+# Generate the makefile(`_p_mk_MakeSubPrjs') for use with making all sub-prjs.
+###############################################################################
+
+_p_mki_SubprjAttr = $(gmu_Gd_PRJ_GMUTMP)/_SubprjsAttr.gmu.mki
+_p_SubprjsAttrMade = $(gmu_Gd_PRJ_GMUTMP)/_SubprjsAttrMade.gmu.ckt
+
+_p_mk_MakeSubPrjs = $(gmu_Gd_PRJ_GMUTMP)/_MakeSubPrjs.gmu.mk
+_p_SubprjsMade = $(gmu_Gd_PRJ_GMUTMP)/_SubprjsMade.gmu.ckt
+
+#_p_SubprjLoopDetect = $(gmu_Gd_PRJ_GMUTMP)/_SubprjLoopDetect.gmu.txt
+	# [2006-11-03] Subprj dependency loop detection
+
+SubprjEvPrjRefname = \$$($${SubPrj}_PrjRefname)#appears in shell executed command: echo ...
+SubprjEvPrjname = \$$($${SubPrj}_Prjname)#appears in shell executed command: echo ...
+SubprjEvOutdir = \$$($${SubPrj}_Outdir)
+SubprjEvOutdirGMUTMP = \$$($${SubPrj}_Outdir)/_gmu_tmp
+SubprjEvFilename = \$$($${SubPrj}_Filename)
+SubprjEvOutpath = $(SubprjEvOutdir)/$(SubprjEvFilename)
+SubprjEvCheckTime = $(SubprjEvOutdirGMUTMP)/_ThisPrjBuiltByParent.gmu.ckt
+SubprjEvCktShortForm = \$$($${SubPrj}_p_SpBuildCkt)# Sp means sub-project
+SubprjEvHisMakefileAttr = $(SubprjEvOutdirGMUTMP)/_HisMakefile.gmu.Attr
+SubprjEvFnCheckInProgress = $(SubprjEvOutdirGMUTMP)/_ThisPrjBuildInProgress.gmu.txt
+SubprjEvIsLooped = \$$($${SubPrj}_IsLooped)
+SubprjEv_ThisPrjAttr = $(SubprjEvOutdirGMUTMP)/_ThisPrjAttr.gmu.txt
+
+SubprjEvMakefile = \$$($${SubPrj}_Makefile)
+SubprjEvMakeVarDefines = \$$($${SubPrj}_MakeVarDefines)
+SubprjEvIsForcePostProc = \$$($${SubPrj}_IsForcePostProc)
+SubprjEvIsPurePostProc = \$$($${SubPrj}_IsPurePostProc)
+SubprjEvIsConfirmPostProc = \$$($${SubPrj}_IsConfirmPostProc)
+SubprjEvAttr = \$$($${SubPrj}_PrjAttr)
+
+SubprjEvCvsRoot = \$$($${SubPrj}_cvsRoot_forMakefiles)
+SubprjEvCvsModuleDir = \$$($${SubPrj}_cvsModuleDir_forMakefiles)
+SubprjEvCvsLocalDir = \$$($${SubPrj}_cvsLocalDir_forMakefiles)
+SubprjEvCvsTag = \$$($${SubPrj}_cvsTag_forMakefiles)
+
+SubprjEvSvnUrl = \$$($${SubPrj}_svnUrl_forMakefiles)
+SubprjEvSvnLocalDir = \$$($${SubPrj}_svnLocalDir_forMakefiles)
+SubprjEvSvnRev = \$$($${SubPrj}_svnRev_forMakefiles)
+
+SubprjEvSCCMD = \$$($${SubPrj}_SCCMD)
+SubprjEvScSource = \$$(strip \$$($${SubPrj}_ScSource))
+
+_SubprjEvCheckoutTagOpt = $(if $(gmu_SC_CHECKOUT_DATETIME),-D \"$(gmu_SC_CHECKOUT_DATETIME)\",-r $(SubprjEvCvsTag))
+_SubprjEvCheckoutRevOpt = -r $(if $(gmu_SC_CHECKOUT_DATETIME),\"{$(gmu_SC_CHECKOUT_DATETIME)}\",$(SubprjEvSvnRev))
+
+_SubprjEvScCheckTime = \$$(_p_$${SubPrj}_ScCheckTime)
+
+_p_SubprjsWrapperMkDone = $(gmu_Gd_PRJ_GMUTMP)/_SubprjsWrapperMkDone.gmu.ckt
+
+_SubprjCvsCoShcmdEvEcho1 = \$$(gmu_CVS_EXE) -q -d $(SubprjEvCvsRoot) $(_checkout_or_export) \
+	$(call _TrShcmd4echo,$(gmu_CVS_CHECKOUT_OPT)) $(_SubprjEvCheckoutTagOpt) $(SubprjEvCvsModuleDir)
+_SubprjSvnCoShcmdEvEcho1 = \$$(gmu_SVN_EXE) $(_checkout_or_export) $(_svn--force) \
+	$(call _TrShcmd4echo,$(gmu_SVN_CHECKOUT_OPT)) $(SubprjEvSvnUrl)$(_SvnAppendPegDateTime) . $(_SubprjEvCheckoutRevOpt)
+_SubprjCoShcmdEvEcho = \$$($${SubPrj}_CoShcmd)
+
+_p_mk_MakeSubPrjs_shsubst = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$${gmu_ud_OUTPUT_ROOT}/%,$(_p_mk_MakeSubPrjs))
+
+_SubprjEv_pAttrCache = \$$(_d_ParentPrjoutput)/SubprjAttrCache.refname.$${SubPrj}
+
+
+ifeq (,$(gmu_NO_MAKE_SUBPRJS))
+
+include $(_p_SubprjsMade)
+
+$(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
+	@$(call _MkdirIfNotExist,$(dir $(_p_mk_MakeSubPrjs)))
+	@$(call _ClearFile,$(_p_mk_MakeSubPrjs))
+	@echo -e "_SubprjMakeCmdGoals = $(_SubprjMakeCmdGoals)\n" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo -e "include $(_p_mki_SubprjAttr)\n" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@for SubPrj in $(gmu_uv_list_ALL_SUBPRJ); do \
+		echo "#######################################################################" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+	echo  -e "ifdef _isInCheckoutPhase # {$${SubPrj}}\n" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo "$${SubPrj}_CoShcmd = \$$(if \$$(call _IsStringEqual,CVS,$(SubprjEvSCCMD)),$(_SubprjCvsCoShcmdEvEcho1),$(_SubprjSvnCoShcmdEvEcho1))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo "include $(_SubprjEvScCheckTime) # This make-var was generated in _SubprjAttrs.gmu.mki" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo "$(_SubprjEvScCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t@echo \"------------------------ checkout subprj's makefiles -------------------------\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+\
+		echo  "ifeq (CVS,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t@echo \"CVS Checking out makefiles for {$(SubprjEvPrjRefname)} ...\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using tag: $(SubprjEvCvsTag))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  CVSROOT = $(SubprjEvCvsRoot)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  ModuleDir = $(SubprjEvCvsModuleDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  LocalDir = $(SubprjEvCvsLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo ------------------------------------------------------------------------------" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t\$$(if \$$(wildcard $(SubprjEvCvsLocalDir)),,\$$(_MD) $(SubprjEvCvsLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\tcd $(SubprjEvCvsLocalDir);\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvCvsLocalDir)' for doing cvs-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
+		echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: cvs-checkout fail.; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@\$$(call _AppendLogCountCompile,V)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo  "endif # ifeq (CVS,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+\
+		echo  "ifeq (SVN,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t@echo \"SVN Checking out makefiles for {$(SubprjEvPrjRefname)} ...\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SubprjEvSvnRev))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  From = $(SubprjEvSvnUrl)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  To   = $(SubprjEvSvnLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(_MD) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\tcd $(SubprjEvSvnLocalDir) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvSvnLocalDir)' for doing svn-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\techo \"    => \`pwd\`\";\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\techo ------------------------------------------------------------------------------;\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
+		echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: svn-checkout fail.; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@\$$(call _AppendLogCountCompile,S)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo  "endif # ifeq (SVN,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+\
+		echo -e "\t@echo '$(SubprjEvScSource)' > \$$@ # touch it and write SC-source to it." >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo -e "\t@echo '\$$(_p_ParentMakefile)' > \$$($${SubPrj}_ScByMakefile) \n" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo  "  ifneq (\$$(call _IsP1OlderThanP2,$(_SubprjEvScCheckTime),\$$(gmu_p_BuildStartCkt)),1) #if it has been updated since build start" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "    _temp := \$$(shell \
+			if [ \"$(SubprjEvScSource)\" = \"\$$\$$(cat $(_SubprjEvScCheckTime))\" ]; \
+				then echo PrevCmdSuccess; \
+			else echo \"\$$\$$(cat \$$($${SubPrj}_ScByMakefile))\"; fi; )\
+			    " >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "    ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "      _mkvPrevSc:=\$$(shell \
+				cat $(_SubprjEvScCheckTime) )" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "      _temp2 :=   \$$(shell ( \
+				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\"; \
+				echo \"  Previous: \$$(_temp)\"; \
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\"; \
+				echo \"  Current : \$$(_p_ParentMakefile)\"; \
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(SubprjEvScSource)),\$$(word 2,$(SubprjEvScSource)),\$$(word 3,$(SubprjEvScSource)),\$$(word 4,$(SubprjEvScSource)))\"; \
+				echo \"  Both to local dir: \$$(dir $(_SubprjEvScCheckTime))\"; \
+				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_SubprjEvScCheckTime)))\"; \
+				) 1>&2 )" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "    endif # NOT PrevCmdSuccess" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "  endif # $(_SubprjEvScCheckTime) older than build start" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+\
+	echo  -e "\nelse # ifdef _isInCheckoutPhase {$${SubPrj}} /else\n" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+\
+		echo "$${SubPrj}_IsConfirmPostProc = \$$(if \$$(call _IsOlderThanBuildStart,$(SubprjEvCktShortForm))\$$(call gmuf_Not,$(SubprjEvIsForcePostProc)),,1)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo "$(SubprjEvCktShortForm): \$$(if $(SubprjEvIsConfirmPostProc),gmu_ut_Always,\$$(gmu_p_BuildStartCkt))" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  Now, BuildLevel [$(MAKELEVEL)]. \$$(if $(SubprjEvIsConfirmPostProc),Processing,Making) sub-project: $(SubprjEvPrjname)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		$(call _DoVerbose1,echo -e "\t@echo \"  CurDir: \$$(CURDIR)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose1,echo -e "\t@echo \"  Makefile: $(SubprjEvMakefile)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\tcd \$$(dir $(SubprjEvMakefile)) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!Unexpected: Cannot cd to the dir referred.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		$(call _DoVerbose1,echo -e "\techo \"       => \`pwd\`/\$$(notdir $(SubprjEvMakefile))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		echo -e "\t)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  Expected Output: \$$(if \$$(findstring _gmu_NoOutput,$(SubprjEvFilename)),(none),\$$(call _StripOutputRootPrefix,$(SubprjEvOutpath)))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		$(call _DoVerbose1,echo -e "\t@echo \"  MakeVarDefs: \$$(call _TrShcmd4echo,$(SubprjEvMakeVarDefines))\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		$(call _DoVerbose2,echo -e "\t@echo \">>>>> Intermediate-make to build [ $(SubprjEvPrjname) ] starting... ( from autogen-ed makefile: $(call _StripOutputRootPrefix,$(_p_mk_MakeSubPrjs)) ) \"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		echo -e "\t@ \$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} \$$(_SubprjMakeCmdGoals) -C \$$(dir $(SubprjEvMakefile)) \$$(if $(SubprjEvIsConfirmPostProc),_gmu_cmdopt_NowPostProc=1) -f \$$(notdir $(SubprjEvMakefile))" \
+			>> $(_p_mk_MakeSubPrjs_shsubst); \
+		$(call _DoVerbose2,echo -e "\t@echo \"<<<<< Intermediate-make for sub-project [ $(SubprjEvPrjname) ] returned.\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose2,echo -e "\t@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose1,echo -e "\t@echo ^^^^^^^^^^BuildLevel[$(MAKELEVEL)] Done Sub-project[ $(SubprjEvPrjname) ]^^^^^^^^^^" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose2,echo -e "\t@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		echo -e "\t@\$$(call _MkdirIfNotExist,\$$(@D)) # If just gmu_ut_checkout, you need this." >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo -n '' > \$$@ # touch it" >> $(_p_mk_MakeSubPrjs_shsubst); \
+	echo  -e "\nendif # ifdef _isInCheckoutPhase {$${SubPrj}} /else\n" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		done
+	@echo "ifdef _isInCheckoutPhase" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo "include \$$(_p_AllSubprjsMakefilesCheckoutDone)" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo "\$$(_p_AllSubprjsMakefilesCheckoutDone): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo -e "\t@echo -n '' > \$$@ # touch it to make it newer than \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo "endif # ifdef _isInCheckoutPhase" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo "$(_p_SubprjsWrapperMkDone): \\" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@for SubPrj in $(gmu_uv_list_ALL_SUBPRJ); do echo -e "\t\t\$$(if $(SubprjEvIsLooped),,$(SubprjEvCktShortForm)) \\" >> $(_p_mk_MakeSubPrjs_shsubst); done
+	@echo -e "\n\t@echo -n '' > \$$@ # touch it" >> $(_p_mk_MakeSubPrjs_shsubst) \
+		# The above three lines write `$(gmu_Gd_PRJ_GMUTMP)/_SubprjsWrapperMkDone.gmu.ckt: Subprj1output Subprj2output ...' to the Makefile file.
+	@echo ".PHONY: gmu_ut_Always" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo "gmu_ut_Always: ;" >> $(_p_mk_MakeSubPrjs_shsubst)
+	$(call _DoVerbose2,@echo ">>>>>>>>>> [ $(gmu_G_Deco_PrjName) ] Launching intermediate-make to build list of sub-prjs:")
+	$(call _DoVerbose2,@echo "    > Autogen-ed intermediate-makefile: $(call _StripOutputRootPrefix,$(_p_mk_MakeSubPrjs)) .")
+#
+	@${MAKE} $(_p_SubprjsWrapperMkDone) -f $(_p_mk_MakeSubPrjs) $(if $(call _IsVerboseLevel2),,--no-print-directory)
+#
+	$(call _DoVerbose2,@echo "<<<<<<<<<< [ $(gmu_G_Deco_PrjName) ] Finished intermediate-make.")
+	$(call _DoVerbose1,@echo "~~~~~~~~~~ Return to parent project [ $(gmu_G_Deco_PrjName) ] ~~~~~~~~~~")
+	@echo -n "" > $(_p_SubprjsMade) # touch it
+
+# [2008-08-04] NOTE the use of double-colon rule here, so that $(gmu_u_SHOW_PROGRESS_CMD)
+# is expaneded only after the prior $(_p_SubprjsMade):: commands are all done.
+$(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
+	@$(gmu_u_SHOW_PROGRESS_CMD)
+
+endif # ifeq (,$(gmu_NO_MAKE_SUBPRJS))
+
+###############################################################################
+# Generate the mki file which contains var-defines for use with all sub-prjs,
+# and this mki generated will be include by GnumakeUniproc.mki as well as
+# by _MakeSubPrjs.gmu.mk .
+###############################################################################
+
+_CheckSccmdForSubprj = $(if $($1_cvsRoot_forMakefiles),CVS,$(if $($1_svnUrl_forMakefiles),SVN,!Sccmd-Unspecified!))
+	# $1: Subprj name
+	#Returns:
+	#	`CVS' if $1_cvsRoot_forMakefiles is not NULL
+	#	`SVN' if $1_svnUrl_forMakefiles is not NULL.
+	#	An invalid value(!Sccmd-Unspecified!) is used if both of the above two is NULL.
+
+ifeq ($(call _IsOlderThanBuildStart,$(_p_SubprjsAttrMade)),1) # (avoid including stale attributes from previous build)
+  include $(_p_SubprjsAttrMade)
+else
+  include $(_p_mki_SubprjAttr)
+endif
+
+_p_mki_SubprjAttr_shsubst = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$${gmu_ud_OUTPUT_ROOT}/%,$(_p_mki_SubprjAttr))
+
+$(_p_SubprjsAttrMade): $(gmu_p_BuildStartCkt)
+	@$(call _MkdirIfNotExist,$(dir $(_p_mki_SubprjAttr)))
+	@$(call _ClearFile,$(_p_mki_SubprjAttr))
+	@echo "include \$$(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "_p_ParentMakefile = $(_p_ThisMakefile)" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "_p_AllSubprjsMakefilesCheckoutDone = $(gmu_Gd_PRJ_GMUTMP)/_AllSubprjsMakefilesCheckoutDone.gmu.ckt" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "_WantScCheckout = $(_WantScCheckout)" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "ifneq (,$(_WantScCheckout))" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "  ifeq (\$$(call _IsP1OlderThanP2,\$$(_p_AllSubprjsMakefilesCheckoutDone),\$$(gmu_p_BuildStartCkt)),1)" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "    _isInCheckoutPhase = 1" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "  endif" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "endif" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "_d_ParentPrjoutput = $(gmu_Gd_PRJ_GMUTMP)" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo -e "\n$(call _TrShcmd4echo,$(foreach SubPrj,$(gmu_uv_list_ALL_SUBPRJ),\n\
+$(SubPrj)_Makefile = $($(SubPrj)_Makefile)\n\
+$(SubPrj)_MakeVarDefines = $($(SubPrj)_MakeVarDefines)\n\
+$(SubPrj)_IsForcePostProc = $($(SubPrj)_IsForcePostProc)\n\
+$(SubPrj)_IsPurePostProc = $($(SubPrj)_IsPurePostProc)\n\
+$(SubPrj)_cvsRoot_forMakefiles = $($(SubPrj)_cvsRoot_forMakefiles)\n\
+$(SubPrj)_cvsModuleDir_forMakefiles = $($(SubPrj)_cvsModuleDir_forMakefiles)\n\
+$(SubPrj)_cvsTag_forMakefiles = $(if $($(SubPrj)_cvsTag_forMakefiles),$($(SubPrj)_cvsTag_forMakefiles),HEAD)\n\
+$(SubPrj)_cvsLocalDir_forMakefiles = $($(SubPrj)_cvsLocalDir_forMakefiles)\n\
+$(SubPrj)_svnUrl_forMakefiles = $($(SubPrj)_svnUrl_forMakefiles)\n\
+$(SubPrj)_svnLocalDir_forMakefiles = $($(SubPrj)_svnLocalDir_forMakefiles)\n\
+$(SubPrj)_svnRev_forMakefiles = $(if $($(SubPrj)_svnRev_forMakefiles),$($(SubPrj)_svnRev_forMakefiles),HEAD)\n\
+$(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
+))\n" >> $(_p_mki_SubprjAttr_shsubst)
+	@for SubPrj in $(gmu_uv_list_ALL_SUBPRJ); do \
+		echo "#################### {$${SubPrj}} start ####################" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_PrjRefname = $${SubPrj}" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "_p_AttrOutput_$${SubPrj} = $(_d_OUTPUT_ROOT_GMUTMP)/$(SubprjEvPrjRefname).refname.gmu.Attr" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Prjname = \$$(word 1,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Prjname = \$$(word 2,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Outdir = \$$(gmu_ud_OUTPUT_ROOT)/$(SubprjEvPrjname)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_OutdirGMUTMP = \$$(gmu_ud_OUTPUT_ROOT)/$(SubprjEvPrjname)/_gmu_tmp" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Filename = \$$(word 3,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Outpath = $(SubprjEvOutpath)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_UserOutputAfterLink = \$$(if \$$(call _IsStringEqual,\$$(word 4,$(SubprjEvAttr)),$(_NullUser1stTarget)),,\$$(word 3,$(SubprjEvAttr)))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_p_SpBuildCkt = $(SubprjEvCheckTime)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "ifeq (,$(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  \$$(error !GMU!Error: Make-var \`$${SubPrj}_Makefile' is not defined for sub-project: {$${SubPrj}} )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+\
+		echo "ifeq (CVS,$(SubprjEvSCCMD))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  _tmp := \$$(if \$$($${SubPrj}_cvsLocalDir_forMakefiles),,\$$(error !GMU!Error: You request to do CVS checkout for subprj(refname: $${SubPrj}), but $${SubPrj}_cvsLocalDir_forMakefiles is not defined))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  _p_$${SubPrj}_ScCheckTime = $(SubprjEvCvsLocalDir)/$(SubprjEvCvsModuleDir)/$(_f_ScCheckTime)# This make-var will be used by _MakeSubPrjs.gmu.mk" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  $${SubPrj}_ScSource = \$$(_GmuSharp)CVS $(SubprjEvCvsRoot) $(SubprjEvCvsModuleDir) $(SubprjEvCvsTag)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "ifeq (SVN,$(SubprjEvSCCMD))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  _tmp := \$$(if \$$($${SubPrj}_svnLocalDir_forMakefiles),,\$$(error !GMU!Error: You request to do SVN checkout for subprj(refname: $${SubPrj}), but $${SubPrj}_svnLocalDir_forMakefiles is not defined))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  _p_$${SubPrj}_ScCheckTime = $(SubprjEvSvnLocalDir)/$(_f_ScCheckTime)# This make-var will be used by _MakeSubPrjs.gmu.mk" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  $${SubPrj}_ScSource = \$$(_GmuSharp)SVN $(SubprjEvSvnUrl) $(SubprjEvSvnRev)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_ScByMakefile = \$$(dir $(_SubprjEvScCheckTime))$(_f_ScByMakefile)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+\
+		echo "ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (,\$$(wildcard $(SubprjEvMakefile)))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    \$$(error !GMU!Error: Your makefile \"$(SubprjEvMakefile)\" does not exist yet for sub-project {$${SubPrj}} )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)),1)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Query-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+		echo "    _gmu_FetchSubprjAttr := \$$(shell \
+			\$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} _gmu_ut_GetPrjAttr -C \$$(dir $(SubprjEvMakefile)) -f \$$(notdir $(SubprjEvMakefile)) \
+			_p_PrjAttrOutput=\$$(_p_AttrOutput_$${SubPrj}) --no-print-directory \
+			\$$(if \$$(call _IsStringEqual,\$${MAKELEVEL},0),\$$(_tmp_MakeOpts),) 1>&2 \
+			&& echo PrevCmdSuccess ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    ifneq (\$$(strip \$$(_gmu_FetchSubprjAttr)),PrevCmdSuccess)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "      \$$(error !GMU!Error: Your makefile \"$(SubprjEvMakefile)\" does not behave correctly for target \`_gmu_ut_GetPrjAttr')" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    $${SubPrj}_PrjAttr := \$$(shell cat \$$(_p_AttrOutput_$${SubPrj}) )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _temp := \$$(shell echo \$$($${SubPrj}_PrjAttr) > $(_SubprjEv_pAttrCache))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  else" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Retrieving cached PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+		echo "    $${SubPrj}_PrjAttr := \$$(shell cat $(_SubprjEv_pAttrCache) )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifneq (\$$(words $(SubprjEvAttr)),4)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    \$$(error !GMU!Error: Your makefile \"$(SubprjEvMakefile)\" does not correctly implement target \`_gmu_ut_GetPrjAttr'. (The unexpected make return is: $(SubprjEvAttr) ))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		$(call _DoVerbose2,echo "  _info := \$$(call gmuf_OutputInfo,         Result: prjname: $(SubprjEvPrjname) (,) Link-output: $(SubprjEvFilename))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+\
+		echo "  _temp := \$$(shell \
+			_tmp_mkf=\$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile)); \
+			_tmp_atf=$(SubprjEvHisMakefileAttr); \
+			if [ ! -f \$$\$$_tmp_atf ] || [ \$$\$$_tmp_atf -ot $(gmu_p_BuildStartCkt) ]; \
+				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(_MD) $(SubprjEvOutdirGMUTMP);fi; (echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf); echo PrevCmdSuccess; \
+			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] $(if $(gmu_IS_USING_POOR_SH_EXE),,|| [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]); \
+				then echo PrevCmdSuccess; \
+			else echo \"\`cat \$$\$$_tmp_atf\`\"; \
+			fi ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _temp2 := \$$(shell ( \
+				echo \"!GMU!Error: The following two Makefiles share the same GMU-project-name [ $(SubprjEvPrjname) ]:\"; \
+				echo \"  Existed: \$$(_temp)\"; \
+				echo \"  ToMake : \$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile))\"; \
+				echo \"  CurDir = $(CURDIR)\"; \
+			    ) 1>&2 ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  _LoopAgainst := \$$(shell _tmp_ckf=$(SubprjEvFnCheckInProgress); \
+			if [ -f \$$\$$_tmp_ckf ] && [ ! \$$\$$_tmp_ckf -ot \$$\$$gmu_p_BuildStartCkt ]; \
+				then cat \"$(SubprjEv_ThisPrjAttr)\" ; \
+			fi ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifneq (\$$(strip \$$(_LoopAgainst)),)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    $${SubPrj}_IsLooped = 1" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (\$$(notdir \$$(_p_ThisMakefile)),_MakeSubPrjs.gmu.mk) # if not this check, the same info will output twice" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp := \$$(shell ( echo \"!GMU!Info: A sub-project with refname {$${SubPrj}} loop against ancestor project[ $(SubprjEvPrjname) ], whose makefile is:\"; \
+				echo \"    $(SubprjEvMakefile)\"; echo '  i.e.' ;\
+				echo \"    \`cat $(SubprjEvHisMakefileAttr)\`\"; \
+				echo "" ) 1>&2 )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "endif # ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo -e "#################### {$${SubPrj}} end ####################\n" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		done
+	@echo -n "" > $(_p_SubprjsAttrMade) # touch it
+
+
+_NowCheckIsSubprjsDone = $(if $(call _IsOlderThanBuildStart_direct_sh,$(_p_SubprjsMade)),,1)
+
+#	[2006-12-13] Here, we create a var to indicate whether subprj-making are done.
+# If subprj-making has not been done, quite a few make code can be set aside, 
+# thus improve run-speed a bit.
+#	A situation encountered today makes me realize this: 
+#	$(gmu_Gp_LINK_OUTPUT) depends on $(gmu_Gp_list_SUBPRJ_TO_LINK), and 
+# $(gmu_Gp_list_SUBPRJ_TO_LINK) now contains contents from subprj's _AutoLinkListForParent.gmu.txt.
+# If subprjs have not been built, their _AutoLinkListForParent.gmu.txt would not
+# exist, which causes $(gmu_Gp_list_SUBPRJ_TO_LINK)'s expansion to refer to non-existed files.
+#
+# [[condition 1 to set _SubprjUndoneYet=1: if making subprjs desired and all those subprjs have not been made]]
+ifeq (,$(gmu_NO_MAKE_SUBPRJS))
+ifeq ($(call _IsOlderThanBuildStart,$(_p_SubprjsMade)),1)
+  _SubprjUndoneYet = 1
+endif
+endif
+# or [[condition 2 to set _SubprjUndoneYet=1: if making subprjs NOT desired and subprjs' attributes have not been retrieved]]
+ifneq (,$(gmu_NO_MAKE_SUBPRJS))
+ifeq ($(call _IsOlderThanBuildStart,$(_p_SubprjsAttrMade)),1)
+  _SubprjUndoneYet = 1
+endif
+endif
+
+
+_uv_SubprjList_GetOutname = $(foreach v,$1,$($v_Filename))
+_uv_SubprjList_GetOutpath = $(foreach v,$1,$($v_Outpath))
+#_uv_SubprjList_GetOutdirGMUTMP = $(foreach v,$1,$($v_Outdir)/_gmu_tmp)
+_uv_SubprjList_GetPrjname = $(foreach v,$1,$($v_Prjname))
+
+_Gf_list_SubprjOutput = $(call _uv_SubprjList_GetOutname,$(gmu_uv_list_ALL_SUBPRJ))
+_Gp_list_SubprjOutput = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_ALL_SUBPRJ))
+
+gmuf_GetSubprjUpjnameByRefname = $(_uv_SubprjList_GetPrjname)
+gmuf_GetSubprjPrjnameByRefname = $(_uv_SubprjList_GetPrjname)
+gmuf_GetSubprjOutputNameByRefname = $(_uv_SubprjList_GetOutname)
+gmuf_GetSubprjOutputPathByRefname = $(_uv_SubprjList_GetOutpath)
+gmuf_GetSubprjUserOutputByRefname = $(foreach v,$1,$($v_UserOutputAfterLink))
+
+gmuf_GetAllSubprjName = $(call _uv_SubprjList_GetPrjname,$(gmu_uv_list_ALL_SUBPRJ))
+gmuf_GetAllSubprjOutputImagePath = $(_Gp_list_SubprjOutput)
+	# [2007-01-16] added when writing PI_windll_from_lib
+	# [2007-03-10] Should not use gmuf_GetAllSubprjOutputImagePath in PI_windll_from_lib, 
+	# since it includes those non-to-link subprjs, use $(gmu_Gp_list_SUBPRJ_TO_LINK) instead.
+
+gmuf_GetAllSubprjNameForLink = $(call _uv_SubprjList_GetPrjname,$(_gmu_uv_list_AllSubprjsForLink))
+	# [2007-03-10] Use gmuf_GetAllSubprjNameForLink instead of gmuf_GetAllSubprjName in plugin PI_windll_from_lib.
+
+
+ifeq (1,$(_isMakeTarget_LinkImage))
+
+  # _GetLinkagePaths function: (can be recursively called)
+  # $1 is an item. 
+  # * If it starts with !LINKREF: , it is link-reference to a project(linkref) the link process requires.
+  # * Otherwise, it is a full path of a LIB/DLL that should be linked.
+  define _GetLinkagePaths
+    tmpfile := $(patsubst !LINKREF:%,%,$1)
+    ifeq ($1,$$(tmpfile))
+      # $1 is a LIB/DLL filename(with full path) to link.
+      _ret := $1
+    else
+      # $1 is a prjref .
+      _linkref := $$(tmpfile)
+      ifeq (,$$(findstring $$(_linkref),$$(_PrjRefDoing)))# This check avoids prjref recursive
+        _PrjRefDoing += $$(_linkref)
+        _DeeperLinkageList := $$(call _GetFileContent_sh,$$(call gmuf_GetPrjTmpDir,$$(_linkref))/$$(_f_AutoLinkListForParent))
+        _ret := $$(foreach v,$$(_DeeperLinkageList),$$(addprefix @@,$$(eval $$(call _GetLinkagePaths,$$v))$$(_ret)))
+          # This is recursive call into _GetLinkagePaths .
+      else
+        # Link-file loop detected, return null to caller.
+        _ret := # This is must, otherwise $(_ret) from previous call level will be returned to caller
+      endif
+    endif
+  endef
+
+  define Start_GetLinkagePaths
+    # $1 is a prjname
+    _PrjRefDoing :=
+    tmp := $$(eval $$(call _GetLinkagePaths,!LINKREF:$1))
+  endef
+
+  _Gp_list_AutoLFC_indent_debug = $(foreach v,$(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL),\
+	$(eval $(call Start_GetLinkagePaths,$($v_Prjname)))$(_ret)\
+	) # _Gp_list_AutoLFC_indent_debug has indents marked by @@s, it can aid your debugging.
+  _Gp_list_AutoLinkFromChildren = $(subst @@, ,$(_Gp_list_AutoLFC_indent_debug))
+	# [2006-12-13]What if some prj in $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL) does not output $(_f_AutoLinkListForParent)
+	#I hope user can ensure that will not happen.
+
+endif
+
+###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
+endif # ifeq (,$(call _FindStrings,$(MAKECMDGOALS),...))
+endif # ifneq (,$(strip $(gmu_uv_list_ALL_SUBPRJ)))
+endif # ifeq (,$(gmu_IGNORE_SUBPRJS))
+###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
+
+_f_AutoLinkListForParent = _AutoLinkListForParent.gmu.txt
+_p_AutoLinkListForParent = $(gmu_Gd_PRJ_GMUTMP)/$(_f_AutoLinkListForParent)
+	# [2006-12-14] These two must not be place inside `ifneq (,$(gmu_uv_list_ALL_SUBPRJ))',
+	#because a leave project(project without any subprj) should have these defined!
+
+##################### For link process ##########################
+
+ifneq ($(_SubprjUndoneYet),1) # if subprjs have been built
+
+# TODO: This can be protected by `ifndef _isInCheckoutPhase'//[2006-11-02] ???
+
+gmu_Gp_list_SUBPRJ_TO_LINK = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
+	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s),$(_Gp_list_AutoLinkFromChildren))
+	# libs to link by EXE/DLL project
+
+$(gmu_Gp_LINK_OUTPUT): $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_Gp_list_SUBPRJ_TO_LINK)
+ifdef gmu_DO_SHOW_LINK_CMD
+	$(_DO_LINK_CMD)
+else
+	@$(_DO_LINK_CMD)
+endif
+
+gmu_Gp_LINK_OUTPUT_ckt = $(gmu_Gd_PRJ_GMUTMP)/_LinkOutputDone.gmu.ckt
+
+#[2006-11-02] GnumakeUniproc user now should depend on $(gmu_Gp_LINK_OUTPUT_ckt) for generating link-output.
+$(gmu_Gp_LINK_OUTPUT_ckt): $(gmu_Gp_LINK_OUTPUT)
+#[2006-12-12] Write auto-link list for parent, but only if this project is a link-component.
+ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
+	@echo "$(_gmuBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" > $(_p_AutoLinkListForParent)
+	@$(if $(gmu_u_EXTRA_LINK_MERGE_s),echo "$(_gmuBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE_s)" >> $(_p_AutoLinkListForParent))
+ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
+#	@echo "@@@@@@@@@@@@@@@@ $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
+	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),$($v_OutdirGMUTMP)/$(_f_AutoLinkListForParent)) >> $(_p_AutoLinkListForParent))
+	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $(_p_AutoLinkListForParent); ))
+endif
+endif
+#
+	@echo -n "" > $@ # touch it
+
+endif # ifneq ($(_SubprjUndoneYet),1)
+
+
+####################################
+
+.PHONY: _gmu_ut_GetPrjAttr
+_gmu_ut_GetPrjAttr: gmu_ut_Always
+#	@echo "[[[[[[ $(CURDIR) , $(MAKECMDGOALS) , $(MAKEFLAGS) , <<$(_p_PrjAttrOutput)>> ]]]]]]"
+	@$(call _MkdirIfNotExist,$(dir $(_p_PrjAttrOutput))) # `_p_PrjAttrOutput' is passed in from command-line
+	@echo -e "$(_gmu_strPrjAttr_LF)" > $(_p_PrjAttrOutput)
+
+
+_GetSccmdFailureCount = $(strip $(shell gmuCountChar $(_Gp_CountSccmdFailure) f ))
+ifeq ($(MAKELEVEL),0)
+define _ShowScWorkInModuleResult
+	echo "Source-control work-in-module failure count: $(_GetSccmdFailureCount)"
+	$(if $(call _IsStringEqual,$(_GetSccmdFailureCount),0),,echo "See $(patsubst $(CURDIR)/%,./%,$(_Gp_ScWorkInModuleOutput)) for CVS output.")
+endef
+endif
+
+define _WorkInModule_echo_done
+	echo $(if $(call _IsStringEqual,${MAKELEVEL},0),"DONE: $@","")
+endef
+
+.PHONY: gmu_ut_update
+gmu_ut_update:
+	@$(_WorkInModule_echo_done)
+	@$(_ShowScWorkInModuleResult)
+
+.PHONY: gmu_ut_diff
+gmu_ut_diff:
+	@$(_WorkInModule_echo_done)
+	@$(_ShowScWorkInModuleResult)
+
+.PHONY: gmu_ut_commit
+gmu_ut_commit:
+	@$(_WorkInModule_echo_done)
+	@$(_ShowScWorkInModuleResult)
+
+
+.PHONY: _in_gmu_ut_checkout
+_in_gmu_ut_checkout:
+	@echo $(if $(call _IsStringEqual,${MAKELEVEL},0),"DONE: $@","") \
+		# Echo a empty string to avoid make's output: make[n]: Nothing to be done for `gmu_ut_checkout'. 
+
+.PHONY: gmu_ut_checkout
+gmu_ut_checkout: _in_gmu_ut_checkout __pattern1_inc_project_count
+	@$(_Gmp1SharedFinishingCmds)
+
+
+.PHONY: _in_gmu_ut_export
+_in_gmu_ut_export:
+	@echo $(if $(call _IsStringEqual,${MAKELEVEL},0),"DONE: $@","") \
+		# Echo a empty string to avoid make's output: make[n]: Nothing to be done for `gmu_ut_export'. 
+
+.PHONY: gmu_ut_export
+gmu_ut_export: _in_gmu_ut_export __pattern1_inc_project_count
+	@$(_Gmp1SharedFinishingCmds)
+
+
+.PHONY: gmu_ut_diagnose
+gmu_ut_diagnose:
+	@echo "******************************************************************************"
+	@echo "=====GnumakeUniproc diagnose for $(if $(gmu_PRJ_NAME),[$(gmu_PRJ_NAME)],[gmu_PRJ_NAME not defined])====="
+	@$(foreach v,$(gmu_u_DIAGNOSE_VARS),$(call _EchoVarValue2,$v);)
+	@$(foreach v,$(gmu_u_DIAGNOSE_VARS_LIST),$(call _ListVarValue,$v);)
+#	@$(call _EchoVarValue,gmu_ud_SRC_ROOT)
+#	@$(call _EchoVarValue,gmu_ud_OUTPUT_ROOT)
+#	@$(call _EchoVarValue,gmu_uf_LINK_OUTPUT)
+#	@$(call _EchoVarValue,gmu_Gp_LINK_OUTPUT)
+#	@$(call _ListVarValue,gmu_uv_list_SUBPRJ_TO_LINK)
+#	@$(call _ListVarValue,gmu_uv_list_ALL_SUBPRJ)
+#	@$(call _ListVarValue,gmu_Gp_list_SUBPRJ_TO_LINK)
+#	@$(call _EchoVarValue,gmu_G_Deco_PrjName)
+
+.PHONY: gmu_ut_Always
+gmu_ut_Always: ;
+
+# IMNOTE1 [2006-12-05]:
+# sh.exe from www.mame.net has such a bug:
+# if you execute command 
+#	echo "" > tdir; echo 2nd
+# and if the first echo fails(maybe due to tdir is a dir), you'll find that
+# the second echo will not be executed by sh.exe. To work around, nest the
+# first echo command in a subshell, that is,
+#	(echo "" > tdir); echo 2nd
+# BTW: if the first command is not echo(actually the `echo' in that situation
+# is sh.exe's internal command), that problem does not arise.
+

@@ -1,0 +1,16 @@
+
+
+ifneq (,$(gmp_DECO_PRJ_NAME))
+  gmu_DECO_SUFFIX_PRJ_NAME += $(if $(gmp_COMPILER_ID),_$(gmp_COMPILER_ID))
+
+  gmu_DECO_SUFFIX_PRJ_NAME += $(gmp_G_CompilerVerToDeco)
+endif
+
+ifneq (,$(gmp_DECO_COMPILER_ID_FOR_LINK_OUTPUT))
+  gmu_DECO_SUFFIX_LINK_OUTPUT += $(if $(gmp_COMPILER_ID),_$(gmp_COMPILER_ID))
+endif
+
+ifneq (,$(gmp_DECO_COMPILER_VER_FOR_LINK_OUTPUT))
+  gmu_DECO_SUFFIX_LINK_OUTPUT += $(gmp_G_CompilerVerToDeco)
+endif
+

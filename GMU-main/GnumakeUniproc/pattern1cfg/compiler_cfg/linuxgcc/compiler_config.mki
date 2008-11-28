@@ -1,0 +1,155 @@
+
+# See notes of the same-name file from "msvc/compiler_config.mki" 
+
+gmp_up_COMPILER_CFG_POSTCORE_TO_LOAD = $(call gmpf_GetCompilerCfgPostcorePath_std,postcore)
+
+include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_common.mki
+
+
+ifneq (,$(gmp_GCC_PREFIX))
+ifneq (,$(gmp_DECO_PRJ_NAME))
+  gmu_DECO_PREFIX_PRJ_NAME += $(gmp_GCC_PREFIX)
+    # 	NOTE: If a gcc user would like to build his app/lib crossly as well as 
+    # natively in the same gmu_ud_OUTPUT_ROOT, he should ensure gmp_DECO_PRJ_NAME 
+    # is defined, otherwise, the different builds(e.g. output from i386-linux-gcc 
+    # and arm-linux-gcc) will mix into the same project output dir.
+endif
+	#[2006-07-10] I'll not however prepend $(gmp_GCC_PREFIX) to output image name,
+	#which is always weird.
+endif
+
+#^^^^^^^^ name decoration ^^^^^^^^
+
+
+################################################################################
+
+#gmp_CFLAGS_MACRO_DEFS += $(patsubst %,-D%=__declspec\(dllexport\),$(gmp_u_list_DLL_EXPORT_SYM))
+#gmp_CFLAGS_MACRO_DEFS += $(patsubst %,-D%=__declspec\(dllimport\),$(gmp_u_list_DLL_IMPORT_SYM))
+
+#                                  ........ gmp_bc_UNICODE ........
+ifdef gmp_bc_UNICODE
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Unicode_defs)
+else # MBCS 
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Mbcs_defs)
+endif
+
+#^^^^^^^^ gmp_bc_UNICODE ^^^^^^^########........ gmp_bc_DEBUG .........
+
+ifdef gmp_bc_DEBUG
+  gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Debug_codegen)
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Debug_defs) 
+else # for so-called release-build
+  gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Release_codegen)
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Release_defs)
+endif
+
+#^^^^^^^ gmp_bc_DEBUG ^^^^^^^^^....... gmp_bc_IMAGE_TYPE ........
+
+
+ifdef gmp_bc_DEBUG
+  gmp_LINKFLAGS_preset += -g
+endif
+
+ifeq (,$(gmp_GCC_OLDVER_NO_FVISIBILITY))
+  gmp_CFLAGS_CODE_GEN_preset += -fvisibility=hidden
+  gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,-D"%=__attribute__((visibility(\"default\")))",$(gmp_u_list_DLL_EXPORT_SYM))
+	#[2007-12-14]Our strategy is: default to "-fvisibility=hidden"; for symbols to export,
+	#you should decorate them with __attribute__((visibility("default"))) explicitly.
+endif
+
+_LCP_CollectSoDir = $(addprefix -L ,$(dir $(filter %.so,$1)))
+_LCP_TearApartSoDir = $(patsubst $(gmp_prefix_LIB)%.$(gmp_extn_DLL),-l %,$(notdir $(filter %.so,$1)))
+_LCP_FilterOutSoNames = $(filter-out %.so,$1)
+	# [2007-02-21] LCP: link command patch
+	# These above three functions help convert link command
+	#	g++ -o testrw testrw.o ./gf/prjname/libIUartBasic.so
+	# into
+	#	g++ -L ./gf/prjname/ -o testrw testrw.o -l IUartBasic
+	# so that libIUartBasic.so will be searched in LD_LIBRARY_PATH when the EXE is run.
+_LCP_LinuxAllLinkOptions = $(call _LCP_CollectSoDir,$1) $2 $(call _LCP_FilterOutSoNames,$1) $(call _LCP_TearApartSoDir,$1)
+	# $1: link-component list(with all .so in it).
+	# $2: all other options
+
+# >>>>>>>>>>>>>> predefine some gmp_XXX commands 
+	# The gmp_LINKFLAGS_XXX here may be used by the plugin user, e.g. when writing precompiled-header generating plugin 
+
+####### DLL #######
+
+  define _gmp_LINK_CMD_DLL
+	@$(bcfShowLibrariesToLink)
+	$(gmu_exe_LINK) $(call _LCP_LinuxAllLinkOptions,$(gmp_ALL_TO_LINK),$(_gmp_LINKFLAGS_final) -o "$@")
+  endef
+
+####### EXE_CUI #######
+define _gmp_LINK_CMD_EXE
+	@$(bcfShowLibrariesToLink)
+	$(gmu_exe_LINK) $(call _LCP_LinuxAllLinkOptions,$(gmp_ALL_TO_LINK),$(_gmp_LINKFLAGS_final) -o "$@")
+endef
+
+
+# <<<<<<<<<<<<<< predefine some gmp_XXX commands 
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+  gmu_I_AM_A_LINK_COMPONENT = 1 #[2006-11-02]
+  gmu_IS_SUBPRJ_AUTO_LINK_MERGE = 1 #[2006-12-11]
+
+  gmp_CFLAGS_MACRO_DEFS_preset += -D_LIB
+
+  gmp_Gp_list_LIB_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  define gmu_u_LINK_CMD
+	@echo "$(gmp_ALL_TO_LINK_FOR_LIB)" > $(gmu_Gd_PRJ_GMUTMP)/_ObjsForThisLib.gmp.lst
+	$(gmu_exe_LIB) -crs "$@" $(gmp_ALL_TO_LINK_FOR_LIB)
+  endef
+
+else
+
+  # For all image types other than static library, add -L xxx link params for extra library path
+  gmp_LINKFLAGS_preset += $(addprefix -L ,$(gmp_ud_list_EXTRALIB))
+	#[2007-02-08] I use a space after -L, so that if gmp_ud_list_EXTRALIB contains a dir
+	#starting with ~ , the ~ will be expanded to be user's home-dir by shell.
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
+
+  gmu_I_AM_A_LINK_COMPONENT = 1
+
+  gmp_Gp_list_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_LINKFLAGS_preset += -shared -fpic
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
+
+else
+#ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE'
+ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
+
+  gmp_Gp_list_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE)
+
+endif # EXE/EXE_CUI
+endif # DLL
+endif # LIB
+
+#^^^^^^^^ gmp_bc_IMAGE_TYPE ^^^^^^^^
+
+# ................................................
+
+gmp_FLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
+
+gmu_u_CC_CMD = $(gmu_exe_CC)   -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $<
+gmu_u_CXX_CMD = $(gmu_exe_CXX) -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $<
+
+# ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
+
+#gmp_bc_SYSLIBS += 
+
+gmp_bc_syslib_THREAD = pthread rt
+#gmp_bc_syslib_WIN_SYS = winspool shell32 advapi32 ole32 oleaut32
+#gmp_bc_syslib_DATABASE = odbc32 odbccp32
+#gmp_bc_syslib_NETWORK = wsock32
+
+

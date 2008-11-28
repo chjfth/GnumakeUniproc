@@ -1,0 +1,308 @@
+# ====== pattern1.mks , 's' means "stem". =========
+# This is the general pattern for integrating the core layer of GnumakeUniproc(GnumakeUniproc.mki) 
+# and a specific compiler, so that an program(EXE,LIB,or DLL) can be compiled and linked.
+# This "stem" chains the following things to accomplish the whole work:
+# * u_srccfg_pre.mki         (user defined)
+# * [custom-image-mki]       
+# * compiler_config.mki      (compiler extension author defined)
+# * [custom-image-mki (second try)]       
+# * [plugins]
+# * u_srccfg_post.mki        (user defined)
+# * u_checkout_more.mki      (user defined, to checkout extra files required by this project)
+# * [compiler-config pre-core]  (compiler extension author defined, immediately before GnumakeUniproc.mki)
+# * GnumakeUniproc.mki       (the GnumakeUniproc core layer)
+# * u_post_gmucore.mki       (user defined)
+# * [plugins post-core]
+# * [custom-image-mki post-core]
+# * [compiler-config post-core]  (compiler extension author defined)
+
+# === Q&A  ===
+#	Q: What if I(the user) want to generate my final output from $(gmu_Gp_LINK_OUTPUT),
+# e.g. I want to zip the output image from the linker.
+#	Answer: 
+#	There are several steps.
+#	0. Assume that $(gmu_Gp_LINK_OUTPUT) is XYZ.exe 
+#	1. Before you include pattern1.mks(this file), you should set a make-var
+# gmp_up_USER_OUTPUT_AFTER_LINK to be your final output(as for our example, XYZ.zip),
+# Normally you would like to use = (instead of :=) to set gmp_up_USER_OUTPUT_AFTER_LINK, 
+# because you may probably expect its value to be expanded AFTER GnumakeUniproc.mki . 
+# that is, you can set it as follows:
+#
+#	gmp_up_USER_OUTPUT_AFTER_LINK = $(basename $(gmu_Gp_LINK_OUTPUT)).zip
+#
+#	Setting gmp_up_USER_OUTPUT_AFTER_LINK makes the real "first-target" of the whole makefile 
+# become $(gmp_up_USER_OUTPUT_AFTER_LINK).
+#	2. And there is more, you may want the same user-defined post-processing
+# for many projects(which all belong to the same project modal), then you
+# probably want to write your post-processing partial-makefile once, and include
+# it for every project. Well, the normal way to accomplish this is to define
+# your "custom image type" processor. See "Load custom-image-mki" sections below
+# for more details.
+
+##############################################################################
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.PHONY: _gmp_first_target
+.PHONY: __pattern1_first_target
+_gmp_first_target: __pattern1_first_target # at rear part of this file
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
+
+
+ifeq (,$(gmp_COMPILER_ID))
+  gmp_COMPILER_ID := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
+  _d_UserPartialMakefiles := $(gmu_d_StartupParent)
+else
+  ifeq ($(gmp_COMPILER_ID),$(call gmuf_GetExtName,$(gmu_d_StartupMakefile)))
+    _d_UserPartialMakefiles := $(gmu_d_StartupParent)
+    #	[2007-01-16] This condiction can be required when you start a non-container project
+    # from a container project. The container project may pass gmp_COMPILER_ID=. to his 
+    # non-container sub-project, and current start-up makefile dir is definitely not what the non-container requires.
+  else
+    _d_UserPartialMakefiles = $(gmu_d_StartupMakefile)
+	#	[2006-12-18] User is allowed to define gmp_COMPILER_ID explicitly.
+	# If that is the case, u_srccfg_post.mki, u_post_gmucore.mki etc will
+	# be read from current start-up makefile dir.
+  endif
+endif
+gmu_Gd_UserPartialMki = $(_d_UserPartialMakefiles)
+
+ifeq (,$(gmp_COMPILER_ID))
+  $(error !GMU!Error: From pattern1.mks: `gmp_COMPILER_ID' can not be extracted from current dir's extension name, nor is it defined by you explicitly)
+endif
+
+
+###########################################################
+
+_gmu_fm_srccfg_pre = u_srccfg_pre
+_gmu_fm_srccfg_post = u_srccfg_post
+
+_p_checkout_more = $(_d_UserPartialMakefiles)/u_checkout_more.mki#[2007-03-30]This should better not contain $(gmp_MKS_PATTERN_FILENAME_SUFFIX)
+_p_srccfg_pre = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_pre)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_srccfg_post = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_post)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_post_gmucore = $(_d_UserPartialMakefiles)/u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+
+ifneq (,$(wildcard $(_p_srccfg_pre))) # include it if exist
+  include $(_p_srccfg_pre)
+endif
+
+
+_dircDefaultPlugin = pattern1cfg/plugins
+
+# Load custom-image-mki if gmp_LOAD_CUSTOM_IMAGE_IT is defined
+ifeq (1,$(gmp_LOAD_CUSTOM_IMAGE_IT))
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-custom-it.mki
+endif
+
+
+# >>>>>> Load compiler cfg here
+
+gmpf_GetCompilerCfgPrecorePath_std  = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
+gmpf_GetCompilerCfgPostcorePath_std = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
+	# [2007-01-15] I finally add it.
+	# With make-var gmp_Gp_COMPILER_CFG_LOADED and the suffix($1) you provided, 
+	# post GnumakeUniproc.mki compiler-cfg-related make-code can be loaded now.
+
+_dirDefaultCompilerCfg = $(_dirPattern1Cfg)/compiler_cfg
+
+
+gmp_Gp_COMPILER_CFG_LOADED = $(firstword \
+	$(foreach _Dir,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg),\
+		$(wildcard $(_Dir)/$(gmp_COMPILER_ID)/compiler_config.mki))\
+	)
+gmp_Gd_COMPILER_CONFIG_USED = $(patsubst %/compiler_config.mki,%,$(gmp_Gp_COMPILER_CFG_LOADED))
+ifeq (,$(gmp_Gp_COMPILER_CFG_LOADED))
+  $(error !GMU!Error: For gmp_COMPILER_ID=$(gmp_COMPILER_ID), no compiler-config-mki can be found from $$(gmp_ud_list_CUSTOM_COMPILER_CFG) or $$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg) )
+endif
+ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+ifneq ($(gmp_Gp_COMPILER_CFG_LOADED),$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/$(gmp_COMPILER_ID)/compiler_config.mki)
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS)) # reason: no use to output this info on every make restart
+    _info := $(call gmuf_OutputInfo,Using custom-compiler-mki from dir: $(gmp_Gd_COMPILER_CONFIG_USED))
+  endif
+  endif
+endif
+endif
+include $(gmp_Gp_COMPILER_CFG_LOADED)
+
+# <<<<<< Load compiler cfg here
+
+
+# >>>>>> Load custom-image-type mki (if gmp_bc_IMAGE_TYPE is not a predefined one) [2006-12-04]
+
+# A second try to load custom-image-mki(for compatibility of GnumakeUniproc v0.92 and prior)
+ifeq (,$(gmu_u_LINK_CMD)) 
+ifeq (,$(gmp_LOAD_CUSTOM_IMAGE_IT))
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-custom-it.mki
+endif
+endif # ifeq (,$(gmu_u_LINK_CMD)) 
+
+# <<<<<< Load custom-image-type mki [2006-12-04]
+
+
+# >>>>>> Load custom plugins [2006-12-04]
+
+gmpf_GetPluginPath_std = $(filter %/$1.mki,$(gmp_Gp_list_PLUGIN_LOADED))
+	# $1: Plugin name
+
+gmpf_GetPluginParentDir = $(patsubst %/$1/$1.mki,%,$(call gmpf_GetPluginPath_std,$1))
+
+gmpf_GetPluginPostcorePath_std = $(patsubst %/$1.mki,%/$1.$2.mki,$(call gmpf_GetPluginPath_std,$1))
+	#[2006-12-04] A standard method to get the path of a plugin's post-core part.
+	# $1: plugin name; $2: the suffix appended to the plugin's name
+	# Example: If $1 is list in $(gmp_Gp_list_PLUGIN_LOADED) as `/dir1/MyPlugin/MyPlugin.mki',
+	# $2 is `postcore', then the post-core path name is `/dir1/MyPlugin/MyPlugin.postcore.mki'
+#The above three gmpf_GetPluginXXX functions can be used in plugin-mki or plugin-postcore-mki.
+
+gmpv_ThisPluginId = $(basename $(notdir $(call gmuf_lastword,$(MAKEFILE_LIST))))
+	#[2007-02-01] This should be assigned to a make-var with := , because $(MAKEFILE_LIST) is volatile.
+
+#	For every plugin(plugin name) listed in $(gmp_u_list_PLUGIN_TO_LOAD), 
+# search all dirs listed in $(gmp_ud_list_CUSTOM_MKI) for the first occurrence
+# of <dir>/<plugin>/<plugin>.mki and include it.
+#	And as a last resort, check $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin) for that plugin.
+
+gmp_u_list_PLUGIN_TO_LOAD += $(gmp_u_list_PLUGIN_TO_LOAD_AUX)
+	#[2008-10-10] gmp_u_list_PLUGIN_TO_LOAD_AUX may provide convenience for Windows users(user not using Bash).
+
+gmp_u_list_PLUGIN_TO_LOAD := $(call gmuf_RemoveDuplicate,\
+	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE) $(gmp_u_list_PLUGIN_TO_LOAD) $(gmp_u_list_PLUGIN_TO_LOAD_ENV_POST))
+
+gmp_Gp_list_PLUGIN_LOADED := $(foreach _PlugIn,$(gmp_u_list_PLUGIN_TO_LOAD),\
+	$(firstword \
+		$(foreach _Dir,$(gmp_ud_list_CUSTOM_MKI) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin),\
+			$(wildcard $(_Dir)/$(_PlugIn)/$(_PlugIn).mki))\
+		$(_PlugIn)__gmuInvlPiM \
+	)\
+)
+gmp_G_list_PLUGIN_LOADED := $(notdir $(basename $(gmp_Gp_list_PLUGIN_LOADED)))
+
+_InvalidPluginList = $(patsubst %__gmuInvlPiM,%,$(filter %__gmuInvlPiM,$(gmp_Gp_list_PLUGIN_LOADED)))
+ifneq (,$(strip $(_InvalidPluginList)))
+  $(error !GMU!Error: The following plugin(s) cannot be loaded: $(_InvalidPluginList))
+endif
+
+ifneq (,$(gmp_Gp_list_PLUGIN_LOADED))
+  ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS))
+    _info := $(call gmuf_OutputInfo,The following plugin(s) are to be loaded:)
+    _info := $(foreach _PlugInPath,$(gmp_Gp_list_PLUGIN_LOADED),$(call gmuf_OutputInfo,  $(_PlugInPath)))
+  endif
+  endif
+  endif
+
+  include $(gmp_Gp_list_PLUGIN_LOADED)
+endif
+
+# <<<<<< Load custom plugins [2006-12-04]
+
+
+ifneq (,$(wildcard $(_p_srccfg_post))) # include it if exist
+  include $(_p_srccfg_post)
+endif
+
+ifeq (,$(wildcard $(_p_srccfg_pre))$(wildcard $(_p_srccfg_post)))
+  $(error !GMP!Error: Source-config files $(notdir $(_p_srccfg_pre)) or $(notdir $(_p_srccfg_post)) \
+cannot be found in dir $(_d_UserPartialMakefiles) (Absolute-dir: $(call _GetAbsPathRelaToCurdir,$(_d_UserPartialMakefiles))))
+endif
+
+ifneq (,$(wildcard $(_p_checkout_more))) # include it if exist
+  include $(_p_checkout_more)
+endif
+	# [2008-07-03] This must be placed before GnumakeUniproc.mki, in other word,
+	# gmu_uv_list_SVN_MODULES,gmu_uv_list_CVS_MODULES must be defined before GnumakeUniproc.mki,
+	# -- because gmu_uv_list_SVN/CVS_MODULES are immediately expanded in GnumakeUniproc.mki .
+
+
+include $(gmp_p_mki_DecoPrjname) # Decorate compiler-id&ver
+include $(gmp_p_mki_DecoUnicodeDebug) # include bc_deco_UNICODE_DEBUG.mki
+	# [2008-09-10] Do these two decoration here so that they appear after all other user decoration.
+
+
+ifneq (,$(gmp_up_COMPILER_CFG_PRECORE_TO_LOAD))
+  include $(gmp_up_COMPILER_CFG_PRECORE_TO_LOAD)
+endif
+	# [2008-09-10] This pre-core mki is considered a special privilege for compiler-config-mki.
+	# It is included immediately before GnumakeUniproc.mki, so that in this pre-core mki,
+	# we can be sure all expansion-in-core gmu-vars have been established, e.g. gmu_Gp_LINK_OUTPUT
+	# is established(no gmu_DECO_SUFFIX_LINK_OUTPUT assigment with affect it, etc).
+	# Today, the idea of this pre-core file comes into being this way: 
+	#	For Windows/WinCE compiler config, applying ``gmu_DECO_SUFFIX_LINK_OUTPUT += --imp''
+	# in this file can guarantee no user makefiles can add further suffix to the link output.
+ 
+
+_p_GnumakeUniproc = $(gmu_DIR_GNUMAKEUNIPROC)/GnumakeUniproc.mki
+ifeq (,$(wildcard $(_p_GnumakeUniproc)))
+  $(error !$(_p_GnumakeUniproc) not exist, I cannot continue.)
+endif
+include $(_p_GnumakeUniproc)
+
+
+ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
+  include $(_p_post_gmucore)
+endif
+
+
+# >>>>>> Load custom plugins postcore [2006-12-04]
+
+ifneq (,$(strip $(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD)))
+  ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS))
+    _info := $(call gmuf_OutputInfo,The following plugin(s) postcore are to be loaded:)
+    _info := $(foreach _PlugInPath,$(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD),$(call gmuf_OutputInfo,  $(_PlugInPath)))
+  endif
+  endif
+  endif
+  include $(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD)
+endif
+# <<<<<< Load custom plugins postcore [2006-12-04]
+
+
+ifneq (,$(gmp_up_CUSTOM_IT_POSTCORE_MKI)) # include it if required
+  include $(gmp_up_CUSTOM_IT_POSTCORE_MKI)
+endif
+
+ifneq (,$(gmp_up_COMPILER_CFG_POSTCORE_TO_LOAD))
+  include $(gmp_up_COMPILER_CFG_POSTCORE_TO_LOAD)
+endif
+
+
+.PHONY: __pattern1_inc_project_count
+__pattern1_inc_project_count: _tmp_prj_mark = $(if $(call _IsOlderThanBuildStart_direct_sh,$(gmu_Gp_LINK_OUTPUT)),=,+)
+__pattern1_inc_project_count: 
+	@echo "$(_tmp_prj_mark) $(_PrjnameShowInList) $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
+	@echo "$(_tmp_prj_mark)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+	@$(call _AppendLogCountCompile,$(_tmp_prj_mark))
+#	@echo "<<< $(shell msleep 95000 ) [[$(gmu_Gp_LINK_OUTPUT)]] {{$(wildcard $(gmu_Gp_LINK_OUTPUT))}}  >>>" # temp
+#[2007-06-15]GNUmake 3.81 . The above echo command with $(wildcard ) in it is for test. Very strangely, 
+#If you build a project from scratch(or say, do an ``rm -fr gf'' before make), that $(wildcard )
+#will return null meaning the file $(gmu_Gp_LINK_OUTPUT) not exist, however, $(gmu_Gp_LINK_OUTPUT)
+#must have existed because only after $(gmu_Gp_LINK_OUTPUT)'s build success can we get here.
+#For that reason, I cannot check filetime with _IsOlderThanBuildStart here.
+# -- Is that a make bug??
+#
+#note: Number of + should be equal to l (i.e. one link means one updated project), if not do bug check.
+
+ifneq (,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
+$(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT_ckt)
+# By defining this rule, we always have $(gmp_up_USER_OUTPUT_AFTER_LINK) built after $(gmu_Gp_LINK_OUTPUT) .
+# Note: We must use $(gmu_Gp_LINK_OUTPUT_ckt) as prerequisite instead of $(gmu_Gp_LINK_OUTPUT) .
+endif
+
+__pattern1_first_target: \
+		$(gmp_USER_PRE_TARGETS) \
+		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \
+		$(gmp_USER_POST_TARGETS) \
+		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
+	@echo "[DONE:] $(call _StripOutputRootPrefix,$(gmu_Gp_LINK_OUTPUT))"
+	@$(_GmpShowDoneUserOutputAfterLink)
+	@$(_Gmp1SharedFinishingCmds)
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common-postcore.mki
+

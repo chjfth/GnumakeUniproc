@@ -1,0 +1,357 @@
+ifndef _Gmu_CommonFunctions_included # avoid being include more than once
+_Gmu_CommonFunctions_included :=1
+
+
+ifdef windir # This is for GMU running on Microsoft Windows.
+  tmp := $(shell echo "")
+	# [2008-08-19] This is a small trick to work around make.exe calling sh.exe, see today's comment in private-doc for detail.
+endif
+
+
+gmuf_IsNull = $(if $1,,1)
+gmuf_IsNullAfterStrip = $(if $(strip $1),,1)
+
+_IsStringEqual = $(if $(subst $1,,$2)$(subst $2,,$1),,1)
+	# If two strings are equal, returns 1, else returns null value.
+_IsStringNotEqual = $(if $(subst $1,,$2)$(subst $2,,$1),1,)
+	# If two strings are equal, returns 1, else returns null value.
+gmuf_IsStringEqual = $(_IsStringEqual)
+gmuf_IsStringNotEqual = $(_IsStringNotEqual)
+
+gmuf_Not = $(if $1,,1)
+
+_IsAllWordsSame = $(if $(strip $(patsubst $(word 1,$1),,$1)),,1)
+	# Don't use $(subst ) here, otherwise, "$(call _IsAllWordsSame,2 22)" will return true.
+
+_aCap:=A
+_bCap:=B
+_cCap:=C
+_dCap:=D
+_eCap:=E
+_fCap:=F
+_gCap:=G
+_hCap:=H
+_iCap:=I
+_jCap:=J
+_kCap:=K
+_lCap:=L
+_mCap:=M
+_nCap:=N
+_oCap:=O
+_pCap:=P
+_qCap:=Q
+_rCap:=R
+_sCap:=S
+_tCap:=T
+_uCap:=U
+_vCap:=V
+_wCap:=W
+_xCap:=X
+_yCap:=Y
+_zCap:=Z
+
+gmuf_ToCapital = $(strip $(eval tmp:=$1) $(foreach v,a b c d e f g h i j k l m n o p q r s t u v w x y z,\
+	$(eval tmp:=$(subst $v,$(_$(v)Cap),$(tmp)))) $(tmp))
+	# Note: Original leading and trailing spaces will be stripped.
+gmuf_IsStrIEqual = $(call gmuf_IsStringEqual,$(call gmuf_ToCapital,$1),$(call gmuf_ToCapital,$2))
+	# Check if $1 and $2 are equal, case insensitive,
+
+gmuf_CountInc = $(1) @
+gmuf_CountDec = $(filter-out @@,$(join $1,@))
+	# Thanks to GMSL's int_plus & int_subtract function.
+
+#.PHONY: gmu_ut_Always
+#gmu_ut_Always: ; //! Don't place the rule here, since it would override GMU user's first rule.
+
+#### >>>>>>> GNUmake version checking (We require at least GNUmake 3.80)
+
+_gmu_isGnumake380 := $(call _IsStringEqual,$(MAKE_VERSION),3.80)
+_gmu_isGnumake381 := $(call _IsStringEqual,$(MAKE_VERSION),3.81)
+_gmu_isGnumake382 := $(call _IsStringEqual,$(MAKE_VERSION),3.82)
+
+_gmu_isAboveGnumake380 := $(_gmu_isGnumake382)$(_gmu_isGnumake381)$(_gmu_isGnumake380)
+_gmu_isAboveGnumake381 := $(_gmu_isGnumake382)$(_gmu_isGnumake381)
+_gmu_isAboveGnumake382 := $(_gmu_isGnumake382)
+
+#### <<<<<<< GNUmake version checking
+
+#################### Common Shell Commands ######################
+_MD = mkdir -p 
+_RM = rm -f -r #this will remove any files dirs assigned
+_MV = mv #move or rename
+
+################# Common user-defined functions for GNU make ###################
+
+_gmu_true = 1
+_gmu_false = 
+
+_CommonFunctions_included = 1
+
+_EchoVarValue = $(if $($1),echo $1 = $($1),echo $1 [Null])
+_EchoVarValue2 = echo $1 = "$(call _TrShcmd4echo,[$($1)])"
+_ListVarValue = $(if $($1),echo -e $1 = "$(call _TrShcmd4echo,$(foreach Ele,$($1),\n    $(Ele)))",echo $1 [NULL])
+_FindStrings = $(strip $(foreach v,$1,$(findstring $v,$2)))
+	# Find appearances of $1 in $2, return space separated words found in $2.
+	# Example: $(call _FindStrings,a b c,b c d)
+	#   returns: b c
+gmuf_FindStrings = $(_FindStrings)
+
+gmuf_IsSubString = $(if $(call _IsStringEqual,$(subst $1,,$2),$2),,1)
+	# If $1 is a substring of $2, return 1, otherwise null.
+	# Example:
+	# 	$(call gmuf_IsSubString,abc,abcd)	=> true
+	# 	$(call gmuf_IsSubString,abc,abc)	=> true
+	# 	$(call gmuf_IsSubString,abcd,abc)	=> false
+	# 	$(call gmuf_IsSubString,ab,xyz)	=> false
+	# If $1 is null, return null.
+
+_MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
+_ClearFile = echo -n "" > $(1)
+
+gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
+	# What the internal $(suffix) function returns has a leading dot, we reject the dot here.
+_GetExtName = $(gmuf_GetExtName)
+
+gmuf_AddToBasename_path = $(dir $1)$2$(basename $(notdir $1))$3$(suffix $1)
+	#gmuf_AddToBasename_path: $1 is filepath, $2 is prefix and $3 is suffix
+_AddToBasename_path = $(gmuf_AddToBasename_path)# obsolete
+
+gmuf_AddToBasename_fname = $2$(basename $(notdir $1))$3$(suffix $1)
+	#gmuf_AddToBasename_fname: The only difference to gmuf_AddToBasename_path: no $(dir $1) ahead.
+	#Therefore, only use gmuf_AddToBasename_fname when $1 is only a filename(no path prefix).
+_AddToBasename_fname = $(gmuf_AddToBasename_fname)# obsolete
+
+gmuf_ChangeFilenameExt = $(basename $1).$2
+_ChangeFilenameExt = $(gmuf_ChangeFilenameExt)# obsolete
+
+_addprefixsuffix = $(addprefix $1,$(addsuffix $3,$2))
+	# $1: prefix to add, $2: your data to process, $3 suffix to add.
+
+_StripBasenameTail = $(if $(patsubst %$2,,$(basename $1)),$1,$(patsubst %$2,%,$(basename $1))$(if $(suffix $1),.)$(call _GetExtName,$1))
+	# $1: pathname, $2: tail-string to strip from basename
+	# If $1 does not end with that tail string, $1 is returned intact.
+	# Example:
+	#	$(call _StripBasenameTail,/dir/mydll--imp.lib,--imp) = /dir/mydll.lib
+	#	$(call _StripBasenameTail,/dir/mydll--imp,--imp)     = /dir/mydll
+	#	$(call _StripBasenameTail,/dir/mydll.lib,--imp)      = /dir/mydll.lib
+	#	$(call _StripBasenameTail,/dir/mydll.lib,)           = /dir/mydll.lib
+
+_IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
+
+_GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
+
+_IsP1OlderThanP2_direct_sh = $(shell (if [ ! -f $1 ] || [ $1 -ot $2 ];then echo -n '1';fi))
+	# User should ensure exist. (`sh' means usING shell's file time compare function.)
+	# Use the *_direct_sh function to avoid the GNU make's $(wildcard ) result caching problem. See my
+	# mailing list thread http://www.nabble.com/HELP!-$(wildcard-)-function-failed-very-strangely-td12964178.html and Paul Smith's answer.
+
+_IsP1OlderThanP2 = $(if $(wildcard $1),$(shell (if [ $1 -ot $2 ];then echo -n '1';fi)),1)
+	# If file $1 not exist or older than $2, 1 is returned, else null value is returned.
+	# If $2 does not exist, result is undetermined(fortunately, up to 2006-07-14, $2 can only be _MainPrjBuildStart.gmu.ckt, which is unlikely absent).
+
+_GetAbsDirRelaToCurdir = $(shell ( cd $1; CmdRet=$$?; if [ $$CmdRet = 0 ];then pwd; else echo __GMU_cd_ERROR; fi; ))
+	# $1, the dir to cd to. Returns the new dir abs-path if success, cd_ERROR if fail.
+gmuf_GetAbsDirRelaToCurdir = $(_GetAbsDirRelaToCurdir)
+
+_GetAbsPathRelaToCurdir = $(call _GetAbsDirRelaToCurdir,$(dir $1))/$(notdir $1)
+gmuf_GetAbsPathRelaToCurdir = $(_GetAbsPathRelaToCurdir)
+
+_GetAbsDir = $(shell ( cd $1 && cd $2; CmdRet=$$?; if [ $$CmdRet = 0 ]; then pwd; else echo __GMU_cd_ERROR; fi; ))
+	#[2006-11-09] $1: starting dir, $2: the dir relative to $1
+gmuf_GetAbsDir = $(_GetAbsDir)
+
+#======== Something not so "common" below ========
+
+_isNowGmuGetPrjAttr = $(call _IsStringEqual,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr)
+
+_IsOlderThanBuildStart = $(call _IsP1OlderThanP2,$1,$(gmu_p_BuildStartCkt))
+
+_IsOlderThanBuildStart_direct_sh = $(call _IsP1OlderThanP2_direct_sh,$1,$(gmu_p_BuildStartCkt))
+
+
+_IsFileContentEqualTo = $(call _IsStringEqual,$2,$(shell cat "$1"))
+	# $1: the filename(pathname), $2: the string to compare to; returns 1 if equal, otherwise null.
+
+gmuf_StripCurDirPrefix = $(patsubst $(CURDIR)/%,$2%,$1)
+	# $1: input absolute path. $2: optional, if you like you can use ./ to make it visually impact.
+	# [2008-10-25] Convention enlightment today: Use : to represent makefile startup dir.
+
+gmuf_StripOutputRootPrefix = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$2%,$1)#[2007-01-09] Used by PI_sync_devoutput
+#gmuf_ShortenPrjOutputDirPrefix = $(patsubst $(gmu_Gd_Deco_PrjOutput)/%,$2%,$1)#[2007-11-19] un-used yet
+
+_StripOutputRootPrefix = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$1)
+	#The leading % is used to represent $(gmu_ud_OUTPUT_ROOT),
+	#if $1 does not start with `$(gmu_ud_OUTPUT_ROOT)/', $1 is returned.
+	#Implementation note: The backslash( in \%/% ) before % is used to preserve the literal meaning of the very % .
+_StripPrjOutputDirPrefix = $(patsubst $(gmu_Gd_Deco_PrjOutput)/%,!/%,$1)
+
+_TrimCURDIR = $(patsubst $(CURDIR)/%,%,$1)
+
+_IsNotVerbose = $(call _IsStringEqual,0,$(gmu_DO_SHOW_VERBOSE))
+_IsVerboseLevel1 = $(call _IsStringEqual,2,$(gmu_DO_SHOW_VERBOSE))$(call _IsStringEqual,1,$(gmu_DO_SHOW_VERBOSE))
+_IsVerboseLevel2 = $(call _IsStringEqual,2,$(gmu_DO_SHOW_VERBOSE))
+_DoVerbose1 = $(if $(call _IsVerboseLevel1),$1,)
+_DoVerbose2 = $(if $(call _IsVerboseLevel2),$1,)
+gmuf_IsVerboseLevel1 = $(_IsVerboseLevel1)
+gmuf_IsVerboseLevel2 = $(_IsVerboseLevel2)
+
+
+#[2006-11-10] Special for _MakeSubPrjs.mk
+_GmuSharp = \#
+_GmuNull =
+_GmuBs = \\
+_GmuComma = ,
+_GmuLB = (
+_GmuRB = )
+_GmuSpace =  $(_GmuNull) $(_GmuNull)
+_GmuSpace2 = $(_GmuNull)  $(_GmuNull)
+_GmuSpace3 = $(_GmuNull)   $(_GmuNull)
+_GmuSpace4 = $(_GmuNull)     $(_GmuNull)
+
+_gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+_StrEchoForScSourceCVS = $(_GmuNull)    >CVSROOT = $1\n    > Module = $2\n    >    tag = $3
+_StrEchoForScSourceSVN = $(_GmuNull)    >SVN URL = $1\n    >    rev = $2
+_StrEchoForScSource = $(if $(call _IsStringEqual,$1,$(_GmuSharp)CVS),$(call _StrEchoForScSourceCVS,$2,$3,$4)\
+,$(if $(call _IsStringEqual,$1,$(_GmuSharp)SVN),$(call _StrEchoForScSourceSVN,$2,$3)\
+,__GMU_Unknown_SourceControl_ID)\
+)
+#	[2006-11-13]Special Note: 
+# If you use line concatenating \ another way(shown below) for the above _StrEchoForScSource definition,
+# the final value for _StrEchoForScSource will have one EXTRA space char prepended to it! Observe for
+# yourself. (Appear on sh.exe from www.mame.net and on Linux as well. Why?)
+ifdef __Bad_StrEchoForScSource_define
+_StrEchoForScSource = $(if $(call _IsStringEqual,$1,$(_GmuSharp)CVS),$(call _StrEchoForScSourceCVS,$2,$3,$4),\
+$(if $(call _IsStringEqual,$1,$(_GmuSharp)SVN),$(call _StrEchoForScSourceSVN,$2,$3),\
+__GMU_Unknown_SourceControl_ID)\
+)
+endif
+
+
+_RevertCommaInBrackets = $(subst (,),$(_GmuComma),$1)
+gmuf_OutputInfo380 = $(shell echo '$(call _RevertCommaInBrackets,$(subst ','\'',$1))' 1>&2)
+gmuf_OutputInfo381 = $(info $(call _RevertCommaInBrackets,$1))
+gmuf_OutputInfo = $(if $(_gmu_isGnumake380),$(gmuf_OutputInfo380),$(gmuf_OutputInfo381))
+	# Note: This should be used in a special way if used in a make-var definition context:
+	#	_info := $(call gmuf_OutputInfo,<your-message>)
+	# Note for using comma: You can use (,) in $1 to represent a comma in your message.
+
+gmuf_OutputInfo_e = $(shell echo -e "$(call _RevertCommaInBrackets,$(subst ",\",$1))" 1>&2)
+	# The suffix "_e" means using -e flag for echo command.
+
+gmuf_lastword = $(if $(_gmu_isAboveGnumake381),$(lastword $1),$(word $(words $1),$1))
+
+gmuf_ChopFinalWord = $(wordlist 2,$(words $1),x $1)
+gmuf_RemoveDuplicate = $(if $1,$(call gmuf_RemoveDuplicate,$(call gmuf_ChopFinalWord,$1)) $(if $(filter $(call gmuf_lastword,$1),$(call gmuf_ChopFinalWord,$1)),,$(call gmuf_lastword,$1)))
+	# Remove duplicate words in $1, but not sorting.
+	# Thanks to the GMSL library for this function
+
+# CVS/SVN path construction functions
+_MakeCvsRepsPath_Svr = $(subst --user--,$(if $($1_USER),$($1_USER),anonymous),$($1))$2
+_MakeCvsRepsPath_SvrRps = $(subst --user--,$($1_USER$(subst /,_,$2)),$($1))$2
+gmuf_MakeCvsRepositoryPath = $(if $($1_USER$(subst /,_,$2)),$(call _MakeCvsRepsPath_SvrRps,$1,$2),$(call _MakeCvsRepsPath_Svr,$1,$2))
+	# $1: server-variable-name, $2: repository path in that server
+gmuf_MakeSvnRepositoryPath = $(if $($1),$($1),$(error !GMU!Error: You makefile requires env-var '$1' set to a SVN root URL in order to access $$$1$2))$2
+	# $1 is the name of a env-var, and that env-var should not be null-value, otherwise,
+	# assert error.
+
+gmuf_RemoveTrailSlash1 = $(patsubst %/,%,$1)
+gmuf_RemoveTrailSlash = $(if $(patsubst %/,,$1),$1,$(call gmuf_RemoveTrailSlash,$(call gmuf_RemoveTrailSlash1,$1)))
+	# Remove all trailing slashes.
+
+gmuf_GetParentDir1 = $(call gmuf_RemoveTrailSlash,$(dir $(call gmuf_RemoveTrailSlash,$1)))
+_GetParentDirCnt = $(if $2,$(call gmuf_GetParentDir1,$(call _GetParentDirCnt,$1,$(call gmuf_CountDec,$2))),$(call gmuf_GetParentDir1,$1))
+	# Note: For _GetParentDirCnt, "@" means 2, "@ @" means 3, that is, count plus 1.
+gmuf_GetParentDir = $(if $(strip $2),$(call _GetParentDirCnt,$1,$(call gmuf_CountDec,$2)),$(call _GetParentDirCnt,$1,))
+	# $1: Input dir(having trail slash or not both OK)
+	# $2: Up level, e.g. null or "@" means 1, "@ @" means 2, "@ @ @" means 3.
+gmuf_GetDir = $(call gmuf_RemoveTrailSlash,$(dir $1))
+	# e.g. $1 = /my/prj1/Makefile
+	# Return: /my/prj1
+
+_p_ThisMakefile := $(CURDIR)/$(firstword $(MAKEFILE_LIST))
+	# If GNUmake provides a intrinsic variable telling what the current startup makefile is, I'll use it instead.
+gmu_p_StartupMakefile := $(_p_ThisMakefile)
+gmu_d_StartupMakefile := $(call gmuf_GetDir,$(_p_ThisMakefile))
+gmu_d_StartupParent := $(call gmuf_GetParentDir,$(gmu_d_StartupMakefile))
+
+gmuf_IsAbsDir = $(if $(call _IsStringEqual,$1,$(call _GetAbsDirRelaToCurdir,$1)),1)
+
+_p_ThisMki = $(call gmuf_lastword,$(MAKEFILE_LIST))
+_d_ThisMki_ = $(dir $(_p_ThisMki))
+	# The trailing _ in make-var name implies there is a trail slash in its value.
+_d_ThisMki = $(patsubst %/,%,$(_d_ThisMki_))
+
+
+_KickoutPrjname = $(firstword $(subst /, ,$(patsubst $(gmu_ud_OUTPUT_ROOT)/%,%,$1)))
+	#[2006-12-12] $1 is a file path, kick out(search for a better word) the GMU-Project-name in it.
+	# Example:
+	#   gmu_ud_OUTPUT_ROOT = /dir/gf
+	#   $1 = /dir/gf/MyExe/_LinkOutputDone.gmu.ckt
+	# Result:
+	#	MyExe
+
+#_TrShcmd4echo = $(subst $$,\$$\$$,$(subst ",\",$(subst \,\\,$1)))
+_TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
+	# [2006-12-15]
+	# This is a very tricky function useful for generating make commands from your make file.
+	# Suppose you have an original shell command(shcmd):
+	#	cvs ci -m "my \\gosh"
+	# and you write my2.mk as follows:
+#OrigShCmd = cvs ci -m "my \\gosh"
+#my2:
+#	echo -e -n "my1:\n\t" > my1.mk; echo "$(call _TrShcmd4echo,echo "$(call _TrShcmd4echo,$(OrigShCmd))" > OrigShCmd.txt)" >> my1.mk
+	#
+	# Then you run two commands:
+	#	make -f my2.mk; make -f my1.mk
+	# Now, OrigShCmd.txt is generated with the content identical to your original shell command.
+	#
+	# By the way, sh.exe from www.mame.net's internal echo command is too simple to
+	# support `echo -e -n ...', therefore, you have to try this example in a bash shell.
+	#
+	#NOTE: Today(2006-12-15) I've found it is not pratical to use $ in your bash command
+	# for this function, since you can not keep $ literally when a $ is passed to GNUmake
+	# through GNUmake's command line.
+
+_TrShcmd4echo_4bs = $(subst `,\`,$(subst ",\",$(subst \,\\\\,$1)))
+	# [2006-12-15]
+	# This is similar to _TrShcmd4echo, but it should be used if the `-e' param of echo gets
+	# in the way. For example, you can use this make command to get the same OrigShCmd.txt
+	# content as in the previous example:
+#	echo -e -n "all:\n\t$(call _TrShcmd4echo_4bs,echo -e "$(call _TrShcmd4echo_4bs,$(OrigShCmd))" > OrigShCmd.txt)" > my1.mk
+
+#_TrShcmd4echo_spd = $(subst !$$!,\$$\$$,$(subst ^$$^,\$$,$(subst `,\`,$(subst ",\",$(subst \,\\,$1)))))
+_TrShcmd4echo_4bs_spd_pnt = $(subst !^t,\t,$(subst !^n,\n,$(subst !$$!,\$$\$$,$(subst ^$$^,\$$,$(call _TrShcmd4echo_4bs,$1)))))
+	# spd: special process for dollar char. pnt: preserve \n \t
+_EvRevoke_for_spd = $(subst \$$,^$$^,$1)
+
+_CountCompileChar = $(shell gmuCountChar $(gmu_Gp_COUNT_COMPILE) $1)
+_JoinResultCharCount = $(join $1,$(call _CountCompileChar,$2))
+
+
+_TrOutputRootShEnvPrefix = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,$${gmu_ud_OUTPUT_ROOT}/%,$1)
+
+
+_AppendLogCountCompile = echo -n "$(1)" >> $(gmu_Gp_COUNT_COMPILE) # add one byte to the count-file
+	# Move it here because _DoCheckout.gmu.mk use this to count action as well.
+
+
+# Functions for source control branch management, 
+
+define gmue_SvnDeclareBranch # Use this with $(eval $(call gmue_SvnDeclareBranch,param1,param2)) .
+  # $1: Env-var corresponding to an SVN repository.
+  # $2: Branch(just one or some directory component(s) here) name to use.
+  ifeq (,$$($1)) # if env-var is not defined, then
+    export $1 = $2
+  endif
+endef
+
+gmuf_SvnDeclareDefaultTrunk = $(eval $(call gmue_SvnDeclareBranch,$1,trunk))
+	# $1: same meaning as that of gmue_SvnDeclareBranch
+
+_export_MakevarDefs = $(if $(strip $1),export $1 ;)
+#_SubstMakevarDefsToExport = $(if $(strip $1),export $(subst $(_GmuSpace),; export ,$(filter %,$1)) ;) // XX no use now
+	# The $(filter %,$1) merges multiple contiguous spaces in $1 into one space.
+
+endif # ifndef _CommonFunctions_included 

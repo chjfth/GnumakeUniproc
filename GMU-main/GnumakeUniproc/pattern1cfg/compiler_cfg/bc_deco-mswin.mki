@@ -1,0 +1,20 @@
+# This file is to be included by compiler_config.mki .
+# It sets the following make-variable for use with GnumakeUniproc.mki .
+#	gmu_DECO_PREFIX_PRJ_NAME & gmu_DECO_SUFFIX_PRJ_NAME
+#	gmu_DECO_PREFIX_LINK_OUTPUT & gmu_DECO_SUFFIX_LINK_OUTPUT
+
+
+gmu_DECO_SUFFIX_PRJ_NAME += $(if $(SUFFIX_CRT),_$(SUFFIX_CRT))
+
+
+ifneq (,$(gmp_bc_WIN64))
+  ifneq (,$(gmp_DECO_PRJ_NAME))
+    gmu_DECO_SUFFIX_PRJ_NAME += _x64
+  endif
+
+  ifneq (,$(gmp_DECO_WIN64))
+    gmu_DECO_SUFFIX_LINK_OUTPUT += _x64
+  endif
+endif
+
+

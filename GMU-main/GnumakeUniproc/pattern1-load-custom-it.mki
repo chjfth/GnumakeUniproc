@@ -1,0 +1,41 @@
+
+#	For every dir listed in $(gmp_ud_list_CUSTOM_MKI), checks the first occurrence
+# of <dir>/$(gmp_bc_IMAGE_TYPE)/$(gmp_bc_IMAGE_TYPE).mki and include it.
+#	And as a last resort, $(gmu_DIR_GNUMAKEUNIPROC)/$(gmp_bc_IMAGE_TYPE)/$(gmp_bc_IMAGE_TYPE).mki
+# will be considered. This makes the benefit that the pure user(not custom-image-mki
+# developer) can copy all custom-image-mki`s to $(gmu_DIR_GNUMAKEUNIPROC) so that
+# he doesn't have to set the variable gmp_ud_list_CUSTOM_MKI.
+#
+#	If the custom mki author wants to do some post-core work,
+# he should set gmp_up_CUSTOM_IT_POSTCORE_MKI to be another partial-makefile, which will
+# be included at the end of the whole makefile(at the end of this file).
+# Another tip: If the user places his post-core partial-makefile in a relative
+# path to the file $(gmp_Gp_CUSTOM_IT_MKI_USED), then he can use 
+# the goodie var $(gmp_Gd_CUSTOM_IT_MKI_USED) to find his post-core partial-makefile.
+
+gmp_Gp_CUSTOM_IT_MKI_USED := $(firstword \
+	$(foreach _Dir,$(gmp_ud_list_CUSTOM_MKI) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin),\
+		$(wildcard $(_Dir)/$(gmp_bc_IMAGE_TYPE)/$(gmp_bc_IMAGE_TYPE).mki)) \
+	)
+	#	Now, gmp_Gd_CUSTOM_IT_MKI_USED is set to the dir containing the
+	# custom image mki for its user to use.
+	#	You know, if the same file-names exist in multiple dirs listed in 
+	# $(gmp_ud_list_CUSTOM_MKI), the first found counts.
+
+ifeq (,$(strip $(gmp_Gp_CUSTOM_IT_MKI_USED)))
+  $(error !GMU!Error. Your gmp_bc_IMAGE_TYPE=$(gmp_bc_IMAGE_TYPE), which is not a predefined image type\
+ and the custom-image-type processor is not found in the dirs of `gmp_ud_list_CUSTOM_MKI' or `$$(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin)')
+endif
+
+gmp_Gd_CUSTOM_IT_MKI_USED := $(patsubst %/$(gmp_bc_IMAGE_TYPE).mki,%,$(gmp_Gp_CUSTOM_IT_MKI_USED))
+
+ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS))
+    _info := $(call gmuf_OutputInfo,Using custom-image-type-mki: $(gmp_Gp_CUSTOM_IT_MKI_USED))
+  endif
+  endif
+endif
+
+include $(gmp_Gp_CUSTOM_IT_MKI_USED)
+

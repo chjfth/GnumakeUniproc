@@ -1,0 +1,147 @@
+#		PREFACE FOR ARM COMPILER
+#	These makefiles here will support the ARM compiler tool set from both 
+# [ARM SDT2.5 with ARM C++1.0] and [ARM ADS 1.2]
+#	There are some significant difference between the two tool sets:
+#	1. library tool:
+#		SDT2.5:    executable: armlib    lib-file ext: .alf
+#		ADS1.2:    executable: armar     lib-file ext: .a
+#
+#	ARM Realview has the same command set as ADS.
+#
+#	To distinguish between SDT, ADS and Realview, the user should use the make-var:
+# gmp_COMPILER_VER. If some token in gmp_COMPILER_VER
+# * starts with "sdt", it means SDT.
+# * starts with "armads", it means ADS.
+# * starts with "armrv", it means Realview.
+#	If none above is defined, it defaults to the highest version(i.e. Realview)
+#	Some numbers can be prepended to indicate the
+# version of the compiler, e.g. "sdt250", "armads120", "armrv220". Note: the
+# trailing two digits are always considers minor version number, so, Realview 2.2
+# should be represented with armrv220, not armrv22 .
+
+_THIS_COMPILER_ID := armcpp
+
+ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
+  $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
+endif
+#gmp_COMPILER_VER = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+
+
+_sdtCompilerVer = $(filter sdt%,$(gmp_COMPILER_VER))
+_IsUsingSDT = $(if $(_sdtCompilerVer),1,)
+
+_adsCompilerVer = $(filter armads%,$(gmp_COMPILER_VER))
+_IsUsingARMADS = $(if $(_adsCompilerVer),1,)
+
+_armrvCompilerVer = $(filter armrv%,$(gmp_COMPILER_VER))
+_IsUsingARMRV = $(if $(_armrvCompilerVer),1,)
+
+_armCompilerVers := $(strip $(_sdtCompilerVer) $(_adsCompilerVer) $(_armrvCompilerVer))
+
+# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER))
+  ifeq (,$(_armCompilerVers))
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for ARM compiler)
+  endif
+endif
+
+ifeq (,$(strip $(_armCompilerVers)))
+  # set the default:
+  _armCompilerVerUse = armrv
+  _IsUsingARMRV = 1
+else
+  ifneq (1,$(call _IsAllWordsSame,$(_armCompilerVers)))
+    $(error !GMP!Error: Multiple ARM compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _armCompilerVers=$(_armCompilerVers))
+  endif
+  _armCompilerVerUse = $(firstword $(_armCompilerVers))
+
+  #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
+  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings.
+  gmp_G_CompilerVerToDeco := _$(_armCompilerVerUse)
+endif
+
+_armCompilerVer = $(_armCompilerVerUse)
+	# Compatibility for old name `_armCompilerVer'
+
+
+
+_IsAboveARMADS = $(if $(_IsUsingARMADS)$(_IsUsingARMRV),1)
+_IsAboveARMRV = $(if $(_IsUsingARMRV),1)
+
+
+# Common ARM options
+-opt-via = $(if $(_IsAboveARMRV),--via,-via)
+# armlink options
+-opt-ro-base = $(if $(_IsAboveARMRV),--ro_base,-ro-base)
+-opt-elf = $(if $(_IsAboveARMRV),--elf,-elf)
+-opt-list = $(if $(_IsAboveARMRV),--list,-list)
+-opt-xref = $(if $(_IsAboveARMRV),--xref,-xref)
+-opt-map = $(if $(_IsAboveARMRV),--map,-map)
+-opt-symbols = $(if $(_IsAboveARMRV),--symbols,-symbols)
+-opt-remove = $(if $(_IsAboveARMRV),--remove,-remove)
+
+
+
+gmu_extn_OBJ = o
+gmp_extn_LIB = $(if $(call _IsUsingSDT),alf,a)
+gmp_extn_DLL = 
+gmp_extn_EXE := $(if $(gmp_extn_EXE),$(gmp_extn_EXE),axf)
+
+gmpf_MakeUpSysLibsToLink = $(addsuffix .$(gmp_extn_LIB),$1)
+
+gmu_u_GCC_M_OPTIONS += 
+
+
+# Check whether the env-vars for running Visual C++ command line compiler are OK.
+#	[2007-12-13] This ARMINC is only meaningful to ARM SDT 2.5, so don't demand it.
+# but setting it is suggested, because this will tell ``gcc -M' which dirs contains
+# ARM system headers so that we need not refer to them in .d files.
+ifeq '' '$(ARMINC)'
+  $(warning !Env-var `ARMINC' not defined! I don't know which directories contain ARM's system headers.\
+ Please set it to, e.g: ARMINC=E:\ARM250\Include (Separate multiple dirs with spaces.))
+endif
+
+gmu_ud_list_SYS_HEADER += $(subst \,/,$(ARMINC))
+	# This ARMINC variable is set up by ARM SDT/ADS installer to indicate the system header dir.
+
+gmu_exe_CC = armcc
+gmu_exe_CXX = armcpp
+gmu_exe_ASM = armasm
+gmu_exe_LINK = armlink
+gmu_exe_LIB = $(if $(call _IsUsingSDT),armlib,armar)
+  gmp_armcpp_LIB_CREATE_OPTION = $(if $(call _IsUsingSDT),-c,-cr)
+
+
+gmp_CFLAGS_NON_CODE_GEN +=
+
+c_flags_Asm_Common = 
+
+c_flags_Link_Common = 
+
+################################################################################
+# For each compiler or link flag category below, you must choose one that suits 
+# your need.
+#	`cfc' means compiler-flag-category
+#	`lfc' means linker-flag-category
+#################################################################################
+
+# Category(dor): Debug-Build or Release-Build
+cfc_for_Debug_codegen = -g -O0
+cfc_for_Debug_defs = -D_DEBUG 
+cfc_for_Release_codegen = -O2
+cfc_for_Release_defs = #-DNDEBUG
+	# !!!!!![2008-10-16] Special: According to long lasting conventions of building uBase apps,
+	# we don't define -DNDEBUG so that assert always takes effect.
+	# (ARM SDT 2.5 ASSERT.H checks NDEBUG macro to determine whether assert() takes effect.)
+	# I'll revert this default -DNDEBUG after I find an elegant way for GNU make to filter-out
+	# -DNDEBUG at a later stage.
+
+# Category(chr): MBCS or Unicode
+cfc_chr_Mbcs_defs = -D_MBCS
+cfc_chr_Unicode_defs = -DUNICODE -D_UNICODE
+
+
+# Category(ldbg): Is link with /DEBUG option
+#lfc_ !!! by yourself
+

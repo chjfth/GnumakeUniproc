@@ -1,0 +1,25 @@
+ifndef __PLUGIN_ALWAYS_COMPILE_LOADED
+__PLUGIN_ALWAYS_COMPILE_LOADED = 1
+
+_pluginId_always_compile := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: ALCP
+
+# User input vars:
+
+# gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT = 
+	# List the filepaths that you want to alway-compile. Of course every element
+	# in this list should also appear in `gmu_up_list_SRC_FROM_ROOT', otherwise,
+	# the ones not existing in `gmu_up_list_SRC_FROM_ROOT' will be ignored.
+
+# gmi_ALCP_ALWAYS_COMPILE_DISABLED =
+	# Set this to 1 to temporarily disable the always-compile feature.
+
+
+ifeq (,$(gmi_ALCP_ALWAYS_COMPILE_DISABLED))
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_always_compile),postcore)
+
+endif
+
+
+endif #__PLUGIN_ALWAYS_COMPILE_LOADED

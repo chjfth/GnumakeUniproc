@@ -1,0 +1,16 @@
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
+
+  ifneq (,$(_p_WINDLL_MODULE_DEF_FromCurDir))
+
+    $(gmu_Gp_LINK_OUTPUT): $(_p_WINDLL_MODULE_DEF_FromCurDir)
+
+  endif
+
+  gmu_DECO_SUFFIX_LINK_OUTPUT += $(if $(_isReportLibOutput),$(gmp_mswin_IMPLIB_SUFFIX))
+	# Append implib's basename with $(gmp_mswin_IMPLIB_SUFFIX)
+	# [2008-08-15] Add this suffix here so that it is guaranteed to be place at the end,
+	# i.e. later than any other suffix. -- The make func _StripImplibSuffix require it at end.
+
+
+endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'

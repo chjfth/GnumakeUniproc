@@ -1,0 +1,63 @@
+
+Current GnumakeUniproc version is v0.94 .
+
+- Install process on Linux
+
+=============================================================================
+-- if you're a normal user(not root) on a Linux machine and want to set it
+   up for your own use:
+=============================================================================
+
+Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
+~/GMU/INSTALL.linux), do the following:
+
+$ cd ~/GMU/GMU-main
+$ ./install-exe.sh ~/GMU/bin    # copy executables required by GnumakeUniproc to ~/GMU/bin
+$ source set-gmuenv.sc          # Set required environment variables(env-var).
+
+Now, you've set up the environment to use GnumakeUniproc.
+
+If you'd like to set up the required env-vars automatically after login, try 
+this: In ~/.bashrc , add the following commands:
+
+====================
+gmu_DIR_ROOT=~/GMU
+source $gmu_DIR_ROOT/GMU-main/set-gmuenv.sc $gmu_DIR_ROOT
+PATH="$gmu_DIR_ROOT/bin:$PATH"
+====================
+
+=============================================================================
+-- if you're the root user on a Linux machine and want to install 
+   GnumakeUniproc for all users on that machine.
+=============================================================================
+
+Assume that you've extracted GMU-xxx.tar.bz2 to /usr/local (i.e. there exists
+/usr/local/GMU/INSTALL.linux), do the following:
+
+# cd /usr/local/GMU/GMU-main
+# ./install-exe.sh /usr/local/bin # copy executables required by GnumakeUniproc to /usr/local/bin
+# source set-gmuenv.sc            # Set required environment variables(env-var).
+
+If you'd like to set up the required env-vars automatically after every user's
+login, try this: In "global" bashrc file, e.g. /etc/bashrc, /etc/profile or
+some other file (this varies on different Linux distributions, on SuSE linux 10,
+it should be /etc/bash.bashrc.local), add the following commands:
+
+====================
+gmu_DIR_ROOT=/usr/local/GMU
+source $gmu_DIR_ROOT/GMU-main/set-gmuenv.sc $gmu_DIR_ROOT
+====================
+
+Note: If you'd like to use a dir other than /usr/local/bin above, you have to
+add that dir in PATH env-var for your users if that dir is not in PATH already.
+
+- Read the quick start guide
+
+Assume $gmu_DIR_ROOT represents where GnuamkeUniproc resides(the GMU dir), 
+the quick start guide lies at:
+
+$gmu_DIR_ROOT/GMU-manual/quick-start/quick-start.htm
+
+The quick start guide will guide you to build some example programs using
+GnumakeUniproc, then you can look into $gmu_DIR_ROOT/GMU-examples to try
+more examples.

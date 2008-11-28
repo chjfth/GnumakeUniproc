@@ -1,0 +1,9 @@
+
+_ALCP_p_ObjList_AlwaysCompile = $(call gmuf_SrcListToObjList,$(gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT))
+
+$(addsuffix .gmiAC,$(_ALCP_p_ObjList_AlwaysCompile)): gmu_ut_Always
+	@$(call gmpf_AddCustomActionCount,Always-compiled)
+
+$(_ALCP_p_ObjList_AlwaysCompile): %: %.gmiAC
+
+

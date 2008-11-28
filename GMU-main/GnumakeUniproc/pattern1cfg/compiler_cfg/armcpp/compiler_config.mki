@@ -1,0 +1,133 @@
+# ==================== common build configurations ==========================
+
+include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_common.mki
+
+
+gmpf_MakeLibName = $(patsubst %,%.$(gmp_extn_LIB),$1)
+gmpf_MakeExeName = $(patsubst %,%.$(gmp_extn_EXE),$1)
+#gmpf_MakeDllName = $1.$(gmp_extn_DLL) # cannot generate this type of image yet
+
+################################################################################
+
+#gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D%=__declspec\(dllexport\),$(gmp_u_list_DLL_EXPORT_SYM))
+#gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D%=__declspec\(dllimport\),$(gmp_u_list_DLL_IMPORT_SYM))
+
+gmp_ASMFLAGS += $(c_flags_Asm_Common)
+
+#                                  ........ gmp_bc_UNICODE ........
+ifdef gmp_bc_UNICODE
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Unicode_defs)
+else # MBCS 
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Mbcs_defs)
+endif
+
+#^^^^^^^^ gmp_bc_UNICODE ^^^^^^^########........ gmp_bc_DEBUG .........
+
+ifdef gmp_bc_DEBUG
+  gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Debug_codegen)
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Debug_defs) 
+else # for so-called release-build
+  gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Release_codegen)
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Release_defs)
+endif
+
+#^^^^^^^ gmp_bc_DEBUG ^^^^^^^^^########....... gmp_bc_IMAGE_TYPE ........
+
+ifdef gmp_bc_DEBUG
+  gmp_LINKFLAGS_preset += -debug
+else
+  gmp_LINKFLAGS_preset += #-nodebug
+  	#	[2006-04-04] I dare not use -nodebug now, because the ELF image 
+  	# generated with -nodebug by armlink(SDT2.5 confirmed) cannot be
+  	# translated into -bin format. Error message by fromelf is:
+	#
+  	#	Error: Q0139E: ELF Image has insufficient information to effect this translation.
+  	#
+endif
+
+
+_p_objliblist = $(gmu_Gd_Deco_PrjOutput)/objlist.lst
+_cmd_write_objliblist = echo -e "$(subst \,\\,$(subst $(_GmuSpace),\n,$1))" > $2
+
+# >>>>>>>>>>>>>> predefine some gmp_XXX commands 
+
+####### DLL ####### (actually unimplemented yet)
+
+  gmp_LINKFLAGS_DLL = 
+  define _gmp_LINK_CMD_DLL
+	@$(bcfShowLibrariesToLink)
+	$(gmu_exe_LINK) $(gmp_LINKFLAGS_DLL) $(_gmp_LINKFLAGS_final) -o "$(gmu_Gp_LINK_OUTPUT)" $(gmp_ALL_TO_LINK)
+  endef
+
+
+####### EXE #######
+define _gmp_LINK_CMD_EXE
+	@$(bcfShowLibrariesToLink)
+	$(gmu_exe_LINK) -o "$@" $(_gmp_LINKFLAGS_final) $(gmp_ALL_TO_LINK)
+endef
+
+
+# <<<<<<<<<<<<<< predefine some gmp_XXX commands 
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+  gmu_I_AM_A_LINK_COMPONENT = 1 #[2006-11-02]
+  gmu_IS_SUBPRJ_AUTO_LINK_MERGE = 1 #[2006-12-11]
+
+  gmp_Gp_list_LIB_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_CFLAGS_MACRO_DEFS_preset += -D_LIB
+
+  define gmu_u_LINK_CMD
+	@echo "$(gmp_ALL_TO_LINK_FOR_LIB)" > $(gmu_Gd_PRJ_GMUTMP)/_ObjsForThisLib.gmp.lst
+	@$(call _cmd_write_objliblist,$(subst /,\\,$(gmp_ALL_TO_LINK)),$(_p_objliblist))
+	$(gmu_exe_LIB) $(gmp_armcpp_LIB_CREATE_OPTION) "$@" $(-opt-via) $(_p_objliblist)
+  endef
+
+else
+
+	#	Note: armlink does not provide such options as -L for searching user libraries,
+	# so user have to prepend a directory to every user library they want to link with.
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL' # not ready for use yet!
+
+  gmu_I_AM_A_LINK_COMPONENT = 1
+
+  gmp_Gp_list_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
+
+else
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE'
+
+  gmp_Gp_list_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE)
+
+endif # EXE_GUI
+endif # DLL
+endif # LIB
+
+#^^^^^^^^ gmp_bc_IMAGE_TYPE ^^^^^^^^
+
+# ................................................
+
+gmp_FLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
+
+gmu_u_CC_CMD =  $(gmu_exe_CC)  -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $<
+gmu_u_CXX_CMD = $(gmu_exe_CXX) -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $<
+gmu_u_ASM_CMD = $(gmu_exe_ASM) $(gmp_ASMFLAGS) -o "$@" $<
+
+# ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
+
+#gmp_bc_SYSLIBS = $(call gmpf_MakeUpSysLibsToLink,kernel32 uuid)
+#
+#gmp_bc_syslib_GUI = user32 gdi32 comdlg32
+#gmp_bc_syslib_WIN_SYS = winspool shell32 advapi32 ole32 oleaut32
+#gmp_bc_syslib_DATABASE = odbc32 odbccp32
+#gmp_bc_syslib_NETWORK = ws2_32
+#
+

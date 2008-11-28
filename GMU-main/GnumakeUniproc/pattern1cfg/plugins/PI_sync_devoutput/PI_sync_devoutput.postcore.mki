@@ -1,0 +1,114 @@
+
+
+_sydo_cp_force := $(if $(gmi_SYDO_COPY_NO_FORCE),,--force)
+
+
+define SYDO_syncproc_vardef
+# $1: SID
+# Makevars defined here(e.g. -SID- will be used by SYDO_syncproc_rule.
+  -SID- := $1
+  -dirSyncFrom- := $$(gmi_SYDO_ud_SYNC_$1_FROM)
+  -dirSyncTo- := $$(gmi_SYDO_ud_SYNC_$1_TO)
+  -listSyncFiles- := $$(gmi_SYDO_up_list_SYNC_$1)
+  -isCopyDirStruct- := $$(gmi_SYDO_CopyDirStruct_$1)
+	#[2008-09-26] Using single $ for above $$(gmi_SYDO_xxxx) is OK as well, but I hope using double $ may increase speed.
+  -ret-DontSync :=
+
+#  ifeq (,$(MAKE_RESTARTS))#Purpose: show these warning info only once
+#    ifneq (,$$(-dirSyncTo-))
+#    ifeq (,$$(-listSyncFiles-))
+#      _info := $$(call gmuf_OutputInfo, !GMP!Warning from $(_pluginId_sync_devoutput): \
+#gmi_SYDO_ud_SYNC_$1_TO( $$(-dirSyncTo-) ) is requested for this project(,) but the project does not define gmi_SYDO_up_list_SYNC_$1 .)
+#      -ret-DontSync := 1
+#    endif
+#    endif
+#  endif
+
+  _sydo_cp_cmd_and_options := cp $$(_sydo_cp_force) $$(if $$(gmi_SYDO_ONLY_COPY_NEWER),-u) $$(if $$(-isCopyDirStruct-),-r --parents)
+
+endef
+
+define SYDO_copy_commands
+	(\
+	$(call _MkdirIfNotExist,$(-dirSyncTo-) ;) \
+	if [ ! -d $(-dirSyncTo-) ];then echo "!Error from $(_pluginId_sync_devoutput): Fail to create dir(gmi_SYDO_ud_SYNC_$(-SID-)_TO): $(-dirSyncTo-)"; exit 1; fi ;\
+	)
+	$(if $(-listSyncFiles-),@echo "PI_sync_devoutput: Syncing Sid:$(-SID-) $(call _DoVerbose1,[ $(-dirSyncFrom-) -> $(-dirSyncTo-) ])... ")
+	(\
+	$(if $(-dirSyncFrom-),cd $(-dirSyncFrom-) && $(if $$(gmi_SYDO_SHOW_COPY_CMD),echo "  Do copy in CurDir: `pwd`" && ) ) \
+	for OneItem in $(-listSyncFiles-); do \
+		$(call _DoVerbose1,echo "  > $${OneItem}";) \
+		_sh_tmp_DestDir=$(-dirSyncTo-); \
+		if [ ! -d "$${_sh_tmp_DestDir}" ]; then $(_MD) $${_sh_tmp_DestDir}; fi; \
+		if [ ! -d "$${_sh_tmp_DestDir}" ]; then echo "!Error from $(_pluginId_sync_devoutput): Destination dir creation fail: $${_sh_tmp_DestDir} "; exit 1; fi; \
+		$(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-)";) \
+		$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-); \
+		CmdRet=$$?; if [ $$CmdRet != 0 ] ; then echo "!Error from $(_pluginId_sync_devoutput): cp command fails while copying $${OneItem} "; exit $$CmdRet; fi; \
+		done \
+	)
+endef
+
+SydoRuleNameForOneSid = SYDO_SyncProcRule_$1
+
+define SYDO_syncproc_rule
+# $1: SID: sync operation identifier.
+# Recognized vars:
+#	gmi_SYDO_ud_SYNC_<SID>_FROM (can be null)
+#	gmi_SYDO_ud_SYNC_<SID>_TO
+#	gmi_SYDO_up_list_SYNC_<SID>
+#	gmi_SYDO_CopyDirStruct_<SID> (can be null)
+
+.PHONY: $(call SydoRuleNameForOneSid,$1)
+$(call SydoRuleNameForOneSid,$1):
+	$$(eval $$(call SYDO_syncproc_vardef,$1))
+	@$$(if $$(-ret-DontSync),,$$(SYDO_copy_commands))
+
+endef
+
+
+# [2007-11-23] There is a problem of mame.net's sh.exe . For the following command:
+#	ww=/dir/123 ; dd=/dir
+# Then 
+#	echo ${ww#$dd/}
+# will output ``123'', and that's right. However, if I surround echo's param with quotes:
+#	echo "${ww#$dd/}"
+# the output of sh.exe will be ``/dir/123''. 
+# This is a flaw of sh.exe. Bash 2.0 do not have this problem.
+
+
+SydoListAllSid := $(patsubst gmi_SYDO_ud_SYNC_%_TO,%,$(filter gmi_SYDO_ud_SYNC_%_TO,$(.VARIABLES)))
+
+$(foreach v,$(SydoListAllSid),$(eval $(call SYDO_syncproc_rule,$v)))
+
+.PHONY: gmi_SYDO_target_SyncOutput
+gmi_SYDO_target_SyncOutput: $(foreach v,$(SydoListAllSid),$(call SydoRuleNameForOneSid,$v))
+	@$(call gmpf_AddCustomActionCount,Sync-dev-output)
+
+
+
+# Makevars for old version compatibility:
+
+gmi_SYDO_up_list_SYNC_HEADERS += $(gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT)
+    # gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT is the old name of gmi_SYDO_up_list_SYNC_HEADERS(GMU v0.93 and prior).
+    # We do this so that the old name can still be valid.
+ifneq (,$(gmi_SYDO_ud_SYNC_HEADER_ROOT))
+  gmi_SYDO_ud_SYNC_HEADER_FROM = $(gmi_SYDO_ud_SYNC_HEADER_ROOT)
+  gmi_SYDO_CopyDirStruct_HEADER = 1
+endif
+ifneq (,$(gmi_SYDO_up_list_SYNC_HEADERS))
+  gmi_SYDO_up_list_SYNC_HEADER = $(gmi_SYDO_up_list_SYNC_HEADERS)
+endif
+
+ifneq (,$(gmi_SYDO_ud_SYNC_LIB_TO))
+  gmi_SYDO_up_list_SYNC_LIB += $(gmp_Gp_list_LIB_OUTPUT)
+    # todo: add only if not added yet.
+endif
+ifneq (,$(gmi_SYDO_ud_SYNC_DLL_TO))
+  gmi_SYDO_up_list_SYNC_DLL += $(gmp_Gp_list_DLL_OUTPUT)
+    # todo: add only if not added yet.
+endif
+ifneq (,$(gmi_SYDO_ud_SYNC_EXE_TO))
+  gmi_SYDO_up_list_SYNC_EXE += $(gmp_Gp_list_EXE_OUTPUT)
+    # todo: add only if not added yet.
+endif
+

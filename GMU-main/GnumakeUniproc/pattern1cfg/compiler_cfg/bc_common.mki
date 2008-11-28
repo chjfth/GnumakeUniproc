@@ -1,0 +1,80 @@
+
+ifeq (,$(gmp_bc_IMAGE_TYPE))
+  $(error `gmp_bc_IMAGE_TYPE' not defined. I cannot know what link command to use)
+endif
+
+_p_ExtraImageTypeMki = $(gmu_DIR_GNUMAKEUNIPROC)/$(gmp_COMPILER_ID)/extra_image_types/$(gmp_bc_IMAGE_TYPE).mki
+
+define bcfShowLibrariesToLink
+	@$(call _DoVerbose1,\
+	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK): "; \
+	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
+	)
+
+	@$(call _DoVerbose1,\
+	echo -n "**library paths: "; \
+	$(if $(gmp_ud_list_EXTRALIB),echo ''; for v in $(gmp_ud_list_EXTRALIB); do echo "    $$v" ; done,echo "(none)")\
+	)
+
+	@$(call _DoVerbose1,\
+	echo -n "**libraries to link(stand-alone,gmp_bc_EXTRALIBS1): "; \
+	$(if $(gmp_bc_EXTRALIBS1),echo ''; for v in $(gmp_bc_EXTRALIBS1); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
+	)
+
+	@$(call _DoVerbose1,\
+	echo -n "**libraries to link(from sub-projects): "; \
+	$(if $(gmu_Gp_list_SUBPRJ_TO_LINK), echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_Gp_list_SUBPRJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
+	)
+
+	@$(call _DoVerbose1,\
+	echo -n "**libraries to link(stand-alone,gmp_bc_EXTRALIBS2): "; \
+	$(if $(gmp_bc_EXTRALIBS2),echo ''; for v in $(gmp_bc_EXTRALIBS2); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
+	)
+endef
+
+
+gmu_SHOW_LINKING_IMAGE_TYPE = $(gmp_bc_IMAGE_TYPE)
+
+
+gmp_LINKFLAGS += $(c_flags_Link_Common)
+
+_gmp_ALL_LIBS_TO_LINK = $(gmp_bc_EXTRALIBS1) $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS2) $(gmp_bc_SYSLIBS)
+
+gmp_ALL_TO_LINK = $(patsubst $(CURDIR)/%,./%,$(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK) \
+	$(_gmp_ALL_LIBS_TO_LINK)	$(if $(gmp_LINK_DuplicateLibList),$(_gmp_ALL_LIBS_TO_LINK)) )
+	#[2008-10-21] For linkers such as GNU ld who hastes to drop objs on LIB scanning,
+	#User can define gmp_LINK_DuplicateLibList=1 so that the LIB list is duplicated on link 
+	#command line to make ld happy.
+
+
+gmp_ALL_TO_LINK_FOR_LIB = $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK)
+	# All those(obj files) to be linked in to a static lib file.
+
+
+gmpf_CombinePsSubdirs = $(foreach v,$1,$(addprefix $v/,$2) $v)
+	# $1: The parent dir
+	# $2: The subdir(storing platform specific files) within the parent dir.
+
+gmu_ud_list_PRJ_HEADER += $(call gmpf_CombinePsSubdirs,$(gmp_ud_list_PS_HEADER_PARENT),$(gmp_PS_INCLUDE_SUBDIRS))
+	#[2007-05-08]Yes, better have those gmp_PS_INCLUDE_SUBDIRS appear before there parent dirs,
+	#so that "platform-specific" header overrides the "general" header(if they have the same name).
+	#[2008-07-29] gmp_ud_list_PS_HEADER_PARENT and gmp_PS_INCLUDE_SUBDIRS are no longer suggested,
+	#because I've realized a more universal idea dealing with that "PS" thing using gmpf_CombinePsSubdirs.
+
+_gmp_C_CXX_FLAGS_ALL += $(gmp_CFLAGS_CODE_GEN_ALL) $(gmp_CFLAGS_NON_CODE_GEN)
+
+gmp_CFLAGS_CODE_GEN_ALL += $(gmp_CFLAGS_CODE_GEN) $(gmp_CXXFLAGS_CODE_GEN) $(gmp_CFLAGS_MACRO_DEFS)
+
+
+gmp_C_CXX_ALL_preset += $(gmp_CFLAGS_CODE_GEN_ALL_preset) $(gmp_CFLAGS_NON_CODE_GEN_preset)
+
+gmp_CFLAGS_CODE_GEN_ALL_preset += $(gmp_CFLAGS_CODE_GEN_preset) $(gmp_CXXFLAGS_CODE_GEN_preset) \
+  $(gmp_CFLAGS_MACRO_DEFS_preset) $(gmp_CFLAGS_INCLUDES_preset)
+
+
+_gmp_CFLAGS_final = $(if $(strip $(_gmp_C_CXX_FLAGS_ALL)),$(_gmp_C_CXX_FLAGS_ALL),$(gmp_C_CXX_ALL_preset))
+
+_gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LINKFLAGS_preset))
+	#[2007-11-16] Actually, the special process for empty _gmp_C_CXX_FLAGS_ALL & empty gmp_LINKFLAGS
+	#is here for old GMU makefiles(v0.92 and prior) compatibility. New GMU makefiles should always
+	#have _gmp_C_CXX_FLAGS_ALL & gmp_LINKFLAGS non-null.

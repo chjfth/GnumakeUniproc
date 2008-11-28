@@ -1,0 +1,26 @@
+rm -f _MainPrjBuildStart.gmu.ckt
+if [ $? != 0 ]; then
+  echo "Error from $0: Cannot delete GnumakeUniproc start-up signature file(_MainPrjBuildStart.gmu.ckt) in current dir. GnumakeUniproc will not work."
+  exit
+fi
+
+if [ "$gmu_LOG_OUTPUT_FILENAME" != "" ]; then
+
+	gmu_LOG_OUTPUT_FILENAME_bak="${gmu_LOG_OUTPUT_FILENAME}.bak"
+
+	if [ -e "$gmu_LOG_OUTPUT_FILENAME_bak" ]; then rm -f "$gmu_LOG_OUTPUT_FILENAME_bak"; fi
+	if [ $? != 0 ]; then
+	  echo "Error from $0: Cannot delete backup log-file($gmu_LOG_OUTPUT_FILENAME_bak) ."
+	  exit
+	fi
+
+	if [ -e "$gmu_LOG_OUTPUT_FILENAME" ]; then mv "$gmu_LOG_OUTPUT_FILENAME" "$gmu_LOG_OUTPUT_FILENAME_bak"; fi
+	if [ $? != 0 ]; then
+	  echo "Error from $0: Cannot rename $gmu_LOG_OUTPUT_FILENAME to $gmu_LOG_OUTPUT_FILENAME_bak ."
+	  exit
+	fi
+
+	make$gmu_MAKEEXESUFFIX gmp_bc_DEBUG=1 gmp_bc_UNICODE=1 "$@" 2>&1 | tee $gmu_LOG_OUTPUT_FILENAME
+else
+  make$gmu_MAKEEXESUFFIX gmp_bc_DEBUG=1 gmp_bc_UNICODE=1 "$@"
+fi

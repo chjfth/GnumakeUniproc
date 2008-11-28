@@ -1,0 +1,50 @@
+ifndef __PLUGIN_SYNC_DEVOUTPUT_LOADED
+__PLUGIN_SYNC_DEVOUTPUT_LOADED = 1
+
+_pluginId_sync_devoutput := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: SYDO
+
+############################### Sync dev output ################################
+#User input variables:
+
+# gmi_SYDO_ud_SYNC_HEADER_ROOT (old)
+	#	The dir that your headers reside in. This dir should be a absolute dir or
+	# a dir relative to $(CURDIR).
+	#	If left empty, it will be the same as using a dot(current dir).
+	# New alternative: gmi_SYDO_ud_SYNC_HEADER_FROM
+
+# gmi_SYDO_up_list_SYNC_HEADERS (old)
+	# List filepaths of the header files to sync; these filepaths are relative to,
+	# and must be inside, $(gmi_SYDO_ud_SYNC_HEADER_ROOT) .
+	# New alternative: gmi_SYDO_up_list_SYNC_HEADER
+
+
+# gmi_SYDO_SHOW_COPY_CMD (optional, default to null)
+	# Set to 1 to enable echoing what shell commands are used to copy the files.
+
+# gmi_SYDO_ONLY_COPY_NEWER (default to null)
+	# If non-null, do copy only if source is newer than target. Typically, ``cp -u'' is used for this.
+	# If null, the copy is always carried out regardless of the times stamps of source and target.
+
+# gmi_SYDO_COPY_NO_FORCE (optional, default to null)
+	# When using default copy command, whether suppress using --force for cp command.
+	# Set it to non-null can prevent overwriting read-only destination file. But if
+	# overwriting fails due to no-force, then cp command will fail causing make to stop.
+	# This can be used if you don't want to overwrite read-only target files.
+
+# Tips:
+#
+#	It is suggested to set those gmi_SYDO_ud_SYNC_XXX_TO vars as env-var, so that you don't
+# have to set them every time on make's command line. Or, let the parent project decide
+# what gmi_SYDO_ud_SYNC_XXX_TO should be. -- Yes, gmi_SYDO_ud_SYNC_XXX_TO is a matter of
+# the project's "user", not the project itself.
+
+
+gmp_USER_POST_TARGETS += gmi_SYDO_target_SyncOutput
+
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+  gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_sync_devoutput),postcore)
+endif
+
+
+endif #ifndef __PLUGIN_SYNC_DEVOUTPUT_LOADED

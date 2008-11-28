@@ -1,0 +1,36 @@
+# This file is to be included by $(gmp_COMPILER_ID)/compiler_config.mki .
+# It set the following make-variable for use with GnumakeUniproc.mki .
+#	gmu_DECO_PREFIX_PRJ_NAME & gmu_DECO_SUFFIX_PRJ_NAME
+#	gmu_DECO_PREFIX_LINK_OUTPUT & gmu_DECO_SUFFIX_LINK_OUTPUT
+
+ifneq (,$(gmp_bc_UNICODE)) # Will append _U
+  ifneq (,$(gmp_DECO_UNICODE_FOR_LINK_OUTPUT)$(gmp_DECO_PRJ_NAME))
+    gmu_DECO_SUFFIX_PRJ_NAME += _U
+  endif
+  	  
+  ifneq (,$(gmp_DECO_UNICODE_FOR_LINK_OUTPUT))
+    gmu_DECO_SUFFIX_LINK_OUTPUT += _U
+    
+    gmp_isfnDecoUnicode = 1
+  endif
+endif
+
+ifneq (,$(gmp_bc_DEBUG)) # Will append _D
+  ifneq (,$(gmp_DECO_DEBUG_FOR_LINK_OUTPUT)$(gmp_DECO_PRJ_NAME))
+    gmu_DECO_SUFFIX_PRJ_NAME += _D
+  endif
+  	  
+  ifneq (,$(gmp_DECO_DEBUG_FOR_LINK_OUTPUT))
+    gmu_DECO_SUFFIX_LINK_OUTPUT += _D
+    
+    gmp_isfnDecoDebug = 1
+  endif
+endif
+
+
+gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(if $(gmp_isfnDecoUnicode),_U)$(if $(gmp_isfnDecoDebug),_D),$1)
+	# [2007-02-12] If for a EXE project, the user wants to link his libs from a dedicated 
+	# place(dir), -- i.e. not listing lib-projects as his sub-project, -- he may use this
+	# function to dynamically determine what variant of libs to link(XXX.lib, XXX_D.lib 
+	# XXX_U.lib or XXX_U_D.lib).
+

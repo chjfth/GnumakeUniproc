@@ -1,0 +1,98 @@
+_THIS_COMPILER_ID := linuxgcc
+
+ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
+  $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
+endif
+#gmp_COMPILER_VER = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+
+
+_gmp_gcc_vers := $(filter gcc%,$(gmp_COMPILER_VER))
+	# User's note: 
+	# In order to use multiple gcc versions a in one GMU build, just differentiate them(actually
+	# (differentiate the project name with different gcc version) by setting 
+	#	gmp_COMPILER_VER=gccXXX
+	# with differnt XXX value.
+
+# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER))
+  ifeq (,$(_gmp_gcc_vers))
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for gcc compiler)
+  endif
+endif
+
+ifeq (,$(strip $(_gmp_gcc_vers)))
+  # Do nothing.
+else
+  ifneq (1,$(call _IsAllWordsSame,$(_gmp_gcc_vers)))
+    $(error !GMP!Error: Multiple gcc compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _gmp_gcc_vers=$(_gmp_gcc_vers))
+  endif
+  _gmp_gcc_ver_use = $(firstword $(_gmp_gcc_vers))
+
+  #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
+  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings. In this case,
+  #any strings starting with gcc are considered valid(matching predefined compiler-ver).
+  gmp_G_CompilerVerToDeco := _$(_gmp_gcc_ver_use)
+endif
+
+
+
+gmu_extn_OBJ = o
+
+gmp_extn_LIB = a
+gmp_extn_DLL = so
+gmp_extn_EXE = 
+gmp_prefix_LIB = lib
+	# The purpose of gmp_prefix_LIB is that gcc build system expect a library to be named libXXX.a
+
+gmpf_MakeLibName = $(patsubst %,$(gmp_prefix_LIB)%.$(gmp_extn_LIB),$1)
+gmpf_MakeExeName = $1
+gmpf_MakeDllName = $(patsubst %,$(gmp_prefix_LIB)%.$(gmp_extn_DLL),$1)
+gmpf_MakeDllNameForLink = $(gmpf_MakeDllName)
+
+
+gmpf_MakeUpSysLibsToLink = $(addprefix -l,$1)
+
+gmu_u_GCC_M_OPTIONS_preset += #-D_M_IX86=500 -DWIN32 -D_WIN32
+
+gmu_ud_list_SYS_HEADER += $(gmp_linuxgcc_ud_list_SYSTEM_HEADER)
+
+
+gmu_exe_CC = $(gmp_GCC_PREFIX)gcc
+gmu_exe_CXX = $(gmp_GCC_PREFIX)g++
+gmu_exe_LINK = $(gmp_GCC_PREFIX)g++
+gmu_exe_LIB = $(gmp_GCC_PREFIX)ar
+
+
+gmp_CFLAGS_NON_CODE_GEN_preset +=
+
+gmp_CFLAGS_MACRO_DEFS_preset += -D__int64="long long"
+
+c_flags_Link_Common = 
+
+################################################################################
+# For each compiler or link flag category below, you must choose one that suits 
+# your need.
+#	`cfc' means compiler-flag-category
+#	`lfc' means linker-flag-category
+#################################################################################
+
+# Category(dor): Debug-Build or Release-Build
+cfc_for_Debug_codegen = -g
+cfc_for_Debug_defs = -D_DEBUG 
+cfc_for_Release_codegen = -O2
+cfc_for_Relesase_defs = -DNDEBUG
+
+# Category(chr): MBCS or Unicode
+cfc_chr_Mbcs_defs = -D_MBCS
+cfc_chr_Unicode_defs = -DUNICODE -D_UNICODE
+
+# Category(ldbg): Is link with /DEBUG option
+#lfc_ !!! by yourself
+
+# Category(apt): application type
+#lfc_apt_Gui = -mwindows
+#lfc_apt_Console = -mconsole
+#lfc_apt_Dll = ...
+
+
