@@ -1,0 +1,137 @@
+[2008-10-22] v0.94(RC1)
+===== Changes and Improvements: =====
+1. r546
+	Generate building_list.gmu.txt as well as built_list.gmu.txt simultaneously. Now building_list.gmu.txt shows you the call stack(build stack) of your project. It is very helpful to check this stack info to know how you reach a specific project, especially the build fails at some project.
+2. r576-580
+	Add a force-postprocess feature which enables, in one GMU run, a already built project to be built(check up-to-date) again so that you can force some "post processing" action to be done within that project.
+	There is an example called "force-postprocess" to demonstrate this.
+3. r587-590
+	Introduce new function gmuf_CombinePsSubdirs, obsolete gmp_ud_list_PS_HEADER_PARENT and gmp_PS_INCLUDE_SUBDIRS(but still supported for backward compatibility). Remove configure for gmp_PS_INCLUDE_SUBDIRS in Windows installer.
+4. r596
+	$(gmu_u_SHOW_PROGRESS_CMD) using enhancement. Now the progress info is updated on a project start as well as a project done, what's more, current project name is shown.
+5. r607-610
+	On Windows, no longer require env-var gmu_DIR_GMU_PRG .
+6. r618-631,r635-636
+	Great feature: LIB project cross-dependency is allowed when multi-level auto-linking is in action.
+	The cross-lib-ref example demonstrates this.
+7. r625
+	For GMU pattern1, introduce a new stem compiler-config file: compiler_config.precore.mki , which appears after u_srccfg_post.mki but before GnumakeUniproc.mki .
+8. r633
+	New gmu-var gmu_u_EXTRA_LINK_MERGE: user makefile can add extra libs(e.g. system libs) for its parent project to link, so that parent projects don't have to care what system libs should be drawed in for deeper sub-projects.
+9. r643
+	When calling gmuf_MakeSvnRepositoryPath and the env-var for SVN root URL is null, assert with $(error ). This makes the user know immediately what env-var is missing for an SVN server.
+10. Some semantic change for gmu_ud_OUTPUT_ROOT: When command line assigned gmu_ud_OUTPUT_ROOT is non-null, GMU start-up signature file will be created in $(gmu_ud_OUTPUT_ROOT) instead of in $(CURDIR). This prevents the directory containing start-up makefile be polluted by start-up signature file.
+	Influence of this change: 
+	* Using GNU make 3.80 and assigning gmu_ud_OUTPUT_ROOT at command line will cause problem.
+	* When command-line assigned gmu_ud_OUTPUT_ROOT is a relative dir and you use ``-C <startup-dir>'' to launch make, gmu_ud_OUTPUT_ROOT is relative to <startup-dir> instead of your shell's cwd.
+11. r646
+	Remove two boring plugin-var: gmi_SYDO_DO_SYNC_DEVOUTPUT and gmi_RCVC_DO_WANT_AUTO_RC_HDEP. Now you don't need to define them to make plugin PI_sync_devoutput and PI_winres_msvc work.
+12. r646
+	Setting gmi_SYDO_ud_SYNC_xxx_TO in env-var is not longer suggested. Windows installer removes its config page.
+13. r640,r647-650
+	PI_sync_devoutput plugin now becomes more generic.
+14. r659
+	Update for MSVC compiler config files: Now works well when INCLUDE directories contain spaces(still to test).
+15. r661
+	New gmu-var gmp_LINK_DuplicateLibList=1. For linkers such as GNU ld who hastes to drop objs on LIB scanning, 	you can define this so that the LIB list is duplicated on link command line to make ld get those "missing" objs.
+
+===== Example and Doc Update: =====
+1: r547-r555,r594
+	Move quick-start guide examples(walkdir) to GMU-examples dir, so that these projects can be easily tested with $gmu_DIR_ROOT/GMU-examples/make-all .
+	Merge together quick-start guide Linux version and Windows version for easier maintenance.
+2: r556
+	Add dll-from-lib example project, making a DLL by linking(packing) LIB project(s).
+3: r575
+	Add gmp_DECO_DEBUG_FOR_LINK_OUTPUT=1 for walkdir lib, so that Debug version and Release version of the same LIB can be placed in the same dir. (It's one kind of SDK design strategy.)
+4: r600-r601
+	Add mix-compiler-ver example demonstrating using two different version of a same compiler in one GMU build session.
+5: Add workable WinCE compiler config files(gmp_COMPILER_ID=wince) as a kick start sample for building WinCE applications with Visual Studio 2005 compiler. Check $gmu_DIR_ROOT\GMU-main\GnumakeUniproc\pattern1cfg\compiler_cfg\wince\readme-for-gmu-user.txt for more details.
+
+
+
+[2008-04-25] v0.93
+
+1. r439
+    !!INTERFACE CHANGE: No longer set default values for gmp_CFLAGS_CODE_GEN, gmp_CFLAGS_MACRO_DEFS, gmp_LINKFLAGS. If users want the default compiler flags or link flags from the templates, they should copy flags from gmp_CFLAGS_CODE_GEN_preset, gmp_CFLAGS_MACRO_DEFS_preset and gmp_LINKFLAGS_preset. And those u_srccfg_post.mki templates have been updated to do so. You probrably have to modify your existing makefiles(according to how the templates change) to accommodate this change. Sorry for the change.
+2. r436-V437
+    Add plugin PI_MIDL (Microsoft interface definition compiler). It helps compile your odl files(tested with MSVC6).
+3. When calling `gcc -M', define -D_GMU_GCC_M_GEN_HDEPEND on command line, so that some conscious C/C++ source code can use this macro to hide some headers or C/C++ statements from being seen by `gcc -M'.
+4. r446
+    Enable gmp_USER_FIRST_TARGET for pattern1-container .
+5. r448
+    New gmu-var gmu_DELIBERATE_NO_SUBPRJ, which makes container-project a free style one, i.e. no need to really contain sub-projects . This is useful to integrate non-gmu makefiles into GMU makefile chain.
+6. r449-451
+    Rename _gmu_log.txt to _gmu_log.txt.bak instead of overwritting it when a new GMU run starts.
+7. r456
+    Change: Load custom-image-type mki inclusion adhead of compiler_config.mki, so that custom-image-type can be a virtual image-type, and real image-type can be redefined by the custom-image-type mki. This can be very helpful when maintaining some kind of cross-platform projects.
+8. r464
+    For MSVC: PDB file is generated at correct place with correct name instead of using the default VCx0.pdb, e.g. ABC.lib corresponds to ABC.lib.VCx0.pdb. Copy those .pdb along with .lib and they works smoothly.
+9. r469,r482,r484
+    For MSVC: Add plugin PI_sync_pdb_msvc, -- copy the .pdb & .idb files for a debug image to the same place where $(gmu_Gp_LINK_OUTPUT) resides (with help of plugin PI_sync_devoutput).
+10. r465
+    !Design change(affects pattern and plugin user): No longer force deco $(gmp_COMPILER_VER) globally, and gmp_COMPILER_VER may be a mix of multiple compiler versions. See comments in bc_deco_prjname.mki .
+11. r466
+    PI_sync_devoutput plugin update: Allow customized copy commands.
+12. r467
+    Add function gmuf_OutputInfo_e to output multiple line of text.
+13. r467
+    Now CVS/SVN action is counted,  summary displayed after done GMU run.
+14. r473
+    Running info output update: Show ${SubPrj}_MakeVarDefines when verbose-level=1. This is important because different make-var defines could affect make process very differently.
+15. r478
+    Now gmu_ud_OUTPUT_ROOT can be assigned as a relative dir.
+16. r479
+    Minor change: msvc-config: No longer add CrtMD to project output dir, since it is the ultimate default.
+17. r484
+    Add new make-var gmu_list_PLUGIN_TO_LOAD_ENV_PRE and gmu_list_PLUGIN_TO_LOAD_ENV_POST , so that plugins loading directive can be assigned from env-var .
+18. r488
+    Important fix: Will decorate prj-name when gmp_CONTAINER_EXTRACT_COMPILER_ID.
+19. r489
+    Improvement: For <refname>_MakeVarDefines, allow using double quotes now. Example:
+refname_MakeVarDefines="PI_sync_debug_info PI_sync_devoutput"
+20. r492
+    Behavior fix: unexport gmu_DECO_PREFIX_PRJ_NAME gmu_DECO_SUFFIX_PRJ_NAME gmu_DECO_PREFIX_LINK_OUTPUT gmu_DECO_SUFFIX_LINK_OUTPUT. Use unexport for these four vars so that their values defined from env can be passed to subprjs, but value += to these in makefiles will not be visible to subprjs.
+21. r495-497
+    For gcc: Set default ``gmp_CFLAGS_MACRO_DEFS_preset += -fvisibility=hidden'', so that when linking .so, symbols/functions default to be local(hidden). For explicitly export symbols/functions, user should declare their symbols/functions with __attribute__((visibility("default"))). For old gcc versions that don't support this option, you can define gmp_GCC_OLDVER_NO_FVISIBILITY=1 to suppress this behavior
+22. r501
+    Add gmp_USER_PRE_TARGETS (pair up with gmp_USER_POST_TARGETS). Thus, something can be done before $(gmp_USER_FIRST_TARGET) -- this add another level of flexibility(or complexity?) .
+23. r504
+    New feature: By setting env-var gmu_u_SHOW_PROGRESS_CMD to a properly shell command, you can display build progress(update once every project done) info on your user interface. Run gmu-goody.bat to know how it works.
+24. r526
+    Rename build_list.gmu.txt to built_list.gmu.txt, which implies an item in the list appears only after a project has been successfully built. Additionally you can define env-var gmu_BUILT_LIST_INDENT=1 to make an indented output of projects being built and already built, -- this lets you easily find out project building stack.
+
+
+
+[2007-10-05] v0.92
+
+1. r378
+ Fix: Now search custom-image-type mki in $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins, 
+ instead of in $(gmu_DIR_GNUMAKEUNIPROC). I remember this should be the only major place
+ that makes GnumakeUniproc v0.92 incompatible with v0.91 .
+
+2. r385
+ New: introduce env-var gmu_DIR_ROOT to indicate the root dir of GnumakeUniproc. 
+ Auto-checkout demo will rely on this var to locate CVS/SVN repository location.
+
+3. r386 (NSIS installer)
+ On installation, record install target dir to registry([HKCU\Software\GnumakeUniproc] 
+ InstallTargetDir=D:\GMU) so that a second install can know where the previous install 
+ dir reside. --useful if the user did not install to the default dir(D:\GMU).
+
+4. r387, r398
+ Write project build list to file $(gmu_ud_OUTPUT_ROOT)/build_list.gmu.txt
+
+5. r391-r392
+ Add make DLL example, using zlib-1.2.3's code (Windows & Linux).
+
+6. r397
+ msvc/compiler_config.mki: write obj & lib list into a file to reduce link command line 
+ length.
+
+7. r393-r418
+ Add auto-checkout demo projects. SVN & CVS repositories are stored on local
+ machine so that checkout can be
+
+8. r399- (docs)
+ Add "GMU var reference"(gmu-vars.htm, still under construction) & "CVS related gmuvars"
+ (cvs-vars.htm)

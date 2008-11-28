@@ -1,0 +1,25 @@
+[2007-03-02]
+
+Steps to generate the NSIS installer package for GnumakeUniproc:
+
+Step 1: 
+
+Run export-gmu.bat to export everything need to pack into an NSIS installer package.
+e.g.
+	export-gmu.bat https://gnumakeuniproc.svn.sourceforge.net/svnroot/gnumakeuniproc
+Everything exported will be store in subdir nsis-data .
+
+Step 2:
+
+Prepare Windows binary tools in two specific directories.
+* Prepare MinGW in nsis-data/MinGW2, e.g. there should be nsis-data/MinGW2/bin/gcc.exe .
+* Prepare all GnumakeUniproc-specific Windows executables in nsis-data/bin-gmu, e.g. there
+	should be nsis-data/bin-gmu/umakeD.bat .
+* Prepare all GnumakeUniproc-specific Windows executables in nsis-data/bin-gmu-addon, e.g. there
+	should be nsis-data/bin-gmu-addon/gmutime.exe .
+And note: 
+	All contents in above-mentioned bin* dir will be merged into destination's MinGW2/bin .
+
+Step 3:
+	NSIS-Compile GMU-nsis.nsi using large string(8192 bytes) version of makensis.exe. The standard 1024-byte version will not suffice the custom page `StoreEnvVar'.
+
