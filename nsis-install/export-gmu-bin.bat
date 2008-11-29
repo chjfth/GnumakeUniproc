@@ -2,7 +2,6 @@
 REM This .bat file exports binary files for GnumakeUniproc NSIS packing.
 REM These files(tens of mega-bytes) are not stored on sf.net, but on my nlssvn SVN server.
 rem		https://nlssvn/BinaryRls/MinGW-binary
-rem		https://myhost:444/BinaryRls/MinGW-binary
 REM Tested with svn 1.4.2 (r22196)
 
 if "x%1x" == "xx" goto ErrParamMissing

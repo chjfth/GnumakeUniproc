@@ -18,8 +18,7 @@ zlib-example_Makefile = $(d_WCRoot)/zlib-example/exe.$(gmp_COMPILER_ID)/Makefile
 # If the sub-project's makefiles are to be checked-out from some repository, assign it here.
 # >>>> For SVN checkout
 zlib-example_svnUrl_forMakefiles = \
-	file:///$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/svnreps-zlib-example/trunk
-	# note: Don't worry about the $(gmu_DEMO_CO_BRANCH), it is null for you average user.
+	file:///$(gmu_DIR_ROOT)/demo-repositories/svnreps-zlib-example/trunk
 zlib-example_svnLocalDir_forMakefiles = $(d_WCRoot)/zlib-example
 	# Local dir corresponding to the whole SVN URL
 zlib-example_svnRev = # Revision to use(string after svn's -r switch)
@@ -30,7 +29,7 @@ zlib-minigzip_Makefile = $(d_WCRoot)/zlib-minigzip/exe.$(gmp_COMPILER_ID)/Makefi
 # If the sub-project's makefiles are to be checked-out from some repository, assign it here.
 # >>>> For SVN checkout
 zlib-minigzip_svnUrl_forMakefiles = \
-	file:///$(gmu_DIR_ROOT)/demo-repositories$(gmu_DEMO_CO_BRANCH)/svnreps-zlib-minigzip/trunk
+	file:///$(gmu_DIR_ROOT)/demo-repositories/svnreps-zlib-minigzip/trunk
 zlib-minigzip_svnLocalDir_forMakefiles = $(d_WCRoot)/zlib-minigzip
 	# Local dir corresponding to the whole SVN URL
 zlib-minigzip_svnRev = # Revision to use(string after svn's -r switch)

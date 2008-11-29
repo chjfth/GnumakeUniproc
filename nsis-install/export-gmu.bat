@@ -4,7 +4,6 @@ REM [2007-03-02] Currently, the prefix from sf.net is
 REM   https://gnumakeuniproc.svn.sourceforge.net/svnroot/gnumakeuniproc
 rem (chj internal use): 
 rem		https://nlssvn/svnreps/makingsys/GnumakeUniproc
-rem		https://myhost:444/svnreps/makingsys/GnumakeUniproc
 REM Tested with svn 1.4.2 (r22196)
 
 if "x%1x" == "xx" goto ErrParamMissing

@@ -3,7 +3,6 @@
 #   https://gnumakeuniproc.svn.sourceforge.net/svnroot/gnumakeuniproc
 # (chj internal use): 
 #		https://nlssvn/svnreps/makingsys/GnumakeUniproc
-#		https://myhost:444/svnreps/makingsys/GnumakeUniproc
 # Tested with svn 1.4.2 (r22196)
 
 if [ "$1" == "" ]; then
@@ -40,9 +39,6 @@ Checkout1Module demo-repositories; if [ "$?" != 0 ]; then exit 1; fi;
 Checkout1Module nsis-install;      if [ "$?" != 0 ]; then exit 1; fi;
 
 echo "All files of GnumakeUniproc have been retrieved."
-
-mv -f ./GMU/GMU-main/INSTALL.linux ./GMU
-if [ "$?" != 0 ]; then echo "Moving INSTALL.linux failed!"; fi;
 
 echo "Packing GMU.tar.bz2 ..."
 tar jcf GMU.tar.bz2 GMU
