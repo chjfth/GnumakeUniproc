@@ -226,7 +226,9 @@
   <tr>
     <td>gmu_NO_GEN_HDEPEND</td>
     <td align="center">I</td>
-    <td>If non-null, disable the `gcc -M' header dependency generation. (default to null) </td>
+    <td><p>If non-null, disable the `gcc -M' header dependency generation. (default to null) </p>
+    <p>You should know the effect of making with <code>gmu_NO_GEN_HDEPEND=1</code>, that is, if some .h files included by your program changes, make again will not notice that so your program will not be rebuilt. To dismiss the effect of using <code>gmu_NO_GEN_HDEPEND=1</code>, you have to clean your output first then make again.</p>
+    </td>
   </tr>
   <tr>
     <td valign="top">gmu_IGNORE_SUBPRJS </td>
