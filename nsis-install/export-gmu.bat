@@ -17,17 +17,7 @@ if NOT "x%2x" == "xx" set BranchToGet=%2
 set OutputDir=nsis-data
 
 @echo on
-svn export --force %SvnUrlPrefix%/GMU-main/%BranchToGet%     %OutputDir%/GMU/GMU-main
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
-svn export --force %SvnUrlPrefix%/GMU-manual/%BranchToGet%   %OutputDir%/GMU/GMU-manual
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
-svn export --force %SvnUrlPrefix%/GMU-ext/%BranchToGet%      %OutputDir%/GMU/GMU-ext
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
-svn export --force %SvnUrlPrefix%/GMU-examples/%BranchToGet% %OutputDir%/GMU/GMU-examples
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
-svn export --force %SvnUrlPrefix%/demo-repositories/%BranchToGet% %OutputDir%/GMU/demo-repositories
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
-svn export --force %SvnUrlPrefix%/nsis-install/%BranchToGet% %OutputDir%/GMU/nsis-install
+svn export --force %SvnUrlPrefix%/%BranchToGet%     %OutputDir%/GMU
 @if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
 @echo off
 

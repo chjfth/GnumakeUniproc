@@ -20,23 +20,12 @@ fi
 
 OutputDir=GMU
 
-
-function Checkout1Module()
-{
-	svn export --force $SvnUrlPrefix/$1/$BranchToGet $OutputDir/$1
-	ret=$?
-	if [ "$ret" != 0 ]; then
-		echo "Unexpected! SVN export($1) failed."
-	fi
-	return $ret
-}
-
-Checkout1Module GMU-main;      if [ "$?" != 0 ]; then exit 1; fi;
-Checkout1Module GMU-manual;    if [ "$?" != 0 ]; then exit 1; fi;
-Checkout1Module GMU-ext;       if [ "$?" != 0 ]; then exit 1; fi;
-Checkout1Module GMU-examples;      if [ "$?" != 0 ]; then exit 1; fi;
-Checkout1Module demo-repositories; if [ "$?" != 0 ]; then exit 1; fi;
-Checkout1Module nsis-install;      if [ "$?" != 0 ]; then exit 1; fi;
+svn export --force $SvnUrlPrefix/$BranchToGet $OutputDir
+ret=$?
+if [ "$ret" != 0 ]; then
+	echo "Unexpected! SVN export($1) failed."
+	exit 1
+fi
 
 echo "All files of GnumakeUniproc have been retrieved."
 
