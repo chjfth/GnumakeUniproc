@@ -1,5 +1,5 @@
 ifndef __PLUGIN_USE_PCH_GCC_LOADED
-__PLUGIN_USE_PCH_GCC_LOADED = 1
+__PLUGIN_USE_PCH_GCC_LOADED := 1
 
 _pluginId_use_pch_gcc = := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: PCHG
@@ -18,8 +18,8 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 		# the generated .h.gch will be rejected if you later g++ compile test.cpp 
 		# which includes test.h .
 
-#	gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT = 
-#	gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT = 
+#	gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT =      (optional)
+#	gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT = (optional)
 	#	These two vars control which source files should use pch and which should not.
 	# The first, gmi_PCHG_up_list_SRC_DEPPCH_FROM_ROOT(abbr. srcDepPch) tells which source files
 	# should use pch. If null, it is as if all $(gmu_up_list_SRC_FROM_ROOT) is listed in.
@@ -31,21 +31,24 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 	# files that don't use precompiled header into srcDontDep.
 
 # User's NOTE:
-#	If you want to add your own compiler flags for a project and that flags effect
+#	If you want to add your own compiler flags for a project and those flags effect
 # code generation, you must have it appear in gmp_CFLAGS_CODE_GEN_ALL
+# MEMO >>>
 #	gmp_CFLAGS_CODE_GEN_ALL += $(gmp_CFLAGS_CODE_GEN) $(gmp_CXXFLAGS_CODE_GEN) $(gmp_CFLAGS_MACRO_DEFS) $(gmp_CFLAGS_INCLUDES)
+# MEMO <<<
 # -- because this plugin use $(gmp_CFLAGS_CODE_GEN_ALL) as compiler flags when precompiling. 
-# You know, you must have precompiling and real compiling use the same set of code generation flags.
+# You know, you must have precompiling and real compiling use the same set of code generation 
+# flags to get the final correct result.
 #
 #	In order to use this plugin properly, user should 
-# 	* have one and only on header file (gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) within his 
-# gmu_ud_SRC_ROOT dir.
+# 	* have one and only one header file (gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) within his 
+# gmu_ud_SRC_ROOT dir. //[2008-11-29] Weird description???
 #	and
 #	* within those C/C++ files that includes gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT, angel brackets
-# should be used to include that header file, because this plugin generates the .gch file
+# should be used to include this header file, because this plugin generates the .gch file
 # in prj-output-dir and add gcc option ``-I <prj-output-dir>'' in order for the .gch
 # file to be found prior to the original gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT . More over, 
-# if your gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=subdir/my.h , don't write in your C/C++ source
+# if your gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=_subdir_/my.h , don't write in your C/C++ source
 # ``#include <_subdir_/my.h>, instead, write ``#include <my.h>'' and no need to list 
 # _subdir_ in gmu_ud_list_PRJ_HEADER -- this plugin will do it for you.
 
