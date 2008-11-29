@@ -1,9 +1,0 @@
-
-define _PI_do_gcc_strip
-	echo "$(_pluginId_GCC_STRIP_LO): Stripping link-output: $(notdir $(gmu_Gp_LINK_OUTPUT)) ..."
-	$(gmp_GCC_PREFIX)strip $(gmu_Gp_LINK_OUTPUT);
-endef
-
-.PHONY: _GSLO_DoStrip
-_GSLO_DoStrip: 
-	@$(if $(call gmuf_IsOlderThanBuildStart_sh,$(gmu_Gp_LINK_OUTPUT)),,$(_PI_do_gcc_strip))

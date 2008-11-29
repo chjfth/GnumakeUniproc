@@ -1,21 +1,19 @@
 ifndef __PLUGIN_GCC_STRIP_LO_LOADED # Comment: LO means link output
-__PLUGIN_GCC_STRIP_LO_LOADED = 1
+__PLUGIN_GCC_STRIP_LO_LOADED := 1
 
 _pluginId_GCC_STRIP_LO := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: GSLO
 
-# User input vars:
-#	gmi_GSLO_DO_STRIP = 
-		# If null, this plugin will do nothing; 
-		# if non-null, stripping $(gmu_Gp_LINK_OUTPUT) will take place.
+# User input vars: (NONE)
 
-ifneq (,$(gmi_GSLO_DO_STRIP))
+# This plugin is really simple, which strip $(gmu_Gp_LINK_OUTPUT) with `strip' command.
 
-gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_GCC_STRIP_LO),postcore)
 
-gmp_USER_POST_TARGETS += _GSLO_DoStrip
+define gmp_LINK_OUTPUT_POSTPROC_CMD
+	@echo "$(_pluginId_GCC_STRIP_LO): Stripping link-output: $(notdir $(gmu_Gp_LINK_OUTPUT)) ..."
+	@$(gmp_GCC_PREFIX)strip $(gmu_Gp_LINK_OUTPUT)
+endef
 
-endif
 
 endif #ifndef __PLUGIN_GCC_STRIP_LO_LOADED
 
