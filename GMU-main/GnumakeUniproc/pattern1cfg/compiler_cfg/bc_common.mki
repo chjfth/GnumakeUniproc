@@ -71,10 +71,13 @@ gmp_C_CXX_ALL_preset += $(gmp_CFLAGS_CODE_GEN_ALL_preset) $(gmp_CFLAGS_NON_CODE_
 gmp_CFLAGS_CODE_GEN_ALL_preset += $(gmp_CFLAGS_CODE_GEN_preset) $(gmp_CXXFLAGS_CODE_GEN_preset) \
   $(gmp_CFLAGS_MACRO_DEFS_preset) $(gmp_CFLAGS_INCLUDES_preset)
 
+gmp_CFLAGS_CODE_GEN_preset += $(gmp_CFLAGS_INCLUDES)
+	#[2008-11-29] added, when building gtktetris example.
+
 
 _gmp_CFLAGS_final = $(if $(strip $(_gmp_C_CXX_FLAGS_ALL)),$(_gmp_C_CXX_FLAGS_ALL),$(gmp_C_CXX_ALL_preset))
 
 _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LINKFLAGS_preset))
-	#[2007-11-16] Actually, the special process for empty _gmp_C_CXX_FLAGS_ALL & empty gmp_LINKFLAGS
+	#[2007-11-16] Actually, the special process for [empty _gmp_C_CXX_FLAGS_ALL & empty gmp_LINKFLAGS]
 	#is here for old GMU makefiles(v0.92 and prior) compatibility. New GMU makefiles should always
 	#have _gmp_C_CXX_FLAGS_ALL & gmp_LINKFLAGS non-null.

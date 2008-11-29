@@ -1,4 +1,5 @@
 
+# Key statement of KeyView2 example:
 $(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT)
 	@echo "KeyView2 GMU example note: Zipping output file $(notdir $<) ..."
 	@( cd $(dir $<) && zip $@ $(notdir $<) )

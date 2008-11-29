@@ -42,6 +42,7 @@ endif
 define _GCC_GEN_PCH
 	@echo " Precompiling $(gmu_ud_SRC_ROOT)/$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) to $(call _StripOutputRootPrefix,$@) ... "
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
+	@$(call _MkdirIfNotExist,$(@D))
 	$(_GccCmd_for_pch) -o $@ $(gmp_CFLAGS_CODE_GEN_ALL) $(gmp_CFLAGS_INCLUDES) $<
 	$(call gmpf_AddCustomActionCount,GCC-PCH-generated)
 endef

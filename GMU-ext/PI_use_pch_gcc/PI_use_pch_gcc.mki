@@ -1,7 +1,7 @@
 ifndef __PLUGIN_USE_PCH_GCC_LOADED
 __PLUGIN_USE_PCH_GCC_LOADED := 1
 
-_pluginId_use_pch_gcc = := $(gmpv_ThisPluginId)
+_pluginId_use_pch_gcc := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: PCHG
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_pch_gcc),postcore)
 
