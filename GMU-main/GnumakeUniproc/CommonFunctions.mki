@@ -168,6 +168,7 @@ _IsOlderThanBuildStart = $(call _IsP1OlderThanP2,$1,$(gmu_p_BuildStartCkt))
 
 _IsOlderThanBuildStart_direct_sh = $(call _IsP1OlderThanP2_direct_sh,$1,$(gmu_p_BuildStartCkt))
 
+gmuf_IsOlderThanBuildStart_sh = $(call _IsOlderThanBuildStart_direct_sh,$1)
 
 _IsFileContentEqualTo = $(call _IsStringEqual,$2,$(shell cat "$1"))
 	# $1: the filename(pathname), $2: the string to compare to; returns 1 if equal, otherwise null.

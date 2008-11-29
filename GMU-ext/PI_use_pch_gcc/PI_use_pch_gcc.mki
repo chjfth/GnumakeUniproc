@@ -7,12 +7,12 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 
 # User input vars:
-#	gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT = # the header file used for precompiling
+#	gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT = #(must) the header file used for precompiling
 		# Of course, if this header file or files included by this file changes, 
 		# the .pch file will be regenerated before compiling any source that
 		# includes this header file.
 
-#	gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX = # set it to `gcc' or `g++' (default to g++)
+#	gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX = #(optional) set it to `gcc' or `g++' (default to g++)
 		# Tells whether use gcc or g++ to pre-compile a header file.
 		# You know, if you just execute ``gcc test.h'', gcc(not g++) is used,
 		# the generated .h.gch will be rejected if you later g++ compile test.cpp 
@@ -40,17 +40,25 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 # You know, you must have precompiling and real compiling use the same set of code generation 
 # flags to get the final correct result.
 #
-#	In order to use this plugin properly, user should 
-# 	* have one and only one header file (gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) within his 
-# gmu_ud_SRC_ROOT dir. //[2008-11-29] Weird description???
+#	In order to use this plugin properly, user should:
+# 	1. Across your whole project, you should not have a second header file that has the
+# same name as $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) .
 #	and
-#	* within those C/C++ files that includes gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT, angel brackets
-# should be used to include this header file, because this plugin generates the .gch file
+#	2. Within those C/C++ files that includes $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT), 
+# angel brackets SHOULD be used to include this header file, because this plugin generates the .gch file
 # in prj-output-dir and add gcc option ``-I <prj-output-dir>'' in order for the .gch
-# file to be found prior to the original gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT . More over, 
-# if your gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=_subdir_/my.h , don't write in your C/C++ source
-# ``#include <_subdir_/my.h>, instead, write ``#include <my.h>'' and no need to list 
+# file to be found prior to the original gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT . 
+#	and
+#	3. Don't prefix directory name when including $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT).
+# Example: If gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=_subdir_/my.h , don't write in your C/C++ source
+# ``#include <_subdir_/my.h>'', instead, write ``#include <my.h>'' and no need to list 
 # _subdir_ in gmu_ud_list_PRJ_HEADER -- this plugin will do it for you.
+#
+# The above requirements are due to gcc's "weird" behavior when dealing with precompiled headers.
+# Unlike Microsoft Visual C++'s using /Yu switch to explicitly assign what pch file to use, 
+# gcc searches pch(.gch) files using the same rule it searchs C/C++ header files. 
+# So to accomplish the goal that .gch is generated in _gmu_tmp(not to polute user's source dir)
+# while maintaining ease of use of PI_use_pch_gcc user, the above requirements are made.
 
 
 ifeq (,$(gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX))
