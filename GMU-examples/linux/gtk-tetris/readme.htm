@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Untitled Document</title>
+
+<style type="text/css">
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+tt { color:#000066; }
+code { color:#660000; }
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+</style>
+</head>
+
+<body>
+<H1 align="center">Readme for gtktetris example </H1>
+
+<p>The gtktetris example here demonstrate the use of two plugins:</p>
+<ul>
+  <li>PI_use_pch_gcc: Use gcc's precompiled header functionality.</li>
+  <li>PI_gcc_strip_lo: Use <code>strip</code> command to strip link output, i.e. get a smaller executable. </li>
+</ul>
+<p>The source code here is provided by <a href="http://sourceforge.net/projects/gtktetris">gtktetris project</a> on sourceforge.net. Subdir <tt>gtktetris-0.6.2</tt> contains the original code, while subdir <tt>gtktetris-gmu</tt> contains the slightly modified code to utilize precompiled header functionality. </p>
+<p><img src="gtktetris.gif"></p>
+<p>And there are still two make-subdirs in <tt>gtktetris-gmu</tt> :</p>
+<ul>
+  <li><tt>make-PI_use_pch_gcc</tt> : Makefile in this dir use plugin PI_use_pch_gcc.</li>
+  <li><tt>make-PI_gcc_strip_lo</tt> : Makefile in this dir uses PI_gcc_strip_lo . </li>
+</ul>
+<p>The two sets of makefiles have been tested with SuSE Linux 10.1 with gcc 4.1.0. </p>
+<h3>Using PI_use_pch_gcc</h3>
+<p>Gcc's precompiled header feature works like this: you assign a <i>pecompile source header</i>(normally, a .h file written by you) as input for gcc, in which you tuck all large, complicated header files, and gcc will outputs a .gch file(usually very large) for you. Then, when you compile a C/C++ source file, gcc will recognize the previously generated .gch file and use it instead of your source header. Parsing a .gch is faster than parsing a .h, so using .gch can increase build speed.</p>
+<p>But how gcc associates a .gch with its source header? According to gcc's manual, it does this by filename matching. If your source header has the name <tt>myheader.h</tt>, your gch must be named <tt>myheader.h.gch</tt>. Where <tt>myheader.h.gch</tt> is generated is not important, as long as it can be found in <code>-I</code> directory list when compiling C/C++ source. </p>
+<p>Now we come to PI_use_pch_gcc with the example. The following steps are taken:</p>
+<ol>
+  <li>We create a new file named <tt>tetris-pch.h</tt> as pecompile source header.</li>
+  <li>We tuck the bulk of system headers in it, noticeablely, <tt>&lt;gtk/gtk.h&gt;</tt> which is very large. </li>
+  <li>In exe.mki, we load PI_use_pch_gcc plugin, and assign<code> gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT=tetris-pch.h</code> . Note: <code>_FROM_ROOT</code> suffix implies this file path must be relative to (and with in) <code>gmu_ud_SRC_ROOT</code> . </li>
+  <li>In source files who need to include <tt>tetris-pch.h</tt>, you must include it with angle bracket, i.e, <code>#include &lt;tetris-pch.h&gt;</code> . Also, it is suggested to include <tt>tetris-pch.h</tt> before including all other headers. </li>
+</ol>
+<p>Now you're done, launch umake to build it. </p>
+<pre>gmu_ud_OUTPUT_ROOT(%) = ./gf
+ GenHdepend for precompiled-header from: ../../tetris-pch.h
+ <b>Precompiling ../../tetris-pch.h to %/gtktetris-pch_linuxgcc/_gmu_tmp/PI_use_pch_gcc/tetris-pch.h.gch</b> ...
+ GenHdepend: (tetris.c.d)
+ [gcc] ../../tetris.c
+ GenHdepend: (misc.c.d)
+ [gcc] ../../misc.c
+ GenHdepend: (interface.c.d)
+ [gcc] ../../interface.c
+ GenHdepend: (highscore.c.d)
+ [gcc] ../../highscore.c
+***** Linking(EXE): %/gtktetris-pch_linuxgcc/gtktetris ...
+[DONE:] %/gtktetris-pch_linuxgcc/gtktetris
+[[[END]]]                                        Projects:1,Containers:0+0
+Files compiled: C++:0 C:4 ASM:0 linked:1
+Custom action count:
+    <b>GCC-PCH-generated: 1</b>
+</pre>
+<p>Something to note:</p>
+<ul>
+  <li>You see that <tt>tetris-pch.h.gch</tt> is generated in a temp directory(<tt>_gmu_tmp</tt>) so that not to polute your source file directory. </li>
+  <li>Although .gch is generated in a temp dir, you don't have to assign that dir in <code>-I</code> compiler option explicitly in order for gcc to find it, PI_use_pch_gcc will do it for you automatically. This can be revealed by viewing the gcc command line(pass <code>gmu_DO_SHOW_COMPILE_CMD=1</code> to umake). </li>
+  <li>Special: No matter what directory the precompile source header resides, you must not write dir-prefix when <code>#include</code> it, e.g. you must not write <code>#include &lt;subdir/tetris-pch.h&gt;</code> . You don't have to tell the dir-prefix because you have told it in <code>gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT</code> .</li>
+  <li>When some files(unless &quot;system headers&quot;) included in precompile source header changes, the .gch file will be regenerated to reflect the new &quot;image&quot; of the precompile source. </li>
+</ul>
+<p>Limitation: Via PI_use_pch_gcc plugin, you can't have multiple projects share a single .gch file. In other word, every project must generate their own .gch file. </p>
+<h3>Using PI_gcc_strip_lo</h3>
+<p>This plugin is quite simple.You just load this plugin and it strips your output image after it is generated.</p>
+<p>NOTE: This plugin is implemented by defining GMU variable <code>gmp_LINK_OUTPUT_POSTPROC_CMD</code>. <code>gmp_LINK_OUTPUT_POSTPROC_CMD</code> is an exclusive varaible, that is, not cumulative, which means you can't use it with another plugin that also alters link output. </p>
+<p>-- </p>
+</body>
+
+</html>

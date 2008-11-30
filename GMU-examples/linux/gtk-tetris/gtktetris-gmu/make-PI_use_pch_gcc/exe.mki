@@ -36,7 +36,7 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_gcc
 
 # Set parameters for plugin PI_use_pch_gcc :
 gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT = tetris-pch.h
-gmi_PCHG_u_GENPCH_USE_GCC_OR_GXX = gcc
+gmi_PCHG_u_GENPCH_USE_gcc_OR_g++ = gcc
 
 
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
