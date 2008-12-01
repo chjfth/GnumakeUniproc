@@ -59,11 +59,13 @@ define _Gmp1SharedFinishingCmds
 endef
 
 # Still referring to the old 'gmp_USER_FIRST_TARGET' for backward compatibility.
-ifdef gmp_USER_FIRST_TARGET
-  gmp_up_USER_OUTPUT_AFTER_LINK = $(gmp_USER_FIRST_TARGET)
-    # I use := here so that user can use only one of 'gmp_up_USER_OUTPUT_AFTER_LINK and gmp_USER_FIRST_TARGET',
-    # This helps, I think, user discover mix using situation.
-endif
+
+gmp_up_USER_OUTPUT_AFTER_LINK += $(gmp_USER_FIRST_TARGET)
+	# For compatibility of the old var gmp_USER_FIRST_TARGET .
+	# [2008-12-01]Note: Don't have $(gmp_USER_FIRST_TARGET) immediate expand here, because
+	# a custom-image-mki author will assign gmp_USER_FIRST_TARGET in his mki after pattern1-common.mki .
+	# Although I can move this backward, but writting it here makes pattern1.mks & pattern-container1.mks share it.
+
 _gmp_up_USER_OUTPUT_AFTER_LINK_s = $(strip $(gmp_up_USER_OUTPUT_AFTER_LINK))
 
 gmi_SYDO_ud_SYNC_UserOutputAL_FROM = $(call gmuf_GetDir,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
