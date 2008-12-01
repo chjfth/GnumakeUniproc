@@ -711,11 +711,17 @@
   <tr>
     <td valign="top">gmp_u_list_PLUGIN_TO_LOAD</td>
     <td align="center" valign="top">I</td>
-    <td>Instruct what plugins to load. </td>
+    <td>Instruct what plugins to load. This var will not influence sub-projects. </td>
   </tr>
   <tr>
-    <td valign="top">gmu_list_PLUGIN_TO_LOAD_ENV_PRE<br>
-    gmu_list_PLUGIN_TO_LOAD_ENV_POST</td>
+    <td valign="top">gmp_u_list_PLUGIN_TO_LOAD_AUX</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>Similar to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, that is, its value will be merged to <code>gmp_u_list_PLUGIN_TO_LOAD</code>.</p>
+    <p>The difference is: If you assign <code>gmp_u_list_PLUGIN_TO_LOAD=<i>xxx</i></code> as make's argument, all <code>gmp_u_list_PLUGIN_TO_LOAD</code> assignment in makefiles will be overrided. <code>gmp_u_list_PLUGIN_TO_LOAD_AUX </code>does not cause such overide. </p>    </td>
+  </tr>
+  <tr>
+    <td valign="top">gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE<br>
+    gmp_u_list_PLUGIN_TO_LOAD_ENV_POST</td>
     <td align="center" valign="top">I(E)</td>
     <td><p>These two vars also instruct what plugins to load. </p>
       <ul>

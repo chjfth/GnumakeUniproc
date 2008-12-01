@@ -4,7 +4,27 @@ __PLUGIN_SYNC_DEVOUTPUT_LOADED = 1
 _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: SYDO
 
-############################### Sync dev output ################################
+#Brief:
+# This plugin searches all variables which match the following patterns:
+#	gmi_SYDO_ud_SYNC_%_FROM
+#	gmi_SYDO_ud_SYNC_%_TO
+#	gmi_SYDO_up_list_SYNC_%
+# % above is a placeholder. If for a word %, the above three variable are all non-null,
+# the plugin takes action: For all file/dir paths listed in gmi_SYDO_up_list_SYNC_%, they are
+# copied from dir gmi_SYDO_ud_SYNC_%_FROM to dir gmi_SYDO_ud_SYNC_%_TO .
+# Example:
+# If
+#	gmi_SYDO_ud_SYNC_myoutput_FROM = /myproj
+#	gmi_SYDO_ud_SYNC_myoutput_TO = /mysdk
+#	gmi_SYDO_up_list_SYNC_myoutput = file1 subdir1
+# then 
+#	/myproj/file1 and /myproj/subdir1
+# will be copied to
+#	/mysdk/file1  and /mysdk/subdir1
+# respectively.
+#
+# Note: gmi_SYDO_ud_SYNC_%_FROM & gmi_SYDO_ud_SYNC_%_TO can be assigned as relative dir to $(CURDIR).
+
 #User input variables:
 
 # gmi_SYDO_ud_SYNC_HEADER_ROOT (old)

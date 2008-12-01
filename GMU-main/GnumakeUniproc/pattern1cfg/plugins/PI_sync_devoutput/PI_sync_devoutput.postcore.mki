@@ -39,7 +39,7 @@ define SYDO_copy_commands
 	for OneItem in $(-listSyncFiles-); do \
 		$(call _DoVerbose1,echo "  > $${OneItem}";) \
 		_sh_tmp_DestDir=$(-dirSyncTo-); \
-		if [ ! -d "$${_sh_tmp_DestDir}" ]; then $(_MD) $${_sh_tmp_DestDir}; fi; \
+		if [ ! -d "$${_sh_tmp_DestDir}" ]; $(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_MD) $${_sh_tmp_DestDir}";) then $(_MD) $${_sh_tmp_DestDir}; fi; \
 		if [ ! -d "$${_sh_tmp_DestDir}" ]; then echo "!Error from $(_pluginId_sync_devoutput): Destination dir creation fail: $${_sh_tmp_DestDir} "; exit 1; fi; \
 		$(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-)";) \
 		$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-); \

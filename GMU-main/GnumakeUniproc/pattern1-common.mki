@@ -4,6 +4,7 @@ unexport gmp_u_list_PLUGIN_TO_LOAD
 	# Avoid user's setting gmp_u_list_PLUGIN_TO_LOAD in env-var resulting in
 	# influencing sub-projects. If required for all subprjs, set
 	# gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE or gmp_u_list_PLUGIN_TO_LOAD_ENV_POST instead.
+unexport gmp_u_list_PLUGIN_TO_LOAD_AUX
 
 _dirPattern1Cfg = pattern1cfg
 gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
@@ -64,6 +65,11 @@ ifdef gmp_USER_FIRST_TARGET
     # This helps, I think, user discover mix using situation.
 endif
 _gmp_up_USER_OUTPUT_AFTER_LINK_s = $(strip $(gmp_up_USER_OUTPUT_AFTER_LINK))
+
+gmi_SYDO_ud_SYNC_UserOutputAL_FROM = $(call gmuf_GetDir,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
+#gmi_SYDO_ud_SYNC_UserOutputAL_TO = (should be assigned from env)
+gmi_SYDO_up_list_SYNC_UserOutputAL = $(notdir $(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
+
 
 define _GmpShowDoneUserOutputAfterLink
 #  $(if $(_Stripped_USER_FIRST_TARGET),echo "[DONE(gmp_USER_FIRST_TARGET):] $(call _StripOutputRootPrefix,$(_Stripped_USER_FIRST_TARGET))")
