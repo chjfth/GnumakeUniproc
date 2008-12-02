@@ -200,12 +200,24 @@
     <td valign="top">gmu_DECO_PREFIX_PRJ_NAME</td>
     <td align="center">I</td>
     <td><p>Explicitly tells what prefix to be prepended to the final project name.</p>
-    <p>User can set this var by using <code>+=</code> operator and spaces and tabs in the var will finally be removed before prepending to final project name. GnumakeUniproc requires that you must not use <code>:=</code> to construct this var.</p></td>
+    <p>User can set this var by using <code>+=</code> operator and spaces and tabs in the var will finally be removed before prepending to final project name. GnumakeUniproc requires that you must not use <code>:=</code> to construct this var.</p>
+    <p>This var will only affect the assigned project, not affecting its sub-projects. (GMU core unexport the var.) </p></td>
   </tr>
   <tr>
     <td>gmu_DECO_SUFFIX_PRJ_NAME</td>
     <td align="center">I</td>
     <td>Roughly the same as <code>gmu_DECO_PREFIX_PRJ_NAME</code>, except that the value here will be appended to final project name. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DECO_PREFIX_PRJ_FORCE_ENV<br>
+    gmu_DECO_SUFFIX_PRJ_FORCE_ENV</td>
+    <td align="center" valign="top">I(E)</td>
+    <td><p>These two variables also decorate project name, but the difference is these two vars will not get unexported. So, assigning them as environment variables will afffect all levels of sub-projects.</p>
+    <p>Decoration position:</p>
+    <ul>
+      <li> <code>gmu_DECO_PREFIX_PRJ_FORCE_ENV</code> is always before <code>gmu_DECO_PREFIX_PRJ_NAME</code> . </li>
+      <li><code>gmu_DECO_SUFFIX_PRJ_FORCE_ENV</code> is always after <code>gmu_DECO_SUFFIX_PRJ_NAME</code> . </li>
+    </ul></td>
   </tr>
   <tr>
     <td valign="top">gmu_DECO_PREFIX_LINK_OUTPUT</td>

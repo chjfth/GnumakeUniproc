@@ -55,7 +55,7 @@ SydoRuleNameForOneSid = SYDO_SyncProcRule_$1
 define SYDO_syncproc_rule
 # $1: SID: sync operation identifier.
 # Recognized vars:
-#	gmi_SYDO_ud_SYNC_<SID>_FROM (can be null)
+#	gmi_SYDO_ud_SYNC_<SID>_FROM (can be null; if null, relative to $(CURDIR))
 #	gmi_SYDO_ud_SYNC_<SID>_TO
 #	gmi_SYDO_up_list_SYNC_<SID>
 #	gmi_SYDO_CopyDirStruct_<SID> (can be null)

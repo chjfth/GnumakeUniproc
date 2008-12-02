@@ -12,8 +12,8 @@ unexport gmu_DECO_PREFIX_PRJ_NAME gmu_DECO_SUFFIX_PRJ_NAME gmu_DECO_PREFIX_LINK_
 	# unexport them because [ user can += to these gmu-vars, but the altered value should not be seen by sub-projects ].
 
 _StripSpacesInDeco = $(subst $(_GmuSpace),,$1)
-_DECO_SUFFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_PRJ_NAME))
-_DECO_PREFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_PRJ_NAME))
+_DECO_SUFFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_PRJ_NAME)$(gmu_DECO_SUFFIX_PRJ_FORCE_ENV))
+_DECO_PREFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_PRJ_FORCE_ENV)$(gmu_DECO_PREFIX_PRJ_NAME))
 _DECO_SUFFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_LINK_OUTPUT))
 _DECO_PREFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_LINK_OUTPUT))
 

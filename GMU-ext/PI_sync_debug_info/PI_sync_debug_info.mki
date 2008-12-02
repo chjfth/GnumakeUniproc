@@ -17,6 +17,10 @@ _pluginId_sync_debug_info := $(gmpv_ThisPluginId)
 	# This tells to where the debug output info will be copied.
 	# This is actually a make-var introduced by plugin PI_sync_devoutput.
 
+# Output vars for user:
+# gmi_SDBI_Gps_DBG_FILE
+	# List of paths of DBG file output. For MSVC, it is XXX.pdb or followed by optional XXX.idb .
+
 ####### @@@@@@@@@@@@
 # NOTE when using msvc's pdb: If you change your projects output name, you should
 # clean your project for this plugin to work. Reason: According to 
