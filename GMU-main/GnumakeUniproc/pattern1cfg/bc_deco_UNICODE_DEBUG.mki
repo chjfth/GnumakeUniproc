@@ -1,3 +1,7 @@
+ifndef __bc_deco_UNICODE_DEBUG_included
+__bc_deco_UNICODE_DEBUG_included := 1
+
+
 # This file is to be included by $(gmp_COMPILER_ID)/compiler_config.mki .
 # It set the following make-variable for use with GnumakeUniproc.mki .
 #	gmu_DECO_PREFIX_PRJ_NAME & gmu_DECO_SUFFIX_PRJ_NAME
@@ -34,3 +38,5 @@ gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(if $(gmp_isfnDecoUnicode),_U)$(if $(g
 	# function to dynamically determine what variant of libs to link(XXX.lib, XXX_D.lib 
 	# XXX_U.lib or XXX_U_D.lib).
 
+
+endif # ifndef __bc_deco_UNICODE_DEBUG_included

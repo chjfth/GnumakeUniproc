@@ -56,7 +56,7 @@ endif
 endif
 
 
-gmp_G_CompilerVerToDeco = $(if $(gmp_COMPILER_VER),_$(gmp_COMPILER_VER))
+gmp_G_CompilerVerToDeco = $(addprefix _,$(gmp_COMPILER_VER))
 	# [2008-08-15] bc_deco_prjname.mki requires this.
 	# Although this is a container project, gmp_COMPILER_VER decoration is still desired, 
 	# because user may want to use different gmp_COMPILER_VER to go through the same container

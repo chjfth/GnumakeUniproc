@@ -1,9 +1,11 @@
-
+ifndef __bc_deco_prjname_included
+__bc_deco_prjname_included := 1
 
 ifneq (,$(gmp_DECO_PRJ_NAME))
   gmu_DECO_SUFFIX_PRJ_NAME += $(if $(gmp_COMPILER_ID),_$(gmp_COMPILER_ID))
 
-  gmu_DECO_SUFFIX_PRJ_NAME += $(gmp_G_CompilerVerToDeco)
+  gmu_DECO_SUFFIX_PRJ_NAME += $(if $(gmp_COMPILER_ID),$(gmp_G_CompilerVerToDeco))
+	#[2008-12-02] Only $(gmp_COMPILER_ID) is present shall I append compiler-ver deco.
 endif
 
 ifneq (,$(gmp_DECO_COMPILER_ID_FOR_LINK_OUTPUT))
@@ -11,6 +13,8 @@ ifneq (,$(gmp_DECO_COMPILER_ID_FOR_LINK_OUTPUT))
 endif
 
 ifneq (,$(gmp_DECO_COMPILER_VER_FOR_LINK_OUTPUT))
-  gmu_DECO_SUFFIX_LINK_OUTPUT += $(gmp_G_CompilerVerToDeco)
+  gmu_DECO_SUFFIX_LINK_OUTPUT += $( $(gmp_COMPILER_ID),$(gmp_G_CompilerVerToDeco))
 endif
 
+
+endif # ifndef __bc_deco_prjname_included
