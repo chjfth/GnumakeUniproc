@@ -1,4 +1,4 @@
-[2008-10-22] v0.94(RC1)
+[2008-12-06] v0.94
 ===== Changes and Improvements: =====
 1. r546
 	Generate building_list.gmu.txt as well as built_list.gmu.txt simultaneously. Now building_list.gmu.txt shows you the call stack(build stack) of your project. It is very helpful to check this stack info to know how you reach a specific project, especially the build fails at some project.
@@ -34,6 +34,22 @@
 	Update for MSVC compiler config files: Now works well when INCLUDE directories contain spaces(still to test).
 15. r661
 	New gmu-var gmp_LINK_DuplicateLibList=1. For linkers such as GNU ld who hastes to drop objs on LIB scanning, 	you can define this so that the LIB list is duplicated on link command line to make ld get those "missing" objs.
+16. r677
+	Experimental: Introduce new gmu-var: gmu_p_StartupMakefile, gmu_d_StartupMakefile, gmu_d_StartupParent, then, in pattern1 mks, use those vars to refer to the dir and parent dir of start-up makefile so that umake is no longer required to be launch from the same dir as start-up makefile. Of course, for this to work, user makefile should use these vars instead of using relative path.
+17. r678
+	Change: As an umake option, now require gmu_ud_OUTPUT_ROOT to be a absolute dir, since a relative gmu_ud_OUTPUT_ROOT will cause quite many problems.
+18. r682
+	Fix for PI_use_pch_msvc plugin. Now always pass the so-called stdafx.obj to the linker to avoid possible problem.
+19. r683
+	Introduce new user-var gmp_up_USER_OUTPUT_AFTER_LINK(more intuitive) to replace the old gmp_USER_FIRST_TARGET(still support the old one).
+20. r686
+	Write checkout and export command to local-dir receiving that checkout/export, in filename _CheckoutCmd.gmu.txt . gmu_NO_LOG_CO_CMD_TO_FILE=1 can suppress it.
+20. r704
+	Introduce custom command $(gmp_LINK_OUTPUT_POSTPROC_CMD) which is designed solely for the situation $(gmu_Gp_LINK_OUTPUT) should be processed after link, e.g. strip it, UPX pack it, digital sign it etc.
+21. r709
+	Add two more prjname decoration gmu-var: gmu_DECO_PREFIX_PRJ_FORCE_ENV & gmu_DECO_SUFFIX_PRJ_FORCE_ENV. These are set by user in the environment and will influence all levels of subprjs.
+
+22. Change GnumakeUniproc SVN repository dir structure, now trunk/tags/branches in repository root. 
 
 ===== Example and Doc Update: =====
 1: r547-r555,r594
@@ -45,8 +61,11 @@
 	Add gmp_DECO_DEBUG_FOR_LINK_OUTPUT=1 for walkdir lib, so that Debug version and Release version of the same LIB can be placed in the same dir. (It's one kind of SDK design strategy.)
 4: r600-r601
 	Add mix-compiler-ver example demonstrating using two different version of a same compiler in one GMU build session.
-5: Add workable WinCE compiler config files(gmp_COMPILER_ID=wince) as a kick start sample for building WinCE applications with Visual Studio 2005 compiler. Check $gmu_DIR_ROOT\GMU-main\GnumakeUniproc\pattern1cfg\compiler_cfg\wince\readme-for-gmu-user.txt for more details.
-
+6: r687
+	Add KeyView2 example to demonstrate usage of gmp_up_USER_OUTPUT_AFTER_LINK .
+7: r701
+	Add gtktetris example to demonstrate PI_use_pch_gcc plugin .
+8: Add workable WinCE compiler config files(gmp_COMPILER_ID=wince) as a kick start sample for building WinCE applications with Visual Studio 2005 compiler. Check $gmu_DIR_ROOT\GMU-main\GnumakeUniproc\pattern1cfg\compiler_cfg\wince\readme-for-gmu-user.txt for more details.
 
 
 [2008-04-25] v0.93

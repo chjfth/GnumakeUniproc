@@ -85,7 +85,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.94(RC1-20081022)"
+!define PRODUCT_VERSION "0.94(20081206)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
