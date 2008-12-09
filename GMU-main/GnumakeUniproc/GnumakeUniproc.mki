@@ -1163,7 +1163,9 @@ gmuf_GetAllSubprjNameForLink = $(call _uv_SubprjList_GetPrjname,$(_gmu_uv_list_A
 	# [2007-03-10] Use gmuf_GetAllSubprjNameForLink instead of gmuf_GetAllSubprjName in plugin PI_windll_from_lib.
 
 
-ifeq (1,$(_isMakeTarget_LinkImage))
+ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
+  #[2008-12-09] Suppress this section at some times, because it may be time consuming(read lots of subprj attributes from file etc).
+  #For example, when doing checkout, I do not have this section enabled.
 
   # _GetLinkagePaths function: (can be recursively called)
   # $1 is an item. 
