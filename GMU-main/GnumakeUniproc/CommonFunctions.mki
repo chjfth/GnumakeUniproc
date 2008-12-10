@@ -85,7 +85,18 @@ _MV = mv #move or rename
 _gmu_true = 1
 _gmu_false = 
 
-_CommonFunctions_included = 1
+#[2006-11-10] Special for _MakeSubPrjs.mk
+_GmuSharp = \#
+_GmuNull =
+_GmuBs = \\
+_GmuComma = ,
+_GmuLB = (
+_GmuRB = )
+_GmuSpace =  $(_GmuNull) $(_GmuNull)
+_GmuSpace2 = $(_GmuNull)  $(_GmuNull)
+_GmuSpace3 = $(_GmuNull)   $(_GmuNull)
+_GmuSpace4 = $(_GmuNull)     $(_GmuNull)
+
 
 _EchoVarValue = $(if $($1),echo $1 = $($1),echo $1 [Null])
 _EchoVarValue2 = echo $1 = "$(call _TrShcmd4echo,[$($1)])"
@@ -160,6 +171,17 @@ _GetAbsDir = $(shell ( cd $1 && cd $2; CmdRet=$$?; if [ $$CmdRet = 0 ]; then pwd
 	#[2006-11-09] $1: starting dir, $2: the dir relative to $1
 gmuf_GetAbsDir = $(_GetAbsDir)
 
+gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
+	while [ $${dirRel$(_GmuSharp)../} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)../}; dirGo=$${dirGo%/*}; done; \
+	echo "$${dirGo}/$${dirRel}" )
+	# $1: Starting absolute dir
+	# $2: Relative dir
+	# 'so' means string operation
+
+gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_soc,$(CURDIR),$1)
+	# $1: a (relative) path relative to curdir.
+	# 'soc' means string operation from curdir. 
+
 #======== Something not so "common" below ========
 
 _isNowGmuGetPrjAttr = $(call _IsStringEqual,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr)
@@ -196,18 +218,6 @@ _DoVerbose2 = $(if $(call _IsVerboseLevel2),$1,)
 gmuf_IsVerboseLevel1 = $(_IsVerboseLevel1)
 gmuf_IsVerboseLevel2 = $(_IsVerboseLevel2)
 
-
-#[2006-11-10] Special for _MakeSubPrjs.mk
-_GmuSharp = \#
-_GmuNull =
-_GmuBs = \\
-_GmuComma = ,
-_GmuLB = (
-_GmuRB = )
-_GmuSpace =  $(_GmuNull) $(_GmuNull)
-_GmuSpace2 = $(_GmuNull)  $(_GmuNull)
-_GmuSpace3 = $(_GmuNull)   $(_GmuNull)
-_GmuSpace4 = $(_GmuNull)     $(_GmuNull)
 
 _gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
