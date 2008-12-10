@@ -21,7 +21,7 @@ define bcfShowLibrariesToLink
 	$(if $(gmu_Gp_list_SUBPRJ_TO_LINK), echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_Gp_list_SUBPRJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
 	)
 
-	$(call _DoVerbose1,\
+	@$(call _DoVerbose1,\
 	echo -n "**libraries to link stand-alone(gmp_bc_EXTRALIBS):"; \
 	$(if $(gmp_bc_EXTRALIBS),echo ''; for v in $(gmp_bc_EXTRALIBS); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
 	)
