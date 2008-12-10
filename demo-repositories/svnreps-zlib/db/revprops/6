@@ -1,0 +1,13 @@
+K 10
+svn:author
+V 3
+chj
+K 8
+svn:date
+V 27
+2008-12-10T02:34:02.614866Z
+K 7
+svn:log
+V 90
+Introduce new gmu-var gmp_bc_EXTRALIBS to deprecate gmp_bc_EXTRALIBS1 & gmp_bc_EXTRALIBS2.
+END

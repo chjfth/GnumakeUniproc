@@ -7,38 +7,36 @@ _p_ExtraImageTypeMki = $(gmu_DIR_GNUMAKEUNIPROC)/$(gmp_COMPILER_ID)/extra_image_
 
 define bcfShowLibrariesToLink
 	@$(call _DoVerbose1,\
-	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK): "; \
+	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK):"; \
 	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
 	)
 
 	@$(call _DoVerbose1,\
-	echo -n "**library paths: "; \
+	echo -n "**library search directories(gmp_ud_list_EXTRALIB): "; \
 	$(if $(gmp_ud_list_EXTRALIB),echo ''; for v in $(gmp_ud_list_EXTRALIB); do echo "    $$v" ; done,echo "(none)")\
 	)
 
 	@$(call _DoVerbose1,\
-	echo -n "**libraries to link(stand-alone,gmp_bc_EXTRALIBS1): "; \
-	$(if $(gmp_bc_EXTRALIBS1),echo ''; for v in $(gmp_bc_EXTRALIBS1); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
-	)
-
-	@$(call _DoVerbose1,\
-	echo -n "**libraries to link(from sub-projects): "; \
+	echo -n "**libraries to link from sub-projects(gmu_Gp_list_SUBPRJ_TO_LINK):"; \
 	$(if $(gmu_Gp_list_SUBPRJ_TO_LINK), echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_Gp_list_SUBPRJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
 	)
 
-	@$(call _DoVerbose1,\
-	echo -n "**libraries to link(stand-alone,gmp_bc_EXTRALIBS2): "; \
-	$(if $(gmp_bc_EXTRALIBS2),echo ''; for v in $(gmp_bc_EXTRALIBS2); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
+	$(call _DoVerbose1,\
+	echo -n "**libraries to link stand-alone(gmp_bc_EXTRALIBS):"; \
+	$(if $(gmp_bc_EXTRALIBS),echo ''; for v in $(gmp_bc_EXTRALIBS); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
 	)
 endef
 
 
 gmu_SHOW_LINKING_IMAGE_TYPE = $(gmp_bc_IMAGE_TYPE)
 
+gmp_bc_EXTRALIBS += $(gmp_bc_EXTRALIBS2)
+	#[2008-12-10] Appending $(gmp_bc_EXTRALIBS2) for pre-0.94 compatibility.
+
 
 gmp_LINKFLAGS += $(c_flags_Link_Common)
 
-_gmp_ALL_LIBS_TO_LINK = $(gmp_bc_EXTRALIBS1) $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS2) $(gmp_bc_SYSLIBS)
+_gmp_ALL_LIBS_TO_LINK = $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS) $(gmp_bc_SYSLIBS)
 
 gmp_ALL_TO_LINK = $(patsubst $(CURDIR)/%,./%,$(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK) \
 	$(_gmp_ALL_LIBS_TO_LINK)	$(if $(gmp_LINK_DuplicateLibList),$(_gmp_ALL_LIBS_TO_LINK)) )

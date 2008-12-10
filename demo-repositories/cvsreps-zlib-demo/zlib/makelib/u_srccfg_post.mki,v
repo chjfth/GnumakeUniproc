@@ -1,10 +1,20 @@
-head	1.4;
+head	1.5;
 access;
 symbols
 	trelease:1.1.1.1 tvendor:1.1.1;
 locks; strict;
 comment	@# @;
 
+
+1.5
+date	2008.12.10.02.33.28;	author chj;	state Exp;
+branches;
+next	1.4;
+deltatype	text;
+kopt	kv;
+permissions	666;
+commitid	1254493f2a786b15;
+filename	u_srccfg_post.mki;
 
 1.4
 date	2008.06.28.02.25.44;	author chj;	state Exp;
@@ -54,9 +64,9 @@ desc
 @@
 
 
-1.4
+1.5
 log
-@Rename gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT to gmi_SYDO_up_list_SYNC_HEADERS
+@Introduce new gmu-var gmp_bc_EXTRALIBS to deprecate gmp_bc_EXTRALIBS1 & gmp_bc_EXTRALIBS2.
 @
 text
 @#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
@@ -147,10 +157,7 @@ gmp_LINKFLAGS +=
 gmu_up_list_EXTRA_OBJ_TO_LINK +=
 	# Extra object files to link
 
-#gmp_bc_EXTRALIBS1 +=
-	# Extra libs to link (not suggested to use currently, use gmp_bc_EXTRALIBS2 instead)
-
-#gmp_bc_EXTRALIBS2 += $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
+gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
 	# Extra libs to link
 	#
 	# The reason for using gmpf_MakeUpSysLibsToLink: 
@@ -158,10 +165,10 @@ gmu_up_list_EXTRA_OBJ_TO_LINK +=
 	# * -lcomfun         for linuxgcc & mingw
 	# * comfun.lib       for msvc
 
-#gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
+gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 	# List system libs in this make-var. 
 	# If more than one sys-lib are used, separate them with spaces.
-	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS2.
+	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS.
 	# It is used just to imply that they are system libs(provided by compiler of OS).
 
 
@@ -182,6 +189,26 @@ gmu_up_list_EXTRA_OBJ_TO_LINK +=
 	# Where the static LIBs/DLLs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
 
 
+@
+
+
+1.4
+log
+@Rename gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT to gmi_SYDO_up_list_SYNC_HEADERS
+@
+text
+@d89 1
+a89 4
+#gmp_bc_EXTRALIBS1 +=
+	# Extra libs to link (not suggested to use currently, use gmp_bc_EXTRALIBS2 instead)
+
+#gmp_bc_EXTRALIBS2 += $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
+d97 1
+a97 1
+#gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
+d100 1
+a100 1
+	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS2.
 @
 
 
