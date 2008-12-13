@@ -1065,7 +1065,8 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 			\$$(if \$$(call _IsStringEqual,\$${MAKELEVEL},0),\$$(_tmp_MakeOpts),) 1>&2 \
 			&& echo PrevCmdSuccess ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    ifneq (\$$(strip \$$(_gmu_FetchSubprjAttr)),PrevCmdSuccess)" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "      \$$(error !GMU!Error: Your makefile \"$(SubprjEvMakefile)\" does not behave correctly for target \`_gmu_ut_GetPrjAttr')" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "      _tmp := \$$(call gmuf_OutputInfo_e,Your sub-project {$${SubPrj}} makefile\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\ndoes not behave correctly for target \`_gmu_ut_GetPrjAttr')" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "      \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    $${SubPrj}_PrjAttr := \$$(shell cat \$$(_p_AttrOutput_$${SubPrj}) )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _temp := \$$(shell echo \$$($${SubPrj}_PrjAttr) > $(_SubprjEv_pAttrCache))" >> $(_p_mki_SubprjAttr_shsubst) ;\
