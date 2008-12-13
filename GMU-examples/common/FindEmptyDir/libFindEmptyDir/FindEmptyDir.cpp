@@ -35,8 +35,12 @@ WalkdirCallback_Fed(const walkdir_CBINFO_st *pWalkdirCbi, void *pCallbackExtra)
 	{
 		if(pFedCbi->EmptyFlag==SFindEmptyDirCbinfo::ThisDirEmpty)
 		{	// Now an empty dir is confirmed.
-			FindEmptyDir_CBRET_et fedret = pFedCbi->cbFoundEmptyDir(
-				pWalkdirCbi->pszPath, pFedCbi->pcbeFindEmptyDir);
+			FindEmptyDir_CBRET_et fedret = 
+				pFedCbi->cbFoundEmptyDir
+				(
+					pWalkdirCbi->pszPath, 
+					pFedCbi->pcbeFindEmptyDir
+				);
 			
 			if(fedret==FindEmptyDir_CBRET_Halt)
 				return walkdir_CBRET_Halt;

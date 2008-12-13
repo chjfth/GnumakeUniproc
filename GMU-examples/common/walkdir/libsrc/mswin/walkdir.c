@@ -70,7 +70,7 @@ WalkDir_OneLevel(int DirLevelNow,
 		Input: pCbinfo->pszDir, pCbinfo->nDirLen
 	*/
 
-	BOOL b;
+	BOOL b = 0; DWORD winerr = 0;
 	WIN32_FIND_DATA finddata;
 	HANDLE hff = NULL; // find-handle
 	FILETIME ftLocal;
@@ -173,7 +173,17 @@ FIND_NEXT_FILE:
 			continue;
 		else
 		{
-			assert(GetLastError()==ERROR_NO_MORE_FILES);
+			winerr = GetLastError();
+			if(winerr==ERROR_MORE_DATA) // ERROR_MORE_DATA=234
+			{
+				// Note: If you use ANSI version of FindNextFile and a file is encountered
+				// with MAX_PATH-1 characters, then the ANSI length of the file can 
+				// exceed MAX_PATH bytes, so ERROR_MORE_DATA will be returned.
+				// For simplicity here, we just ignore it.
+				continue;
+			}
+
+			assert(winerr==ERROR_NO_MORE_FILES); // ERROR_NO_MORE_FILES=18
 			walkret = walkdir_RET_Success;
 			break;
 		}
