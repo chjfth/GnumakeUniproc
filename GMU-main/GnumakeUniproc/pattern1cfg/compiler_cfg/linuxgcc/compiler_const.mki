@@ -68,6 +68,9 @@ gmp_CFLAGS_NON_CODE_GEN_preset +=
 
 gmp_CFLAGS_MACRO_DEFS_preset += -D__int64="long long"
 
+gmp_CFLAGS_CODE_GEN_preset += \
+	$(if $(gmp_GCC_CFLAGS_PIC),$(if $(call _IsStringEqual,$(gmp_GCC_CFLAGS_PIC),nopic),,$(gmp_GCC_CFLAGS_PIC)),-fpic)
+
 c_flags_Link_Common = 
 
 ################################################################################

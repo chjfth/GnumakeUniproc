@@ -118,7 +118,8 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
   gmp_Gp_list_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
-  gmp_LINKFLAGS_preset += -shared -fpic
+  gmp_LINKFLAGS_preset += -shared \
+	$(if $(gmp_GCC_LFLAGS_PIC),$(if $(call _IsStringEqual,$(gmp_GCC_LFLAGS_PIC),nopic),,$(gmp_GCC_LFLAGS_PIC)),-fpic)
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
 

@@ -24,6 +24,13 @@
     <td><p>Tell the prefix of gcc executable. </p>
       <p>Example: If you want to run <code>arm-linux-gcc</code> instead of <code>gcc</code>, you set <code>gmp_GCC_PREFIX=arm-linux-</code> . At the same time, <code>arm-linux-g++</code>, <code>arm-linux-ar</code> etc will be used instead of their non-prefix counterpart. </p>    </td>
   </tr>
+  <tr>
+    <td valign="top">gmp_GCC_CFLAGS_PIC</td>
+    <td><p>This controls use of gcc flag <code>-fpic</code> or <code>-fPIC</code> or none.</p>
+    <p>If null, <code>-fpic</code> is always used. </p>
+    <p>If you want to use neither <code>-fpic</code> or <code>-fPIC</code>, assign <tt>nopic</tt> as its value. </p>
+    <p>Rationale: GnumakeUniproc's author thinks <code>-fpic</code> should be the default, so set it in <tt>gmp_CFLAGS_CODE_GEN_preset</tt>. However, GNU make (at least for 3.81 and prior) does not provide <tt>-=</tt> operator to filter off a token from a variable itself, so, the extra gmu-var is introduced. </p></td>
+  </tr>
 </table>
 <h4>Compatibility vars </h4>
 <p>In principles, if you're using latest gcc compiler, you don't have to set any of these vars. But if you're using older versions of gcc, the default pattern1 compiler option may contain some options that older gcc don't support, in this situation, you can look up the following table to see whether setting some gmp vars can make a work around. The benefit of setting these vars is you can hopefully avoid making changes to your makefiles </p>
