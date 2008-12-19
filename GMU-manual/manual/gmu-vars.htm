@@ -52,7 +52,7 @@
 </ul>
 <p>If you write your own patterns or plugins, it is highly suggested to follow these naming conventions.</p>
 <h3><a name="More%20gmuvar%20naming%20conventions"></a>More gmuvar naming conventions </h3>
-<p>Affer gmu_, gmp_, gmi_ prefix, there may be a second-level prefix in lower case letter, like <code>ud, uf, Gp, list</code> etc. There meaning is as follows. </p>
+<p>After gmu_, gmp_, gmi_ prefix, there may be a second-level prefix in lower case letter, like <code>ud, uf, Gp, list</code> etc. There meaning is as follows. </p>
 <table width="100%"  border="1">
   <tr>
     <th scope="col">second level prefix </th>
@@ -258,14 +258,14 @@
     <td valign="top">gmu_DELIBERATE_NO_SUBPRJ</td>
     <td align="center">I</td>
     <td><p>Default value of this var is null.</p>
-    <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. SVN export bunches of files for other projects to use. If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirment. </p>
+    <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. SVN export bunches of files for other projects to use. If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirement. </p>
     <p>The benefit of a free-style GMU makefile is you can give it a proejct-name(<code>gmu_PRJ_NAME</code>), so that it has a dedicated project output dir(<a href="#gmu_Gd_Final_PrjOutput"><code>gmu_Gd_Final_PrjOutput</code></a>) for end user to create files in it, and, it's build result appears in the statistic information of GMU pattern1 build model.</p>    <p>This var must be set before <tt>pattern-container1.mks</tt> is included. </p></td>
   </tr>
   <tr>
     <td valign="top">gmu_u_SHOW_PROGRESS_CMD</td>
     <td align="center">I(E)</td>
     <td> <p>This var is optional. It is used when GMU pattern1 is going to feed back it progress info, once each project is done. </p>
-      <p>This var is consider a shell command to execute, and if it contains <code>$(gmu_progress_info)</code> (note: retain in its unexpanded form), the  <code>$(gmu_progress_info)</code> will be dynamically expanded into GMU's progroess info(e.g. <tt>Projects=3 Container=1</tt>) </p></td>
+      <p>This var is consider a shell command to execute, and if it contains <code>$(gmu_progress_info)</code> (note: retain in its unexpanded form), the  <code>$(gmu_progress_info)</code> will be dynamically expanded into GMU's progress info(e.g. <tt>Projects=3 Container=1</tt>) </p></td>
   </tr>
 </table>
 <h5>Example of gmu_u_SHOW_PROGRESS_CMD</h5>
@@ -312,7 +312,7 @@
     <td valign="top"><a name="gmu_SC_CHECKOUT_DATETIME"></a>gmu_SC_CHECKOUT_DATETIME</td>
     <td><p>Assign the date of checkout/export. It should have the format <code>YYYY-MM-DD HH:MM:SS</code> . </p>
       <p>Note: Since there is a space in the date-time format, you should enclose it in quotes when assigning this from a shell command line(apply to both Linux and Windows). </p>
-      <p>In order to utilize this var with Subversion, you must have Subverion v1.4.2 or above. </p></td>
+      <p>In order to utilize this var with Subversion, you must have Subversion v1.4.2 or above. </p></td>
   </tr>
   <tr>
     <td valign="top">gmu_CVS_CHECKOUT_OPT<br>
@@ -334,15 +334,15 @@
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_COMPILE_CMD</td>
-    <td>Non-null means echo compile comand. </td>
+    <td>Non-null means echo compile command. </td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_LINK_CMD</td>
-    <td>Non-null means echo link comand.</td>
+    <td>Non-null means echo link command.</td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_GENHDEPEND_CMD</td>
-    <td>Non-null means echo header dependancy generation comand.</td>
+    <td>Non-null means echo header dependency generation command.</td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_CHANGED_PREREQ</td>
@@ -367,7 +367,7 @@
 </table>
 <p>&nbsp;</p>
 <h3><a name="Compound%20gmuvars"></a>Compound gmuvars </h3>
-<p>Note: <i>refname</i> and <i>modname</i> below are just place holders that correspoind to user provided name. </p>
+<p>Note: <i>refname</i> and <i>modname</i> below are just place holders that correspond to user provided name. </p>
 <p>Gmuvars in this section are all input vars. </p>
 <h4><a name="Compound%20gmuvars%20for%20sub-project%20assignment"></a>Compound gmuvars for sub-project  assignment</h4>
 <p>These compound vars are used with the following gmuvars:</p>
@@ -477,8 +477,8 @@
   <tr>
     <td>gmu_u_GCC_M_OPTIONS</td>
     <td align="center">I</td>
-    <td><p>Options that should be explictly passed to ``gcc -M'' command. </p>
-    <p>Senario of usage: Some compilers pre-define some internal macros(e.g. Visual C++ pre-defines <code>_MSC_VER</code> ) for its user, however ``gcc -M'' does not know about these macros. So, under some circumstance you have to tell ``gcc -M'' about those macros so that the ``gcc -M'' runs well.</p></td>
+    <td><p>Options that should be explicitly passed to ``gcc -M'' command. </p>
+    <p>Scenario of usage: Some compilers pre-define some internal macros(e.g. Visual C++ pre-defines <code>_MSC_VER</code> ) for its user, however ``gcc -M'' does not know about these macros. So, under some circumstance you have to tell ``gcc -M'' about those macros so that the ``gcc -M'' runs well.</p></td>
   </tr>
   <tr>
     <td><b>gmu_ud_list_SYS_HEADER</b></td>
@@ -615,7 +615,7 @@
   <tr>
     <td>gmu_GCC_M_PREFIX</td>
     <td align="center">I</td>
-    <td><p>For <code>gcc -M</code> command, what prefix to use before gcc. If you'd like to use a specific gcc version to generate C source header dependency other than the one in your PATH env-var, this can be helpful, typicall on non-Unix like platforms. </p>
+    <td><p>For <code>gcc -M</code> command, what prefix to use before gcc. If you'd like to use a specific gcc version to generate C source header dependency other than the one in your PATH env-var, this can be helpful, typical on non-Unix like platforms. </p>
       <p>This defaults to null.</p></td>
   </tr>
   <tr>
@@ -683,7 +683,7 @@
     <td>gmu_up_list_STARTUP_CLEAR_FILES</td>
     <td align="center">I</td>
     <td><p>Tells what files should be cleared(and file modification time updated to current time) just when a build process starts. </p>
-    <p>User should use <code>+=</code> to append to this list instead of using <code>=</code> to overwirte this list. </p></td>
+    <p>User should use <code>+=</code> to append to this list instead of using <code>=</code> to overwrite this list. </p></td>
   </tr>
 </table>
 <h2><a name="Pattern1%20defined%20gmuvars"></a>Pattern1 defined gmuvars(gmp_<i>XXX</i>) </h2>
@@ -698,7 +698,7 @@
     <td valign="top">gmp_COMPILER_ID</td>
     <td align="center" valign="top">I+O</td>
     <td><p>Compiler ID.</p>
-    <p>According to pattern1's convention, this is normally not set in your makefiles, but indicated by the directory's extesion-name(that dir holds your startup makefile). </p>
+    <p>According to pattern1's convention, this is normally not set in your makefiles, but indicated by the directory's extension-name(that dir holds your startup makefile). </p>
     <p>You can use it to dynamically represent the current compiler-ID in your makefiles.</p></td>
   </tr>
   <tr>
@@ -729,7 +729,7 @@
     <td valign="top">gmp_u_list_PLUGIN_TO_LOAD_AUX</td>
     <td align="center" valign="top">I(E)</td>
     <td><p>Similar to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, that is, its value will be merged to <code>gmp_u_list_PLUGIN_TO_LOAD</code>.</p>
-    <p>The difference is: If you assign <code>gmp_u_list_PLUGIN_TO_LOAD=<i>xxx</i></code> as make's argument, all <code>gmp_u_list_PLUGIN_TO_LOAD</code> assignment in makefiles will be overrided. <code>gmp_u_list_PLUGIN_TO_LOAD_AUX </code>does not cause such overide. </p>    </td>
+    <p>The difference is: If you assign <code>gmp_u_list_PLUGIN_TO_LOAD=<i>xxx</i></code> as make's argument, all <code>gmp_u_list_PLUGIN_TO_LOAD</code> assignment in makefiles will be overrided. <code>gmp_u_list_PLUGIN_TO_LOAD_AUX </code>does not cause such override. </p>    </td>
   </tr>
   <tr>
     <td valign="top">gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE<br>
@@ -737,7 +737,7 @@
     <td align="center" valign="top">I(E)</td>
     <td><p>These two vars also instruct what plugins to load. </p>
       <ul>
-        <li>They should be set as environment variables, so that they affect sub-projects and futher sub-projects.</li>
+        <li>They should be set as environment variables, so that they affect sub-projects and further sub-projects.</li>
         <li>Plugins list in <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE</code> is guarantee to load before <code>gmp_u_list_PLUGIN_TO_LOAD</code> and those in <code>gmu_list_PLUGIN_TO_LOAD_ENV_POST </code>are guaranteed to be after <code>gmp_u_list_PLUGIN_TO_LOAD</code>. </li>
       </ul>
     <p>A typical use: Assign <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE=PI_sync_devoutput</code> with <code>gmi_SYDO_ud_SYNC_HEADER_TO,gmi_SYDO_ud_SYNC_LIB_TO=&lt;some-dir&gt;</code> in make command line to summon a project to sync its output to somewhere.</p></td>
@@ -764,7 +764,7 @@
   <tr>
     <td>gmp_ud_list_EXTRALIB</td>
     <td align="center" valign="top">I</td>
-    <td><p>Extra libray dir for the link command. </p>
+    <td><p>Extra library dir for the link command. </p>
         <p>Note: Only list the directories, don't add prefix like <code>-L</code> , -- since the compiler-config mki will do it for you. </p></td>
   </tr>
   <tr>
@@ -877,25 +877,28 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
     <p>This value is normally set to a filepath under $(<code>gmp_Gd_CUSTOM_IT_MKI_USED</code>) . </p></td>
   </tr>
   <tr>
-    <td valign="top">gmp_USER_FIRST_TARGET</td>
+    <td valign="top">gmp_up_USER_OUTPUT_AFTER_LINK</td>
     <td align="center" valign="top">I</td>
-    <td><p>This overrides the &quot;first&quot; make target for pattern1.</p>
-    <p>It defaults to null, so pattern1 will by default use <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code> as first target, thus your source files listed in <code>$(gmu_up_list_SRC_FROM_ROOT)</code> get compiled and linked. </p>
-    <p>If you want to do something before the default compile-and-link process begins, you can define your custom target(only one target allowed) in <code>gmp_USER_FIRST_TARGET</code>, so that your custom target gets considered by make first. Note: Simply define this first target and write the rule for this target will not make the default compile-and-link process run. So in order to make it run, you must have <code>$(gmp_USER_FIRST_TARGET)</code> eventually depend on <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code>. The position of <code>$(gmu_Gp_LINK_OUTPUT_ckt)</code>in your dependency chain determines when the compile-and-link process takes place &mdash; before or after your custom targets. </p>
-    <p>Conventionally, since this var allows only one target, it should be defined by a custom-image-type mki, to avoid conflict with end user makefiles. </p>
-    <p>NOTE: you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. This target, however, will always be built after all sub-projects are done. </p></td>
+    <td><p>If you want to do post-processing for your link output(<code>gmu_Gp_LINK_OUTPUT</code>) to generate a different output(different filename or filepath), you can define this gmuvar to your post-processing output filepath and write the rule for the post-processing commands. </p>
+      <p>GMU will internally has <code>$(gmp_up_USER_OUTPUT_AFTER_LINK)</code> depend on <code>$(gmu_Gp_LINK_OUTPUT)</code>, so that you post-processing output will be taken when and only when the link output is out-of-date. </p>
+      <p>NOTE: you must define this var before gmu-core. This target, however, will always be built after all sub-projects are done. </p>
+    </td>
   </tr>
   <tr>
     <td valign="top">gmp_USER_PRE_TARGETS</td>
     <td align="center" valign="top">I</td>
-    <td><p>This is a suppliment to <code>gmp_USER_FIRST_TARGET</code>(also default to null). It can be a list of targets(it means you and your end user can use <code>+=</code> to append to the list). These targets will get built before <code>$(gmp_USER_FIRST_TARGET)</code> is built. Since these target are done before <code>$(gmp_USER_FIRST_TARGET)</code> , so the name <code>gmp_USER_FIRST_TARGET</code> becomes not up to it literal meaning. </p>
-    <p>Like <code>gmp_USER_FIRST_TARGET</code>, you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. </p></td>
+    <td><p>This controls extra things to do in the makefile. It can be a list of targets(it means you and your end user can use <code>+=</code> to append to the list). These targets will get made before project source files get compiled. </p>
+    <p>&nbsp;</p></td>
   </tr>
   <tr>
     <td valign="top">gmp_USER_POST_TARGETS</td>
     <td align="center" valign="top">I</td>
-    <td><p>This is a suppliment to <code>gmp_USER_FIRST_TARGET</code>(also default to null). It can be a list of targets(it means you and your end user can use <code>+=</code> to append to the list). These targets will get built after <code>$(gmp_USER_FIRST_TARGET)</code> is built. </p>
-    <p>Like <code>gmp_USER_FIRST_TARGET</code>, you must define this var before <tt>pattern1.mks</tt> or <tt>pattern-container1.mks</tt> is included. </p></td>
+    <td><p>This is similar to <code>gmp_USER_PRE_TARGETS</code>, execpt that the targets in <code>gmp_USER_POST_TARGETS</code>, are made after <code>gmu_Gp_LINK_OUTPUT</code> and <code>gmp_up_USER_OUTPUT_AFTER_LINK</code>.</p>
+    <p>NOTE: <code>gmp_USER_PRE_TARGETS</code> and <code>gmp_USER_POST_TARGETS</code> </p>
+    <ul>
+      <li>is not chained into make dependency chain, so they will be run every time even if all you outputs have been up-to-date. </li>
+      <li>must be defined before gmu-core.</li>
+    </ul></td>
   </tr>
 </table>
 <p>&nbsp;</p>
