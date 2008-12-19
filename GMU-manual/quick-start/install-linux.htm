@@ -26,7 +26,7 @@
 <p>GnumakeUniproc itself can be placed anywhere, and a special environment(<code>gmu_DIR_ROOT</code>) variable will tell where it resides(<a href="#EnvVarSetup">described later</a>). Let's assume that all GnumakeUniproc files will be placed in <tt>~/GMU</tt> . </p>
 <p>Currently, GnumakeUniproc is distributed in a package called GMU-xxx.tar.bz2 (xxx is the version number). I assume that you've extracted its content to ~ (your home dir), that is, there should exist a file named <tt>~/GMU/INSTALL.linux</tt> . To setup GnumakeUniproc's running environment, follow the instruction in <tt>INSTALL.linux</tt> (a text file). In the following words, I'll somehow reiterate some procedure described in <tt>INSTALL.linux</tt>. </p>
 <h3><a name="GnumakeUniprocdepends"></a>Software that GnumakeUniproc depends </h3>
-<p>The softwares described in this section(GNU make, bash, and gcc) are not provided in GMU-xxx.tar.bz2, so you have to make sure they have been pre-installed on your Linux system. </p>
+<p>The software described in this section(GNU make, bash, and gcc) are not provided in GMU-xxx.tar.bz2, so you have to make sure they have been pre-installed on your Linux system. </p>
 <h4>GNUmake(GNU make) 3.80 or above</h4>
 <p>If you do not have  GNUmake 3.80 or above on your system, please do a software upgrade.</p>
 <p>AND NOTE: If you use make 3.80, you MUST start a GMU build process by executing <tt>umake</tt>, not just executing <tt>make</tt>. With make 3.81, you can just execute <tt>make</tt>, but using <tt>umake</tt> is recommended. (<a href="#make380or381">described in detail later</a>) </p>
@@ -36,10 +36,10 @@
 <p>Bourne shell should be OK but I have not tried it on my own. I have not tried other shells(csh or ksh), I cannot tell whether the will work, and probably not, due to the discrepancy in backslash escaping scheme. </p>
 <p>Shell utilities include mkdir, cp, rm, mv, cat etc. I do not use rarely-seen switches for these command, so I think it'll be just OK as long as those executables are present. </p>
 <h4>gcc</h4>
-<p>Well, I believe you won't miss this. We'll be using this compiler to build our C/C++ programs, and, to generate header file depenency for C/C++ source files(<code>gcc -M</code>). </p>
+<p>Well, I believe you won't miss this. We'll be using this compiler to build our C/C++ programs, and, to generate header file dependency for C/C++ source files(<code>gcc -M</code>). </p>
 <p>I myself have tried gcc 3.3.1(on SUSE Linux 9.0) and gcc 4.1.0(on SUSE Linux 10.1).</p>
 <h3><a name="specprgs"></a>Some special programs provided by GnumakeUniproc</h3>
-<p>In order to acquire some special functionalitly required by GMU, some simple programs must be crafted. To build and install those programs, execute the <tt>install-exe.sh</tt> shell script in <tt>~/GMU/GMU-main</tt> , with an argument indicating where to copy those programs. We assume that you use <tt>~/GMU/bin</tt> : </p>
+<p>In order to acquire some special functionality required by GMU, some simple programs must be crafted. To build and install those programs, execute the <tt>install-exe.sh</tt> shell script in <tt>~/GMU/GMU-main</tt> , with an argument indicating where to copy those programs. We assume that you use <tt>~/GMU/bin</tt> : </p>
 <pre class="fws">[chj @suse101 ~/GMU/GMU-main]
 $ ./install-exe.sh ~/GMU/bin</pre>
 <p>This shell script could output information like this: </p>

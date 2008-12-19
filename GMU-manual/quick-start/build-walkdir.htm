@@ -23,7 +23,7 @@
   </li>
 </ul>
 <h3><a name="Preface"></a>Preface</h3>
-<p>The example program is called <b>walkdir_ex1</b>, which is an executable file, it calls function <code>walkdir_start</code> to walk an directory tree and print all files within that directory, including all its sub-directories. The function <code>walkdir_start</code> is implemented in a static library called <b>walkdir</b>. During the build of walkdir_ex1 project, walkdir project will be built on the fly then get linked into walkdir_ex1, and later everytime you want to build walkdir_ex1, walkdir lib project is checked and gets rebuilt if any of its source files changes. That is the model we desire. </p>
+<p>The example program is called <b>walkdir_ex1</b>, which is an executable file, it calls function <code>walkdir_start</code> to walk an directory tree and print all files within that directory, including all its sub-directories. The function <code>walkdir_start</code> is implemented in a static library called <b>walkdir</b>. During the build of walkdir_ex1 project, walkdir project will be built on the fly then get linked into walkdir_ex1, and later every time you want to build walkdir_ex1, walkdir lib project is checked and gets rebuilt if any of its source files have changed. That is the model we desire. </p>
 <p>The relation of the C/C++ projects here are illustrated below:</p>
 <p><img src="walkdir.gif" width="379" height="241"> </p>
 <p>Since the building procedure on Windows and Linux are quite similar, I'll take Windows for example, only referring to Linux specific instructions when required. </p>
@@ -182,11 +182,11 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
 <pre class="fws">rm -fr gf</pre>
 <p>That's all for a clean operation. </p>
 <h4><a name="umake"></a>Write GMU's running output to a log file</h4>
-<p>By typing <code>umake</code> instead of <tt>make</tt>, you get it. On Windows, umake is actually a .bat file, which  writes make's running output to a log file. The log file's name is controlled by env-var <tt>gmu_LOG_OUTPUT_FILENAME</tt>, which defaults to <tt>_gmulog.txt</tt> . </p>
+<p>By typing <code>umake</code> instead of <tt>make</tt>, you get it. On Windows, umake is actually a .bat file, which writes make's running output to a log file. The log file's name is controlled by env-var <tt>gmu_LOG_OUTPUT_FILENAME</tt>, which defaults to <tt>_gmulog.txt</tt> . </p>
 <p>By the way, there is <code>umakeD.bat</code> to help build debug-type programs. </p>
 <h4><a name="TuneGMU"></a>Tune GMU's running behavior </h4>
 <p>You can tune GMU's behavior with many make variables(make-var), You can set these make-vars by defining environment variables(env-var) or assign them on make's command line. I'll call those variables used by GnumakeUniproc gmu-vars. </p>
-<p>Some oftenly used gmu-vars: </p>
+<p>Some often used gmu-vars: </p>
 <ul>
   <li><code>gmu_DO_SHOW_COMPILE_CMD=1</code> This makes the compiling command shown on screen, so that you can know what options are used to compile a file. </li>
   <li><code>gmu_DO_SHOW_LINK_CMD=1</code> This makes the linking command shown on screen. </li>
