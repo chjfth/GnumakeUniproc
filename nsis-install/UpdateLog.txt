@@ -20,10 +20,9 @@
 	New gmu-var gmu_u_EXTRA_LINK_MERGE: user makefile can add extra libs(e.g. system libs) for its parent project to link, so that parent projects don't have to care what system libs should be drawed in for deeper sub-projects.
 9. r643
 	When calling gmuf_MakeSvnRepositoryPath and the env-var for SVN root URL is null, assert with $(error ). This makes the user know immediately what env-var is missing for an SVN server.
-10. Some semantic change for gmu_ud_OUTPUT_ROOT: When command line assigned gmu_ud_OUTPUT_ROOT is non-null, GMU start-up signature file will be created in $(gmu_ud_OUTPUT_ROOT) instead of in $(CURDIR). This prevents the directory containing start-up makefile be polluted by start-up signature file.
-	Influence of this change: 
-	* Using GNU make 3.80 and assigning gmu_ud_OUTPUT_ROOT at command line will cause problem.
-	* When command-line assigned gmu_ud_OUTPUT_ROOT is a relative dir and you use ``-C <startup-dir>'' to launch make, gmu_ud_OUTPUT_ROOT is relative to <startup-dir> instead of your shell's cwd.
+10. r645,678
+	Some semantic change for gmu_ud_OUTPUT_ROOT: When command line assigned gmu_ud_OUTPUT_ROOT is non-null, GMU start-up signature file will be created in $(gmu_ud_OUTPUT_ROOT) instead of in $(CURDIR). This prevents the directory containing start-up makefile be polluted by start-up signature file.
+	Influence of this change: If using GNU make 3.80 and assigning gmu_ud_OUTPUT_ROOT at command line, umake(the batch/script) will not give you correct running result. To work around, you should manually delete $gmu_ud_OUTPTU_ROOT/_MainPrjBuildStart.gmu.ckt before running umake. GNU make 3.81 does not have this problem.
 11. r646
 	Remove two boring plugin-var: gmi_SYDO_DO_SYNC_DEVOUTPUT and gmi_RCVC_DO_WANT_AUTO_RC_HDEP. Now you don't need to define them to make plugin PI_sync_devoutput and PI_winres_msvc work.
 12. r646
@@ -36,20 +35,21 @@
 	New gmu-var gmp_LINK_DuplicateLibList=1. For linkers such as GNU ld who hastes to drop objs on LIB scanning, 	you can define this so that the LIB list is duplicated on link command line to make ld get those "missing" objs.
 16. r677
 	Experimental: Introduce new gmu-var: gmu_p_StartupMakefile, gmu_d_StartupMakefile, gmu_d_StartupParent, then, in pattern1 mks, use those vars to refer to the dir and parent dir of start-up makefile so that umake is no longer required to be launch from the same dir as start-up makefile. Of course, for this to work, user makefile should use these vars instead of using relative path.
-17. r678
-	Change: As an umake option, now require gmu_ud_OUTPUT_ROOT to be a absolute dir, since a relative gmu_ud_OUTPUT_ROOT will cause quite many problems.
-18. r682
+17. r682
 	Fix for PI_use_pch_msvc plugin. Now always pass the so-called stdafx.obj to the linker to avoid possible problem.
-19. r683
+18. r683
 	Introduce new user-var gmp_up_USER_OUTPUT_AFTER_LINK(more intuitive) to replace the old gmp_USER_FIRST_TARGET(still support the old one).
-20. r686
+19. r686
 	Write checkout and export command to local-dir receiving that checkout/export, in filename _CheckoutCmd.gmu.txt . gmu_NO_LOG_CO_CMD_TO_FILE=1 can suppress it.
 20. r704
 	Introduce custom command $(gmp_LINK_OUTPUT_POSTPROC_CMD) which is designed solely for the situation $(gmu_Gp_LINK_OUTPUT) should be processed after link, e.g. strip it, UPX pack it, digital sign it etc.
 21. r709
 	Add two more prjname decoration gmu-var: gmu_DECO_PREFIX_PRJ_FORCE_ENV & gmu_DECO_SUFFIX_PRJ_FORCE_ENV. These are set by user in the environment and will influence all levels of subprjs.
-
-22. Change GnumakeUniproc SVN repository dir structure, now trunk/tags/branches in repository root. 
+22. r716
+	Add function gmuf_GetAbsPathByRela_so , translate relative path to absolute path, without calling shell's cd command. 
+23. r720
+	Make -fpic as gcc's default compile flags. However, you can use gmu-var gmp_GCC_CFLAGS_PIC to override it.
+24. Change GnumakeUniproc SVN repository dir structure, now trunk/tags/branches in repository root. 
 
 ===== Example and Doc Update: =====
 1: r547-r555,r594

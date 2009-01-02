@@ -29,7 +29,7 @@
     <td><p>This controls use of gcc flag <code>-fpic</code> or <code>-fPIC</code> or none.</p>
     <p>If null, <code>-fpic</code> is always used. </p>
     <p>If you want to use neither <code>-fpic</code> or <code>-fPIC</code>, assign <tt>nopic</tt> as its value. </p>
-    <p>Rationale: GnumakeUniproc's author thinks <code>-fpic</code> should be the default, so set it in <tt>gmp_CFLAGS_CODE_GEN_preset</tt>. However, GNU make (at least for 3.81 and prior) does not provide <tt>-=</tt> operator to filter off a token from a variable itself, so, the extra gmu-var is introduced. </p></td>
+    <p>Rationale: GnumakeUniproc's author thinks <code>-fpic</code> should be the default, so set it in <tt>gmp_CFLAGS_CODE_GEN_preset</tt>. However, GNU make (at least for 3.81 and prior) does not provide <tt>-=</tt> operator to filter off a token from a variable itself, so, this extra gmu-var is introduced. </p></td>
   </tr>
 </table>
 <h4>Compatibility vars </h4>
