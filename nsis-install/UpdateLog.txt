@@ -1,4 +1,4 @@
-[2008-12-06] v0.94
+[2009-01-02] v0.94
 ===== Changes and Improvements: =====
 1. r546
 	Generate building_list.gmu.txt as well as built_list.gmu.txt simultaneously. Now building_list.gmu.txt shows you the call stack(build stack) of your project. It is very helpful to check this stack info to know how you reach a specific project, especially the build fails at some project.
