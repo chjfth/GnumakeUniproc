@@ -167,6 +167,12 @@ SectionEnd
 Section "GnumakeUniproc" GMU ; GnumakeUniproc required files
   SectionIn RO
   SetOverwrite try
+  
+  SetOutPath "$INSTDIR"
+  File "nsis-data\GMU\*.txt"
+  File "nsis-data\GMU\*.htm"
+  File "nsis-data\GMU\*.html"
+  
   !insertmacro CopyASubdir_InGMU GMU-main
   !insertmacro CopyASubdir_InGMU GMU-ext
 SectionEnd
