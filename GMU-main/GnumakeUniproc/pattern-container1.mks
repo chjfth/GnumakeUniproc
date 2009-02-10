@@ -31,6 +31,8 @@ ifneq (,$(gmp_CONTAINER_EXTRACT_COMPILER_ID))
 
 endif
 
+_gmu_isUmakeTargetReqCompiler = 
+_gmu_isUmakeTargetNoReqCompiler = 1
 
 ###########################################################
 
