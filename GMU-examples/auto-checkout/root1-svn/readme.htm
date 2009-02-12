@@ -51,6 +51,12 @@ H4 {
 .c-comment { color:#009900; }
 .c-string { color:#990099; }
 
+tt { color:#000066; }
+
+code { color:#660000; }
+
+.blue {color: #0000FF}
+
 </style>
 </head>
 
@@ -58,7 +64,7 @@ H4 {
 <H1 align="center">GMU demo root1-svn(auto checkout) </H1>
 
 <H2>Brief View</H2>
-<p>The GnumakeUniproc project here is a container project, which contains no C/C++ code, however, it has two child projects <tt>zlib-example</tt> and <tt>zlib-minigzip</tt>, which can be checked-out from SVN repository on the fly then get compiled. What's more, <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> themselfs further depend on the <tt>zlib</tt> project which will be checked-out from SVN as well.</p>
+<p>The GnumakeUniproc project here is a container project, which contains no C/C++ code, however, it has two child projects <tt>zlib-example</tt> and <tt>zlib-minigzip</tt>, which can be checked-out from SVN repository on the fly then get compiled. What's more, <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> themselves further depend on the <tt>zlib</tt> project which will be checked-out from SVN as well.</p>
 <p>To see the job done, issue the command: </p>
 <pre class="fws">umake gmu_DO_CHECKOUT=1</pre>
 <p>That will checkout and compile all pertinent projects. Finally one DLL(or .so) <tt>zlib</tt> and two executables <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> are generated. </p>
@@ -66,21 +72,25 @@ H4 {
   <p>Q: Who wrote the C source code used in this example? </p>
   <p>A: The code is from the zlib project(www.zlib.net), a widely used compress/decompression library. </p>
 </div>
-<p>If  you want to just checkout not checkout-and-compile, no problem, just run: </p>
+<p>If  you want to just checkout but not compile C/C++ source, no problem, just run: </p>
 <pre class="fws">umake gmu_ut_checkout</pre>
-<p><code>gmu_ut_checkout</code> is a special GMU target that does checkout operation according your makefile's instruction. After the checkout, you can issue <tt>umake</tt> to build the projects since all source files are on your local disk now. </p>
-<p>In case you just start <tt>umake</tt> without checkout first, you get the following error message from GMU:</p>
-<pre class="fws"><i>...(long path prefix preceded)</i>/gf/demo-zlib/_gmu_tmp/_SubprjsAttr.gmu.mki:57: 
-*** <b>!GMU!Error:</b> Your makefile &quot;../../root1-svn-wc/zlib-example/exe.msvc/Makefile&quot; does not exist yet 
-for sub-project {zlib-example} .  Stop. </pre>
-<p>You can know from the above message(notice the <b><tt>!GMU!Error:</tt></b> hint): The current project refers to a sub-project named <tt>zlib-example</tt>(displayed in curly brackets) and wants to build it, but  can't find the startup makefile for that sub-project. </p>
+<p><code>gmu_ut_checkout</code> is a special GMU target that does checkout operation according to your makefile's instruction. After the checkout, you can issue <tt>umake</tt> to build the projects since all source files are on your local disk now. </p>
+<p>In case you just start <tt>umake</tt> without checkout first nor run with <code>gmu_DO_CHECKOUT=1</code>, you get the following error message from GMU:</p>
+<pre class="fws">You assign sub-project {zlib-example} makefile as
+    ../../root1-svn-wc/zlib-example/exe.msvc/Makefile
+  =>
+    D:/GMU/GMU-examples/auto-checkout/root1-svn-wc/zlib-example/exe.msvc/Makefile
+But that makefile does not exist. Did you forget to run with gmu_DO_CHECKOUT=1 ?
+<i>...(long path prefix)XXX.mki</i>:<i>line</i>: *** !GMU!Error occured. See error reason above.  Stop.
+</pre>
+<p>You can know from the above message the current project refers to a sub-project named <tt>zlib-example</tt>(the so-called <i>refname</i>, displayed in curly brackets) and wants to build it, but can't find the startup makefile for that sub-project. </p>
 <p>Of course, if someone commits new versions to the repositories later, a second run will do checkout again thus update your local copy. </p>
 <h2>How to write makefiles for this nice feature</h2>
 <p>That's not difficult but you have to write with care in order not to make repository path and local path wrong.</p>
 <p>The secret resides in a GMU-var called <code>gmu_uv_list_ALL_SUBPRJ</code>. You assign sub-project in this var. In this example, you see the following line in <tt>u_srccfg_post.mki</tt>. </p>
 <pre class="fws">gmu_uv_list_ALL_SUBPRJ = <b>zlib-example</b> <b>zlib-minigzip</b>
 </pre>
-<p>There are two sub-projects assigned to <tt>gmu_uv_list_ALL_SUBPRJ</tt>, <code>zlib-example</code> and <code>zlib-minigzip</code>. Their names are of no importance, you can name them anything you like, not related to any filename on the disk -- we call them <i>project reference name</i>(refname for short). The important thing is, you have to construct some more make vars according to the refname you invent. </p>
+<p>There are two sub-projects assigned to <tt>gmu_uv_list_ALL_SUBPRJ</tt>, <code>zlib-example</code> and <code>zlib-minigzip</code>. Their names are of no importance, you can name them anything you like, not related to makefiles from other projects -- we call them <i>project reference name</i>(<i>refname</i> for short). The important thing is, you have to construct some more make vars according to the refname you invent. </p>
 <p>For example, for refname <tt>zlib-example</tt>, you can see the following line in <tt>u_srccfg_post.mki</tt> . </p>
 <pre class="fws">d_WCRoot = ../../root1-svn-wc
 
@@ -88,24 +98,19 @@ for sub-project {zlib-example} .  Stop. </pre>
 <b>zlib-example</b>_svnUrl_forMakefiles = file:///$(gmu_DIR_ROOT)/demo-repositories/svnreps-zlib-example/trunk
 <b>zlib-example</b>_svnLocalDir_forMakefiles = $(d_WCRoot)/zlib-example</pre>
 <p>Note the bold <b><code>zlib-example</code></b> in the above snippet, it is used to construct some extra make vars. You can invent refname yourself, the the suffix of the extra vars( <code>_Makefile , _svnUrl_forMakefiles , _svnLocalDir_forMakefiles</code> ) are defined by GnumakeUniproc, which you have to obey. Let me explain it briefly:</p>
-<table width="100%"  border="1" cellspacing="3" cellpadding="2">
-  <tr>
-    <td><i>refname</i>_Makefile</td>
-    <td>Startup makefile of the sub-project, whose path is relative to the startup path of the parent project. </td>
-  </tr>
-  <tr>
-    <td><i>refname</i>_svnUrl_forMakefiles</td>
-    <td>If the sub-project(precisely, its startup makefile) can be checked-out from a repository, this tells the SVN URL to check out from. </td>
-  </tr>
-  <tr>
-    <td><i>refname</i>_svnLocalDir_forMakefiles</td>
-    <td><p>Local dir of the checkout. For our example, the content from repository path: </p>
-      <pre><span class="fws">file:///$(gmu_DIR_ROOT)/demo-repositories/svnreps-zlib-example/trunk</span></pre>
+<dl>
+  <dt><i><code>refname</code></i><code>_Makefile</code></dt>
+  <dd><p>Startup makefile of the sub-project, whose path is relative to the startup path of the parent project. </p></dd>
+  <dt><i><code>refname</code></i><code>_svnUrl_forMakefiles</code></dt>
+  <dd><p>If the sub-project(precisely, its startup makefile) can be checked-out from a repository, this tells the SVN URL to check out from. </p></dd>
+  <dt><i><code>refname</code></i><code>_svnLocalDir_forMakefiles</code></dt>
+  <dd><p>Local dir of the checkout. For our example, the content from repository path: </p>
+    <pre><span class="fws">file:///$(gmu_DIR_ROOT)/demo-repositories/svnreps-zlib-example/trunk</span></pre>
     <p>will be checked-out to local dir: </p>
     <pre><span class="fws">$(d_WCRoot)/zlib-example</span></pre>
-    <p>There will not be a extra <tt>trunk</tt> sub-dir in <tt>$(d_WCRoot)/zlib-example</tt> after the checkout. </p></td>
-  </tr>
-</table>
+    <p>There will not be an extra <tt>trunk</tt> local sub-dir after the checkout, since we do not append a <code>/trunk</code> to the <tt>$(d_WCRoot)/zlib-example</tt> above. </p>
+  </dd>
+</dl>
 <p>Seems pretty enough, ha? But there is a more complex situation that is not demonstrated in this example: If one sub-project itself involves source code from multiple repositories, i.e. multiple checkouts are required to get all source files for that single project, then how should we write the makefile? </p>
 <p>The answer is we need another GMU-var called <code>gmu_uv_list_SVN_MODULES</code>. Assume PA has a sub-project PB and PB needs multiple checkout, then you should </p>
 <ul>
@@ -113,20 +118,22 @@ for sub-project {zlib-example} .  Stop. </pre>
   <li>In PB's makefile, use <code>gmu_uv_list_SVN_MODULES</code> to list all remaining checkout actions that should be done. GMU guarantees these extra checkouts are performed before compiling PB's source code starts. </li>
 </ul>
 <p>A good place to assign <code>gmu_uv_list_SVN_MODULES</code> is in file <tt>u_checkout_more.mki</tt>(a reserved filename by GMU). Check the template to know what should be written in <tt>u_checkout_more.mki</tt> . </p>
-<p>For CVS checkout,  the similar process exists but with different make-var names. </p>
+<p>For CVS checkout, the similar process exists but with different make-var names. </p>
 <h2>Some working details </h2>
 <h4>The project <code>zlib</code> is checked out only once </h4>
-<p>Although <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> both want to checkout <tt>zlib</tt>, <tt>zlib</tt> is checked-out only once in one GMU run, that is, only one <code>svn co</code> command is issued on checking out the <tt>zlib</tt> repository. GnumakeUniproc knows <tt>zlib</tt> has been checked-out after the first check-out on <tt>zlib</tt> has done, so that avoid a second action. </p>
+<p>Although <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> both want to checkout <tt>zlib</tt>, <tt>zlib</tt> is checked-out only once in one GMU run, that is, only one <code>svn co</code> command is issued on checking out the <tt>zlib</tt> repository. GnumakeUniproc knows <tt>zlib</tt> has been checked-out after the first check-out on <tt>zlib</tt> has done, so that avoid a second action. GnumakeUniproc knows this because it updates some files(<tt>_ScByMakefile.gmu.txt</tt> , <tt>_ScCheckTime.gmu.ckt</tt>) in your local dir as check out signiture. </p>
 <h4>Check-out source conflict is detected</h4>
-<p>If <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> both want to checkout <tt>zlib</tt> to the same local dir, but using differenct SVN URL or different revision(-r REV), then GnumakeUniproc halts on detection of this repository source conflict. The rationale is, it's not likely to build a production project with the same local dir corresponding to different repository source, which is probably a mistaken decision. So, if you really want to do that, do it manually, not with GMU's auto checkout feature. </p>
-<h4>What GMU makefile template is used? </h4>
-<p>This project use template from <tt>use-pattern-container1/need-compiler-id</tt> . </p>
+<p>If <tt>zlib-example</tt> and <tt>zlib-minigzip</tt> both want to checkout <tt>zlib</tt> to the same local dir, but using differenct SVN/CVS URL or different revision(-r REV), then GnumakeUniproc halts on detection of this repository source conflict. The rationale is, it's not likely to build a production project with the same local dir corresponding to different repository source, which is probably a mistaken decision. So, if you really want to do that, do it manually, not with GMU's auto checkout feature. </p>
+<h4>What GMU makefile template is used for this example? </h4>
+<p>This project use template from </p>
+<p><tt>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern-container1/need-compiler-id</tt> . </p>
 <h4>From which repositories does this demo check out? </h4>
 <p>It depends on an environment variable <tt>gmu_DIR_ROOT</tt> which should have been set when GMU is installed. The SVN repositories we have just used all reside in:</p>
 <p><tt>file:///$(gmu_DIR_ROOT)/demo-repositories</tt></p>
 <p>Find them out yourself if feel interested. </p>
 <h4>What SVN client version should I use for this demo? </h4>
-<p>You must use svn 1.4 or above. The SVN repository here has format 5. </p>
+<p>You must use Subversion 1.4.0 or above. The SVN repository here has format 5. </p>
+<p>Subversion 1.4.2 and later is recommended. </p>
 <p>--</p>
 </body>
 

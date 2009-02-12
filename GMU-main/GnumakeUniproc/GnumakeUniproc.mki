@@ -1052,7 +1052,7 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 \
 		echo "ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifeq (,\$$(wildcard $(SubprjEvMakefile)))" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "    _tmp := \$$(call gmuf_OutputInfo_e,You assign sub-project {$${SubPrj}} makefile as\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\nBut that makefile does not exist. Did you forget to run with gmu_DO_CHECKOUT=1 ?)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp := \$$(call gmuf_OutputInfo_e,You assign sub-project {$${SubPrj}} makefile as\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\nBut that makefile does not exist. \$$(if \$$(gmu_DO_CHECKOUT),,Did you forget to run with gmu_DO_CHECKOUT=1 ?))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)),1)" >> $(_p_mki_SubprjAttr_shsubst) ;\
