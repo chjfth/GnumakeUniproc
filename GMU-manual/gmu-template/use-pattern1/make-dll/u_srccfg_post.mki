@@ -26,7 +26,7 @@ gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllName,<your-dll-name>)
 # GMU-var: gmu_ud_SRC_ROOT
 #	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
 # You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
-# not to this mki file.
+# not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
 ############################################################################
 gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 
