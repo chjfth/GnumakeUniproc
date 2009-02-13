@@ -562,7 +562,7 @@ cd: HOME not set
 <pre>gmu_Gp_list_SUBPRJ_TO_LINK = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
 	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s),$(<b>_Gp_list_AutoLinkFromChildren</b>))
 </pre>
-<p>今天发现 <b><code>_Gp_list_AutoLinkFromChildren</code></b> 会出问题：当本工程(PT)之 <code>_Gp_list_AutoLinkFromChildren</code> 中的某个工程(PA)即是本工程的父工程时（这在 PT 和 PA 互相成环时发生），每次构建 PT 和 PA 都要被重新链接。</p>
+<p>今天发现 <b><code>_Gp_list_AutoLinkFromChildren</code></b> 会出问题：当本工程(PT)之 <code>_Gp_list_AutoLinkFromChildren</code> 中的某个工程(PA)即是本工程的父工程时（换言之，PT 和 PA 互相成环），每次运行 umake， PT 和 PA 都要被重新链接。</p>
 <p>解决方法是，<code>gmu_Gp_list_SUBPRJ_TO_LINK</code> 必须剔除掉导致成环的那些子工程（自动生成的变量 <i><code>&lt;refname&gt;</code></i><code>_IsLooped</code> 标示了某个子工程是否成环。</p>
 <p>本修正提交于 r631 。 </p>
 <h2><a name="061108"></a>[2006-11-08] 加入了子工程跨层自动链接功能</h2>

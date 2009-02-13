@@ -74,7 +74,7 @@ ifeq (,$(gmp_COMPILER_ID))
   $(error !GMU!Error: From pattern1.mks: `gmp_COMPILER_ID' can not be extracted from current dir's extension name, nor is it defined by you explicitly)
 endif
 
-_gmu_isUmakeTargetReqCompiler = $(if $(call _FindStrings,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr gmu_ut_checkout gmu_ut_export),,1)
+_gmu_isUmakeTargetReqCompiler = $(if $(call _FindStrings,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr gmu_ut_diagnose gmu_ut_checkout gmu_ut_export),,1)
 _gmu_isUmakeTargetNoReqCompiler = $(if $(_gmu_isMakeTargetReqCompiler),,1)
 
 ###########################################################

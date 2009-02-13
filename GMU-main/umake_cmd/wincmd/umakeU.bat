@@ -5,7 +5,7 @@ REM Delete GnumakeUniproc start-up signiture file
 IF EXIST _MainPrjBuildStart.gmu.ckt DEL _MainPrjBuildStart.gmu.ckt
 IF EXIST _MainPrjBuildStart.gmu.ckt GOTO ErrorDelGmuSig
 
-set GMU_PATH_PRE_SAVE=%PATH%
+REM set GMU_PATH_PRE_SAVE=%PATH%
 	rem For the old sh.exe, The PATH value will change weirdly in sh.exe
 
 IF "x%gmu_LOG_OUTPUT_FILENAME%x" == "xx" goto NoLogOutput
