@@ -193,7 +193,25 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
 <h4><a name="diag-gmu-var"></a>How do I know the value of a GMU variable(gmu-var)?</h4>
 <p>If you're interested in the actual value of a gmu-var(like <code>gmu_uf_LINK_OUTPUT</code>), you can check it like this:</p>
 <pre class="fws">umake gmu_ut_diagnose gmu_u_DIAGNOSE_VARS=<code>gmu_uf_LINK_OUTPUT</code></pre>
-<p> Replace <code>gmu_uf_LINK_OUTPUT</code> with other make variables interested, then you can know there value.</p>
+<p>From the screen output, we can see: </p>
+<pre class="fws">******************************************************************************
+=====GnumakeUniproc diagnose for [walkdir]=====
+gmu_uf_LINK_OUTPUT = [libwalkdir.a]
+
+******************************************************************************
+=====GnumakeUniproc diagnose for [walkdir_ex1]=====
+gmu_uf_LINK_OUTPUT = [<b>walkdir_ex1.exe</b>]</pre>
+<p>The bold text above indicates <code>gmu_uf_LINK_OUTPUT</code>'s value is <tt>walkdir_ex1.exe</tt> . </p>
+<p>Replace <code>gmu_uf_LINK_OUTPUT</code> with other make variables interested, then you can know their value.</p>
+<p>NOTE: Since walkdir_ex1 has a sub-project, the sub-project is also run with <code>gmu_u_DIAGNOSE_VARS=gmu_uf_LINK_OUTPUT</code>, so you see  <code>gmu_uf_LINK_OUTPUT</code> value of two projects. In order to diagnose for only the root project, you can pass option </p>
+<ul>
+  <li> <code>gmu_NO_MAKE_SUBPRJS=1</code></li>
+  <li>or 
+
+
+  <code>gmu_IGNORE_SUBPRJS=1</code></li>
+</ul>
+<p>to umake. The above two options are a bit different though; check <a href="../manual/gmu-vars.htm">gmu-vars.htm</a> if you'd like to know. </p>
 <p>More tips of getting gmu-var values can be found at <a href="http://p.sf.net/gnumakeuniproc/diag-gmu-var">http://p.sf.net/gnumakeuniproc/diag-gmu-var</a> . </p>
 <h4><a name="TuneGMU"></a>Tune GMU's running behavior </h4>
 <p>You can tune GMU's behavior with many make variables(make-var), You can set these make-vars by defining environment variables(env-var) or assign them on make's command line. I'll call those variables used by GnumakeUniproc gmu-vars. </p>

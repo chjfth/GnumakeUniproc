@@ -1098,17 +1098,17 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  _LoopAgainst := \$$(shell _tmp_ckf=$(SubprjEvFnCheckInProgress); \
-			if [ -f \$$\$$_tmp_ckf ] && [ ! \$$\$$_tmp_ckf -ot \$$\$$gmu_p_BuildStartCkt ]; \
+			if [ -f \$$\$$_tmp_ckf ] && [ ! \$$\$$_tmp_ckf -ot \$$(gmu_p_BuildStartCkt) ]; \
 				then cat \"$(SubprjEv_ThisPrjAttr)\" ; \
 			fi ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifneq (\$$(strip \$$(_LoopAgainst)),)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    $${SubPrj}_IsLooped = 1" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "  ifeq (\$$(notdir \$$(_p_ThisMakefile)),_MakeSubPrjs.gmu.mk) # if not this check, the same info will output twice" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "   ifeq (\$$(notdir \$$(_p_ThisMakefile)),_MakeSubPrjs.gmu.mk) # if not this check, the same info will output twice" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _tmp := \$$(shell ( echo \"!GMU!Info: A sub-project with refname {$${SubPrj}} loop against ancestor project[ $(SubprjEvPrjname) ], whose makefile is:\"; \
 				echo \"    $(SubprjEvMakefile)\"; echo '  i.e.' ;\
 				echo \"    \`cat $(SubprjEvHisMakefileAttr)\`\"; \
 				echo "" ) 1>&2 )" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "   endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "endif # ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo -e "#################### {$${SubPrj}} end ####################\n" >> $(_p_mki_SubprjAttr_shsubst) ;\
@@ -1320,6 +1320,7 @@ gmu_ut_diagnose:
 	@echo "=====GnumakeUniproc diagnose for $(if $(gmu_PRJ_NAME),[$(gmu_PRJ_NAME)],[gmu_PRJ_NAME not defined])====="
 	@$(foreach v,$(gmu_u_DIAGNOSE_VARS),$(call _EchoVarValue2,$v);)
 	@$(foreach v,$(gmu_u_DIAGNOSE_VARS_LIST),$(call _ListVarValue,$v);)
+	@$(_Gmp1SharedFinishingCmds)
 #	@$(call _EchoVarValue,gmu_ud_SRC_ROOT)
 #	@$(call _EchoVarValue,gmu_ud_OUTPUT_ROOT)
 #	@$(call _EchoVarValue,gmu_uf_LINK_OUTPUT)
