@@ -48,7 +48,7 @@ define SYDO_copy_commands
 		CmdRet=$$?; if [ $$CmdRet != 0 ] ; then echo "!Error from $(_pluginId_sync_devoutput): cp command fails while copying $${OneItem} "; exit $$CmdRet; fi; \
 		done \
 	)
-endef
+endef # define SYDO_copy_commands
 
 SydoRuleNameForOneSid = SYDO_SyncProcRule_$1
 
@@ -65,7 +65,7 @@ $(call SydoRuleNameForOneSid,$1):
 	$$(eval $$(call SYDO_syncproc_vardef,$1))
 	@$$(if $$(-ret-DontSync),,$$(SYDO_copy_commands))
 
-endef
+endef # define SYDO_syncproc_rule
 
 
 # [2007-11-23] There is a problem of mame.net's sh.exe . For the following command:
@@ -84,7 +84,7 @@ $(foreach v,$(SydoListAllSid),$(eval $(call SYDO_syncproc_rule,$v)))
 
 .PHONY: gmi_SYDO_target_SyncOutput
 gmi_SYDO_target_SyncOutput: $(foreach v,$(SydoListAllSid),$(call SydoRuleNameForOneSid,$v))
-	@$(call gmpf_AddCustomActionCount,Sync-dev-output)
+	@$(if $(SydoListAllSid),$(call gmpf_AddCustomActionCount,Sync-dev-output))
 
 
 
