@@ -77,8 +77,11 @@ endef # define SYDO_syncproc_rule
 # the output of sh.exe will be ``/dir/123''. 
 # This is a flaw of sh.exe. Bash 2.0 do not have this problem.
 
+_IsSydoSourceExist = $(if $(gmi_SYDO_ud_SYNC_$1_FROM)$(gmi_SYDO_up_list_SYNC_$1),1)
+	# $1: SID: sync operation identifier.
 
 SydoListAllSid := $(patsubst gmi_SYDO_ud_SYNC_%_TO,%,$(filter gmi_SYDO_ud_SYNC_%_TO,$(.VARIABLES)))
+SydoListAllSid := $(foreach v,$(SydoListAllSid),$(if $(call _IsSydoSourceExist,$v),$v))
 
 $(foreach v,$(SydoListAllSid),$(eval $(call SYDO_syncproc_rule,$v)))
 

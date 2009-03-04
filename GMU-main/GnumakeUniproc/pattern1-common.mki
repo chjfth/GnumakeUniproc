@@ -4,7 +4,8 @@ unexport gmp_u_list_PLUGIN_TO_LOAD
 	# Avoid user's setting gmp_u_list_PLUGIN_TO_LOAD in env-var resulting in
 	# influencing sub-projects. If required for all subprjs, set
 	# gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE or gmp_u_list_PLUGIN_TO_LOAD_ENV_POST instead.
-unexport gmp_u_list_PLUGIN_TO_LOAD_AUX
+unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE
+unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_POST
 
 _dirPattern1Cfg = pattern1cfg
 gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
@@ -69,7 +70,7 @@ gmp_up_USER_OUTPUT_AFTER_LINK += $(gmp_USER_FIRST_TARGET)
 _gmp_up_USER_OUTPUT_AFTER_LINK_s = $(strip $(gmp_up_USER_OUTPUT_AFTER_LINK))
 
 gmi_SYDO_ud_SYNC_UserOutputAL_FROM = $(call gmuf_GetDir,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
-#gmi_SYDO_ud_SYNC_UserOutputAL_TO = (should be assigned from env)
+#gmi_SYDO_ud_SYNC_UserOutputAL_TO = (should be assigned from parent, and normally, from env)
 gmi_SYDO_up_list_SYNC_UserOutputAL = $(notdir $(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
 
 

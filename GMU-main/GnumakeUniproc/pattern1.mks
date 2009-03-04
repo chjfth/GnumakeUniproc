@@ -167,11 +167,15 @@ gmpv_ThisPluginId = $(basename $(notdir $(call gmuf_lastword,$(MAKEFILE_LIST))))
 # of <dir>/<plugin>/<plugin>.mki and include it.
 #	And as a last resort, check $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin) for that plugin.
 
-gmp_u_list_PLUGIN_TO_LOAD += $(gmp_u_list_PLUGIN_TO_LOAD_AUX)
-	#[2008-10-10] gmp_u_list_PLUGIN_TO_LOAD_AUX may provide convenience for Windows users(user not using Bash).
+gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE += $(gmp_u_list_PLUGIN_TO_LOAD_AUX)
+	# For compatibility of the old gmp_u_list_PLUGIN_TO_LOAD_AUX.
 
 gmp_u_list_PLUGIN_TO_LOAD := $(call gmuf_RemoveDuplicate,\
-	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE) $(gmp_u_list_PLUGIN_TO_LOAD) $(gmp_u_list_PLUGIN_TO_LOAD_ENV_POST))
+	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE) \
+		$(gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE) \
+			$(gmp_u_list_PLUGIN_TO_LOAD) \
+		$(gmp_u_list_PLUGIN_TO_LOAD_AUX_POST) \
+	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_POST))
 
 gmp_Gp_list_PLUGIN_LOADED := $(foreach _PlugIn,$(gmp_u_list_PLUGIN_TO_LOAD),\
 	$(firstword \

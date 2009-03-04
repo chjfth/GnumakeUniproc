@@ -117,7 +117,9 @@ gmuf_IsSubString = $(if $(call _IsStringEqual,$(subst $1,,$2),$2),,1)
 	# If $1 is null, return null.
 
 _MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
+gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
 _ClearFile = echo -n "" > $(1)
+gmuf_ClearFile = $(_ClearFile)
 
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
 	# What the internal $(suffix) function returns has a leading dot, we reject the dot here.
@@ -274,7 +276,7 @@ gmuf_MakeSvnRepositoryPath = $(if $($1),$($1),$(error !GMU!Error: You makefile r
 	# assert error.
 
 gmuf_RemoveTrailSlash1 = $(patsubst %/,%,$1)
-gmuf_RemoveTrailSlash = $(if $(patsubst %/,,$1),$1,$(call gmuf_RemoveTrailSlash,$(call gmuf_RemoveTrailSlash1,$1)))
+gmuf_RemoveTrailSlash = $(if $1,$(if $(patsubst %/,,$1),$1,$(call gmuf_RemoveTrailSlash,$(call gmuf_RemoveTrailSlash1,$1))))
 	# Remove all trailing slashes.
 
 gmuf_GetParentDir1 = $(call gmuf_RemoveTrailSlash,$(dir $(call gmuf_RemoveTrailSlash,$1)))
