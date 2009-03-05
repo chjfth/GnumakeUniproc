@@ -181,14 +181,15 @@ gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
 	# 'so' means string operation
 	# This is suitable for directory and filepath(dir+filename)
 
-gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_soc,$(CURDIR),$1)
+gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 	# $1: a (relative) path relative to curdir.
 	# Similar to gmuf_GetAbsPathByRela_so, but 'soc' means string operation from curdir. 
 	#
 	# [2009-01-23]Caution: On Windows port of GNU make 3.81, using gmuf_GetAbsPathByRela_soc may sometimes
-	# cause make to crash:
+	# cause make to crash: 
 	#	make: Interrupt/Exception caught (code = 0xc00000fd, addr = 0x7c92eddc)
 	# (internal ref: https://nlssvn/svnreps/CommonLib/NDSI/trunk/NDSI_Lib/make/dll.wince/domakeU.bat)
+	# [2009-03-05] (that may due to my mistake.) so still trying gmuf_GetAbsPathByRela_soc .
 
 #======== Something not so "common" below ========
 
