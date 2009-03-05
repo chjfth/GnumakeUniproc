@@ -1469,6 +1469,34 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
   <li>把 <tt>bc_deco_prjname.mki</tt> 挪到 compiler-config-mki 之后（原先是在其之前）。此步并非必要——若 <tt>bc_deco_prjname.mki</tt> 里头不用 make-var immediate expansion 的话。挪到 compiler-config-mki 后就可以对 <b>gmp_G_CompilerVerToDeco</b> 的值做 immediate expansion 了。 </li>
 </ul>
 <p>以上改进在 v601 基本完成，初步测试通过（见 mix-compiler-ver 中的例子 ）。</p>
+<h2>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
+<p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
+<ul>
+  <li>根工程(RP)第一次用 <code>_gmu_ut_GetPrjAttr</code> 试图取子工程属性时其实已经是在一个“中间子 make”（_MakeSubPrjs.gmu.mk）中进行了，因此那种 bug 影响不了这里。</li>
+  <li>根工程(RP)第二次想取子工程属性的动作确是在 MAKELEVEL=0 环境下发出，但这时是通过 cached 方法取得的，因此用不到 <code>_gmu_ut_GetPrjAttr</code> 方式，那个 bug 也影响不到这里，这样看起来就不需 gmuExtractVarDefines 了。</li>
+</ul>
+<p>那天就想到了删除 gmuExtractVarDefines 。但为了保险起见，加了如下黑体。若确实用不着 gmuExtractVarDefines，那么黑体中的 <code>$(error )</code> 就永远不会装上。 </p>
+<pre>		echo "ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (,\$$(wildcard $(SubprjEvMakefile)))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp := \$$(call gmuf_OutputInfo_e,You assign sub-project {$${SubPrj}} makefile as\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\nBut that makefile does not exist. \$$(if \$$(gmu_DO_CHECKOUT),,Did you forget to run with gmu_DO_CHECKOUT=1 ?))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)),1)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Query-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+<b>  echo "          ifeq (\$${MAKELEVEL},0)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+  echo "            \$$(error !!!!!!!!!!!!!!!!!!!! BAD! Got MAKELEVE=0 HERE!!!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+  echo "          endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
+</b>		echo "    _gmu_FetchSubprjAttr := \$$(shell \
+			\$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} _gmu_ut_GetPrjAttr -C \$$(dir $(SubprjEvMakefile)) -f \$$(notdir $(SubprjEvMakefile)) \
+			_p_PrjAttrOutput=\$$(_p_AttrOutput_$${SubPrj}) --no-print-directory \
+			\$$(if \$$(call _IsStringEqual,\$${MAKELEVEL},0),\$$(_tmp_MakeOpts),) 1>&2 \
+			&& echo PrevCmdSuccess ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+</pre>
+<p>今天，撞上黑体中的 $(error ) 了，原来是用了 <code>gmu_NO_MAKE_SUBPRJS=1</code> 导致的。是啊，这种情况下根工程对任一直接子工程只有一次取属性的机会，而且就在 MAKELEVEL=0 环境下取的。</p>
+<div class="hint">另外的思路：当 gmu_NO_MAKE_SUBPRJS=1 时，是否 Retrieving cached PrjAttr 的判断规则改掉，不是判断 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 比 prj-start 的时间滞后才取，而是只要文件 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 存在就取。（该方案暂未实施，待继续考虑） </div>
+<p>&nbsp;</p>
 <p>==</p>
 </body>
 

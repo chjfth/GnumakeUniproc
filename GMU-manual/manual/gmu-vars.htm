@@ -258,8 +258,14 @@
     <td valign="top">gmu_DELIBERATE_NO_SUBPRJ</td>
     <td align="center">I</td>
     <td><p>Default value of this var is null.</p>
-    <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. SVN export bunches of files for other projects to use. If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirement. </p>
-    <p>The benefit of a free-style GMU makefile is you can give it a proejct-name(<code>gmu_PRJ_NAME</code>), so that it has a dedicated project output dir(<a href="#gmu_Gd_Final_PrjOutput"><code>gmu_Gd_Final_PrjOutput</code></a>) for end user to create files in it, and, it's build result appears in the statistic information of GMU pattern1 build model.</p>    <p>This var must be set before <tt>pattern-container1.mks</tt> is included. </p></td>
+    <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. what the makefile does is only to CVS/SVN export some files for other projects to use. </p>
+    <p>Influence: If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirement. </p>
+    <p>The benefits of a free-style GMU makefile are </p>
+    <ul>
+      <li>You can give it a project-name(<code>gmu_PRJ_NAME</code>), so that it has a dedicated project output dir(<a href="#gmu_Gd_Final_PrjOutput"><code>gmu_Gd_Final_PrjOutput</code></a>) for end user to create files in it, </li>
+      <li>Once the project is built, it is recorded up-to-date, so that it is run only once (normally) across one GMU run. </li>
+      <li>Its build result appears in the statistic information of GMU pattern1 build model.</li>
+    </ul>    <p>This var must be set before <tt>pattern-container1.mks</tt> is included. </p></td>
   </tr>
   <tr>
     <td valign="top">gmu_u_SHOW_PROGRESS_CMD</td>

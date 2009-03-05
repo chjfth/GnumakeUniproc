@@ -99,7 +99,7 @@ ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
 	@for v in $(_Gp_list_AutoLinkFromChildren); do echo $$v >> $(_p_AutoLinkListForParent); done
 endif
 #
-ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ)) # Show the following only it really contains subprjs.
+ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ)$(gmu_IGNORE_SUBPRJS)) # Show the following only it really contains subprjs.
 	@echo -e "[DONE sub-projects:] $(foreach s,$(gmu_uv_list_ALL_SUBPRJ),\n  {$s}: %/$($s_Prjname)/$(subst _gmu_NoOutput,(none),$($s_Filename))$(if $($s_UserOutputAfterLink),\n    U: $(call _StripOutputRootPrefix,$($s_UserOutputAfterLink))))"
 endif
 	@$(_GmpShowDoneUserOutputAfterLink)
