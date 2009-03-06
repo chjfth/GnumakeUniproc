@@ -1,6 +1,8 @@
 # GnumakUniproc.mki, this single file implements the core layer of GnumakeUniproc.
 # -- Authored by Chen Jun(chjfth@gmail.com, chenjun@mail.nlscan.com) since Feb 2006.
 
+include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
+
 gmu_PRJ_NAME_s = $(strip $(gmu_PRJ_NAME))
 ifeq (,$(gmu_PRJ_NAME_s))
   $(error !GMU!Error: Make-var: `gmu_PRJ_NAME' not defined or it is empty)
@@ -44,7 +46,8 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     CURDIR_TEMP := $(if $(call _IsStringEqual,$(OSTYPE),cygwin),$(subst \,/,$(shell cygpath -w $(CURDIR))),$(CURDIR))
       # The usage of `cygpath -w' is important for invoking non "cygwin-dll" compilers such as VC++.
       #If not doing this, make.exe in cygwin will give VC++ a filepath like /cygdrive/e/prgroot.
-    gmu_ud_OUTPUT_ROOT := $(CURDIR_TEMP)/gf
+    export gmu_ud_STARTUP_DIR := $(CURDIR_TEMP)
+    export gmu_ud_OUTPUT_ROOT := $(CURDIR_TEMP)/gf
     gmu_d_BuildStartCkt := $(CURDIR)
   else
     _tmp_dir := $(call gmuf_GetAbsDirRelaToCurdir,$(gmu_ud_OUTPUT_ROOT))
@@ -114,12 +117,9 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     export gmu_DO_SHOW_VERBOSE = 0
   endif
 
-endif
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif # ifeq ($(MAKELEVEL),0)
 
-export gmu_ud_OUTPUT_ROOT
-
-include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
 
 
 _gmu_uv_list_AllSubprjsForLink = $(gmu_uv_list_SUBPRJ_TO_LINK) $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL)
