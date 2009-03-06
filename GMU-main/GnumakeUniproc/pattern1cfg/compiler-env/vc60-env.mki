@@ -1,12 +1,44 @@
 ifndef __vc60-env_included_
 __vc60-env_included_ := 1
 
+# For Visual C++ 6.0
 
-gmp_LoadVc60Env = MSVSDir="$1" MSSdk="$2" \
-	INCLUDE="$(if $2,$2/Include;)$1/VC98/INCLUDE;$1/VC98/ATL/INCLUDE;$1/VC98/MFC/INCLUDE;"\
-	LIB="$(if $2,$2/Lib;)$1/VC98/LIB;$1/VC98/MFC/LIB;"\
-	PATH="$(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;$(subst \,/,$(PATH))"
+ifeq (,$(gmp_CENV_MSVC60_ROOT))
+  $(error !GMP!Error: gmp_CENV_MSVC60_ROOT is not defined, so I cannot find Visual C++ 6 compiler)
+endif
+
+ifeq (,$(gmp_CENV_MSVC60_PSDK_ROOT))
+  $(warning !GMP!Warning: gmp_CENV_MSVC60_PSDK_ROOT is not defined, you may be suffering from very old Windows platform headers)
+endif
+
+
+_vc60_val_INCLUDE = $(if $2,$2/Include;)$1/VC98/INCLUDE;$1/VC98/ATL/INCLUDE;$1/VC98/MFC/INCLUDE;
+_vc60_val_LIB = $(if $2,$2/Lib;)$1/VC98/LIB;$1/VC98/MFC/LIB;
+_vc60_val_PATH = $(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VC6 install dir(root-dir)
+	# $2: PSDK install dir
 
 # Adding Common\MSDev98\Bin into PATH for MSPDB60.DLL.
+
+in_gmpf_LoadCenv_vc60 = \
+	gmp_COMPILER_VER="vc60 $(gmp_COMPILER_VER)" \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc60_val_INCLUDE)" \
+	LIB="$(_vc60_val_LIB)" \
+	PATH="$(_vc60_val_PATH)"
+
+gmpf_LoadCenv_vc60 = $(call in_gmpf_LoadCenv_vc60,$(gmp_CENV_MSVC60_ROOT),$(gmp_CENV_MSVC60_PSDK_ROOT))
+
+define def_ExportCenv_vc60
+  export gmp_COMPILER_VER := vc60 $(gmp_COMPILER_VER)
+  export MSVSDir=$1
+  export MSSdk=$2
+  export INCLUDE := $(_vc60_val_INCLUDE)
+  export LIB := $(_vc60_val_LIB)
+  export PATH := $(_vc60_val_PATH)
+endef
+
+gmpf_ExportCenv_vc60 = $(eval $(call def_ExportCenv_vc60,$(gmp_CENV_MSVC60_ROOT),$(gmp_CENV_MSVC60_PSDK_ROOT)))
 
 endif

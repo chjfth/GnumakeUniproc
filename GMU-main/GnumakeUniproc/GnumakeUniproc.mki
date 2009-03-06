@@ -1059,6 +1059,9 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Query-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+  echo "          ifeq (\$${MAKELEVEL},0)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+  echo "            \$$(error !!!!!!!!!!!!!!!!!!!! BAD! Got MAKELEVE=0 HERE!!!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+  echo "          endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _gmu_FetchSubprjAttr := \$$(shell \
 			\$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} _gmu_ut_GetPrjAttr -C \$$(dir $(SubprjEvMakefile)) -f \$$(notdir $(SubprjEvMakefile)) \
 			_p_PrjAttrOutput=\$$(_p_AttrOutput_$${SubPrj}) --no-print-directory \
