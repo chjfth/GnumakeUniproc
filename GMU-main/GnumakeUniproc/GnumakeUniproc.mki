@@ -1055,7 +1055,7 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "    _tmp := \$$(call gmuf_OutputInfo_e,You assign sub-project {$${SubPrj}} makefile as\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\nBut that makefile does not exist. \$$(if \$$(gmu_DO_CHECKOUT),,Did you forget to run with gmu_DO_CHECKOUT=1 ?))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)),1)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)).\$$(gmu_NO_MAKE_SUBPRJS),1.)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Query-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
@@ -1076,6 +1076,9 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "  else" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Retrieving cached PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
 		echo "    $${SubPrj}_PrjAttr := \$$(shell cat $(_SubprjEv_pAttrCache) )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    ifeq (,\$$($${SubPrj}_PrjAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "      \$$(error !GMU!Error: Failed to retrieve cached PrjAttr for {$(SubprjEvPrjRefname)})" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifneq (\$$(words $(SubprjEvAttr)),4)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    \$$(error !GMU!Error: Your makefile \"$(SubprjEvMakefile)\" does not correctly implement target \`_gmu_ut_GetPrjAttr'. (The unexpected make return is: $(SubprjEvAttr) ))" >> $(_p_mki_SubprjAttr_shsubst) ;\

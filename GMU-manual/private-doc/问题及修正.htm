@@ -1496,7 +1496,32 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 </pre>
 <p>今天，撞上黑体中的 $(error ) 了，原来是用了 <code>gmu_NO_MAKE_SUBPRJS=1</code> 导致的。是啊，这种情况下根工程对任一直接子工程只有一次取属性的机会，而且就在 MAKELEVEL=0 环境下取的。</p>
 <div class="hint">另外的思路：当 gmu_NO_MAKE_SUBPRJS=1 时，是否 Retrieving cached PrjAttr 的判断规则改掉，不是判断 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 比 prj-start 的时间滞后才取，而是只要文件 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 存在就取。（该方案暂未实施，待继续考虑） </div>
-<p>&nbsp;</p>
+<h3>[2009-03-08] 终于，撞上 gmuExtractVarDefines 的大限，准备将其废掉！</h3>
+<p>回顾一下 gmuExtractVarDefines 的使用场合：当 GnumakeUniproc 中调用 gmuExtractVarDefines 时，传给它 <code>$(MAKEFLAGS)</code> ，这使得根工程启动时 make 命令行参数中的变量赋值能够传给 根工程中用 $(shell ) 启动的子工程。 然而，这种依靠 gmuExtractVarDefines 的补救手段在下面这两个场合就很难用了。</p>
+<p>场合一：</p>
+<blockquote>
+  <p>这几天在写 uBase 和 uTools 的合并工程时，意识到，uBase 和 uTools 自身的 makefile 应该给自己设定自己的编译环境（编译器要求的环境变量），而非由它们的父工程来设定（父工程切换编译环境）。想想看，若让父工程进行切换，则要是有多个父工程都要包容 uBase/uTools 构成大工程，那么所有父工程中都要进行环境切换。这个负担——<span class="style-font-small">如果 uBase/uTools 的编译环境如何设应该算他们自己的 duty 的话</span>——显然不应该由那些父工程来承担。 </p>
+  <p>好了，现在明确了 uBase/uTools 应该自己设定编译环境，他应该如何设呢？下面以 uTools 为例。</p>
+  <p>第一种，uTools 的根工程在它的每个直接子工程的 <i>&lt;refname&gt;</i>_MakeVarDefines 赋值中切换环境变量——这之前已经可以做到。</p>
+  <p>第二种，uTools 的根工程在自己的 makefile 中 </p>
+  <pre>export INCLUDE:=xxx
+export LIB:=yyy
+export PATH:=zzz
+  </pre>
+  <p>如此设置环境变量以便其子工程能够得到。</p>
+  <p>第一种方法有些问题。若 uTools 的直接子工程有多个，那么给他们都要进行 <i>&lt;refname&gt;</i>_MakeVarDefines 赋值，makefile 写起来稍显麻烦。另，对同一个变量的“appending 赋值”目前用 _MakeVarDefines 方法还无法实现，比如，你写</p>
+  <pre>refname_MakeVarDefines = PATH=$(PATH);/c1/bin PATH=$(PATH);/c2/bin</pre>
+  <p>并不能最终达到 <tt>PATH=$(PATH);/c1/bin;c2/bin</tt> 的效果 。</p>
+  <p>因此用第二种方法是比较好的。</p>
+</blockquote>
+<p>场合二：</p>
+<blockquote>
+  <p>有时，在某父工程中希望设一个环境变量给所有子工程，比如 <tt>$uTools/make-all/uBaseDemoApps/u_subprjs.mki</tt> 中希望让所有子工程的最终工程名都加上个前缀</p>
+  <pre>export gmu_DECO_PREFIX_PRJ_FORCE_ENV = uToolsExample+</pre>
+  <p>&nbsp;</p>
+</blockquote>
+<p>这样看出来了吧，在父工程 makefile 中有时希望用 export 变量定义的方式来传递变量给子工程，而这种 export 定义变量的方式，和 make 命令行定义变量一样，同样无法被 $(shell ) 启动的子进程接受。<span class="red">这样一来 gmuExtractVarDefines 的作用就不彻底了。</span>既然不彻底，我就倾向于朝着不用它的方向前进。因此，我今天采取了 2009-03-08 那个“另外的思路”。</p>
+<p>今天的改动就在 r747 。</p>
 <p>==</p>
 </body>
 

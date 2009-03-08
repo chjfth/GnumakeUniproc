@@ -157,7 +157,7 @@
   </tr>
   <tr>
     <td>gmu_ud_OUTPUT_ROOT</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>Output root dir for the whole build process, which is default to <tt>gf</tt> under current dir( <tt>$(CURDIR)/gf</tt> ). </p>
     <p>User can override this value in make command link or in env-var to change the build output place.</p></td>
   </tr>
@@ -168,7 +168,7 @@
   </tr>
   <tr>
     <td valign="top"><a name="gmu_uv_list_CVS_MODULES"></a>gmu_uv_list_CVS_MODULES</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>List of additional CVS modules to checkout for this project. The tokens listed here are reference names(refname), each of which represent a CVS module. For each <i>refname</i>, you should define the following vars:</p>
       <ul>
         <li><code>&lt;<i>refname</i>&gt;_cvsRoot</code>: Tells the CVSROOT to use. </li>
@@ -179,7 +179,7 @@
   </tr>
   <tr>
     <td valign="top"><a name="gmu_uv_list_SVN_MODULES"></a>gmu_uv_list_SVN_MODULES</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td>List of additional SVN modules to checkout for this project. The tokens listed here are reference names(refname), each of which represent a SVN checkout action. For each <i>refname</i>, you should define the following vars:
       <ul>
         <li><code>&lt;<i>refname</i>&gt;_svnUrl</code>: Tells the SVN URL to use. </li>
@@ -237,7 +237,7 @@
   </tr>
   <tr>
     <td>gmu_NO_GEN_HDEPEND</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>If non-null, disable the `gcc -M' header dependency generation. (default to null) </p>
     <p>You should know the effect of making with <code>gmu_NO_GEN_HDEPEND=1</code>, that is, if some .h files included by your program changes, make again will not notice that so your program will not be rebuilt. To dismiss the effect of using <code>gmu_NO_GEN_HDEPEND=1</code>, you have to clean your output first then make again.</p>
     </td>
@@ -249,14 +249,14 @@
   </tr>
   <tr>
     <td valign="top">gmu_NO_MAKE_SUBPRJS</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>Set this to non-null so that GMU will not try to build sub-projects, or say, not check sub-projects' up-to-date status.</p>
       <p>When <code>gmu_NO_MAKE_SUBPRJS=1</code>, GMU retrieves immediate sub-projects' information(their project-name, output image path etc) then go on remaining root project's building. It is really useful when you build an EXE project a second time without any its sub-projects' code change. If you know you have not changed the subprjs, you can ignore checking them to speed up the build.</p>
-    </td>
+      <p>Note: If you set this var without sub-projects really having been built, unpredictable build failure will arise. User himself should be aware of this. </p></td>
   </tr>
   <tr>
     <td valign="top">gmu_DELIBERATE_NO_SUBPRJ</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>Default value of this var is null.</p>
     <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. what the makefile does is only to CVS/SVN export some files for other projects to use. </p>
     <p>Influence: If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirement. </p>
