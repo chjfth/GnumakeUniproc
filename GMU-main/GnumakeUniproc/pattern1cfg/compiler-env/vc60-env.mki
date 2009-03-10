@@ -22,7 +22,7 @@ _vc60_val_PATH = $(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;
 # Adding Common\MSDev98\Bin into PATH for MSPDB60.DLL.
 
 in_gmpf_LoadCenv_vc60 = \
-	gmp_COMPILER_VER="vc60 $(gmp_COMPILER_VER)" \
+	gmp_COMPILER_VER="$(gmp_COMPILER_VER) vc60" \
 	MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(_vc60_val_INCLUDE)" \
 	LIB="$(_vc60_val_LIB)" \
@@ -31,12 +31,12 @@ in_gmpf_LoadCenv_vc60 = \
 gmpf_LoadCenv_vc60 = $(call in_gmpf_LoadCenv_vc60,$(gmp_CENV_MSVC60_ROOT),$(gmp_CENV_MSVC60_PSDK_ROOT))
 
 define def_ExportCenv_vc60
-  export gmp_COMPILER_VER := vc60 $(gmp_COMPILER_VER)
-  export MSVSDir=$1
-  export MSSdk=$2
-  export INCLUDE := $(_vc60_val_INCLUDE)
-  export LIB := $(_vc60_val_LIB)
-  export PATH := $(_vc60_val_PATH)
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER := $(gmp_COMPILER_VER) vc60)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc60_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc60_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc60_val_PATH))
 endef
 
 gmpf_ExportCenv_vc60 = $(eval $(call def_ExportCenv_vc60,$(gmp_CENV_MSVC60_ROOT),$(gmp_CENV_MSVC60_PSDK_ROOT)))

@@ -194,6 +194,7 @@ gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 #======== Something not so "common" below ========
 
 _isNowGmuGetPrjAttr = $(call _IsStringEqual,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr)
+_isNowNotGmuGetPrjAttr = $(if $(_isNowGmuGetPrjAttr),,1)
 
 _IsOlderThanBuildStart = $(call _IsP1OlderThanP2,$1,$(gmu_p_BuildStartCkt))
 
@@ -373,8 +374,22 @@ endef
 gmuf_SvnDeclareDefaultTrunk = $(eval $(call gmue_SvnDeclareBranch,$1,trunk))
 	# $1: same meaning as that of gmue_SvnDeclareBranch
 
-_export_MakevarDefs = $(if $(strip $1),export $1 ;)
-#_SubstMakevarDefsToExport = $(if $(strip $1),export $(subst $(_GmuSpace),; export ,$(filter %,$1)) ;) // XX no use now
-	# The $(filter %,$1) merges multiple contiguous spaces in $1 into one space.
+_export_MakevarDefs = $(if $1,export $1;)
+	# $1 can be multiple var-assignments separated by spaces.
+
+define _AnounceExportEnvvar
+  _tmp := $1# verbose, but for demonstratio purpose
+  ifneq (,$(_isNowNotGmuGetPrjAttr))
+  ifeq (,$(MAKE_RESTARTS)) # only when a make project is first restarted.
+    $$(info In make: export $$(_tmp))
+  endif
+  endif
+  export $1
+    # NOTE above: Writing ``export $$(_tmp)'' fails me. -- maybe a whole export assigment should not be express in a make variable
+endef
+
+gmuf_AnounceExportEnvvar = $(eval $(call _AnounceExportEnvvar,$1))
+	# $1 is var assignment, such as ``myvar=myval'' or ``myvar := myval''
+
 
 endif # ifndef _CommonFunctions_included 
