@@ -8,7 +8,7 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 # Summary
 	# 	This plugin enables you to link a Windows DLL from LIB projects. Sometimes, you'd like
 	# to combine lots of static LIBs into a single DLL, then this plugin is what you need.
-	# The key point to accomplish this is: A LIB project outputs a export definition list
+	# The key point to accomplish this is: A LIB project outputs an export definition list
 	# to a file named LibExportDefs.gmi.txt, later the DLL project will merge the content of
 	# LibExportDefs.gmi.txt from every LIB projects(as DLL's subprjs) into DLL's real .def file .
 	#	With this plugin, exported functions/variables from a LIB is described in LIB project
