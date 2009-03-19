@@ -40,5 +40,10 @@ gmp_DECO_UNICODE_FOR_LINK_OUTPUT =
 gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
 
+# >>> optional for win32 lib (enable as you will)
+#gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
+#gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = [dir-prefix]/ExportDefs.txt
+# <<< optional for win32 lib
+
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
 

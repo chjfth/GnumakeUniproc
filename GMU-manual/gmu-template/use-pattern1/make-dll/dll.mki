@@ -39,5 +39,10 @@ gmp_DECO_UNICODE_FOR_LINK_OUTPUT =
 gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
 
+# >>> optional for win32 dll (enable as you will)
+#gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc     # Load resource(.rc) compiling plugin.
+#gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib # Load "make dll from lib" plugin.
+# <<< optional for win32 dll
+
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
 

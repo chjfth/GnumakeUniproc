@@ -37,6 +37,10 @@ gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 ############################################################################
 gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 
+# >>> optional for win32 lib (enable as you will)
+#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
+# <<< optional for win32 lib
+
 ############################################################################
 # GMU-var: gmu_ud_list_PRJ_HEADER
 #	Define header file dirs, multiple dirs should be separated by spaces or tabs.
