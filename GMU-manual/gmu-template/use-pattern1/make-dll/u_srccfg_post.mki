@@ -43,7 +43,7 @@ gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 
 # >>> optional for win32 dll (enable as you will)
-#gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = [dir-prefix]/1snc-wstcp.def
+#gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = [dir-prefix]/some-name.def
 	# This tells the module-definition (.DEF) file to use for linking a DLL .
 #gmp_mswin_IMPLIB_SUFFIX = --imp
 	# (optional) This forces the import-lib name to have suffix --imp .
