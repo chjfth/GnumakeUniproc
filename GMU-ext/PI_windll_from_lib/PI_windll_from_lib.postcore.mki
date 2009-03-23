@@ -4,18 +4,20 @@ ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
 ### Code for DLL project >>>>>>
 ############################################################################
 
-ifeq ($(gmi_WDFL_THISPRJ_LIB_OR_DLL),DLL)
-  ifeq (,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
-    $(error !Error from PI_windll_from_lib: You do not provided a .def file in make-var gmp_up_WINDLL_MODULE_DEF_FROM_ROOT )
-  endif
-endif
+#ifeq ($(gmi_WDFL_THISPRJ_LIB_OR_DLL),DLL)
+#  ifeq (,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
+#    $(error !Error from PI_windll_from_lib: You do not provided a .def file in make-var #gmp_up_WINDLL_MODULE_DEF_FROM_ROOT )
+#  endif
+#endif
 
 $(gmu_Gp_LINK_OUTPUT): _p_WINDLL_MODULE_DEF_FromCurDir = $(_WDFL_p_FinalDefForDll)
 # make _p_WINDLL_MODULE_DEF_FromCurDir(required by compiler_config.mki) target-specific variable
 
 $(gmu_Gp_LINK_OUTPUT): $(_WDFL_p_FinalDefForDll)
 
-$(_WDFL_p_FinalDefForDll): $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $(gmu_Gp_list_SUBPRJ_TO_LINK)
+$(_WDFL_p_FinalDefForDll): \
+		$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),$(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))\
+		$(gmu_Gp_list_SUBPRJ_TO_LINK)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
 	@for OneFile in "$(patsubst %,%/$(_WDFL_p_LibExportsDef_fpo),$(gmuf_GetAllSubprjNameForLink))"; do \
