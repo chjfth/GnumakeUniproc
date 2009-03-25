@@ -13,7 +13,7 @@
 # gmu_G_Final_PrjName.
 ############################################################################
 ifndef gmu_PRJ_NAME
-  gmu_PRJ_NAME = dfl-walkdir-lib
+  gmu_PRJ_NAME = dfl-libtest
 endif
 
 ############################################################################
@@ -31,16 +31,20 @@ endif
 # by spaces. Plugins are searched from $(gmp_ud_list_CUSTOM_MKI) and then
 # from $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins .
 ############################################################################
-gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
-gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt
-	# [2007-02-20] The above two lines are just for demostrating the use of
-	#PI_windll_from_lib, that is, generate a DLL from a LIB project.
+gmp_u_list_PLUGIN_TO_LOAD += 
+	# PI_sync_devoutput PI_always_compile
 
 
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
 gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
+
+# >>> optional for win32 lib (enable as you will)
+gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
+#gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = [dir-prefix]/ExportDefs.txt
+gmi_WDFL_up_EXPORT_STUB_FROM_ROOT = export-stub.c
+# <<< optional for win32 lib
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
 

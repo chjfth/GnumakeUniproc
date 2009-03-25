@@ -197,6 +197,7 @@ gmu_Gd_Final_PrjOutput = $(_Gd_Deco_PrjOutput)
 gmu_Gd_OBJ_OUTPUT = $(_Gd_OBJ_OUTPUT)
 	#[2006-07-24] User may use this value.
 
+gmuf_GetPrjOutputDir = $(gmu_ud_OUTPUT_ROOT)/$1
 gmuf_GetPrjTmpDir = $(gmu_ud_OUTPUT_ROOT)/$1/_gmu_tmp
 	# $1: final prjname 
 

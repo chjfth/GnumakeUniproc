@@ -15,20 +15,24 @@
 # Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
 # Using function gmpf_MakeExeName to construct output name makes the name more portable.
 ############################################################################
-gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllName,<your-dll-name>)
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllNameForLink,dll-2libs)
 #or
 # gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllNameForLink,<your-import-lib-name>)
 # --if you, making an Windows DLL, want other projects to auto-link this
 # DLL project's import-lib. On Windows, it results in <your-import-lib-name>.lib .
+
+gmp_mswin_IMPLIB_SUFFIX = --imp
+	# (optional) This forces the import-lib name to have suffix --imp .
+	# This must not be set before pattern1.mks .
 
 
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
 #	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
 # You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
-# not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
+# not to this mki file.
 ############################################################################
-gmu_ud_SRC_ROOT = <root-dir-for-your-source>
+gmu_ud_SRC_ROOT = ..
 
 ############################################################################
 # GMU-var: gmu_up_list_SRC_FROM_ROOT
@@ -40,19 +44,7 @@ gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 # * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
 #	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
 ############################################################################
-gmu_up_list_SRC_FROM_ROOT += <source-file-list>
-
-# >>> optional for win32 dll (enable as you will)
-#gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = [dir-prefix]/some-name.def
-	# This tells the module-definition (.DEF) file to use for linking a DLL .
-#gmp_mswin_IMPLIB_SUFFIX = --imp
-	# (optional) This forces the import-lib name to have suffix --imp .
-	# This must not be set before pattern1.mks .
-#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
-#gmi_RCVC_up_list_WINRC_FROM_ROOT = [dir-prefix]/1snc-wstcp.rc
-	# This is a required parameter for PI_winres_msvc plugin, telling where is 
-	# the Windows resource script file.
-# <<< optional for win32 dll
+gmu_up_list_SRC_FROM_ROOT += 
 
 ############################################################################
 # GMU-var: gmu_ud_list_PRJ_HEADER
@@ -65,6 +57,8 @@ gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 ############################################################################
 gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
 	# Don't write ``-I'' in this var; it will be prependded automatically.
+# or
+#gmp_ud_list_PS_HEADER_PARENT += (within gmp_PS_INCLUDE_SUBDIRS)
 
 gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
 	# those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
@@ -147,32 +141,15 @@ gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 # by you.
 ############################################################################
 
-#gmu_uv_list_SUBPRJ_TO_LINK += # <subprj1-refname> <subprj2-refname> ...
+#gmu_uv_list_SUBPRJ_TO_LINK += 
 # or
-gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += # <subprj1-refname> <subprj2-refname> ...
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += walkdirLib libtest
 
 ######## Details of your sub-projects go here: ########
 
-<subprj1-refname>_Makefile = # where the sub-project's makefile resides
-<subprj1-refname>_MakeVarDefines = # command line options passed to sub-make
-# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
-# >>>> For SVN checkout
-<subprj1-refname>_svnUrl_forMakefiles = # SVN Url for the checkout
-	# Hint: $(call gmuf_MakeSvnRepositoryPath,<SVN-path-prefix-var>,<remaining-repository-path>)
-<subprj1-refname>_svnLocalDir_forMakefiles = # Local dir corresponding to the whole SVN URL
-<subprj1-refname>_svnRev_forMakefiles = # Revision to use(string after svn's -r switch)
-# <<<< For SVN checkout
-# >>>> For CVS checkout
-<subprj1-refname>_cvsRoot_forMakefiles = # CVSROOT for the checkout
-	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
-<subprj1-refname>_cvsModuleDir_forMakefiles = # CVS module name or module dir to checkout
-<subprj1-refname>_cvsLocalDir_forMakefiles = # Local dir corresponding to CVSROOT
-<subprj1-refname>_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
-# <<<< For CVS checkout
+walkdirLib_Makefile = ../../libsrc-walkdir/makelib/lib.$(gmp_COMPILER_ID)/Makefile
 
-# NOTE for novice: Don't try to make sub-projects' output libs listed in gmp_ALL_TO_LINK,
-# those libs will be listed in gmp_ALL_TO_LINK automatically.
-
+libtest_Makefile = ../../libsrc-test/lib.$(gmp_COMPILER_ID)/Makefile
 
 # ----------- below for plugins -----------
 

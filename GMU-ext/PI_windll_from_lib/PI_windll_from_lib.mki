@@ -20,14 +20,19 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 # User input vars:
 
 #	gmi_WDFL_THISPRJ_LIB_OR_DLL = 
-		# Is current project a LIB or a DLL project. Its value is `LIB' or `DLL'.
+		# (optional) Is current project a LIB or a DLL project. Its value is `LIB' or `DLL'.
 		# If not explicitly assigned, this plugin will deduce it from $(gmp_bc_IMAGE_TYPE).
 
 #	gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = 
-		# (only for LIB project)
+		# (only for LIB project, optional)
 		# Indicate the text file that contains export definitions. These "export definition"
 		# lines will later be appended to DLL project's .def file to make a complete
 		# export definition for that DLL.
+
+#	gmi_WDFL_up_EXPORT_STUB_FROM_ROOT = 
+		# (only for LIB project, optional)
+		# Oops, this is a bit profound. Tells a C/C++ file from whom the call graph can cover
+		# all functions to be exported.
 
 # Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
 # msvc/compiler_config.mki or mingw/compiler_config.mki)
@@ -53,6 +58,8 @@ _WDFL_dirTmp = _gmu_tmp/$(_pluginId_windll_from_lib)
 _WDFL_f_LibExportsDef = _LibExportDefs.gmi.txt
 _WDFL_p_LibExportsDef_fpo = $(_WDFL_dirTmp)/$(_WDFL_f_LibExportsDef)#fpo: from prj-output dir
 
+_WDFL_p_LibStubObj_fpo = $(_WDFL_dirTmp)/export-stub.$(gmu_extn_OBJ)
+
 _WDFL_p_FinalDefForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_dirTmp)/FinalDefForDll.def
 	# [2007-02-19] We'll make it an absolute path. This cannot result in a relative dir to cur-dir,
 	# because it will be generated in $(gmu_Gd_Final_PrjOutput) -- which probably not resides within cur-dir.
@@ -68,6 +75,9 @@ ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
 ### Code for DLL project >>>>>>
 ############################################################################
 
+_WDFL_GetPrjStubObj = $(call gmuf_GetPrjOutputDir,$1)/$(_WDFL_p_LibStubObj_fpo)
+	# $1: final project name of a sub-project
+
 ############################################################################
 ### Code for DLL project <<<<<<
 ############################################################################
@@ -77,6 +87,11 @@ else
 ############################################################################
 
 _WDFL_p_Abs_ExportDefsForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibExportsDef_fpo)
+
+
+gmu_up_list_SRC_FROM_ROOT += $(gmi_WDFL_up_EXPORT_STUB_FROM_ROOT)
+
+_WDFL_p_LibStubObj = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibStubObj_fpo)
 
 ############################################################################
 ### Code for LIB project <<<<<<

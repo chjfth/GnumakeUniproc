@@ -20,7 +20,7 @@ $(_WDFL_p_FinalDefForDll): \
 		$(gmu_Gp_list_SUBPRJ_TO_LINK)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
-	@for OneFile in "$(patsubst %,%/$(_WDFL_p_LibExportsDef_fpo),$(gmuf_GetAllSubprjNameForLink))"; do \
+	for OneFile in $(patsubst %,"%/$(_WDFL_p_LibExportsDef_fpo)",$(gmuf_GetAllSubprjNameForLink)); do \
 		OneAbsPath=$${gmu_ud_OUTPUT_ROOT}/$$OneFile; \
 		if [ -f "$$OneAbsPath" ]; then cat $$OneAbsPath >> $@; fi; \
 	done
@@ -30,6 +30,12 @@ $(_WDFL_p_FinalDefForDll): \
 #	$(_p_WINDLL_MODULE_DEF_FromCurDir) ,
 # because _p_WINDLL_MODULE_DEF_FromCurDir has been overridden to be $(_WDFL_p_FinalDefForDll),
 # when this rule is executed.
+# ps: _p_WINDLL_MODULE_DEF_FromCurDir is a variable recognized by msvc/compiler_config.mki
+
+gmu_up_list_EXTRA_OBJ_TO_LINK += \
+	$(foreach v,$(gmuf_GetAllSubprjNameForLink),\
+		$(if $(call gmuf_IsOlderThanBuildStart_sh,$(call _WDFL_GetPrjStubObj,$v)),,$(call _WDFL_GetPrjStubObj,$v))\
+	)
 
 ############################################################################
 ### Code for DLL project <<<<<<
@@ -38,6 +44,19 @@ else
 ############################################################################
 ### Code for LIB project >>>>>>
 ############################################################################
+
+ifneq (,$(gmi_WDFL_up_EXPORT_STUB_FROM_ROOT))
+
+  $(gmu_Gp_LINK_OUTPUT_ckt): $(_WDFL_p_LibStubObj)
+
+  $(_WDFL_p_LibStubObj): $(call gmuf_CnCXX_ListToObjList,$(gmi_WDFL_up_EXPORT_STUB_FROM_ROOT))
+  ifeq (,$(_IsVerboseLevel1))
+	@cp $< $@
+  else
+	cp $< $@
+  endif
+
+endif
 
 #	[2007-01-16] NOTE: Even if _WDFL_p_LibExportDefs_fcd is null, $(_WDFL_p_Abs_ExportDefsForDll)
 # should be created anyway, since this LIB project's sub-projects may present some 

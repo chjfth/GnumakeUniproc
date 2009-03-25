@@ -13,7 +13,7 @@
 # gmu_G_Final_PrjName.
 ############################################################################
 ifndef gmu_PRJ_NAME
-  gmu_PRJ_NAME = dfl-walkdir-lib
+  gmu_PRJ_NAME = dll-from-2libs
 endif
 
 ############################################################################
@@ -22,7 +22,7 @@ endif
 # Common image-types are: LIB, DLL and EXE.
 ############################################################################
 ifndef gmp_bc_IMAGE_TYPE
-  gmp_bc_IMAGE_TYPE = LIB
+  gmp_bc_IMAGE_TYPE = DLL
 endif
 
 ############################################################################
@@ -31,10 +31,14 @@ endif
 # by spaces. Plugins are searched from $(gmp_ud_list_CUSTOM_MKI) and then
 # from $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins .
 ############################################################################
-gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
-gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt
-	# [2007-02-20] The above two lines are just for demostrating the use of
-	#PI_windll_from_lib, that is, generate a DLL from a LIB project.
+gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib PI_winres_msvc
+
+#gmp_up_WINDLL_MODULE_DEF_FROM_ROOT =
+	# This tells module-definition (.DEF) file to use for linking a DLL .
+
+gmi_RCVC_up_list_WINRC_FROM_ROOT = dll-2libs.rc
+	# This is a required parameter for PI_winres_msvc, telling where is the 
+	# Windows resource script file.
 
 
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
