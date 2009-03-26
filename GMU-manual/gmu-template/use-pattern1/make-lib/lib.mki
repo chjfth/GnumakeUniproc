@@ -43,6 +43,7 @@ gmp_DECO_DEBUG_FOR_LINK_OUTPUT =
 # >>> optional for win32 lib (enable as you will)
 #gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
 #gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = [dir-prefix]/ExportDefs.txt
+#gmi_WDFL_up_EXPORT_STUB_FROM_ROOT = <export stub C/C++ file>
 # <<< optional for win32 lib
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks

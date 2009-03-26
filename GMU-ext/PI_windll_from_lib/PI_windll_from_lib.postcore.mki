@@ -20,7 +20,7 @@ $(_WDFL_p_FinalDefForDll): \
 		$(gmu_Gp_list_SUBPRJ_TO_LINK)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
-	for OneFile in $(patsubst %,"%/$(_WDFL_p_LibExportsDef_fpo)",$(gmuf_GetAllSubprjNameForLink)); do \
+	@for OneFile in $(patsubst %,"%/$(_WDFL_p_LibExportsDef_fpo)",$(gmuf_GetAllSubprjNameForLink)); do \
 		OneAbsPath=$${gmu_ud_OUTPUT_ROOT}/$$OneFile; \
 		if [ -f "$$OneAbsPath" ]; then cat $$OneAbsPath >> $@; fi; \
 	done
