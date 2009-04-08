@@ -2,10 +2,49 @@ ifndef __vc80-env_included_
 __vc80-env_included_ := 1
 
 
-gmp_LoadVc80Env = MSVSDir="$1" MSSdk="$2" \
-	INCLUDE="$(if $2,$2/Include;)$1/VC/INCLUDE;$1/VC/PlatformSDK/include;$1/VC/ATLMFC/INCLUDE;"\
-	LIB="$(if $2,$2/Lib;)$1/VC/LIB;$1/VC/PlatformSDK/lib;$1/VC/ATLMFC/LIB;$1/SDK/v2.0/lib;"\
-	PATH="$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))"
+#gmp_LoadVc80Env = MSVSDir="$1" MSSdk="$2" \
+#	INCLUDE="$(if $2,$2/Include;)$1/VC/INCLUDE;$1/VC/PlatformSDK/include;$1/VC/ATLMFC/INCLUDE;"\
+#	LIB="$(if $2,$2/Lib;)$1/VC/LIB;$1/VC/PlatformSDK/lib;$1/VC/ATLMFC/LIB;$1/SDK/v2.0/lib;"\
+#	PATH="$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))"
 
+# For Visual C++ 8.0
+
+ifeq (,$(gmp_CENV_MSVC80_ROOT))
+  $(error !GMP!Error: gmp_CENV_MSVC80_ROOT is not defined, so I cannot find Visual C++ 8 compiler)
+endif
+
+ifeq (,$(gmp_CENV_MSVC80_PSDK_ROOT))
+  $(info !GMP!info: gmp_CENV_MSVC80_PSDK_ROOT is not defined, so you are not using a PlatformSDK)
+endif
+
+
+_vc80_val_INCLUDE = $(if $2,$2/Include;)$1/VC/include;$1/VC/PlatformSDK/Include;$1/VC/atlmfc/include;
+_vc80_val_LIB = $(if $2,$2/Lib;)$1/VC/lib;$1/VC/PlatformSDK/Lib;$1/VC/atlmfc/lib;$1/SDK/v2.0/lib;
+_vc80_val_PATH = $1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VC8 install dir(root-dir)
+	# $2: PSDK(preferred one is PSDK March 2006, also called PSDK Windows Server 2003 R2) install dir
+	# [2009-04-08]pending: $2 has not been prepended in _vc80_val_PATH
+
+
+in_gmpf_LoadCenv_vc80 = \
+	gmp_COMPILER_VER="$(gmp_COMPILER_VER) vc80" \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc80_val_INCLUDE)" \
+	LIB="$(_vc80_val_LIB)" \
+	PATH="$(_vc80_val_PATH)"
+
+gmpf_LoadCenv_vc80 = $(call in_gmpf_LoadCenv_vc80,$(gmp_CENV_MSVC80_ROOT),$(gmp_CENV_MSVC80_PSDK_ROOT))
+
+define def_ExportCenv_vc80
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER := $(gmp_COMPILER_VER) vc80)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc80_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc80_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc80_val_PATH))
+endef
+
+gmpf_ExportCenv_vc80 = $(eval $(call def_ExportCenv_vc80,$(gmp_CENV_MSVC80_ROOT),$(gmp_CENV_MSVC80_PSDK_ROOT)))
 
 endif

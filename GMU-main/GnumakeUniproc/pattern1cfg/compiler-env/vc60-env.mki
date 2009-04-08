@@ -17,7 +17,7 @@ _vc60_val_LIB = $(if $2,$2/Lib;)$1/VC98/LIB;$1/VC98/MFC/LIB;
 _vc60_val_PATH = $(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;$(subst \,/,$(PATH))
 	# Values of the above three is allowed to have spaces.
 	# $1: VC6 install dir(root-dir)
-	# $2: PSDK install dir
+	# $2: PSDK(preferred one is PSDK February 2003) install dir
 
 # Adding Common\MSDev98\Bin into PATH for MSPDB60.DLL.
 
