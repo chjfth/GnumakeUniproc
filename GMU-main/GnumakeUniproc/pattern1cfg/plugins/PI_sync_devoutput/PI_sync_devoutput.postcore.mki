@@ -61,7 +61,7 @@ define SYDO_copy_commands
 	$(call _MkdirIfNotExist,$(-dirSyncTo-) ;) \
 	if [ ! -d $(-dirSyncTo-) ];then echo "!Error from $(_pluginId_sync_devoutput): Fail to create dir(gmi_SYDO_ud_SYNC_$(-SID-)_TO): $(-dirSyncTo-)"; exit 1; fi ;\
 	)
-	$(if $(-listSyncFiles-),@echo "PI_sync_devoutput: Syncing Sid:$(-SID-) $(call _DoVerbose1,[ $(-dirSyncFrom-) -> $(-dirSyncTo-) ])... ")
+	$(if $(-listSyncFiles-),@echo "PI_sync_devoutput: Syncing Sid:$(-SID-) $(call _DoVerbose1,[ $(if $(-dirSyncFrom-), ,)-> $(-dirSyncTo-) ])... ")
 	(\
 	$(if $(-dirSyncFrom-),cd $(-dirSyncFrom-) && $(if $$(gmi_SYDO_SHOW_COPY_CMD),echo "  Do copy in CurDir: `pwd`" && ) ) \
 	for OneItem in $(-listSyncFiles-); do \
