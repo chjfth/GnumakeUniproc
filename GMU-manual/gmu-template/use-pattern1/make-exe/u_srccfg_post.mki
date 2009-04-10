@@ -25,6 +25,14 @@ gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,<your-exe-name>)
 ############################################################################
 gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 
+# >>> optional for Windows exe (enable as you will)
+#gmi_RCVC_up_list_WINRC_FROM_ROOT = [dir-prefix]/1snc-wstcp.rc
+	# This is a required parameter for PI_winres_msvc plugin, telling where is 
+	# the Windows resource script file.
+#gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
+	# This tells the .H file used for precompiled header(passed as /Yc 's argument)
+# <<< optional for Windows exe
+
 ############################################################################
 # GMU-var: gmu_up_list_SRC_FROM_ROOT
 #	Define your source files to compile, source files(dir prefix allowed) separated by spaces or tabs.

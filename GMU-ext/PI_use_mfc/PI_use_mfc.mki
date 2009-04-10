@@ -1,0 +1,33 @@
+ifndef __PLUGIN_USE_MFC_LOADED
+__PLUGIN_USE_MFC_LOADED = 1
+
+_pluginId_use_mfc := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: USEMFC
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_mfc),postcore)
+
+
+# User input vars:
+
+# gmi_USEMFC_STATIC_LIB = 
+	#(optional, default to null) 
+	# If null, use MFC as DLL;
+	# if non-null, statically link MFC.
+	#
+	# NOTE: This will also determine(override) whether to use MS CRT as DLL or static LIB.
+
+
+ifneq (,$(gmi_USEMFC_STATIC_LIB))
+  # Use MFC static lib
+
+  gmp_bc_CRT_STATIC_LIB = 1
+
+else
+  # Use MFC DLL
+
+  gmp_bc_CRT_STATIC_LIB = 
+
+  gmp_CFLAGS_MACRO_DEFS += -D_AFXDLL
+
+endif
+
+endif #__PLUGIN_USE_MFC_LOADED

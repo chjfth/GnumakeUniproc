@@ -13,10 +13,9 @@
 # gmp_bc_DEBUG: (bool) Build with debugging info (default is not defined)
 # gmp_bc_UNICODE: (bool) Build with unicode string (default is not defined)
 # gmp_bc_WIN64: (bool) AMD64, (not IA-64) (default is not defined)
-# gmp_bc_CRT:
-#	CRT_SINGLE_THREADED
-#	CRT_MULTI_THREADED_LIB
-#	CRT_MULTI_THREADED_DLL (default)
+# gmp_bc_CRT_STATIC_LIB:
+#	null(default): use CRT as DLL(dynamic linking)
+#	non-null:      use CRT as static library
 # gmp_bc_IMAGE_TYPE: 
 #	EXE_CUI(EXE)
 #	EXE_GUI
@@ -121,37 +120,29 @@ endif
 
 #^^^^^^^^ gmp_bc_UNICODE ^^^^^^^########........ gmp_bc_DEBUG .........
 
-ifneq (,$(gmp_bc_DEBUG))
+ifneq (,$(gmp_bc_DEBUG)) 
+  # Debug-build
+
   gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Debug_codegen)
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Debug_defs) 
-else # for so-called release-build
+
+  # gmp_bc_CRT_STATIC_LIB:
+  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_CRT_STATIC_LIB),/MTd,/MDd)
+
+else 
+  # Release-build
+
   gmp_CFLAGS_CODE_GEN_preset += $(cfc_for_Release_codegen)
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_for_Release_defs)
+
+  # gmp_bc_CRT_STATIC_LIB:
+  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_CRT_STATIC_LIB),/MT,/MD)
+
 endif
 
-#^^^^^^^ gmp_bc_DEBUG ^^^^^^^^^########......... gmp_bc_CRT ...........
+#^^^^^^^ gmp_bc_DEBUG ^^^^^^^^^
 
-ifeq '$(gmp_bc_CRT)' 'CRT_SINGLE_THREADED'
-  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_DEBUG),/MLd,/ML)
-  SUFFIX_CRT = CrtML
-else
-ifeq '$(gmp_bc_CRT)' 'CRT_MULTI_THREADED_LIB'
-  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_DEBUG),/MTd,/MT)
-  SUFFIX_CRT = CrtMT
-else
-  ifdef gmp_bc_CRT
-  ifneq '$(gmp_bc_CRT)' 'CRT_MULTI_THREADED_DLL'
-    $(error !Invalid `gmp_bc_CRT' definition.)
-  endif
-  endif
-
-  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_DEBUG),/MDd,/MD)
-  SUFFIX_CRT = #CrtMD [2007-12-06] No longer set this suffix today, because it is the ultimate default.
-
-endif # CRT_MULTI_THREADED_LIB
-endif # CRT_SINGLE_THREADED
-
-#^^^^^^^^^  ^^^^^^^^########....... gmp_bc_IMAGE_TYPE ........
+#....... gmp_bc_IMAGE_TYPE ........
 
 gmp_LINKFLAGS_preset += /nologo
 

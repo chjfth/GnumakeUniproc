@@ -8,7 +8,8 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 
 # User input vars:
-#	gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = (must) # the header file used for precompiling
+#	gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = (must) 
+		# the header file used for precompiling (passed as /Yc 's argument)
 		# Of course, if this header file or files included by this file changes, 
 		# the .pch file will be regenerated before compiling any source that
 		# includes this header file.

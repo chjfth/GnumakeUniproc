@@ -26,14 +26,13 @@
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td valign="top">gmp_bc_CRT</td>
+    <td valign="top">gmp_bc_CRT_STATIC_LIB</td>
     <td align="center" valign="top">MSVC</td>
-    <td><p>In history of Microsoft Windows, there have been three different C Runtime Libraries (CRT) that can be linked by an application. This var is used for this. It value can be set to: </p>
+    <td>
         <ul>
-          <li>Null(default): Use MSVCRT(D).DLL as CRT, compiler option <code>/MD </code>or <code>/MDd</code> . </li>
-          <li><code>CRT_MULTI_THREADED_LIB</code>: Use multithreaded static CRT, compiler option <code>/MT</code> or <code>/MTd</code> . </li>
-          <li><code>CRT_SINGLE_THREADED</code>: Use single-threaded static CRT, compiler option <code>/ML</code> or <code>/MLd</code>. Single-threaded CRT has been obsolete since Visual Studio 2005. </li>
-      </ul></td>
+          <li>null(default): use CRT as DLL(dynamic linking)<code></code> , compiler option <code>/MD</code> or <code>/MDd </code>.</li>
+          <li>non-null:  use CRT as static library<code>/MT</code> or <code>/MTd</code> . </li>
+    </ul></td>
   </tr>
 </table>
 <p>&nbsp; </p>
