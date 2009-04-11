@@ -75,7 +75,7 @@ CODE { color:#660000; }
   <li>FindEmptyDir library yet depends on(calls) function <code>walkdir_start</code> in walkdir library in turn. </li>
 </ul>
 <p><img src="FindEmptyDir.gif" width="529" height="214"></p>
-<p>With traditional makefile style, demoFindEmptyDir's makefile would need to explicitly state that he depends on two libraries, FindEmptyDir and walkdir. However, there is a flaw with this style: demoFindEmptyDir calls function(s) from FindEmptyDir lib, but not from walkdir lib, but he has the burden of knowing FindEmptydir depends on walkdir so that demoFindEmptyDir's makefile can know what extra libs need to be linked. That's really not good. If FindEmptyDir changes his implementation to depend on other libs, then demoFindEmptyDir's makefile has to be changed accordingly.</p>
+<p>With traditional makefile style, demoFindEmptyDir's makefile would need to explicitly state that he depends on two libraries, FindEmptyDir and walkdir. However, there is a flaw with this style: demoFindEmptyDir calls function(s) from FindEmptyDir lib, but not from walkdir lib, but he has the burden of knowing FindEmptydir depends on walkdir so that demoFindEmptyDir's makefile can know what extra libs need to be linked. That's really not good. If libFindEmptyDir changes his implementation to depend on other libs, then demoFindEmptyDir's makefile has to be changed accordingly.</p>
 <p>Now, GnumakeUniproc's <code>gmu_uv_list_AUTO_LINK_ALL_LEVEL</code> can give you a relief. What you have to do now is:</p>
 <ul>
   <li>In demoFindEmptyDir, you list sub-project FindEmptyDir in <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> . Makefiles of demoFindEmptyDir does not have to refer to walkdir. </li>
@@ -84,8 +84,8 @@ CODE { color:#660000; }
 <p>Yes, in the above process, for demoFindEmptyDir project, you list sub-projects in gmuvar  <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> instead of the traditional <code>gmu_uv_list_SUBPRJ_TO_LINK</code> . This constitutes the multi-level auto-linking feature. </p>
 <p>When making demoFindEmptyDir, you'll see all three projects built. What's more, if you modify some C source file in walkdir and make again, you'll see only walkdir and demoFindEmptyDir updated.</p>
 <h2>Q &amp; A</h2>
-<h3>Is there any substantial difference to the two names <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> and <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> ? </h3>
-<p>Yes, they serves different purposes. To make it clearer, I tell you that there is (at least) one circumstance that you have to use the two vars both, that is, when building a special Windows DLL.</p>
+<h3>Is there any substantial difference to the two names <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code> and <code>gmu_uv_list_SUBPRJ_LINK_FOR_PARENT</code> ? </h3>
+<p>Yes, they serve different purposes. To make it clearer, I tell you that there is (at least) one circumstance that you have to use the two vars both, that is, when building a special Windows DLL.</p>
 <p>(pending)</p>
 <p>&nbsp; </p>
 <p>-- </p>
