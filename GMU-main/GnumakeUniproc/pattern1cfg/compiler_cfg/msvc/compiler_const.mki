@@ -85,14 +85,14 @@ _msvc_env_vars := $(filter INCLUDE LIB MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(ca
 ifeq (1,$(_gmu_isUmakeTargetReqCompiler))
   # Check whether the env-vars for running Visual C++ command line compiler are OK.
   ifeq '' '$(filter INCLUDE,$(_msvc_env_vars))'
-    $(error !Env-var `INCLUDE' not defined! Please setup the Visual C++ compiler environment first)
+    $(error !GMP!Error: Env-var `INCLUDE' not defined! Please setup the Visual C++ compiler environment first)
       #[2007-03-11] On a WinXP with VC6 installed, exeuting VCVARS32.BAT cause env-var `include' to appear instead of `INCLUDE', strange!
   endif
   ifeq '' '$(filter LIB,$(_msvc_env_vars))'
-    $(error !Env-var `LIB' not defined! Please setup the Visual C++ compiler environment first)
+    $(error !GMP!Error: Env-var `LIB' not defined! Please setup the Visual C++ compiler environment first)
   endif
   ifeq '' '$(filter MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(_msvc_env_vars))'
-    $(error !Neither MSVSDIR, MSVCDir, MSVCVer nor VCINSTALLDIR is defined! Please setup the Visual C++ compiler environment first)
+    $(error !GMP!Error: Neither MSVSDIR, MSVCDir, MSVCVer nor VCINSTALLDIR is defined! Please setup the Visual C++ compiler environment first)
       #[2007-03-11] VS2005 sets env-var VCINSTALLDIR, not MSVCDir.
   endif
 endif

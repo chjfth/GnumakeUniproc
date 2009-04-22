@@ -137,6 +137,13 @@ _AddToBasename_fname = $(gmuf_AddToBasename_fname)# obsolete
 gmuf_ChangeFilenameExt = $(basename $1).$2
 _ChangeFilenameExt = $(gmuf_ChangeFilenameExt)# obsolete
 
+gmuf_IsPrefixWith = $(if $1,$(if $(patsubst $2%,,$1),,1))
+	# Check whether $1 is prefix with $2. Return 1 for true; return null for false.
+	# $(call gmuf_IsPrefixWith,sdt,sdt)		true
+	# $(call gmuf_IsPrefixWith,sdt250,sdt)	true
+	# $(call gmuf_IsPrefixWith,sdt,sdtXX)	false
+	# $(call gmuf_IsPrefixWith,,sdt)		false
+
 _addprefixsuffix = $(addprefix $1,$(addsuffix $3,$2))
 	# $1: prefix to add, $2: your data to process, $3 suffix to add.
 
