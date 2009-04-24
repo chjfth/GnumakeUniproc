@@ -46,6 +46,7 @@ else
   #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
   #gmp_COMPILER_VER matches one of the predefined compiler-ver strings.
   gmp_G_CompilerVerToDeco := _$(_msvc_CompilerVerUse)
+  gmp_G_CompilerVerValid  :=  $(_msvc_CompilerVerUse)
 endif
 
 

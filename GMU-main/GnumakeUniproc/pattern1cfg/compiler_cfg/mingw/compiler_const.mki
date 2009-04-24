@@ -33,6 +33,7 @@ else
   #gmp_COMPILER_VER matches one of the predefined compiler-ver strings. In this case,
   #any strings starting with gcc are considered valid(matching predefined compiler-ver).
   gmp_G_CompilerVerToDeco := _$(_gmp_gcc_ver_use)
+  gmp_G_CompilerVerValid  :=  $(_gmp_gcc_ver_use)
 endif
 
 
