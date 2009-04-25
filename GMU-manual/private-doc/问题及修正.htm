@@ -124,6 +124,11 @@ tt { color:#003366; }
 <li><a href="#080719">080719: 有时候需要给用户对同一工程执行多次 make 的权利</a></li>
 <li><a href="#080813">080813: 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</a></li>
 <li>080819: <a href="win32-make-and-sh.htm">重要发现：Windows 上 make.exe 和 sh.exe 的互关联问题</a></li>
+<li><a href="#090305">090305: 一个备忘，gmuExtractVarDefines 还是不能丢</a>
+  <ul>
+    <li><a href="#090308">090308 终于，撞上 gmuExtractVarDefines 的大限，准备将其废掉！</a></li>
+  </ul>
+</li>
 </ol>
 
 <H2><a name="060216"></a>[2006-02-16 15:00]</H2>
@@ -1407,6 +1412,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
    <pre>-       [<span class="style1">project-name</span>] POSTPROC
 </pre>
 </ul>
+<p>（[2009-03-xx]按这种思路，凡是要通过 <span class="style1"><code>refname</code></span><code>_MakeVarDefines</code> 给子工程装载 PI_sync_devoutput 的场合，都应该给那个子工程指定 <code>_IsForcePostProc</code> ，否则，子工程若在一轮构建开始以来已被编过，PI_sync_devoutput 就成为空谈了。）</p>
 <p>以上修改位于 v576～583 。 </p>
 <h4>另外的思路</h4>
 <p>[2008-07-19] 今天又想到，若没有引入 force-post-processing 模型，可以让 walkdir 的父工程在 <code>gmp_USER_POST_TARGETS</code> 中加载一个额外的 target，在此 target 中手动来执行 walkdir 的 makefile，以此强迫子工程的再次执行。当然，此法对于工程自身的 makefile 来说比 force-post-processing 要麻烦。（此法未实地确认）</p>
@@ -1471,7 +1477,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 <p>以上改进在 v601 基本完成，初步测试通过（见 mix-compiler-ver 中的例子 ）。</p>
 <h4>[2009-04-24] 增加输出变量 gmp_G_CompilerVerValid</h4>
 <p>根据 2008-04-14 那天的决定，当环境中的 gmp_COMPILER_VER 指示不止一个编译器版本时，compiler-config-mki 会从中挑选出合适当前编译器的那个版本描述串(compiler-ver string)，并生成一个 <code>gmp_G_CompilerVerToDeco</code> 变量给用户，但这个变量总是以下划线打头的（用于添加到 <code>gmu_DECO_SUFFIX_PRJ_NAME</code> 中）。今天发现，有时用户 makefile 中需要判断 compiler-config-mki 到底挑了哪一个版本描述串（比如，当 <code>gmp_COMPILER_VER=vc60 sdt </code> 时，makefile 要直到当前 compiler-config-mki 挑的是 <code>vc60</code> 还是 <code>sdt</code>，因此，就输出一个新变量 <span class="red">gmp_G_CompilerVerValid</span> 来描述这个。 </p>
-<h2>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
+<h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
 <p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
 <ul>
   <li>根工程(RP)第一次用 <code>_gmu_ut_GetPrjAttr</code> 试图取子工程属性时其实已经是在一个“中间子 make”（_MakeSubPrjs.gmu.mk）中进行了，因此那种 bug 影响不了这里。</li>
@@ -1497,8 +1503,8 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 			&& echo PrevCmdSuccess ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 </pre>
 <p>今天，撞上黑体中的 $(error ) 了，原来是用了 <code>gmu_NO_MAKE_SUBPRJS=1</code> 导致的。是啊，这种情况下根工程对任一直接子工程只有一次取属性的机会，而且就在 MAKELEVEL=0 环境下取的。</p>
-<div class="hint">另外的思路：当 gmu_NO_MAKE_SUBPRJS=1 时，是否 Retrieving cached PrjAttr 的判断规则改掉，不是判断 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 比 prj-start 的时间滞后才取，而是只要文件 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 存在就取。（该方案暂未实施，待继续考虑） </div>
-<h3>[2009-03-08] 终于，撞上 gmuExtractVarDefines 的大限，准备将其废掉！</h3>
+<div class="hint">另外的思路：当 gmu_NO_MAKE_SUBPRJS=1 时，是否 Retrieving cached PrjAttr 的判断规则改掉，不是判断 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 比 prj-start 的时间滞后才取，而是只要文件 <tt>SubprjAttrCache.refname.<span class="style1">XXX</span></tt> 存在就取。</div>
+<h3><a name="090308"></a>[2009-03-08] 终于，撞上 gmuExtractVarDefines 的大限，准备将其废掉！</h3>
 <p>回顾一下 gmuExtractVarDefines 的使用场合：当 GnumakeUniproc 中调用 gmuExtractVarDefines 时，传给它 <code>$(MAKEFLAGS)</code> ，这使得根工程启动时 make 命令行参数中的变量赋值能够传给 根工程中用 $(shell ) 启动的子工程。 然而，这种依靠 gmuExtractVarDefines 的补救手段在下面这两个场合就很难用了。</p>
 <p>场合一：</p>
 <blockquote>
@@ -1522,7 +1528,7 @@ export PATH:=zzz
   <pre>export gmu_DECO_PREFIX_PRJ_FORCE_ENV = uToolsExample+</pre>
   <p>&nbsp;</p>
 </blockquote>
-<p>这样看出来了吧，在父工程 makefile 中有时希望用 export 变量定义的方式来传递变量给子工程，而这种 export 定义变量的方式，和 make 命令行定义变量一样，同样无法被 $(shell ) 启动的子进程接受。<span class="red">这样一来 gmuExtractVarDefines 的作用就不彻底了。</span>既然不彻底，我就倾向于朝着不用它的方向前进。因此，我今天采取了 2009-03-08 那个“另外的思路”。</p>
+<p>这样看出来了吧，在父工程 makefile 中有时希望用 export 变量定义的方式来传递变量给子工程，而这种 export 定义变量的方式，和 make 命令行定义变量一样，同样无法被 $(shell ) 启动的子进程接受。<span class="red">这样一来 gmuExtractVarDefines 的作用就不彻底了。</span>既然不彻底，我就倾向于朝着不用它的方向前进。因此，我今天采取了 2009-03-05 那个“另外的思路”。</p>
 <p>今天的改动就在 r747 。</p>
 <p>==</p>
 </body>
