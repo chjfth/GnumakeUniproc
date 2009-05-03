@@ -41,3 +41,10 @@ Solution: According to http://www.grimes.demon.co.uk/workshops/fusWSThirteen.htm
   mt /manifest CopyPathExt.dll.manifest /outputresource:CopyPathExt.dll;#2
 
 This command embeds the manifest file into the dll, then the resulting CopyPathExt.dll can be done with regsvr32.
+
+
+[2009-04-06]
+
+I find today that compiling this project on x64 Windows(with VS2005) still fails, even if you have PSDK March 2006 installed. I later find the answer from the comment beneath this codeproject article. The first parameter for GetCommandString should be updated from UINT to UINT_PTR. This solves the x64 building problem.
+
+Also, it seems with that UINT_PTR update, you even don't have to install PSDK March 2006.

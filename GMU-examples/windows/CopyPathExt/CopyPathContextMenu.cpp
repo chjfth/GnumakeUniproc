@@ -172,7 +172,7 @@ STDMETHODIMP CCopyPathContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 //*					  exists, and to get a language-independent string.
 //***************************************
 //
-STDMETHODIMP CCopyPathContextMenu::GetCommandString(UINT idCmd, UINT  uType, UINT *pwReserved, LPSTR pszName, UINT cchMax)
+STDMETHODIMP CCopyPathContextMenu::GetCommandString(UINT_PTR idCmd, UINT  uType, UINT *pwReserved, LPSTR pszName, UINT cchMax)
 {
 	HRESULT				hr = E_INVALIDARG; 
 	int					nFileCount = 0;
