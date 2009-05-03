@@ -139,28 +139,27 @@ walkdir_extname
 </ul>
 <div class="hint">
   <p>Rationale: </p>
-  <p>When some function or C++ class are declared with  <code>__declspec(dllexport)</code> , the compiler will add <code>/EXPORT:</code> or <code>-export:</code> directives for those corresponding functions into the .obj files, so that when the .obj files are linked into a DLL, the linker knows that those function should get exported. However, if the obj files are first packed into a LIB then passed to the linker, the linker will not check all objs in all LIBs one by one to see whether there are functions in some obj corner with <code>/EXPORT:</code> directive; instead, the linker only checks those objs that are explicitly referred to. </p>
-  <p>An obj is said to be &quot;explicity referred to&quot; when any function in that obj </p>
-  <ul>
-    <li>is referred to by <code>EXPORTS</code> statement in the .def file,</li>
-    <li>is referred to by any obj files directly passed to the linker,</li>
-    <li>or is in the call graphs of any already-referred-to obj files. </li>
-  </ul>
+  <p>When some function or C++ class are declared with  <code>__declspec(dllexport)</code> , the compiler will add <code>/EXPORT:</code> or <code>-export:</code> directives for those corresponding functions into the .obj files, so that when the .obj files are linked into a DLL, the linker knows that those functions should get exported. However, if the obj files are first packed into a LIB then passed to the linker, the linker does not undiscriminatingly export all functions who have been declared with <code>__declspec(dllexport)</code>, instead, only those matching the following rules get exported:</p>
+  <ol>
+    <li>those referred to by <code>EXPORTS</code> statement in the .def file.</li>
+    <li>If some code in level-1 obj(the obj directly passed to linker) calls a function in a level-2 obj(the obj first packed in lib then passed to linker), then all functions declared with <code>__declspec(dllexport)</code>in level-2 obj are exported. </li>
+    <li>All functions  that are declared with <code>__declspec(dllexport)</code>and are in the call graphs of [ functions matching rule 2 ] are also exported. </li>
+  </ol>
   <p> Check the following example:</p>
   <p><img src="dll-export.gif"></p>
   <p>We generate a DLL using linker command</p>
   <pre>link /dll /out:my.dll /def:mydef.def mystub.obj my.lib</pre>
-  <p>Assume that all functions in my.lib are declared with   <code>__declspec(dllexport)</code> , then resulting DLL will have a1, a2, b1, b2, c1, c2 exported. (NOTE: It is so even if no function in my.lib calls b2().) </p>
-  <p>In the above example, </p>
+  <p>Assume that all functions in my.lib are declared with   <code>__declspec(dllexport)</code> , then resulting DLL will have a1,  b1, b2, c1, c2 exported. (NOTE: It is so even if no function in my.lib calls b2().) </p>
+  <p>In the above example, the following facts apply as well: </p>
   <ul>
-    <li>no one refers to d1 or d2 during DLL linking, so d.obj is actually not present in my.dll . </li>
-    <li>If a2 has code calling into d1 or d2, d1 and d2 will be exported as well. </li>
+    <li>No one refers to d1 or d2 during DLL linking, so d.obj is actually not present in my.dll . </li>
+    <li>If a2 has code calling into d1 or d2, d1 and d2 will be exported as well. But, a2 itself is still not exported. (author note: to verify!) </li>
   </ul>
 </div>
 
 <h4>IDE hint: Use <tt>ExportDefs.txt</tt> as final .DEF file</h4>
 <p>If, besides using GMU, you'd like to use Visual C++ IDE to build your DLL project for ease of development-time debugging and testing, you may probably want to assign a .def file to your DLL project. Now you are facing a problem: it seems you will result in writing your export symbols in <tt>ExportDefs.txt</tt> as well as in your .def file -- that is a source duplication, not good! </p>
-<p>Fortunately, VC linker allows multiple <code>EXPORTS</code> statement in a .def file, so, just rename ExportDefs.txt to ExportDefs.def and add <code>EXPORTS</code> as it first line. Thus, ExportDefs.def can be used for your VC-IDE DLL project as well as for <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> . </p>
+<p>Fortunately, VC linker allows multiple <code>EXPORTS</code> statement in a .def file, so, just rename ExportDefs.txt to ExportDefs.def and add <code>EXPORTS</code> as its first line. Thus, ExportDefs.def can be used for your VC-IDE DLL project as well as for <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> . </p>
 </body>
 
 </html>
