@@ -294,6 +294,27 @@ __pattern1_inc_project_count:
 #
 #note: Number of + should be equal to l (i.e. one link means one updated project), if not do bug check.
 
+
+
+_p_list_ALLFP_NonLoopSp := $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),$($v_OutdirGMUTMP)/$(_f_AutoLinkListForParent))
+	# ALLFP: Auto-LinkList F`or Parent. _NonLoopSp: of/from Non-looped subprjs.
+	
+ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
+
+  $(_p_AutoLinkListForParent): $(gmu_Gp_LINK_OUTPUT) $(gmu_u_EXTRA_LINK_MERGE) \
+		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALLFP_NonLoopSp))
+	@echo -n "" > $@ # clear the target file
+	@echo "$(_gmuBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" >> $@
+	@$(if $(gmu_u_EXTRA_LINK_MERGE),echo "$(_gmuBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE)" >> $@)
+  ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
+#	@echo "@@@@@@@@@@@@@@@@ $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
+	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(_p_list_ALLFP_NonLoopSp) >> $@)
+	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
+  endif
+
+endif # ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
+
+
 ifneq (,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
 $(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT_ckt)
 # By defining this rule, we always have $(gmp_up_USER_OUTPUT_AFTER_LINK) built after $(gmu_Gp_LINK_OUTPUT) .
@@ -303,6 +324,7 @@ endif
 __pattern1_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
 		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \
+		$(if $(gmu_I_AM_A_LINK_COMPONENT),$(_p_AutoLinkListForParent)) \
 		$(gmp_USER_POST_TARGETS) \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
 	@echo "[DONE:] $(call _StripOutputRootPrefix,$(gmu_Gp_LINK_OUTPUT))"

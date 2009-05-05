@@ -135,7 +135,7 @@ gmu_uv_list_SUBPRJ_TO_LINK += $(gmu_uv_list_LIB_TO_LINK)
 	# Since gmu_uv_list_LIB_TO_LINK has been used by nearly all non-LIB projects, I should keep its compatibility.
 
 gmu_uv_list_ALL_SUBPRJ_s = $(strip $(gmu_uv_list_ALL_SUBPRJ))
-gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL))
+#gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL))
 
 gmu_uv_list_SUBPRJ_LINK_FOR_PARENT_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT))
 
@@ -1234,7 +1234,7 @@ ifneq ($(_SubprjUndoneYet),1) # if subprjs have been built
 # TODO: This can be protected by `ifndef _isInCheckoutPhase'//[2006-11-02] ???
 
 gmu_Gp_list_SUBPRJ_TO_LINK = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
-	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s),$(_Gp_list_AutoLinkFromChildren))
+	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL),$(_Gp_list_AutoLinkFromChildren))
 	# libs to link by EXE/DLL project
 
 $(gmu_Gp_LINK_OUTPUT): $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_Gp_list_SUBPRJ_TO_LINK)
@@ -1250,16 +1250,6 @@ gmu_Gp_LINK_OUTPUT_ckt = $(gmu_Gd_PRJ_GMUTMP)/_LinkOutputDone.gmu.ckt
 $(gmu_Gp_LINK_OUTPUT_ckt): $(gmu_Gp_LINK_OUTPUT)
 #[2006-12-12] Write auto-link list for parent, but only if this project is a link-component.
 	$(gmp_LINK_OUTPUT_POSTPROC_CMD)
-ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
-	@echo "$(_gmuBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" > $(_p_AutoLinkListForParent)
-	@$(if $(gmu_u_EXTRA_LINK_MERGE_s),echo "$(_gmuBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE_s)" >> $(_p_AutoLinkListForParent))
-ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
-#	@echo "@@@@@@@@@@@@@@@@ $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
-	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),$($v_OutdirGMUTMP)/$(_f_AutoLinkListForParent)) >> $(_p_AutoLinkListForParent))
-	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $(_p_AutoLinkListForParent); ))
-endif
-endif
-#
 	@echo -n "" > $@ # touch it
 
 endif # ifneq ($(_SubprjUndoneYet),1)
