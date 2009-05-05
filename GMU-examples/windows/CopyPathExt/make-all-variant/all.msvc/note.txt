@@ -1,0 +1,12 @@
+[2009-05-05] Chj Note:
+I sugguest using umake to run the Makefile, not using umakeD.
+With umakeD.bat(today), gmp_bc_DEBUG=1 is set on CMD.EXE command line as make's parameter, so it will override ``gmp_bc_DEBUG='' settings with <refname>_MakeVarDefines assignment.
+Example: In $gmu_DIR_ROOT\GMU-examples\windows\CopyPathExt\make-all-variant\u_subprjs.mki , there are gmp_bc_DEBUG=(null) assignments, but they will result in vain with umakeD.bat, and the result is: two sub-projects will result in getting the same project-name. Since such two-project-same-name problem is from the same parent project, it will not cause make to halt(today's behavior), but outputs warning such as:
+
+========
+G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt-all-variant_msvc_D/_gmu_tmp/_MakeSubPrjs.gmu.mk:220: warning: overriding commands for target `G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt_msvc_D/_gmu_tmp/_ThisPrjBuiltByParent.gmu.ckt'
+G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt-all-variant_msvc_D/_gmu_tmp/_MakeSubPrjs.gmu.mk:64: warning: ignoring old commands for target `G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt_msvc_D/_gmu_tmp/_ThisPrjBuiltByParent.gmu.ckt'
+G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt-all-variant_msvc_D/_gmu_tmp/_MakeSubPrjs.gmu.mk:298: warning: overriding commands for target `G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt_msvc_U_D/_gmu_tmp/_ThisPrjBuiltByParent.gmu.ckt'
+G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt-all-variant_msvc_D/_gmu_tmp/_MakeSubPrjs.gmu.mk:142: warning: ignoring old commands for target `G:/w/GMU/GMU-examples/make-all/all-on-windows/all.msvc/gf/CopyPathExt_msvc_U_D/_gmu_tmp/_ThisPrjBuiltByParent.gmu.ckt'
+========
+
