@@ -33,9 +33,7 @@ $(_WDFL_p_FinalDefForDll): \
 # ps: _p_WINDLL_MODULE_DEF_FromCurDir is a variable recognized by msvc/compiler_config.mki
 
 gmu_up_list_EXTRA_OBJ_TO_LINK += \
-	$(foreach v,$(gmuf_GetAllSubprjNameForLink),\
-		$(if $(call gmuf_IsOlderThanBuildStart_sh,$(call _WDFL_GetPrjStubObj,$v)),,$(call _WDFL_GetPrjStubObj,$v))\
-	)
+	$(foreach v,$(gmuf_GetAllSubprjNameForLink),$(call _WDFL_GetPrjStubObj,$v))
 
 ############################################################################
 ### Code for DLL project <<<<<<
