@@ -102,7 +102,7 @@ walkdir_extname
 <p>Again, it is not difficult as well. After copying the template files for DLL project(from <tt>$gmu_ROOT/GMU-manual/gmu-template/use-pattern1/make-dll</tt>) , it boils down to the following steps:</p>
 <ol>
   <li>Load PI_windll_from_lib plugin in <tt>dll.mki</tt> . </li>
-  <li>Assign the .def file to use in <code>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</code> . This is not absolutely must. If you don't assign a .def file, PI_windll_from_lib  will generate a temporary .def file(<tt>FinalDefForDll.def</tt>) for you.</li>
+  <li>(optional) Assign the .def file to use in <code>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</code> . This is not absolutely must. If you don't assign a .def file, PI_windll_from_lib  will generate a temporary .def file(<tt>FinalDefForDll.def</tt>) for you.</li>
   <li>List walkdir as  sub-project.</li>
 </ol>
 <p>Your .def need to contain only one line that reads <code>EXPORTS</code> . If you want to write other .def file statements, that's OK. But be sure to leave the <code>EXPORT</code> statement at the tail, because PI_windll_from_lib's code will append the text in <tt>ExportDefs.txt</tt> to your .def file to construct a complete .def file for the linker . </p>

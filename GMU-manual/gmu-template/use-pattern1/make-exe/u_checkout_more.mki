@@ -3,6 +3,8 @@
 #### to make it built. That is, when your project's source is scattered in
 #### many CVS/SVN repositories.
 
+# This file is optional. 
+# If you just copy it but not modify it, then you don't have to copy it in the first place.
 
 ############ For SVN checkout:
 

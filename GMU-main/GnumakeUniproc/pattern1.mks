@@ -247,6 +247,10 @@ ifeq (,$(wildcard $(_p_GnumakeUniproc)))
 endif
 include $(_p_GnumakeUniproc)
 
+ifeq (,$(strip $(gmu_uf_LINK_OUTPUT)))
+  $(error !GMP!Error: Your gmu_uf_LINK_OUTPUT is null, but pattern1.mks requires you define gmu_uf_LINK_OUTPUT.\
+ In case this is a container project not generating any output file, you should use pattern-container1.mks instead)
+endif
 
 ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
   include $(_p_post_gmucore)
