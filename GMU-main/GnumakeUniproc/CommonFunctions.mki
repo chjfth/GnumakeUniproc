@@ -157,6 +157,7 @@ _StripBasenameTail = $(if $(patsubst %$2,,$(basename $1)),$1,$(patsubst %$2,%,$(
 	#	$(call _StripBasenameTail,/dir/mydll.lib,)           = /dir/mydll.lib
 
 _IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
+gmuf_IsFileExist_sh = $(_IsFileExist_sh)
 
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 
