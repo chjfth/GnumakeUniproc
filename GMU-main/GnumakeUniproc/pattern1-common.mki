@@ -80,7 +80,7 @@ define _GmpShowDoneUserOutputAfterLink
 endef
 
 
-_IsInBuildSelfStage = $(if $(gmu_uv_list_ALL_SUBPRJ_s),$(if $(_NowCheckIsSubprjsDone),1),1)
+_IsInBuildSelfStage = $(if $(gmu_uv_list_ALL_SUBPRJ),$(if $(_NowCheckIsSubprjsDone),1),1)
 
 _gmu_dyn_title_count = $(shell gmuCountChar $(gmu_Gp_COUNT_COMPILE) += Rr)
 gmu_progress_info = $(join Projects= Containers=,$(_gmu_dyn_title_count))  Now: $(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))$(if $(_IsInBuildSelfStage),,...)

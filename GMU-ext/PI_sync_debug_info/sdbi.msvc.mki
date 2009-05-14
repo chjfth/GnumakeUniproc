@@ -14,8 +14,7 @@
 	# (file list with full path)
 	# If gmp_MSVC_Gp_LINK_OUTPUT_pdb is null and this var is defined, these files are considered as debug info files.
 
-sdbi_pdbLibOutput =	$(gmp_MSVC_Gp_VCx0_pdb) \
- $(if $(wildcard $(gmp_MSVC_Gp_VCx0_idb)),$(gmp_MSVC_Gp_VCx0_idb))
+sdbi_pdbLibOutput =	$(gmp_MSVC_Gp_VCx0_pdb)$(if $(wildcard $(gmp_MSVC_Gp_VCx0_idb)), $(gmp_MSVC_Gp_VCx0_idb))
 
 #sdbi_pdbExeOutput = $(call gmuf_ChangeFilenameExt,$(gmu_Gp_LINK_OUTPUT),pdb) // old before 2009-05-12
 sdbi_pdbExeOutput = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
