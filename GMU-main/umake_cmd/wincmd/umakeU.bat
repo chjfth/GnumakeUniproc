@@ -3,4 +3,4 @@ REM 'dir > null' resets the internal %ERRORLEVEL% to 0. We must do this because 
 setlocal
 set gmp_bc_UNICODE=1
 
-call %~dp0umake-share.bat
+call %~dp0umake-share.bat %*
