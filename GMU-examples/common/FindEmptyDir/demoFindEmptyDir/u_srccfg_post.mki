@@ -49,8 +49,6 @@ gmu_up_list_SRC_FROM_ROOT += demoFindEmptyDir.cpp
 ############################################################################
 gmu_ud_list_PRJ_HEADER += $(dirFindEmptyDirLib)
 	# Don't write ``-I'' in this var; it will be prependded automatically.
-# or
-#gmp_ud_list_PS_HEADER_PARENT += (within gmp_PS_INCLUDE_SUBDIRS)
 
 gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
 	# those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
