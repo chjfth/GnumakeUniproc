@@ -154,7 +154,9 @@ gmp_LINKFLAGS_preset += /nologo
 
 ifdef gmp_bc_DEBUG
   gmp_LINKFLAGS_preset += /debug #/pdb:"$(basename $@).pdb"
-  	#[2006-12-03] /pdb:XXX.pdb seems unnecessary, since the linker will output it in the same dir as the generated exe.
+  	# [2006-12-16] Later note: Since r771(GMU v0.95), I will explicitly assign pdb filename in /pdb: option.
+  	# My naming rule is just adding .pdb to output DLL/EXE name, and I think it's better than 
+  	# the default behavior of substituting .dll/.exe suffix with .pdb.
 endif
 
 _p_objliblist = $(gmu_Gd_Deco_PrjOutput)/objlist.lst
