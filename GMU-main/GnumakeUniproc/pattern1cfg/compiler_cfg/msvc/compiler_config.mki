@@ -94,8 +94,10 @@ gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u
 
 #gmp_MSVC_Gp_VCx0_pdb = $(dir $(gmu_Gp_LINK_OUTPUT))$(gmu_Gf_Deco_LinkOutput).VCx0.pdb //!2009-05-13 verbose, gmu_Gp_LINK_OUTPUT is already the decorated form, not necessary
 gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).VCx0.pdb
-	# NOTE: gmp_MSVC_Gp_VCx0_pdb is for cl compile process.
-	# For EXE and DLL, we use gmp_MSVC_Gp_LINK_OUTPUT_pdb, which is defined later separately for EXE and DLL.
+	# NOTE: gmp_MSVC_Gp_VCx0_pdb is for cl compile process(not for link process); it is used with /Fd compile flag.
+	# [2009-12-16] Side note: 
+	# For PDBs generated with EXE and DLL, we use gmp_MSVC_Gp_LINK_OUTPUT_pdb instead to tell the pdb file path, 
+	# whose value is defined later separately for EXE and DLL.
 gmp_MSVC_Gp_VCx0_idb = $(call gmuf_ChangeFilenameExt,$(gmp_MSVC_Gp_VCx0_pdb),idb)
 	# note: gmp_MSVC_Gp_VCx0_idb is defined for user convenience, in case user wants to copy .idb to other places.
 	# But idb seems to be a quite old format used on VC5 and prior, so I have not test it yet.

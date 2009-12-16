@@ -14,6 +14,11 @@
 	# (file list with full path)
 	# If gmp_MSVC_Gp_LINK_OUTPUT_pdb is null and this var is defined, these files are considered as debug info files.
 
+###### USER NOTE >>>>> (2009-12-16)
+# Although gmp_MSVC_Gp_LINK_OUTPUT_pdb and gmp_MSVC_Gp_VCx0_pdb is input value for this plugin,
+# end users of GMU don't have to set them manually, instead, they are set automatically by msvc/compiler_config.mki
+###### USER NOTE <<<<<
+
 sdbi_pdbLibOutput =	$(gmp_MSVC_Gp_VCx0_pdb)$(if $(wildcard $(gmp_MSVC_Gp_VCx0_idb)), $(gmp_MSVC_Gp_VCx0_idb))
 
 #sdbi_pdbExeOutput = $(call gmuf_ChangeFilenameExt,$(gmu_Gp_LINK_OUTPUT),pdb) // old before 2009-05-12
