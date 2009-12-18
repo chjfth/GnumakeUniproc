@@ -28,7 +28,8 @@
 <h3><a name="GnumakeUniprocdepends"></a>Software that GnumakeUniproc depends </h3>
 <p>The software described in this section(GNU make, bash, and gcc) are not provided in GMU-xxx.tar.bz2, so you have to make sure they have been pre-installed on your Linux system. </p>
 <h4>GNUmake(GNU make) 3.80 or above</h4>
-<p>If you do not have  GNUmake 3.80 or above on your system, please do a software upgrade.</p>
+<p>If you do not have GNUmake 3.80 or above on your system, please do a software upgrade.</p>
+<p>Using GNU make 3.81 is strongly recommended. We have experienced some bugs with GNU make 3.80 when dealing with something complicated makefiles.</p>
 <p>AND NOTE: If you use make 3.80, you MUST start a GMU build process by executing <tt>umake</tt>, not just executing <tt>make</tt>. With make 3.81, you can just execute <tt>make</tt>, but using <tt>umake</tt> is recommended. (<a href="#make380or381">described in detail later</a>) </p>
 <h4>Bash shell and some file utilities </h4>
 <p>A shell is used when make executes a command for a rule or when <code>$(shell )</code> function is invoked. </p>

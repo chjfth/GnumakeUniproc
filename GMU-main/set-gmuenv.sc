@@ -21,8 +21,9 @@ export gmu_DIR_ROOT=$_gmu_root
 export gmu_DIR_GNUMAKEUNIPROC=$gmu_DIR_ROOT/GMU-main/GnumakeUniproc
 
 if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
-	echo "Warning! The file \"$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki\" does not exist,\
+	echo "Error! The file \"$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki\" does not exist,\
  you may have given a wrong dir as the parameter or GnumakeUniproc.mki is missing."
+	exit 1
 fi
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
@@ -31,6 +32,8 @@ export gmp_ud_list_CUSTOM_MKI=$gmu_DIR_ROOT/GMU-ext
 # export gmp_PS_INCLUDE_SUBDIRS=linux // the old one
 export gmp_DECO_PRJ_NAME=1
 
-echo    "To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
+PATH="$gmu_DIR_ROOT/bin:$PATH"
+
+echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
 
 _gmu_root=
