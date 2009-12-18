@@ -1,11 +1,13 @@
 
 if [ "$1" != "" ]; then
-	_gmu_root="$1"; 
+	_gmu_root="$1"
 	# Note: $1 must be an absolute dir(start with /) and not end with / .
 	# An example would be:
 	#	/home/chj/GMU
 else
-	_gmu_root="`(cd .. > /dev/null; pwd)`";
+	_gmu_root="${BASH_SOURCE%/*}"
+	_gmu_root="${_gmu_root%/*}"
+	# USER NOTE: ${BASH_SOURCE} is only supported on Bash 3.0 and above.
 fi
 # Note: I redirect cd's stdout output to /dev/null because some user
 # may define cd as an alias and output something.
@@ -23,7 +25,7 @@ export gmu_DIR_GNUMAKEUNIPROC=$gmu_DIR_ROOT/GMU-main/GnumakeUniproc
 if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
 	echo "Error! The file \"$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki\" does not exist,\
  you may have given a wrong dir as the parameter or GnumakeUniproc.mki is missing."
-	exit 1
+	return 1
 fi
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output

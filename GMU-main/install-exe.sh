@@ -15,19 +15,28 @@
 # 2. Compile and copy the umake* scripts to $DIR_GMU_PRG, which is required 
 #	by GNUmake 3.80(not required by GNUmake 3.81 or above).
 
-DIR_GMU_PRG_SRC=gmu_programs
+DIR_GMU=
+DIR_GMU_MAIN=
 DIR_GMU_PRG=$1
 
 if [ "$DIR_GMU_PRG" = "" ]; then
-	echo "You must assign a direcotry as parameter, and GnumakeUniproc's\
- binaries will be copied there( e.g. /usr/local/bin )."
-	exit 1
+	if [ "${0%/*}" = "$0" ]; then # $0 does not contain any path separator(rare case by user, and seems impossible with Bash 3.x, 4,x etc), so we use current working dir.
+		DIR_GMU=.
+		DIR_GMU_MAIN=./GMU-main
+	else # $0 contains some path separator, so we use relative dir ../bin to where this script file resides.
+		DIR_GMU=${0%/*}/..
+		DIR_GMU_MAIN=${0%/*}
+	fi
+	DIR_GMU_PRG=$DIR_GMU/bin
+	echo "You did not assign a directory as parameter, so \"$DIR_GMU_PRG\" will be used."
 fi
 
 if [ ! -d $DIR_GMU_PRG ]; then
 	if mkdir $DIR_GMU_PRG; then true
 	else echo "Cannot mkdir $DIR_GMU_PRG"; exit 1; fi
 fi
+
+DIR_GMU_PRG_SRC=$DIR_GMU_MAIN/gmu_programs
 
 GMU_PRGS="gmuAddActionWord gmuCountChar gmuExtractVarDefines"
 for OnePrg in $GMU_PRGS; do
@@ -39,8 +48,8 @@ done
 
 UMAKE_CMD="umake umakeD umakeU umakeUD"
 for OnePrg in $UMAKE_CMD; do
-	echo "cp umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
-	if ! cp umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg ; then
+	echo "cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
+	if ! cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg ; then
 		exit 1
 	fi
 done
