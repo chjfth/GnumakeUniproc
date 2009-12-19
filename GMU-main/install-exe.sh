@@ -6,14 +6,23 @@
 # in order for GnumakeUniproc to work. These env-vars to set are listed 
 # in set-gmuenv.sc , which you can `source'. 
 #   I suggest you check the simple set-gmuenv.sc to know what env-vars
-# it will set. If you are in haste, just cd to the dir where this 
-# install-exe.sh resides and execute `source set-gmuenv.sc' , 
-# then your env-vars are set.
+# it will set. 
 #
 # Two things are done in this script:
 # 1. Compile and copy the gmuXXX programs to $DIR_GMU_PRG
-# 2. Compile and copy the umake* scripts to $DIR_GMU_PRG, which is required 
-#	by GNUmake 3.80(not required by GNUmake 3.81 or above).
+# 2. Compile and copy the umake* scripts to $DIR_GMU_PRG. 
+
+# _gmu_rel2abs (): 
+# Input a dir(relative or absolute), return(echo) its absolute dir.
+# If the input dir is not valid or not accessible, return null string.
+# This function will not change callers current working directory.
+_gmu_rel2abs ()
+{
+	if [ "$1" = "" ]; then return 4; fi
+
+	if cd $1; then echo $(pwd)
+	else return 5; fi
+}
 
 DIR_GMU=
 DIR_GMU_MAIN=
@@ -24,11 +33,12 @@ if [ "$DIR_GMU_PRG" = "" ]; then
 		DIR_GMU=.
 		DIR_GMU_MAIN=./GMU-main
 	else # $0 contains some path separator, so we use relative dir ../bin to where this script file resides.
-		DIR_GMU=${0%/*}/..
+		DIR_GMU=${0%/*} ; DIR_GMU=${DIR_GMU%/*}
 		DIR_GMU_MAIN=${0%/*}
 	fi
+
 	DIR_GMU_PRG=$DIR_GMU/bin
-	echo "You did not assign a directory as parameter, so \"$DIR_GMU_PRG\" will be used."
+	echo "Info: You did not assign a directory as parameter, so \"$DIR_GMU_PRG\" will be used."
 fi
 
 if [ ! -d $DIR_GMU_PRG ]; then
@@ -46,10 +56,11 @@ for OnePrg in $GMU_PRGS; do
 	fi
 done
 
-UMAKE_CMD="umake umakeD umakeU umakeUD"
+UMAKE_CMD="umake-share umake umakeD umakeU umakeUD"
 for OnePrg in $UMAKE_CMD; do
 	echo "cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
 	if ! cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg ; then
 		exit 1
 	fi
 done
+
