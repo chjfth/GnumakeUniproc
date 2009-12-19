@@ -1,3 +1,16 @@
+# NOTE: You MUST `source' this script(should let current env modified) instead of executing it.
+
+# _gmu_rel2abs (): 
+# Input a dir(relative or absolute), return(echo) its absolute dir.
+# If the input dir is not valid or not accessible, return null string.
+# This function will not change callers current working directory.
+_gmu_rel2abs ()
+{
+	if [ "$1" = "" ]; then return 4; fi
+
+	if cd $1; then echo $(pwd)
+	else return 5; fi
+}
 
 if [ "$1" != "" ]; then
 	_gmu_root="$1"
@@ -5,9 +18,15 @@ if [ "$1" != "" ]; then
 	# An example would be:
 	#	/home/chj/GMU
 else
+	# USER NOTE: ${BASH_SOURCE} (used below) is only supported on Bash 3.0 and above,
+	# so, for Bash 2.0 and prior, user must provide $1, otherwise, wrong result will arise.
 	_gmu_root="${BASH_SOURCE%/*}"
-	_gmu_root="${_gmu_root%/*}"
-	# USER NOTE: ${BASH_SOURCE} is only supported on Bash 3.0 and above.
+	_gmu_root=$(_gmu_rel2abs "$_gmu_root")
+	if [ "$_gmu_root" = "" ]; then 
+		echo "Error! Cannot deduce your GMU root dir. Please assign a GMU root dir manually."
+		return 4
+	fi
+	_gmu_root="${_gmu_root%/*}" # another level of parent dir
 fi
 # Note: I redirect cd's stdout output to /dev/null because some user
 # may define cd as an alias and output something.
@@ -39,3 +58,4 @@ PATH="$gmu_DIR_ROOT/bin:$PATH"
 echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
 
 _gmu_root=
+

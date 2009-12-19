@@ -1,0 +1,39 @@
+
+# [2009-12-19] GNU make uses /bin/sh as default command shell, and GMU requires Bourne shell or Bash.
+# so here we check whether /bin/bin really is Bourne shell or Bash. If not, we force SHELL=/bin/bash to make.
+#
+GMU_FORCE_BASH=
+# [2009-12-19] Test for dash:
+# On Ubuntu 9.10, /bin/sh defaults to /bin/dash, and dash's builtin command echo does not  
+# recognize "-e" as an option, so we can test it.
+toutput=`/bin/sh -c "echo -e ABC"`
+if [ "$toutput" = "-e ABC" ]; then GMU_FORCE_BASH="SHELL=/bin/bash"; fi
+
+
+rm -f _MainPrjBuildStart.gmu.ckt
+if [ $? != 0 ]; then
+  echo "Error from $0: Cannot delete GnumakeUniproc start-up signature file(_MainPrjBuildStart.gmu.ckt) in current dir. GnumakeUniproc will not work."
+  exit
+fi
+
+if [ "$gmu_LOG_OUTPUT_FILENAME" != "" ]; then
+
+	gmu_LOG_OUTPUT_FILENAME_bak="${gmu_LOG_OUTPUT_FILENAME}.bak"
+
+	if [ -e "$gmu_LOG_OUTPUT_FILENAME_bak" ]; then rm -f "$gmu_LOG_OUTPUT_FILENAME_bak"; fi
+	if [ $? != 0 ]; then
+	  echo "Error from $0: Cannot delete backup log-file($gmu_LOG_OUTPUT_FILENAME_bak) ."
+	  exit
+	fi
+
+	if [ -e "$gmu_LOG_OUTPUT_FILENAME" ]; then mv "$gmu_LOG_OUTPUT_FILENAME" "$gmu_LOG_OUTPUT_FILENAME_bak"; fi
+	if [ $? != 0 ]; then
+	  echo "Error from $0: Cannot rename $gmu_LOG_OUTPUT_FILENAME to $gmu_LOG_OUTPUT_FILENAME_bak ."
+	  exit
+	fi
+
+	make$gmu_MAKEEXESUFFIX $GMU_FORCE_BASH "$@" 2>&1 | tee $gmu_LOG_OUTPUT_FILENAME
+
+else
+  make$gmu_MAKEEXESUFFIX $GMU_FORCE_BASH "$@"
+fi
