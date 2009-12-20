@@ -1,3 +1,13 @@
+[2009-12-22] v0.95
+===== Changes and Improvements: =====
+1. r795 (incompatible change)
+	For msvc/compiler_config.mki, abandon single-threaded CRT option. At the same time, use make-var gmp_bc_CRT_STATIC_LIB to tell whether use static CRT lib or dynamically-linked CRT DLL.
+2. r795 
+	Add PI_use_mfc plugin, -- for Windows programs using MFC. (not thoroughly tested with MSVC8 and MSVC9)
+3. r772,r773,r780
+	Improve those umake* batch/script to eliminate duplicate code. Those duplicate code are now in umake-share.
+4. r779
+
 [2009-01-02] v0.94
 ===== Changes and Improvements: =====
 1. r546

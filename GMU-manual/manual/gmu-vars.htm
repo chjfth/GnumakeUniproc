@@ -273,6 +273,11 @@
     <td> <p>This var is optional. It is used when GMU pattern1 is going to feed back it progress info, once each project is done. </p>
       <p>This var is consider a shell command to execute, and if it contains <code>$(gmu_progress_info)</code> (note: retain in its unexpanded form), the  <code>$(gmu_progress_info)</code> will be dynamically expanded into GMU's progress info(e.g. <tt>Projects=3 Container=1</tt>) </p></td>
   </tr>
+  <tr>
+  				<td valign="top">gmu_NO_LOG_CO_CMD_TO_FILE</td>
+  				<td align="center">I</td>
+  				<td>When doing checkout, do not generate _CheckoutCmd.gmu.txt file to check-out destination directory. </td>
+  				</tr>
 </table>
 <h5>Example of gmu_u_SHOW_PROGRESS_CMD</h5>
 <p>Using Windows 2000/XP's default Command Prompt(cmd.exe), you can set it as follows:</p>
@@ -907,6 +912,11 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
       <li>must be defined before gmu-core.</li>
     </ul></td>
   </tr>
+  <tr>
+  				<td valign="top">gmp_G_CompilerVerValid</td>
+  				<td align="center" valign="top">O</td>
+  				<td>Compiler config mki author should output this var so that makefile writer can know what compiler version is being used. </td>
+  				</tr>
 </table>
 <p>&nbsp;</p>
 <p>~~~~~~~~ sample table:</p>

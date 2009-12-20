@@ -138,7 +138,7 @@ gmuf_ChangeFilenameExt = $(basename $1).$2
 _ChangeFilenameExt = $(gmuf_ChangeFilenameExt)# obsolete
 
 gmuf_IsPrefixWith = $(if $1,$(if $(patsubst $2%,,$1),,1))
-	# Check whether $1 is prefix with $2. Return 1 for true; return null for false.
+	# Check whether $1 is prefixed with $2. Return 1 for true; return null for false.
 	# $(call gmuf_IsPrefixWith,sdt,sdt)		true
 	# $(call gmuf_IsPrefixWith,sdt250,sdt)	true
 	# $(call gmuf_IsPrefixWith,sdt,sdtXX)	false

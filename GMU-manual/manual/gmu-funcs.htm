@@ -57,6 +57,25 @@
     <p>Multiple subprj refnames can be passed, and the result will be multiple names/paths separated by space.</p>
     <p>NOTE: These functions will return correct result only after GnumakeUniproc.mki has been read by make. </p></td>
   </tr>
+  <tr>
+  				<td valign="top">gmuf_AnounceExportEnvvar</td>
+  				<td><p>This is for your convenience. If you want to <code>export</code> some env-var in your makefile, you can write</p>
+  								<pre> $(call gmuf_AnounceExportEnvvar,MyVar = MyVal)
+</pre>  								
+  								<p>This function will construct the two make statements for you:</p>
+  								<pre>export MyVar = MyVal
+_tmp := $(shell echo &quot;In make: export MyVar = MyVal&quot;)</pre>
+  								So, your user can see it on the screen when you export a variable to the environment.</td>
+  				</tr>
+  <tr>
+  				<td valign="top">gmuf_IsPrefixWith</td>
+  				<td>  <p>Check whether $1 is prefixed with $2. Return 1 for true; return null for false.</p>
+  								<pre>$(call gmuf_IsPrefixWith,sdt,sdt)      true
+$(call gmuf_IsPrefixWith,sdt250,sdt)   true
+$(call gmuf_IsPrefixWith,sdt,sdtXX)    false
+$(call gmuf_IsPrefixWith,,sdt)         false
+ 								</pre></td>
+  				</tr>
 </table>
 <h2><a name="gmpf%20functions"></a>gmpf functions </h2>
 
