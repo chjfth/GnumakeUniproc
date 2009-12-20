@@ -6,6 +6,7 @@
 <title>Windows 上 make.exe 和 sh.exe 的互关联问题</title>
 
 <style type="text/css">
+P { line-height: 120%; }
 pre {
     border: #777777 1px solid;
     padding: 0.5em;
@@ -129,12 +130,12 @@ make: Nothing to be done for `all'.
 <p>若对 t2.mk 也加上 <code>echo "$${PATH}" 1>&2 ;</code> 窥视一下 PATH 会怎样，这会落得和 t3sp.mk 一样的结果，因为 <code>$(shell ...)</code> 中出现了引号。 </p>
 <div class="footnoteb">Linux 下并无此问题，即本例运行输出的 PATH 值和原 Bash 环境中的 PATH 一样。</div>
 <h3>如何解决实验 3 的问题 </h3>
-<p>此问题在 GnumakeUniproc 开发的头几个月就已发现，当时的解决方法是借助一个额外的环境变量 <code>gmu_DIR_GMU_PRG</code> 来指示 sh.exe 所在的目录，gmu_DIR_GMU_PRG 的值要实现手动设置好（Windows 上由 GnumakeUniproc installer 来帮用户设好）。gmu_DIR_GMU_PRG 的起源见 v201 的 GnumakeUniproc.mki（当时的名字叫 <code>gmu_DIR_FMK_PRG</code>）。当要用 <code>$(shell )</code> 启动一个 EXE 时，得如下写</p>
+<p>此问题在 GnumakeUniproc 开发的头几个月就已发现，当时的解决方法是借助一个额外的环境变量 <code>gmu_DIR_GMU_PRG</code> 来指示 sh.exe 所在的目录，gmu_DIR_GMU_PRG 的值要事先手动设置好（Windows 上由 GnumakeUniproc installer 来帮用户设好）。gmu_DIR_GMU_PRG 的起源见 v201 的 GnumakeUniproc.mki（当时的名字叫 <code>gmu_DIR_FMK_PRG</code>）。当要用 <code>$(shell )</code> 启动一个 EXE 时，得如下写</p>
 <pre>    tmp := $(shell (if [ -n <span class="c-string">"$$gmu_DIR_GMU_PRG"</span> ];then PATH=$$gmu_DIR_GMU_PRG;fi; some-exe-to-invoke))
 </pre>
 <p>除了写起来麻烦，如此方法还有个显著缺点，你想执行原先 PATH 中能找到的程序时就不妙了。当时认为此做法还是能接受的，——因为 GnumakeUniproc 是 Linux &amp; Windows 通用的，没理由去执行 Linux or Windows specific 的程序。但是，随着 <code>gmu_u_SHOW_PROGRESS_CMD</code> 这个东西的引入，那个局限性的缺点就暴露出来了。由于 <code>gmu_u_SHOW_PROGRESS_CMD</code> 的值是用 GMU 用户自己定义的，在 Windows 和 Linux 上几乎肯定是不同的。这样 Windows 上的麻烦来了，<code>gmu_u_SHOW_PROGRESS_CMD</code> 中要想直接调 <tt>cmd /C set title xxx</tt> 都不顺。前几周还不得不用一种土办法，即调 cmd 前临时设置 <tt>PATH=$(SystemRoot))/system32</tt> 。确实烦。 </p>
 <p>中途还想到一招，不过也不够好，暂时没用上。在 umake.bat 中将 PATH 先保存为环境变量 <code>GMU_PATH_PRE_SAVE</code> ，此后 sh.exe 中要用 PATH 时改为用 <code>GMU_PATH_PRE_SAVE</code> 。</p>
-<h3>很幸运地发现一个 workaround </h3>
+<h3>很幸运地发现一个变通方法（workaround） </h3>
 <p>该 workaround 演示如下：还是在实验 2 的基础上，对 t3.mk 作点修改，</p>
 <pre><span class="c-comment"># t3wa.mk</span>
 tmp := $(shell echo &quot;&quot;)

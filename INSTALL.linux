@@ -1,63 +1,41 @@
 
-Current GnumakeUniproc version is v0.94 .
+Current GnumakeUniproc version is v0.95 .
 
+=============================================================================
 - Install process on Linux
+=============================================================================
 
-=============================================================================
--- if you're a normal user(not root) on a Linux machine and want to set it
-   up for your own use:
-=============================================================================
+The brief install process described here is suitable for almost all Linux 
+distributions since year 2005.
 
 Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
-~/GMU/INSTALL.linux), do the following:
+~/GMU/INSTALL.linux), then do the following:
 
-$ cd ~/GMU/GMU-main
-$ ./install-exe.sh ~/GMU/bin    # copy executables required by GnumakeUniproc to ~/GMU/bin
-$ source set-gmuenv.sc          # Set required environment variables(env-var).
+$ ~/GMU/GMU-main/install-exe.sh        # Prepare required executables into ~/GMU/bin
+$ source ~/GMU/GMU-main/set-gmuenv.sc  # Set required environment variables(env-var)
 
+If the above two commands does not spout any "Error" message, then it succeeds.
 Now, you've set up the environment to use GnumakeUniproc.
 
-If you'd like to set up the required env-vars automatically after login, try 
-this: In ~/.bashrc , add the following commands:
+Note: This second command should be executed every time you login to you shell.
+So it is suggested to run the second command in your login script(.bashrc).
 
-====================
-gmu_DIR_ROOT=~/GMU
-source $gmu_DIR_ROOT/GMU-main/set-gmuenv.sc $gmu_DIR_ROOT
-PATH="$gmu_DIR_ROOT/bin:$PATH"
-====================
+If you encounter errors or need more detail, refer to the install section for
+Linux user in quick start guide.
 
 =============================================================================
--- if you're the root user on a Linux machine and want to install 
-   GnumakeUniproc for all users on that machine.
-=============================================================================
-
-Assume that you've extracted GMU-xxx.tar.bz2 to /usr/local (i.e. there exists
-/usr/local/GMU/INSTALL.linux), do the following:
-
-# cd /usr/local/GMU/GMU-main
-# ./install-exe.sh /usr/local/bin # copy executables required by GnumakeUniproc to /usr/local/bin
-# source set-gmuenv.sc            # Set required environment variables(env-var).
-
-If you'd like to set up the required env-vars automatically after every user's
-login, try this: In "global" bashrc file, e.g. /etc/bashrc, /etc/profile or
-some other file (this varies on different Linux distributions, on SuSE linux 10,
-it should be /etc/bash.bashrc.local), add the following commands:
-
-====================
-gmu_DIR_ROOT=/usr/local/GMU
-source $gmu_DIR_ROOT/GMU-main/set-gmuenv.sc $gmu_DIR_ROOT
-====================
-
-Note: If you'd like to use a dir other than /usr/local/bin above, you have to
-add that dir in PATH env-var for your users if that dir is not in PATH already.
-
 - Read the quick start guide
+=============================================================================
 
-Assume $gmu_DIR_ROOT represents where GnuamkeUniproc resides(the GMU dir), 
-the quick start guide lies at:
+If you are new to GnumakeUniproc, you must read the quick start guide to get
+to know it. The quick start guide locates at:
 
-$gmu_DIR_ROOT/GMU-manual/quick-start/quick-start.htm
+~/GMU/GMU-manual/quick-start/quick-start.htm
 
-The quick start guide will guide you to build some example programs using
-GnumakeUniproc, then you can look into $gmu_DIR_ROOT/GMU-examples to try
-more examples.
+It will tell you important basic ideas about GnumakeUniproc and guide you to 
+build some example programs using GnumakeUniproc. 
+
+To try more, you can look into ~/GMU/GMU-examples to build more examples.
+And don't forget, http://gnumakeuniproc.sourceforge.net/ provides some detailed
+information regarding those examples provided.
+

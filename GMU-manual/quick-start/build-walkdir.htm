@@ -121,13 +121,25 @@ ry
 Files compiled: C++:0 C:4 ASM:0 linked:2
 </pre>
 <p>Some basic facts regarding the above build process: </p>
-<ul>
-  <li>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir), you can override this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>. (<code>gf</code> means &quot;generated files&quot;). This output root dir is represented by a <b><code>% </code></b>character in the screen output. </li>
-  <li>In the above build process(one run), a LIB project is built followed by an EXE project. The <tt>[DONE:] %/...</tt> lines tells when a project's build has been done. Since the EXE project refers to the LIB project in make-var <code>gmu_uv_list_SUBPRJ_TO_LINK</code>, we call the EXE project parent-project and the LIB project its sub-project(or child-project). </li>
-  <li>In the output root dir, every project's output is stored in a dedicated &quot;project output directory&quot;, so that different projects output will not get mixed. In this example, the two project output dirs are named <tt>walkdir_mingw</tt> and <tt>walkdir_ex1_mingw</tt> respectively, these names are determined by make-var <code>gmu_PRJ_NAME</code> in <tt>exe.mki</tt>(with some decoration). </li>
-  <li>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target<code>(_gmu_ut_GetPrjAttr)</code> for the sub-project) . </li>
-  <li>The final two screen lines tells how many <tt>Projects</tt> were built in this run, how many <tt>C++</tt>, <tt>C</tt>, and <tt>ASM </tt>files were compiled, finally, how many linking processes(<tt>linked</tt>) were carried out. </li>
-</ul>
+<ol>
+  <li>
+  				<p>In the above build process(one run), a LIB project is built followed by an EXE project. You can see two <tt>[DONE:] %/...</tt> lines, each indicating completion of a project's build. Since the EXE project refers to the LIB project in make-var <code>gmu_uv_list_SUBPRJ_TO_LINK</code>, we call the EXE project parent-project and the LIB project its sub-project(or child-project). </p>
+				<p>Also, since the build of EXE project is launch by us directly, we also call the EXE project, in this example, root project. </p>
+  </li>
+  <li>
+  				<p>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir); root project and all child projects' output(.o .obj .lib .exe etc) will be generated into that directory. You can override, if you like, this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>(must assign a full path in this case).  This output root dir is represented by a <b><code>% </code></b>character in the screen output. </p>
+				<p>Hint: <code>gf</code> means &quot;generated files&quot;.</p>
+  </li>
+  <li>
+  				<p>In the output root dir, every project's output is stored in a dedicated &quot;project output directory&quot;, so that different projects output will not get mixed. In this example, the two project output dirs are named <tt>walkdir_mingw</tt> and <tt>walkdir_ex1_mingw</tt> respectively, these names are determined by make-var <code>gmu_PRJ_NAME</code> in <tt>exe.mki</tt>(with some decoration). </p>
+  </li>
+  <li>
+  				<p>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target<code>(_gmu_ut_GetPrjAttr)</code> for the sub-project) . </p>
+  </li>
+  <li>
+  				<p>The final two screen lines tells how many <tt>Projects</tt> were built in this run, how many <tt>C++</tt>, <tt>C</tt>, and <tt>ASM </tt>files were compiled, finally, how many linking processes(<tt>linked</tt>) were carried out. </p>
+  </li>
+</ol>
 <div class="hint">
   <p>About those &quot;No such file or directory&quot; warning lines:</p>
   <p>They're totally normal, don't panic, they don't signify any threat of error. It's just that GNUmake 3.81 does not provide a way to simply suppress that boring message(when an <code>include</code> directive is used, and the to-be-included file does not exist at that moment). I hope GNUmake's future version can provide the choice to suppress it. </p>
@@ -151,9 +163,13 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
 
 <p>You can see that the second run compiles no files and links nothing, because all output files are up-to-date at this time. But if you modify any source file or header file(that of EXE project or LIB project, but not &quot;system headers&quot;), those(and only those) obj files and link images(.lib or .exe) will be regenerated &mdash; that is what we expect from a &quot;make system&quot;. </p>
 <div class="footnoteb">
-  <p>Why execute umake? Can I execute just make?</p>
-  <p>umake is a batch file/shell script wrapping that <tt>make</tt> executable. umake provides some useful facilities such as storing the screen output to a log file defautly named <tt>_gmulog.txt</tt> . </p>
-  <p>NOTE: In this quick start guide, we're using make 3.81. But if you use make's older version(i.e. 3.80),  you may not always get the correct result by running <tt>make</tt> due to the lack of a new feature(the <code>$(MAKE_RESTARTS)</code> built-in make-var). <code>umake</code> helps you work around make 3.80 and presents the correct result. </p>
+  <p>Why execute <tt>umake</tt>? Can I execute just <tt>make</tt>?</p>
+  <p>umake is a batch file/shell script wrapping the <tt>make</tt> executable. umake does the following:</p>
+  <ul>
+  		<li>Do running environment adjustment for GnumakeUniproc&#12290;</li>
+  		<li>Provide some useful facilities such as storing the screen output to a log file defautly named <tt>_gmulog.txt</tt> . </li>
+  </ul>
+  <p>In one word, you should always use umake to avoid problems. </p>
 </div>
 
 <h4>About the LIB project</h4>
@@ -171,7 +187,7 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
   </li>
   <li>The LIB project's makefile sets <code>gmu_PRJ_NAME = walkdir</code> , while the output info shows you &quot;<tt>Making sub-project: walkdir_mingw</tt>&quot; . I tell you that <tt>walkdir_mingw</tt> is the LIB project's decorated(or final) project name; <tt>_mingw</tt> is added as suffix because you're using MinGW compiler. The idea of project name decoration enables us to build the &quot;same&quot; makefile with more than one compiler without cleaning one compiler's output before building with another.</li>
 </ul>
-<p>One little trick to explain: If you check <tt>u_srccfg_post.mki</tt> of the walkdir LIB project, you'll see only <tt>walkdir-extname.c</tt> is assigned to <code>gmu_up_list_SRC_FROM_ROOT</code> , whereas you see three C files get compiled for the LIB, then where are the other two(<tt>walkdir.c, ps_func.c</tt>) assigned? Actually, the other two are assigned in the following two places:</p>
+<p>One little trick to explain: If you check <tt>u_srccfg_post.mki</tt> of the walkdir LIB project, you'll see only <tt>walkdir-extname.c</tt> is assigned to <code>gmu_up_list_SRC_FROM_ROOT</code> , whereas you see three C files get compiled for the LIB, then where are the other two(<tt>walkdir.c, ps_func.c</tt>) assigned? Actually, the other two are assigned in the following two files:</p>
 <ul>
   <li><tt>makelib/lib.mingw/Makefile</tt></li>
   <li><tt>makelib/lib.linuxgcc/Makefile</tt></li>
@@ -181,6 +197,7 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
 <h4><a name="HowtoClean"></a>How to do a clean </h4>
 <p>There isn't concept of <code>make clean</code> for GnumakeUniproc, instead, in order to clean the output files, just remove the whole <code>gmu_ud_OUTPUT_ROOT</code> directory. In our example, you can do: </p>
 <pre class="fws">rm -fr gf</pre>
+<p>Root project and all child projects will all be cleaned. Remember? We said above that all projects' output was generated into that <tt>gf</tt> directory.</p>
 <p>That's all for a clean operation. </p>
 <h4><a name="umake"></a>Check GMU's running output in a log file</h4>
 <p>By typing <code>umake</code> instead of <tt>make</tt>, you get it. umake is actually a .bat file on Windows, or a shell script on Linux, which writes make's running output(stdout and stderr) to a log file. The log file's name is controlled by env-var <tt>gmu_LOG_OUTPUT_FILENAME</tt>, which defaults to <tt>_gmulog.txt</tt> . </p>

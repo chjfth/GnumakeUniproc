@@ -30,50 +30,52 @@
 <h4>GNUmake(GNU make) 3.80 or above</h4>
 <p>If you do not have GNUmake 3.80 or above on your system, please do a software upgrade.</p>
 <p>Using GNU make 3.81 is strongly recommended. We have experienced some bugs with GNU make 3.80 when dealing with something complicated makefiles.</p>
-<p>AND NOTE: If you use make 3.80, you MUST start a GMU build process by executing <tt>umake</tt>, not just executing <tt>make</tt>. With make 3.81, you can just execute <tt>make</tt>, but using <tt>umake</tt> is recommended. (<a href="#make380or381">described in detail later</a>) </p>
 <h4>Bash shell and some file utilities </h4>
-<p>A shell is used when make executes a command for a rule or when <code>$(shell )</code> function is invoked. </p>
-<p>For Bash, I myself have tried Bash 2.x on SUSE 9.0 and Bash 3.x on SUSE 10.1. </p>
+<p>A shell is used when <tt>make</tt> executes a command for a rule or when <code>$(shell )</code> function is invoked. </p>
+<p>For Bash, I myself have tried Bash 2.x on SUSE 9.0, Bash 3.x on SUSE 10.1, and Bash 4.0 on Ubuntu 9.10. </p>
 <p>Bourne shell should be OK but I have not tried it on my own. I have not tried other shells(csh or ksh), I cannot tell whether the will work, and probably not, due to the discrepancy in backslash escaping scheme. </p>
 <p>Shell utilities include mkdir, cp, rm, mv, cat etc. I do not use rarely-seen switches for these command, so I think it'll be just OK as long as those executables are present. </p>
 <h4>gcc</h4>
 <p>Well, I believe you won't miss this. We'll be using this compiler to build our C/C++ programs, and, to generate header file dependency for C/C++ source files(<code>gcc -M</code>). </p>
 <p>I myself have tried gcc 3.3.1(on SUSE Linux 9.0) and gcc 4.1.0(on SUSE Linux 10.1).</p>
 <h3><a name="specprgs"></a>Some special programs provided by GnumakeUniproc</h3>
-<p>In order to acquire some special functionality required by GMU, some simple programs must be crafted. To build and install those programs, execute the <tt>install-exe.sh</tt> shell script in <tt>~/GMU/GMU-main</tt> , with an argument indicating where to copy those programs. We assume that you use <tt>~/GMU/bin</tt> : </p>
-<pre class="fws">[chj @suse101 ~/GMU/GMU-main]
-$ ./install-exe.sh ~/GMU/bin</pre>
-<p>This shell script could output information like this: </p>
-<pre class="fws">gcc -o /home/chj/GMU/bin/gmuAddActionWord gmu_programs/gmuAddActionWord/gmuAddActionWord.c
-gcc -o /home/chj/GMU/bin/gmuCountChar gmu_programs/gmuCountChar/gmuCountChar.c
-gcc -o /home/chj/GMU/bin/gmuExtractVarDefines gmu_programs/gmuExtractVarDefines/gmuExtractVarDefines.c
-cp umake_cmd/bash/umake /home/chj/GMU/bin/umake
-cp umake_cmd/bash/umakeD /home/chj/GMU/bin/umakeD
-cp umake_cmd/bash/umakeU /home/chj/GMU/bin/umakeU
-cp umake_cmd/bash/umakeUD /home/chj/GMU/bin/umakeUD
+<p>In order to acquire some special functionality required by GMU, some simple programs must be crafted. To build and install those programs, execute the <tt>install-exe.sh</tt> shell script in <tt>~/GMU/GMU-main</tt> . </p>
+<pre class="fws">[chj @suse101 ~]$ <b>~/GMU/GMU-main/install-exe.sh</b>
+Info: You did not assign a directory as parameter, so "/home/chj/GMU/bin" will be used.
+gcc -o /home/chj/GMU/bin/gmuAddActionWord /home/chj/GMU/GMU-main/gmu_programs/gmuAddActionWord/gmuAddActionWord.c
+gcc -o /home/chj/GMU/bin/gmuCountChar /home/chj/GMU/GMU-main/gmu_programs/gmuCountChar/gmuCountChar.c
+gcc -o /home/chj/GMU/bin/gmuExtractVarDefines /home/chj/GMU/GMU-main/gmu_programs/gmuExtractVarDefines/gmuExtractVarDefines.c
+cp /home/chj/GMU/GMU-main/umake_cmd/bash/umake-share /home/chj/GMU/bin/umake-share
+cp /home/chj/GMU/GMU-main/umake_cmd/bash/umake /home/chj/GMU/bin/umake
+cp /home/chj/GMU/GMU-main/umake_cmd/bash/umakeD /home/chj/GMU/bin/umakeD
+cp /home/chj/GMU/GMU-main/umake_cmd/bash/umakeU /home/chj/GMU/bin/umakeU
+cp /home/chj/GMU/GMU-main/umake_cmd/bash/umakeUD /home/chj/GMU/bin/umakeUD
 </pre>
-<p>You can clearly know what has happened from that shell script. </p>
-<ul>
-  <li>If you are root, you may want to generate those gmu<i>XXX</i> programs into a publicly available location such as <tt>/usr/local/bin</tt>, so that no extra PATH setting is required.</li>
-  <li>If you are just a normal user, you have to generate those programs within you home directory and add that directory to your PATH environment variable. </li>
-</ul>
+<p>Tip: It does not matter what your working directory is when executing <tt>install-exe.sh</tt> . </p>
+<p>You can see, that will create a <tt>bin</tt> directory alongside <tt>GMU-main</tt> and some files(executables) will be generated and placed there. </p>
 <h2><a name="EnvVarSetup"></a>Environment variable(env-var) setup </h2>
 <p>You can do it with <tt>~/GMU/GMU-main/set-gmuenv.sc</tt> , in either way:</p>
-<ol>
-  <li>You can `source' it, passing GnumakeUniproc installation root directory <tt></tt> as parameter:</li>
-  <pre class="fws">source ~/GMU/GMU-main/set-gmuenv.sc ~/GMU</pre>
-  <li>You can cd to where it is and `source' it:</li>
-  <pre class="fws">cd ~/GMU/GMU-main ; source set-gmuenv.sc</pre>
-</ol>
-<p>This <tt>set-gmuenv.sc</tt> sets environment variable <code>gmu_DIR_ROOT</code> to <tt>~/GMU</tt> and so on, which is required for GnumakeUniproc's running. </p>
-<p>That's all of installation process on Linux. </p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+<p>You can `source' it, passing GnumakeUniproc installation root directory <tt></tt> as parameter:</p>
+  				<pre class="fws">source ~/GMU/GMU-main/set-gmuenv.sc</pre>
+<p>This <tt>set-gmuenv.sc</tt> sets some environment variable required for GnumakeUniproc's running, such as </p>
+<ul>
+				<li><code>gmu_DIR_ROOT</code> to the full path of <tt>~/GMU</tt> and so on.</li>
+                <li>Prepend <tt>~/GMU/bin</tt> to PATH.</li>
+</ul>
+<div class="hint">
+				<p>NOTE for users prior to Bash 3.0: If your shell is Bash 2.x or prior, you must explicitly pass GMU root dir as a parameter, </p>
+				<pre class="fws">source ~/GMU/GMU-main/set-gmuenv.sc ~/GMU </pre>
+				<p>For Bash 3.0 and above, GMU root dir can be automatically deduced from <tt>set-gmuenv.sc</tt>'s location. </p>
+</div>
+<p>This will output something like:</p>
+<pre class="fws">From set-gmuenv.sc: export env-var:
+    gmu_DIR_ROOT=/home/chj/GMU
+    gmu_DIR_GNUMAKEUNIPROC=/home/chj/GMU/GMU-main/GnumakeUniproc
+Success! To see all gmu-vars set into env, type command:   set | grep -e "^gm[a-z]_"
+</pre>
+<p>Finally, you should know that env-vars set by <tt>set-gmuenv.sc</tt> will vanish after you quit your current login shell, therefore, it is suggested to source it in your <tt>.bashrc</tt> , so that it can be done automatically when you login your linux box. </p>
+<p>If you are the system admin, you can also install GnumakeUniproc to a system wide place like <tt>/usr/local/GMU</tt>, and source <tt>set-gmuenv.sc</tt>  in a system-wide start-up script.</p>
+<p>That's all the installation process on Linux. Now, you can go on building our first example.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 </body>
