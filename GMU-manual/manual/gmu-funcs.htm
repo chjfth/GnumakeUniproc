@@ -76,6 +76,17 @@ $(call gmuf_IsPrefixWith,sdt,sdtXX)    false
 $(call gmuf_IsPrefixWith,,sdt)         false
  								</pre></td>
   				</tr>
+  <tr>
+    <td valign="top">gmuf_genspaces</td>
+    <td><p>Generate consecutive spaces. </p>
+      <p><code>$(call gmuf_genspaces,3)</code> will generate three spaces. </p>
+    <p>If $1 missing, return null.</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_repeatstr</td>
+    <td><p>Repeat a given string multiple times. $1: string to repeat. $2: repeat count.</p>
+    <p><code>$(call gmuf_genchars,abc,2)</code> will return <code>abcabc</code> .  </p>    <p>If $2 missing, return null.</p></td>
+  </tr>
 </table>
 <h2><a name="gmpf%20functions"></a>gmpf functions </h2>
 

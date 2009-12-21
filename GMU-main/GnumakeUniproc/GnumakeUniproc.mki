@@ -265,6 +265,10 @@ _SubprjMakeCmdGoals = $(if $(gmu_NO_SUBPRJ_CMDGOALS_PASSING),,$(MAKECMDGOALS))
 	#[2007-01-21] It seems today using gmu_NO_SUBPRJ_CMDGOALS_PASSING is no longer meaningful.
 
 
+_gmuf_ShowCompileeFullpath = $(if $(gmu_DO_SHOW_COMPILEE_FULLPATH),\
+	echo " $(call gmuf_genspaces,$(call strlen,$1))=> $(call gmuf_GetAbsPathRelaToCurdir,$2)" )
+	# $1: Compiler string. cl, gcc, armcpp etc.
+	# $2: Relative path of the input file
 
 #------------------
 # configure actions (canned command sequence)
@@ -280,6 +284,7 @@ endif
 define _DO_C_COMPILE
 	@$(call _MkdirIfNotExist,$(@D))
 	@echo " $(if $(gmu_exe_CC),[$(gmu_exe_CC)],C Compiling) $<"
+	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_CC),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_CC_CMD)
 	@$(call _AppendLogCountCompile,c)
@@ -288,6 +293,7 @@ endef
 define _DO_CXX_COMPILE
 	@$(call _MkdirIfNotExist,$(@D))
 	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $<"
+	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_CC),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_CXX_CMD)
 	@$(call _AppendLogCountCompile,x)

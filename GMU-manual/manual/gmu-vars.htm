@@ -277,7 +277,7 @@
   				<td valign="top">gmu_NO_LOG_CO_CMD_TO_FILE</td>
   				<td align="center">I</td>
   				<td>When doing checkout, do not generate _CheckoutCmd.gmu.txt file to check-out destination directory. </td>
-  				</tr>
+  </tr>
 </table>
 <h5>Example of gmu_u_SHOW_PROGRESS_CMD</h5>
 <p>Using Windows 2000/XP's default Command Prompt(cmd.exe), you can set it as follows:</p>
@@ -334,6 +334,7 @@
 </table>
 <h4><a name="Gmuvars%20for%20debugging%20purpose"></a>Vars for debugging purpose</h4>
 <p>Since vars in this table are for debugging purpose, they should normally set from command line or env-var, not in makefiles. </p>
+<p>These vars all defaults to null. </p>
 <table width="100%"  border="1">
   <tr>
     <th scope="col">Var name </th>
@@ -345,19 +346,24 @@
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_COMPILE_CMD</td>
-    <td>Non-null means echo compile command. </td>
+    <td>Non-null to display compile command. </td>
+  </tr>
+  <tr>
+    <td valign="top">gmu_DO_SHOW_COMPILEE_FULLPATH</td>
+    <td><p>Non-null to display the fullpath of a file being compiled. </p>
+    <p>If null, a filespath is displayed as it is assigned in the makefile(i.e. in <code>gmu_up_list_SRC_FROM_ROOT</code>), probably a relative path to the project's start-up directory.</p></td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_LINK_CMD</td>
-    <td>Non-null means echo link command.</td>
+    <td>Non-null to display link command.</td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_GENHDEPEND_CMD</td>
-    <td>Non-null means echo header dependency generation command.</td>
+    <td>Non-null to display header dependency generation command.</td>
   </tr>
   <tr>
     <td valign="top">gmu_DO_SHOW_CHANGED_PREREQ</td>
-    <td><p>Non-null will echo the prerequisites that causes a target to be rebuilt (make's <code>$?</code> variable).</p>
+    <td><p>Non-null will display the prerequisites that cause a target to be rebuilt (make's <code>$?</code> variable).</p>
     <p>If you encounter the problem that a target is re-made every time even if you don't change any of your source files, you may define the gmu-var to know which files cause the re-made.</p></td>
   </tr>
 </table>
@@ -916,7 +922,7 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
   				<td valign="top">gmp_G_CompilerVerValid</td>
   				<td align="center" valign="top">O</td>
   				<td>Compiler config mki author should output this var so that makefile writer can know what compiler version is being used. </td>
-  				</tr>
+  </tr>
 </table>
 <p>&nbsp;</p>
 <p>~~~~~~~~ sample table:</p>

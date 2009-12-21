@@ -7,6 +7,9 @@ ifdef windir # This is for GMU running on Microsoft Windows.
 	# [2008-08-19] This is a small trick to work around make.exe calling sh.exe, see today's comment in private-doc for detail.
 endif
 
+# [2009-12-21] Include GMSL(GNU Make Standard Library) from http://gmsl.sourceforge.net
+include $(patsubst %CommonFunctions.mki,%../gmsl/gmsl,$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
 
 gmuf_IsNull = $(if $1,,1)
 gmuf_IsNullAfterStrip = $(if $(strip $1),,1)
@@ -240,7 +243,20 @@ gmuf_IsVerboseLevel1 = $(_IsVerboseLevel1)
 gmuf_IsVerboseLevel2 = $(_IsVerboseLevel2)
 
 
-_gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+_gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+gmuf_genspaces = $(if $1,$(foreach v,$(wordlist 1,$1,$(_gmuDotList)),)$(_GmuSpace))
+	# $1: How many spaces to generate. If $1 missing, return null.
+
+gmuf_repeatstr = $(eval _tmp:=)$(strip $(foreach v,$(wordlist 1,$(if $2,$2,0),$(_gmuDotList)),$(eval _tmp:=$(_tmp)$1)))$(_tmp)
+	# $1: String to repeat. 
+	# $2: repeat count. If $2 missing, return null.
+	# Example:
+	#  $(call gmuf_genchars,abc,2) 
+	# Result:
+	#  abcabc
+
+gmuf_genspaces_2in = $(call genspaces,$1)$(call genspaces,$2)
 
 
 _StrEchoForScSourceCVS = $(_GmuNull)    >CVSROOT = $1\n    > Module = $2\n    >    tag = $3
