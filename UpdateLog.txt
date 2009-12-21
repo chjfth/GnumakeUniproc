@@ -1,4 +1,5 @@
 [2009-12-22] v0.95
+This is mostly a maintenance and bug-fix release, fixed some very subtle bugs. Only a few new features are added.
 ===== Changes and Improvements: =====
 1. r795 (incompatible change)
 	For msvc/compiler_config.mki, abandon single-threaded CRT option. At the same time, use make-var gmp_bc_CRT_STATIC_LIB to tell whether use static CRT lib or dynamically-linked CRT DLL.
@@ -7,6 +8,18 @@
 3. r772,r773,r780
 	Improve those umake* batch/script to eliminate duplicate code. Those duplicate code are now in umake-share.
 4. r779
+	Update install scripts on linux, so that user do not have to cd into GMU-main to execute them.
+5. r780 (experimental, tested on Ubuntu 9.10)
+	Improvement: (Linux) In umake script, Check for /bin/sh 's behavior, if not Bourne shell or Bash, force SHELL=/bin/bash on make command line. -- encountered on Ubuntu Linux.
+6. r785
+	New feature: If gmu_DO_SHOW_COMPILEE_FULLPATH=1, I will show the fullpath of a file being compiled. That's great when a user sees a file being compiled and immediately wants to get its path and open it.
+7. r784 
+	Include GMSL 1.0.11 into GnumakeUniproc. (GMSL is from http://gmsl.sourceforge.net) 
+
+===== Example and Doc Update: =====
+1. r752-755 (Visual C++ only)
+	Add dll-2libs example to show how we can construct two LIBs project into one DLL project with minimum project maintenance human overhead. Description of the rationale is updated.
+
 
 [2009-01-02] v0.94
 ===== Changes and Improvements: =====

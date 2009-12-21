@@ -105,9 +105,9 @@ walkdir_extname
   <li>(optional) Assign the .def file to use in <code>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</code> . This is not absolutely must. If you don't assign a .def file, PI_windll_from_lib  will generate a temporary .def file(<tt>FinalDefForDll.def</tt>) for you.</li>
   <li>List walkdir as  sub-project.</li>
 </ol>
-<p>Your .def need to contain only one line that reads <code>EXPORTS</code> . If you want to write other .def file statements, that's OK. But be sure to leave the <code>EXPORT</code> statement at the tail, because PI_windll_from_lib's code will append the text in <tt>ExportDefs.txt</tt> to your .def file to construct a complete .def file for the linker . </p>
+<p>Your .def need to contain only one line that reads <code>EXPORTS</code> . If you want to write other .def file statements, that's OK. But be sure to leave the <code>EXPORT</code> statement at the tail, because PI_windll_from_lib's code will append the text in <tt>ExportDefs.txt</tt>(from LIB projects) to your .def file to construct a complete .def file for the linker . </p>
 <p>That's all. Quite convenient, isn't it? </p>
-<p>If you are interested what's going on there, just enable verbose output to know more, e.g. add option <code>gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> when invoking umake. </p>
+<p>If you are interested in what's going on there, just enable verbose output to know more, e.g. add option <code>gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> when invoking umake. </p>
 <p>In this DLL project, some extra action are demonstrated:</p>
 <ul>
   <li><b>PI_winres_msvc</b> plugin is loaded to compile <tt>walkdir.rc</tt> into the DLL. A <code>VERSIONINFO</code> statement in the .rc describe the DLL's version info.</li>
@@ -159,7 +159,12 @@ walkdir_extname
 
 <h4>IDE hint: Use <tt>ExportDefs.txt</tt> as final .DEF file</h4>
 <p>If, besides using GMU, you'd like to use Visual C++ IDE to build your DLL project for ease of development-time debugging and testing, you may probably want to assign a .def file to your DLL project. Now you are facing a problem: it seems you will result in writing your export symbols in <tt>ExportDefs.txt</tt> as well as in your .def file -- that is a source duplication, not good! </p>
-<p>Fortunately, VC linker allows multiple <code>EXPORTS</code> statement in a .def file, so, just rename ExportDefs.txt to ExportDefs.def and add <code>EXPORTS</code> as its first line. Thus, ExportDefs.def can be used for your VC-IDE DLL project as well as for <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> . </p>
+<p>Fortunately, VC linker allows multiple <code>EXPORTS</code> statement in a .def file, so, just rename ExportDefs.txt to ExportDefs.def and add <code>EXPORTS</code> as its first line. Thus, ExportDefs.def can be used for your VC-IDE DLL project as well as for <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> . That is, you should at the same time change the line</p>
+<pre>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt</pre>
+<p>into</p>
+<pre>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.def</pre>
+<p>That's all. </p>
+<p>-- </p>
 </body>
 
 </html>
