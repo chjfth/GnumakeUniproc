@@ -6,6 +6,7 @@
 <title>问题及修正</title>
 
 <style type="text/css">
+P { line-height: 110%; }
 pre {
     border: #777777 1px solid;
     padding: 0.5em;
@@ -1400,7 +1401,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 
 </pre>
 <p>我们希望定义 <code>DONT_WANT_PS_TCHAR</code> 的工程将此定义也让 <code>gcc -M</code> 看到，否则 gcc -M 处理时将找不到 <tt>ps_TCHAR.h</tt> 。</p>
-<h2><a name="080719"></a>[2008-07-19] 有时候需要给用户对同一工程执行多次 make 的权利</h2>
+<h2><a name="080719"></a>[2008-07-19] 有时候需要给用户对同一工程执行多次 make 的权利(force post-proc)</h2>
 <p>先前，在一轮的 GMU 构建中，一个工程(以 final-project-name 标识)一旦被构建过一次，它就不过被再次构建，意即：即使之后有其他工程将此工程列为子工程，此工程的 makefile 也不会被再次执行。</p>
 <p>但现在发现有时这种要求会阻碍我们完成一些事，比如，我们要在一次构建中生成两套 SDK，这两套 SDK 中 都要包含一个库，比如说 walkdir 库。Walkdir 库作为那轮构建中的一个 GMU 工程被编出，其头文件和生成的二进制库要被拷贝到两个地方供打包——因为我们要做两套 SDK、即有两个 SDK 输出目录。根据目前 GMU 提供的 SDK 制作模型，walkdir 工程的父工程通过给 walkdir 加载 PI_sync_devoutput 插件来让 walkdir 工程拷贝 SDK 输出。现在的问题是：当 walkdir 第一次被 make 时，它按期望将 SDK 输出拷贝给第一套 SDK ，但第二套 SDK 不会被拷贝，因为 walkdir 已经被 make 过一次，针对它的 make 不会跑第二次了。</p>
 <h4>目前的解决方法</h4>
@@ -1417,7 +1418,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 <h4>另外的思路</h4>
 <p>[2008-07-19] 今天又想到，若没有引入 force-post-processing 模型，可以让 walkdir 的父工程在 <code>gmp_USER_POST_TARGETS</code> 中加载一个额外的 target，在此 target 中手动来执行 walkdir 的 makefile，以此强迫子工程的再次执行。当然，此法对于工程自身的 makefile 来说比 force-post-processing 要麻烦。（此法未实地确认）</p>
 <h4>[2008-09-07] force-post-processing 功能引发原先“工程成环检测”的重新思考</h4>
-<p>详细记录见 ... </p>
+<p>详细记录见 <a href="#080907">此节</a> 。 </p>
 <h2><a name="080813"></a>[2008-08-13] 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</h2>
 <p><code>gmp_COMPILER_VER</code> 用于指示编译器的版本，其值可由 GMU 用户可自由设置，若其值非空，则在 gmp_DECO_PRJ_NAME=1 及 gmp_DECO_COMPILER_VER=1<span class="style-font-small">(此变量后被废除)</span>的情况下，$(<code>gmp_COMPILER_VER</code>) 会被加到工程名上。</p>
 <div class="footnoteb">gmp_COMPILER_VER 自由设置的含义是：GnumakeUniproc 核心层不关心此值的具体内容(你可留意它不是用 gmu_ 前缀) 。但具体的编译器配置文件（compiler config mki）可以定义 gmp_COMPILER_VER 的合法取值，用处是从 gmp_COMPILER_VER 的取值中判断用户当前用的是哪个编译器版本，以便对编译开关做出一些调整。 </div>

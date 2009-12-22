@@ -13,6 +13,7 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 		# Of course, if this header file or files included by this file changes, 
 		# the .pch file will be regenerated before compiling any source that
 		# includes this header file.
+		# Normally, this is set to StdAfx.h .
 
 #	gmi_PCHVC_up_HEADER_FOR_PCH_IN_YOUR_SRC = (optional) # the header name as appeared in 
 		# the `#include "..."' statements in your source file, if you do not

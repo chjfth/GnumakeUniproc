@@ -594,9 +594,20 @@
     <td>GMU-arranged temp dir. Plugin author can output its temporary files in this dir. </td>
   </tr>
   <tr>
+    <td>gmu_Gp_list_REQOBJS_C</td>
+    <td align="center">O</td>
+    <td>List of object file path that is from C source files. </td>
+  </tr>
+  <tr>
+    <td>gmu_Gp_list_REQOBJS_CXX</td>
+    <td align="center">O</td>
+    <td>List of object file path that is from C++ source files. </td>
+  </tr>
+  <tr>
     <td>gmu_Gp_list_REQOBJS</td>
     <td align="center">O</td>
-    <td>The list of objects files, converted from those source files listed in <a href="#gmu_up_list_SRC_FROM_ROOT"><tt>gmu_up_list_SRC_FROM_ROOT</tt></a>.</td>
+    <td><p>The list of objects files, converted from those source files listed in <a href="#gmu_up_list_SRC_FROM_ROOT"><tt>gmu_up_list_SRC_FROM_ROOT</tt></a>.</p>
+    <p>This list includes $(gmu_Gp_list_REQOBJS_C) , $(gmu_Gp_list_REQOBJS_CXX) and those from ASM files.</p></td>
   </tr>
   <tr>
     <td>gmu_Gp_COUNT_COMPILE</td>
