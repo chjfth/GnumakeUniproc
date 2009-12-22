@@ -5,9 +5,12 @@
 
 gmu_PRJ_NAME = <project-name-for-this-container>
 
-#gmp_CONTAINER_EXTRACT_COMPILER_ID = 1
-	# Do not define this since we do not need gmp_COMPILER_ID 
-	# for sub-project's attributes .
+
+gmp_USER_POST_TARGETS += # <some make targets>
+	# If you'd like something to be done after all sub-projects is built, 
+	# you can your targets in this var, and executes your commands under
+	# these targets.
+
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks
 
