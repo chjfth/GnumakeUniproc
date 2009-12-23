@@ -318,11 +318,20 @@ gmuf_RemoveTrailSlash = $(if $1,$(if $(patsubst %/,,$1),$1,$(call gmuf_RemoveTra
 	# Remove all trailing slashes.
 
 gmuf_GetParentDir1 = $(call gmuf_RemoveTrailSlash,$(dir $(call gmuf_RemoveTrailSlash,$1)))
+	# gmuf_GetParentDir1 removes one level of dir component, dealing with multiple consecutive slashes.
+	# $(call gmuf_GetParentDir1,/dir1///dir2) returns /dir1 .
+	
 _GetParentDirCnt = $(if $2,$(call gmuf_GetParentDir1,$(call _GetParentDirCnt,$1,$(call gmuf_CountDec,$2))),$(call gmuf_GetParentDir1,$1))
 	# Note: For _GetParentDirCnt, "@" means 2, "@ @" means 3, that is, count plus 1.
+
 gmuf_GetParentDir = $(if $(strip $2),$(call _GetParentDirCnt,$1,$(call gmuf_CountDec,$2)),$(call _GetParentDirCnt,$1,))
 	# $1: Input dir(having trail slash or not both OK)
 	# $2: Up level, e.g. null or "@" means 1, "@ @" means 2, "@ @ @" means 3.
+
+gmuf_GetParentDirN = $(call gmuf_GetParentDir,$1,$(wordlist 1,$2,$(subst .,@,$(_gmuDotList))))
+	# $1: the starting path
+	# $2: a number, tells the parent up level.
+
 gmuf_GetDir = $(call gmuf_RemoveTrailSlash,$(dir $1))
 	# e.g. $1 = /my/prj1/Makefile
 	# Return: /my/prj1
