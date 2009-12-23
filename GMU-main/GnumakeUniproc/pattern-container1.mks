@@ -85,8 +85,8 @@ endif
 __pattern1_inc_project_count:
 	@$(call _AppendLogCountCompile,$(if $(gmu_DELIBERATE_NO_SUBPRJ),r,R)) \
 		# a 'R' or 'r' means a container project, 'r' is for $(gmu_DELIBERATE_NO_SUBPRJ)
-	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_USER_FIRST_TARGET),$(gmp_USER_FIRST_TARGET),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
-	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_USER_FIRST_TARGET),$(gmp_USER_FIRST_TARGET),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
+	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
 
 __pattern1_default_first_target: \
 		$(gmp_USER_PRE_TARGETS) \

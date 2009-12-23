@@ -87,6 +87,11 @@ $(call gmuf_IsPrefixWith,,sdt)         false
     <td><p>Repeat a given string multiple times. $1: string to repeat. $2: repeat count.</p>
     <p><code>$(call gmuf_genchars,abc,2)</code> will return <code>abcabc</code> .  </p>    <p>If $2 missing, return null.</p></td>
   </tr>
+  <tr>
+    <td valign="top">gmuf_RemoveTrailSlash</td>
+    <td><p>Remove trailing slashes of a given string. </p>
+    <p><code>$(call gmuf_RemoveTrailSlash,/dir1/abc///)</code> will return <code>/dir1/abc</code> . </p></td>
+  </tr>
 </table>
 <h2><a name="gmpf%20functions"></a>gmpf functions </h2>
 

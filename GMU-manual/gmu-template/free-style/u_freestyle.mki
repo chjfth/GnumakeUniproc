@@ -7,10 +7,13 @@
 # This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks 
 # as u_freestyle.mki 
 # 	You define your own make target here by replacing <your-custom-target>
-# with your custom target name are supply make rule for it.
+# with your custom target name and supply make rule for it.
 #	By calling it "free-style", it means you can not define GMU-style sub-projects
 # here, nor can you assign source files in gmu_up_list_SRC_FROM_ROOT to make them
 # get compiled and linked.
+#	By using a GMU free-style makefile, you get these benefits:
+# * Use various GMU functions(gmuf_XXX) here.
+# * Get the project counted in GMU build result statistics.
 #---------------------------------------------------------------------------
 
 <your-custom-target>: #<prerequisites ...>

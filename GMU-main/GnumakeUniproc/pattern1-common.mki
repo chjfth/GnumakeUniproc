@@ -67,7 +67,16 @@ gmp_up_USER_OUTPUT_AFTER_LINK += $(gmp_USER_FIRST_TARGET)
 	# a custom-image-mki author will assign gmp_USER_FIRST_TARGET in his mki after pattern1-common.mki .
 	# Although I can move this backward, but writting it here makes pattern1.mks & pattern-container1.mks share it.
 
+ifneq (,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
+ifneq (,$(gmp_USER_FREE_STYLE_TARGET))
+	$(error !GMP!Error: gmp_up_USER_OUTPUT_AFTER_LINK and gmp_USER_FREE_STYLE_TARGET are both defined)
+	# [2009-12-23] gmp_USER_FREE_STYLE_TARGET is an intuitive name for GMU free-style makefiles.
+	# Note: gmp_USER_FREE_STYLE_TARGET is ONLY used in GMU free-style makefiles.
+endif
+endif
+
 _gmp_up_USER_OUTPUT_AFTER_LINK_s = $(strip $(gmp_up_USER_OUTPUT_AFTER_LINK))
+_gmp_USER_FREE_STYLE_TARGET_s = $(strip $(gmp_USER_FREE_STYLE_TARGET))
 
 gmi_SYDO_ud_SYNC_UserOutputAL_FROM = $(call gmuf_GetDir,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
 #gmi_SYDO_ud_SYNC_UserOutputAL_TO = (should be assigned from parent, and normally, from env)
@@ -75,8 +84,8 @@ gmi_SYDO_up_list_SYNC_UserOutputAL = $(notdir $(_gmp_up_USER_OUTPUT_AFTER_LINK_s
 
 
 define _GmpShowDoneUserOutputAfterLink
-#  $(if $(_Stripped_USER_FIRST_TARGET),echo "[DONE(gmp_USER_FIRST_TARGET):] $(call _StripOutputRootPrefix,$(_Stripped_USER_FIRST_TARGET))")
-  $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),echo "[DONE(gmp_up_USER_OUTPUT_AFTER_LINK):] $(call _StripOutputRootPrefix,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))")
+  $(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),echo "[DONE(gmp_up_USER_OUTPUT_AFTER_LINK):] $(call _StripOutputRootPrefix,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))")
+  $(if $(_gmp_USER_FREE_STYLE_TARGET_s),echo "[DONE(gmp_USER_FREE_STYLE_TARGET):] $(_gmp_USER_FREE_STYLE_TARGET_s)")
 endef
 
 

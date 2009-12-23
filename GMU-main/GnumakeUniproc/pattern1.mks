@@ -332,7 +332,7 @@ endif
 
 __pattern1_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
-		$(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \
+		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \
 		$(if $(gmu_I_AM_A_LINK_COMPONENT),$(_p_AutoLinkListForParent)) \
 		$(gmp_USER_POST_TARGETS) \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
