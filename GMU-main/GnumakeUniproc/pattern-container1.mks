@@ -90,7 +90,7 @@ __pattern1_inc_project_count:
 
 __pattern1_default_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
-		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK)) \
+		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_USER_FREE_STYLE_TARGET)) \
 		$(gmp_USER_POST_TARGETS) \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
 ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))

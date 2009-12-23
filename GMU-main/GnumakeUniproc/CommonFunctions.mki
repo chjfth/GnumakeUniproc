@@ -184,13 +184,22 @@ _GetAbsDir = $(shell ( cd $1 && cd $2; CmdRet=$$?; if [ $$CmdRet = 0 ]; then pwd
 	#[2006-11-09] $1: starting dir, $2: the dir relative to $1
 gmuf_GetAbsDir = $(_GetAbsDir)
 
+gmuf_ConcatePath = $(gmuf_GetAbsPathByRela_so)
 gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
 	while [ $${dirRel$(_GmuSharp)../} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)../}; dirGo=$${dirGo%/*}; done; \
-	echo "$${dirGo}/$${dirRel}" )
+	if [ "$${dirRel}" = ".." ]; then echo "$${dirGo%/*} "; \
+	else echo "$${dirGo}/$${dirRel}"; fi )
 	# $1: Starting absolute dir
 	# $2: Relative dir
 	# 'so' means string operation
 	# This is suitable for directory and filepath(dir+filename)
+	# LIMITATION: Don't let $2 trace back to root dir, otherwise, the behavior is wrong.
+	#   E.G. $(call gmuf_GetAbsPathByRela_so,/dir1/dir2,../..) will produce null string.
+	#
+	# [2009-12-23] Old sh.exe CAUTION: 
+	# For the shell command
+	#	then echo "$${dirGo%/*} ";
+	# above, Don't remove the space char before the closing quote, otherwise, wrong behavior is given.
 
 gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 	# $1: a (relative) path relative to curdir.
