@@ -438,4 +438,12 @@ gmuf_AnounceExportEnvvar = $(eval $(call _AnounceExportEnvvar,$1))
 	# $1 is var assignment, such as ``myvar=myval'' or ``myvar := myval''
 
 
+gmuf_CvsDatatimeParam = -D "$1"
+gmu_CvsCmdUseGmuGivenTime = -D "$(gmu_SC_CHECKOUT_DATETIME)"
+
+gmuf_SvnDatetimeParam = -r "{$1}"
+gmu_SvnCmdUseGmuGivenTime = -r "{$(gmu_SC_CHECKOUT_DATETIME)}"
+
+
+
 endif # ifndef _CommonFunctions_included 

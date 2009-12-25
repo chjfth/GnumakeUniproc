@@ -108,6 +108,14 @@ $(call gmuf_IsPrefixWith,,sdt)         false
     <td valign="top">gmuf_GetStartupDir</td>
     <td>Get the directory of startup makefile of current project. Different sub-projects will get their own respective startup directories.</td>
   </tr>
+  <tr>
+    <td valign="top">CVS/SVN date-time option construction </td>
+    <td><pre>gmuf_CvsDatatimeParam = -D &quot;$1&quot;
+gmu_CvsCmdUseGmuGivenTime = -D &quot;$(gmu_SC_CHECKOUT_DATETIME)&quot;</pre>
+      <pre>gmuf_SvnDatetimeParam = -r &quot;{$1}&quot;
+gmu_SvnCmdUseGmuGivenTime = -r &quot;{$(gmu_SC_CHECKOUT_DATETIME)}&quot;
+     </pre></td>
+  </tr>
 </table>
 <h2><a name="gmpf%20functions"></a>gmpf functions </h2>
 
