@@ -253,6 +253,10 @@ gmuf_IsVerboseLevel2 = $(_IsVerboseLevel2)
 
 
 _gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+_gmuAtcList = $(subst .,@,$(_gmuDotList))
+	# Atc: "At"(@) character
+	# I'd like not to use := for _gmuAtcList, to save some persistent memory allocated for make process.
+	# You know, if many levels of make process are recursively run, that will cost considerable RAM.
 
 gmuf_genspaces = $(if $1,$(foreach v,$(wordlist 1,$1,$(_gmuDotList)),)$(_GmuSpace))
 	# $1: How many spaces to generate. If $1 missing, return null.
@@ -328,7 +332,7 @@ gmuf_GetParentDir = $(if $(strip $2),$(call _GetParentDirCnt,$1,$(call gmuf_Coun
 	# $1: Input dir(having trail slash or not both OK)
 	# $2: Up level, e.g. null or "@" means 1, "@ @" means 2, "@ @ @" means 3.
 
-gmuf_GetParentDirN = $(call gmuf_GetParentDir,$1,$(wordlist 1,$2,$(subst .,@,$(_gmuDotList))))
+gmuf_GetParentDirN = $(call gmuf_GetParentDir,$1,$(wordlist 1,$2,$(_gmuAtcList)))
 	# $1: the starting path
 	# $2: a number, tells the parent up level.
 
