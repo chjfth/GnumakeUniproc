@@ -12,16 +12,35 @@
 # 1. Compile and copy the gmuXXX programs to $DIR_GMU_PRG
 # 2. Compile and copy the umake* scripts to $DIR_GMU_PRG. 
 
-# _gmu_rel2abs (): 
-# Input a dir(relative or absolute), return(echo) its absolute dir.
-# If the input dir is not valid or not accessible, return null string.
+# _gmu_rel2abs_file (): 
+# Input a filepath(relative or absolute), return(echo) its absolute path.
+# This function only does string operation. 
 # This function will not change callers current working directory.
-_gmu_rel2abs ()
+_gmu_rel2abs_file ()
 {
-	if [ "$1" = "" ]; then return 4; fi
+	if [ "${1%%/*}" = "" ]; then 
+		# $1 starts with a / , so it is already a absolute path.
+		echo $1
+		return
+	fi
 
-	if cd $1; then echo $(pwd)
-	else return 5; fi
+	dirGo="$PWD"
+	dirRel="$1"
+	
+	# Strip preceeding ./ if any
+	while [ "${dirRel#./}" != "${dirRel}" ]; do dirRel="${dirRel#./}"; done
+
+	# Now we process possible ../.. prefix at the begining of $1
+	while [ "${dirRel#../}" != "${dirRel}" ]; do
+		dirRel="${dirRel#../}"
+		dirGo="${dirGo%/*}"
+	done
+
+	if [ "${dirRel}" = ".." ]; then 
+		echo "${dirGo%/*} "
+	else
+		echo "${dirGo}/${dirRel}"; 
+	fi
 }
 
 DIR_GMU=
@@ -33,8 +52,9 @@ if [ "$DIR_GMU_PRG" = "" ]; then
 		DIR_GMU=.
 		DIR_GMU_MAIN=./GMU-main
 	else # $0 contains some path separator, so we use relative dir ../bin to where this script file resides.
-		DIR_GMU=${0%/*} ; DIR_GMU=${DIR_GMU%/*}
-		DIR_GMU_MAIN=${0%/*}
+		PATH_THIS_FILE=$(_gmu_rel2abs_file $0)
+		DIR_GMU=${PATH_THIS_FILE%/*} ; DIR_GMU=${DIR_GMU%/*}
+		DIR_GMU_MAIN=${PATH_THIS_FILE%/*}
 	fi
 
 	DIR_GMU_PRG=$DIR_GMU/bin
