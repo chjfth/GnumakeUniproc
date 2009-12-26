@@ -10,7 +10,7 @@ This is mostly a maintenance and bug-fix release, fixed some very subtle bugs. O
 4. r779
 	Update install scripts on linux, so that user do not have to cd into GMU-main to execute them.
 5. r780 (experimental, tested on Ubuntu 9.10)
-	Improvement: (Linux) In umake script, Check for /bin/sh 's behavior, if not Bourne shell or Bash, force SHELL=/bin/bash on make command line. -- encountered on Ubuntu Linux.
+	Improvement: (Linux) In umake script, Check for /bin/sh 's behavior, if not Bourne shell or Bash, force SHELL=/bin/bash on make command line. -- encountered on Ubuntu Linux 9.10.
 6. r785
 	New feature: If gmu_DO_SHOW_COMPILEE_FULLPATH=1, I will show the fullpath of a file being compiled. That's great when a user sees a file being compiled and immediately wants to get its path and open it.
 7. r784 

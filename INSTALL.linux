@@ -5,8 +5,8 @@ Current GnumakeUniproc version is v0.95 .
 - Install process on Linux
 =============================================================================
 
-The brief install process described here is suitable for almost all Linux 
-distributions since year 2005.
+The brief install process described here is suitable for most Linux 
+distributions since year 2005(with Bash 3.0).
 
 Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
 ~/GMU/INSTALL.linux), then do the following:
