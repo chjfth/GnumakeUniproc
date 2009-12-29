@@ -4,7 +4,7 @@ REM setting C++ environment
 
 
 SETLOCAL
-call "C:/Program Files/Microsoft Visual Studio/VC98/Bin/VCVARS32.BAT"
+rem call "C:/Program Files/Microsoft Visual Studio/VC98/Bin/VCVARS32.BAT"
 
 
 REM SET CFG=Win32 Release

@@ -452,7 +452,9 @@ execute_command_internal_from_thread (command,
 
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
-      paren_pid = make_child (savestring (make_command_string (command)),
+	  char *ss = savestring (make_command_string (command));
+fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous, command->redirects); fflush(stderr); //chj
+      paren_pid = make_child (ss,
 			      asynchronous);
       if (paren_pid == 0)
 	{
@@ -2831,7 +2833,18 @@ shell_execve_async (command, args, env, asynchronous)
      int asynchronous;
 {
    char **args_new = NULL;
-
+	int i=0, slen=0;
+	
+	char wincmd[32800];
+//	sprintf(wincmd, "%s ", command);
+	for(i=0; args[i]!=NULL; i++)
+	{
+		slen = strlen(wincmd);
+		sprintf(wincmd+slen, "\"%s\" ", args[i]);
+	}
+	slen = strlen(wincmd);
+	wincmd[slen-1] = '\0';
+	
    /*fprintf(stderr, "shell_execve command %s\n", command); fflush(stderr); */
 #if defined (isc386) && defined (_POSIX_SOURCE)
   __setostype (0);		/* Turn on USGr3 semantics. */
@@ -2920,9 +2933,15 @@ shell_execve_async (command, args, env, asynchronous)
           else if ((sample_len != -1) &&
                    check_binary_file (sample, sample_len))
           {
+			//[2009-12-29] Chj: With make statement
+			//   _temp := $(shell showargs "V1=a" bb)
+			// It will get here.
+			//
              /* fprintf(stderr, "shell_execve  command %s --- %d\n", command, __LINE__); fflush(stderr); */
-             report_error ("%s: cannot execute binary file", command);
-             return (EX_BINARY_FILE);
+              // fprintf(stderr, "shell_execve command [%s]\n", wincmd); fflush(stderr); //chj debug
+             // report_error ("%s: cannot execute binary fileX", command);
+             // return (EX_BINARY_FILE);
+             return execute_wincmd(wincmd);
           }
        }
        

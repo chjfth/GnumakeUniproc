@@ -672,6 +672,7 @@ HANDLE downhill_Process_Forkexec(char* exec_Name,char* exec_Argv[],
 			exec_Startup.dwFlags = STARTF_USESTDHANDLES;
 		}
 	}
+fprintf(stderr, "CreateProcess called AT line %d\n", __LINE__); fflush(stderr); //chj debug
 	if (!CreateProcess(NULL,exec_Command,NULL,NULL,exec_Inherit,exec_Flags,
 	 NULL,NULL,&exec_Startup,&exec_Info))
 	{
@@ -841,7 +842,8 @@ int getdtablesize()
 
 int fork(void)
 {
-	report_error("option not availible on this NT BASH release");
+	report_error("fork not availible on this NT BASH release");
+	DebugBreak();
 	return -1 ;
 }
 
@@ -977,4 +979,28 @@ void endpwent(void)
 long ulimit(int a, long b)
 {
 	return 1000000 ;
+}
+
+////////////// Chj:
+
+int execute_wincmd(char *wincmd)
+{
+	DWORD process_exitcode = 0;
+	STARTUPINFO sti = { sizeof(STARTUPINFO) };
+	PROCESS_INFORMATION psi;
+	BOOL b = CreateProcess(NULL, wincmd, NULL, NULL,
+		FALSE,
+		0,
+		NULL, NULL,
+		&sti, &psi);
+	if(b)
+	{
+		CloseHandle(psi.hThread);
+		WaitForSingleObject(psi.hProcess, INFINITE);
+		GetExitCodeProcess(psi.hProcess, &process_exitcode);
+		CloseHandle(psi.hProcess);
+		return process_exitcode;
+	}
+	else
+		return GetLastError();
 }

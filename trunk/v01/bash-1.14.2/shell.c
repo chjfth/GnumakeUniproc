@@ -731,7 +731,7 @@ main (argc, argv, env)
          sample_len = READ (fd, sample, sizeof (sample));
          if (sample_len > 0 && (check_binary_file (sample, sample_len)))
          {
-            report_error ("%s: cannot execute binary file", filename);
+            report_error ("%s: cannot execute binary fileY", filename);
             exit (EX_BINARY_FILE);
          }
          /* Now rewind the file back to the beginning. */

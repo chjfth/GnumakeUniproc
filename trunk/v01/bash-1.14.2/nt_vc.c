@@ -377,6 +377,7 @@ static int spawnve_console(const char * command,const char ** args,
       }
    }
 
+fprintf(stderr, "CreateProcess called at line %s\n", __LINE__); fflush(stderr); //chj
 	if (!CreateProcess(command,exp_args,0,0,exec_Inherit,exec_Flags,
         nt_env,0,&cstart,&pstart))
    {
@@ -909,7 +910,10 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
          Sleep(iSleepBeforeExec);
       }
    }
-
+//fprintf(stderr, "CreateProcess called At line %d\n", __LINE__); fflush(stderr); //chj
+	//[2009-12-29] Chj: With make statement
+	//   _temp := $(shell showargs "V1=a" bb 1>&2)
+	// This CreateProcess will be called.
    iCreateRc = CreateProcess(args[0], /* application name */
                              pcCmdStr, /* command string */
                              NULL, /* sec attribs */

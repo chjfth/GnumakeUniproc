@@ -105,7 +105,7 @@ source_builtin (list)
       if (check_binary_file ((unsigned char *)string, tt))
 	{
 	  free (string);
-	  builtin_error ("%s: cannot execute binary file", filename);
+	  builtin_error ("%s: cannot execute binary fileZ", filename);
 	  free (filename);
 	  return (EX_BINARY_FILE);
 	}
