@@ -1,6 +1,6 @@
 /* wait.c, created from wait.def. */
 
-
+#include <stdlib.h>
 #include <sys/types.h>
 #include <signal.h>
 #include "../shell.h"
