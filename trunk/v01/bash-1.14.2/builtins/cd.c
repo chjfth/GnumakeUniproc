@@ -593,3 +593,18 @@ cd_to_string (name)
   dispose_words (tlist);
   return (result);
 }
+
+// 2009-12-30 Chj: add true, false builtin
+// Thanks to http://files.linjian.org/articles/bash_study/bash_linjian.html
+
+int
+true_builtin (WORD_LIST *list)
+{
+	return 0;
+}
+
+int
+false_builtin (WORD_LIST *list)
+{
+	return 1;
+}

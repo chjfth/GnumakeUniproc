@@ -21,6 +21,10 @@ extern int cd_builtin ();
 extern char *cd_doc[];
 extern int pwd_builtin ();
 extern char *pwd_doc[];
+extern int true_builtin ();
+extern char *true_doc[];
+extern int false_builtin ();
+extern char *false_doc[];
 #if defined (PUSHD_AND_POPD)
 extern int pushd_builtin ();
 extern char *pushd_doc[];

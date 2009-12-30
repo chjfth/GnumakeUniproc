@@ -59,6 +59,12 @@ struct builtin shell_builtins[] = {
      "cd [dir]" },
   { "pwd", pwd_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, pwd_doc,
      "pwd" },
+// 2009-12-30 Chj >>>
+  { "true", true_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, true_doc,
+     "true" },
+  { "false", false_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, false_doc,
+     "false" },
+// 2009-12-30 Chj <<<
 #if defined (PUSHD_AND_POPD)
   { "pushd", pushd_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, pushd_doc,
      "pushd [dir | +n | -n]" },
@@ -268,6 +274,14 @@ char *cd_doc[] = {
 };
 char *pwd_doc[] = {
   "Print the current working directory.",
+  (char *)NULL
+};
+char *true_doc[] = {
+  "The true command just return 0.",
+  (char *)NULL
+};
+char *false_doc[] = {
+  "The false command just return 1.",
   (char *)NULL
 };
 #if defined (PUSHD_AND_POPD)

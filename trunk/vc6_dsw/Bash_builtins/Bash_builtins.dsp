@@ -193,10 +193,6 @@ SOURCE="..\..\v01\bash-1.14.2\builtins\let.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\v01\bash-1.14.2\builtins\mkbuiltins.c"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\v01\bash-1.14.2\builtins\psize.c"
 # End Source File
 # Begin Source File
