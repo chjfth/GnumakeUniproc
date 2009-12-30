@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "Bash"=".\Bash.dsp" - Package Owner=<4>
+Project: "Bash"="Bash\Bash.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -18,7 +18,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "Bash_builtins"=".\Bash_builtins.dsp" - Package Owner=<4>
+Project: "Bash_builtins"="Bash_builtins\Bash_builtins.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

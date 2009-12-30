@@ -447,15 +447,45 @@ execute_command_internal_from_thread (command,
       (command->flags & CMD_FORCE_SUBSHELL)  ||
       (shell_control_structure (command->type) &&
        (pipe_out != NO_PIPE || pipe_in != NO_PIPE || asynchronous)))
-    {
+  {
+	  const char *pcShellName = nt_get_shell_binary();
+	  char *cmd_for_sh = NULL;
+	  char wincmd[32800] = "";
+	  int i, j, ret = 254;
       pid_t paren_pid;
 
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
 	  char *ss = savestring (make_command_string (command));
-fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous, command->redirects); fflush(stderr); //chj
-      paren_pid = make_child (ss,
-			      asynchronous);
+fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X cmdflag=0x%X\n", ss, asynchronous, command->redirects, command->flags); fflush(stderr); //chj
+//      paren_pid = make_child (ss, 
+//			      asynchronous);
+
+		// [2009-12-30] Chj >>> 
+		// Construct a new windows command line and execute it with 
+		//	sh -c "<command-line>"
+		sprintf(wincmd, "%s -c \"", pcShellName);
+
+		command->flags &= ~(CMD_FORCE_SUBSHELL | CMD_WANT_SUBSHELL | CMD_INVERT_RETURN);
+		cmd_for_sh = make_command_string(command);
+
+		// Copy cmd_for_sh into wincmd, with " translated into \"
+		i = strlen(wincmd);
+		for(j=0; cmd_for_sh[j]; j++)
+		{
+			if(cmd_for_sh[j]=='\"')
+				wincmd[i++] = '\\', wincmd[i++] = '\"';
+			else
+				wincmd[i++] = cmd_for_sh[j];
+		}
+		wincmd[i++] = '\"';
+		wincmd[i] = '\0';
+
+		ret = execute_wincmd(wincmd);
+		return ret;
+
+		// [2009-12-30] Chj <<<
+
       if (paren_pid == 0)
 	{
 	  int user_subshell, return_code, function_value;
@@ -545,8 +575,8 @@ fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous
 
 	  /* Do redirections, then dispose of them before recursive call. */
 	  if (command->redirects)
-	    {
-	      if (do_redirections (command->redirects, 1, 0, 0) != 0)
+	  {
+	     if (do_redirections (command->redirects, 1, 0, 0) != 0)
          {
 #ifndef  __NT_VC__      
             exit (EXECUTION_FAILURE);
@@ -557,7 +587,7 @@ fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous
 
 	      dispose_redirects (command->redirects);
 	      command->redirects = (REDIRECT *)NULL;
-	    }
+	  }
 
 	  /* If this is a simple command, tell execute_disk_command that it
 	     might be able to get away without forking and simply exec.
@@ -596,6 +626,8 @@ fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous
 	}
       else
 	{
+		_assert("Chj: Unexpected: paren_pid == 0", __FILE__, __LINE__); // chj
+
 	  close_pipes (pipe_in, pipe_out);
 
 #if defined (PROCESS_SUBSTITUTION) && defined (HAVE_DEV_FD)
@@ -635,7 +667,7 @@ fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous
 	      return (EXECUTION_SUCCESS);
 	    }
 	}
-    }
+  }
 
   /* Handle WHILE FOR CASE etc. with redirections.  (Also '&' input
      redirection.)  */
@@ -745,8 +777,9 @@ fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X\n", ss, asynchronous
 	 infinite loop of executions through this spot in subshell after
 	 subshell until the process limit is exhausted. */
 
-      if (asynchronous)
+    if (asynchronous)
 	{
+		_assert("Chj Unexpected: asynchronous", __FILE__, __LINE__); //chj
 	  command->flags |= CMD_FORCE_SUBSHELL;
 	  exec_result =
 	    execute_command_internal (command, 1, pipe_in, pipe_out,
@@ -1951,9 +1984,9 @@ execute_simple_command_from_thread (simple_command, pipe_in, pipe_out, async, fd
 
                char * temp_name = NULL; /* name of temporary file */
                const char * temp_dir = getenv("TEMP");
-               char acFullPrefix[256] = "";
-               char acCommandLine[1024] = "";
-               char acCommandWords[1024] = "";
+               char acFullPrefix[2560] = "";
+               char acCommandLine[32800] = "";
+               char acCommandWords[32800] = "";
                const char *pcShellName = nt_get_shell_binary();
                WORD_LIST *wlist = NULL;
                WORD_LIST *warg = NULL;
@@ -2835,7 +2868,7 @@ shell_execve_async (command, args, env, asynchronous)
    char **args_new = NULL;
 	int i=0, slen=0;
 	
-	char wincmd[32800];
+	char wincmd[32800] = "";
 //	sprintf(wincmd, "%s ", command);
 	for(i=0; args[i]!=NULL; i++)
 	{
