@@ -1000,7 +1000,7 @@ nt_execute_disk_command (words, redirects, command, pipe_in, pipe_out,
       and stderr and spawn */
    /* This leaves garbage open and signals set incorrectly -- we will
       fix this later. The complication is that we must pass the information
-      to do this in come reasoable way to the spawned proces, have it clean
+      to do this in come reasonable way to the spawned process, have it clean
       things up and then exec the real target. */
 
    int pid = 0;
@@ -1008,7 +1008,7 @@ nt_execute_disk_command (words, redirects, command, pipe_in, pipe_out,
 	char ** args ;
 	int save_stdin = 0, save_stdout = 0, save_stderr = 0;
 	int mode = 0;
-
+//DebugBreak();
 	if (async || (pipe_out != NO_PIPE))
    {
       mode = /*_P_DETACH */ _P_NOWAIT ;
@@ -1112,6 +1112,7 @@ nt_execute_disk_command (words, redirects, command, pipe_in, pipe_out,
 
       if (!redirects && async && pipe_in == NO_PIPE && pipe_out == NO_PIPE)
       {
+		  _assert("Chj: Unexpected: async=yes!", __FILE__, __LINE__); // chj
          pid = spawnve_console(((pcShortCommand && !shell)? pcShortCommand:args[0]),
                             (const char **) args, (const char **)spawn_env);
       }

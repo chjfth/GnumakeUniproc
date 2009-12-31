@@ -270,6 +270,26 @@ static void shell_reinitialize ();
 static void initialize_signals ();
 static void initialize_terminating_signals ();
 
+// Chj:
+void dump_args(int argc, char **argv)
+{
+	int i;
+	FILE *fp;
+	char timestr[40];
+	time_t tnow = time(NULL);
+	struct tm *ptm = localtime(&tnow);
+	sprintf(timestr, "[%d-%02d-%02d %02d:%02d:%02d]", 
+		1900+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+
+	fp = fopen("winbasha.txt", "wb+");
+	if(fp)
+	{
+		fwrite(timestr, 1, strlen(timestr), fp);
+		for(i=0; i<argc; i++)
+			fprintf(fp, "\r\nargv[%d]: %s", i, argv[i]);
+		fclose(fp);
+	}
+}
 
 main (argc, argv, env)
    int argc;
@@ -279,6 +299,8 @@ main (argc, argv, env)
    int arg_index, locally_skip_execution;
    int top_level_arg_index, read_from_stdin;
    FILE *default_input;
+
+  dump_args(argc, argv);
 
    /* There is a bug in the NeXT 2.1 rlogind that causes opens
       of /dev/tty to fail. */

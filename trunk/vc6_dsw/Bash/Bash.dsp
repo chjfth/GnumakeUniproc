@@ -39,6 +39,7 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\v01\bash-1.14.2" /I "..\..\v01\bash-1.14.2\lib" /I "..\..\v01\dum_inc" /D "NDEBUG" /D Program=bash /D "__NT_VC__" /D "INITIALIZE_SIGLIST" /D "HAVE_VFPRINTF" /D "HAVE_UNISTD_H" /D "HAVE_STDLIB_H" /D "HAVE_LIMITS_H" /D "HAVE_RESOURCE" /D "HAVE_SYS_PARAM" /D "HAVE_DIRENT_H" /D "VOID_SIGHANDLER" /D "BROKEN_SIGSUSPEND" /D "HAVE_GETHOSTNAME" /D "MKFIFO_MISSING" /D "NO_DEV_TTY_JOB_CONTROL" /D "NO_SBRK_DECL" /D "PGRP_PIPE" /D "TERMIOS_MISSING" /D "HAVE_DUP2" /D "HAVE_STRERROR" /D "HAVE_DIRENT" /D "HAVE_STRING_H" /D "HAVE_VARARGS_H" /D "HAVE_STRCHR" /D "SHELL" /D "HAVE_ALLOCA" /D "HAVE_ALLOCA_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
@@ -49,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib /nologo /subsystem:console /machine:I386
 
 !ELSEIF  "$(CFG)" == "Bash - Win32 Debug"
 
@@ -62,6 +63,7 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\v01\bash-1.14.2" /I "..\..\v01\bash-1.14.2\lib" /I "..\..\v01\dum_inc" /D "_DEBUG" /D Program=bash /D "__NT_VC__" /D "INITIALIZE_SIGLIST" /D "HAVE_VFPRINTF" /D "HAVE_UNISTD_H" /D "HAVE_STDLIB_H" /D "HAVE_LIMITS_H" /D "HAVE_RESOURCE" /D "HAVE_SYS_PARAM" /D "HAVE_DIRENT_H" /D "VOID_SIGHANDLER" /D "BROKEN_SIGSUSPEND" /D "HAVE_GETHOSTNAME" /D "MKFIFO_MISSING" /D "NO_DEV_TTY_JOB_CONTROL" /D "NO_SBRK_DECL" /D "PGRP_PIPE" /D "TERMIOS_MISSING" /D "HAVE_DUP2" /D "HAVE_STRERROR" /D "HAVE_DIRENT" /D "HAVE_STRING_H" /D "HAVE_VARARGS_H" /D "HAVE_STRCHR" /D "SHELL" /D "HAVE_ALLOCA" /D "HAVE_ALLOCA_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
@@ -72,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug/sh.exe" /pdbtype:sept
 
 !ENDIF 
 

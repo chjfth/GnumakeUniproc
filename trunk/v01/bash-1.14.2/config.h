@@ -67,7 +67,8 @@
 
 /* Define BANG_HISTORY if you want to have Csh style "!" history expansion.
    This is unrelated to READLINE. */
-#define BANG_HISTORY
+//#define BANG_HISTORY
+	// Chj disable this!
 
 /* Define HISTORY if you want to have access to previously typed commands.
 

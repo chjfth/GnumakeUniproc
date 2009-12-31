@@ -290,6 +290,8 @@ execute_command (command)
 
   // char *cmd = NULL; /* just for debugging */
 
+//fprintf(stderr, "execute_command, flags=0x%X\n", command->flags); //chj
+
 #ifdef __NT_VC__ /* kludge */
 
   nt_clean_current_fds();
@@ -457,7 +459,7 @@ execute_command_internal_from_thread (command,
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
 	  char *ss = savestring (make_command_string (command));
-fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X cmdflag=0x%X\n", ss, asynchronous, command->redirects, command->flags); fflush(stderr); //chj
+//fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X cmdflag=0x%X\n", ss, asynchronous, command->redirects, command->flags); fflush(stderr); //chj
 //      paren_pid = make_child (ss, 
 //			      asynchronous);
 

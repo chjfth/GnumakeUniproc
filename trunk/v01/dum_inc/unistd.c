@@ -995,9 +995,10 @@ int execute_wincmd(char *wincmd)
 		&sti, &psi);
 	if(b)
 	{
-		CloseHandle(psi.hThread);
 		WaitForSingleObject(psi.hProcess, INFINITE);
 		GetExitCodeProcess(psi.hProcess, &process_exitcode);
+		
+		CloseHandle(psi.hThread);
 		CloseHandle(psi.hProcess);
 		return process_exitcode;
 	}
