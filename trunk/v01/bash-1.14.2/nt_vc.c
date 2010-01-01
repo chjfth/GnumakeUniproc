@@ -38,6 +38,7 @@
 #include "nt_types.h"
 #include "config.h"
 
+#include <sub_proc.h>
 #include <assert.h>
 
 #ifndef assert
@@ -860,6 +861,11 @@ char * to_dos_slash(char * w)
  */
 int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn_env)
 {
+	HANDLE handleProcess = NULL;
+	int process_id;
+	int pid = 0; // used as return code(sub-process exit code) when mode=sync
+	(void)pcShortCommand;
+/*
    char *pcCmdStr = NULL;
    int i = 0;
    int iCount = 0;
@@ -867,7 +873,6 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
    int iCreateRc = 0;
    STARTUPINFO si;
    PROCESS_INFORMATION pi;
-   int pid = 0;
    char * nt_env = make_nt_env((const char **) spawn_env);
 
    ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
@@ -876,9 +881,9 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
    si.dwFlags =  STARTF_USESHOWWINDOW;
    si.wShowWindow = SW_SHOW;
 
-   si.hStdOutput = INVALID_HANDLE_VALUE; /* use stdout */
-   si.hStdError = INVALID_HANDLE_VALUE; /* use stderr */
-   si.hStdInput = INVALID_HANDLE_VALUE; /* use stdin */
+   si.hStdOutput = INVALID_HANDLE_VALUE; 
+   si.hStdError = INVALID_HANDLE_VALUE; 
+   si.hStdInput = INVALID_HANDLE_VALUE; 
 
    iCount = 1;
    for (i=0; args[i] != NULL; i++)
@@ -901,7 +906,7 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
          strcat(pcCmdStr, " ");
       }
    }
-
+*/
    {
       int iSleepBeforeExec = get_sleep_time_before_spawn();
 
@@ -914,45 +919,50 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
 	//[2009-12-29] Chj: With make statement
 	//   _temp := $(shell showargs "V1=a" bb 1>&2)
 	// This CreateProcess will be called.
-   iCreateRc = CreateProcess(args[0], /* application name */
-                             pcCmdStr, /* command string */
-                             NULL, /* sec attribs */
-                             NULL, /* thread sec attribus */
-                             TRUE, /* inherit handles */
-                             0,
-                             nt_env, /* environment */
-                             NULL, /* current directory */
-                             &si, /* startup info */
-                             &pi); /* process info */
+//    iCreateRc = CreateProcess(args[0], /* application name */
+//                              pcCmdStr, /* command string */
+//                              NULL, /* sec attribs */
+//                              NULL, /* thread sec attribus */
+//                              TRUE, /* inherit handles */
+//                              0,
+//                              nt_env, /* environment */
+//                              NULL, /* current directory */
+//                              &si, /* startup info */
+//                              &pi); /* process info */
+	// [2010-01-01] Use the great GNU make 3.81's process_easy instead!
 
-   if (0 == iCreateRc)
+   maybe_make_export_env();
+			// This will include those ``export VAR=value'' variables.
+   spawn_env = nt_make_spwan_env(export_env);
+
+   handleProcess = process_easy_return_winkhandle(args, spawn_env, &process_id);
+
+   if (NULL == handleProcess)
    {
       pid = -1;
 
       goto _quit_;
    }
 
-   pid = pi.dwProcessId;
-
    if (_P_WAIT == mode)
    {
       /* wait for the child to terminate */
-      WaitForSingleObject(pi.hProcess, INFINITE);
+      WaitForSingleObject(handleProcess, INFINITE);
 
-      GetExitCodeProcess(pi.hProcess, &pid);
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
+      GetExitCodeProcess(handleProcess, &pid);
+      CloseHandle(handleProcess);
    }
    else
    {
+	   _assert("Chj: Unexpected: mode!=_P_WAIT", __FILE__, __LINE__); // chj
       /* add handle to "to-be-closed" list */
-      nt_add_running_child(pi.hProcess, pcCmdStr);
+      // nt_add_running_child(pi.hProcess, pcCmdStr);
       /* close handles no longer needed */
-      CloseHandle(pi.hThread);
+      // CloseHandle(pi.hThread);
    }
 
   _quit_:
-   if (NULL != pcCmdStr)
+/*   if (NULL != pcCmdStr)
    {
       xfree(pcCmdStr);
    }
@@ -960,7 +970,7 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
    {
       xfree(nt_env);
    }
-
+*/
    return(pid);
 }
 

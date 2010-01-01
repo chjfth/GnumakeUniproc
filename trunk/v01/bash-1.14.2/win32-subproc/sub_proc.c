@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with
 GNU Make; see the file COPYING.  If not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <process.h>  /* for msvc _beginthreadex, _endthreadex */
@@ -40,7 +41,8 @@ typedef struct sub_process_t {
 	volatile DWORD outcnt;
 	char * volatile errp;
 	volatile DWORD errcnt;
-	int pid;
+	int pid; // chj: this is the HANDLE returned by CreateProcess
+	int process_id; // chj added.
 	int exit_code;
 	int signal;
 	long last_err;
@@ -563,6 +565,8 @@ process_begin(
 	}
 
 	pproc->pid = (int)procInfo.hProcess;
+	pproc->process_id = procInfo.dwProcessId;
+
 	/* Close the thread handle -- we'll just watch the process */
 	CloseHandle(procInfo.hThread);
 
@@ -934,6 +938,29 @@ process_cleanup(
 	free(pproc);
 }
 
+void
+process_cleanup_rest(
+	HANDLE proc)
+{
+	sub_process *pproc = (sub_process *)proc;
+	int i;
+	
+	if (pproc->using_pipes) {
+		for (i= 0; i <= 1; i++) {
+			if ((HANDLE)pproc->sv_stdin[i])
+				CloseHandle((HANDLE)pproc->sv_stdin[i]);
+			if ((HANDLE)pproc->sv_stdout[i])
+				CloseHandle((HANDLE)pproc->sv_stdout[i]);
+			if ((HANDLE)pproc->sv_stderr[i])
+				CloseHandle((HANDLE)pproc->sv_stderr[i]);
+		}
+	}
+//	if ((HANDLE)pproc->pid) 
+//		CloseHandle((HANDLE)pproc->pid);
+	
+	free(pproc);
+}
+
 
 /*
  * Description:
@@ -1181,18 +1208,31 @@ make_command_line( char *shell_name, char *full_exec_path, char **argv)
  *		process_wait_for_any().
  *
  * Returns:
+ *	 Chj: the return value must be freed with process_cleanup()
  *
  * Notes/Dependencies:
  */
+
 HANDLE
 process_easy(
+	 char **argv,
+	 char **envp)
+{
+	return process_easy_return_id(argv, envp, NULL);
+}
+
+HANDLE
+process_easy_return_id(
 	char **argv,
-	char **envp)
+	char **envp,
+	int *p_process_id)
 {
   HANDLE hIn;
   HANDLE hOut;
   HANDLE hErr;
-  HANDLE hProcess;
+  HANDLE hProcess; 
+	// Chj: Be aware! This is not the Windows kernel object HANDLE, but a sub_process* .
+	// Use process_cleanup() later to clean it up.
 
   if (proc_index >= MAXIMUM_WAIT_OBJECTS) {
 	DB (DB_JOBS, ("process_easy: All process slots used up\n"));
@@ -1250,7 +1290,47 @@ process_easy(
     CloseHandle(hErr);
   }
 
+  if(p_process_id)
+	*p_process_id = ((sub_process*) hProcess)->process_id;
+
   process_register(hProcess);
 
   return hProcess;
 }
+
+HANDLE // return true windows kernel object handle(the same as CreateProcess)
+process_easy_return_winkhandle(char **argv, char **envp, int *process_id)
+{
+	// This function will not wait until sub-process's exit
+
+	sub_process *proc = process_easy_return_id(argv, envp, process_id);
+	int winerr = proc->last_err;
+	HANDLE handleProcess = (HANDLE)(proc->pid);
+
+	process_cleanup_rest(proc); 
+	// !! Chj: Ooups. I found I can't do this, otherwise, stdin/stdout goes problematic.
+	// That is: user must do this!
+	
+	if(winerr)
+		return NULL;
+	else
+		return handleProcess; // to be CloseHandle by caller
+}
+
+
+int // return sub-process error code
+process_easy_wait_process_done(char **argv, char **envp, int *process_id)
+{
+	DWORD waitre = -1, exitcode = -1;
+	HANDLE handleProcess = process_easy_return_winkhandle(argv, envp, process_id);
+	if(handleProcess==NULL)
+		return -1;
+
+	waitre = WaitForSingleObject(handleProcess, INFINITE);
+	assert(waitre==WAIT_OBJECT_0);
+
+	GetExitCodeProcess(handleProcess, &exitcode);
+	CloseHandle(handleProcess);
+	return exitcode;
+}
+

@@ -49,4 +49,6 @@ extern DWORD nt_parse_and_execute_thread(void * param);
 void do_piping (int pipe_in, int pipe_out) ;
 int do_redirections2(REDIRECT * list, int for_real, int internal, int set_clexec, int bypass_buf_dup);
 
+char **nt_make_spwan_env(char **orig_env);
+
 #endif /* #ifdef NT_TYPES_DOT_H */

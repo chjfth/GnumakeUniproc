@@ -43,6 +43,10 @@ EXTERN_DECL(void process_cleanup, (HANDLE proc));
 EXTERN_DECL(HANDLE process_wait_for_any, (VOID_DECL));
 EXTERN_DECL(void process_register, (HANDLE proc));
 EXTERN_DECL(HANDLE process_easy, (char** argv, char** env));
+EXTERN_DECL(HANDLE process_easy_return_id, (char **argv, char **envp, int *process_id));
+EXTERN_DECL(HANDLE process_easy_return_winkhandle, (char **argv, char **envp, int *process_id));
+EXTERN_DECL(int process_easy_wait_process_done, (char **argv, char **envp, int *process_id));
+
 EXTERN_DECL(BOOL process_kill, (HANDLE proc, int signal));
 EXTERN_DECL(int process_used_slots, (VOID_DECL));
 

@@ -461,7 +461,7 @@ execute_command_internal_from_thread (command,
 	  char *wincmdline = NULL;
 	  char *win_argv[4] = {0};
 	  char **spawn_env = NULL;
-	  int i, j, ret = 254;
+	  int ret = 254;
       pid_t paren_pid;
 
       /* Fork a subshell, turn off the subshell bit, turn off job
@@ -486,7 +486,8 @@ execute_command_internal_from_thread (command,
 			// This will include those ``export VAR=value'' variables.
 		spawn_env = nt_make_spwan_env(export_env);
 		
-		process_easy(win_argv, spawn_env);
+		//process_easy(win_argv,spawn_env);
+		ret = process_easy_wait_process_done(win_argv, spawn_env, NULL);
 		
 		return ret; // Chj: Yes, we're done for the subshell. We can return now.
 
