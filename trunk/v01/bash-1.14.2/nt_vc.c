@@ -693,16 +693,16 @@ nt_make_word_array (first,list)
   for (; list; count++)
   {
      char * word = list->word->word ;
-     if (!count)
-     {
-        array[count] = xmalloc (1 + strlen (word)) ;
-        strcpy(array[count], word);
-     }
-     else
-     {
-        array[count] = xmalloc (1 + strlenquote (word)) ;
-        strcpyquote(array[count], word);
-     }
+//      if (!count)
+//      {
+         array[count] = xmalloc (1 + strlen (word)) ;
+         strcpy(array[count], word);
+//      }
+//      else  // [2010-01-01] Chj comment! process_easy() will do the \ and " quote actions for us!
+//      {
+//         array[count] = xmalloc (1 + strlenquote (word)) ;
+//         strcpyquote(array[count], word);
+//      }
      list = list->next;
   }
   array[count] = (char *)NULL;
