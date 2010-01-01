@@ -25,6 +25,8 @@
 #include <malloc.h>
 #include <io.h>
 #include <trap.h>
+#include <assert.h>
+#include <win32-extra.h>
 char * find_hashed_filename_nt(const char *);
 /*#include <windows.h>*/
 #endif
@@ -451,8 +453,10 @@ execute_command_internal_from_thread (command,
        (pipe_out != NO_PIPE || pipe_in != NO_PIPE || asynchronous)))
   {
 	  const char *pcShellName = nt_get_shell_binary();
-	  char *cmd_for_sh = NULL;
-	  char wincmd[32800] = "";
+//	  char *cmd_for_sh_c = NULL;
+//	  char wincmd[32800] = "";
+	  char *wincmdline = NULL;
+	  char *win_argv[4] = {0};
 	  int i, j, ret = 254;
       pid_t paren_pid;
 
@@ -463,27 +467,19 @@ execute_command_internal_from_thread (command,
 //      paren_pid = make_child (ss, 
 //			      asynchronous);
 
+		command->flags &= ~(CMD_FORCE_SUBSHELL | CMD_WANT_SUBSHELL | CMD_INVERT_RETURN);
+
 		// [2009-12-30] Chj >>> 
 		// Construct a new windows command line and execute it with 
 		//	sh -c "<command-line>"
-		sprintf(wincmd, "%s -c \"", pcShellName);
-
-		command->flags &= ~(CMD_FORCE_SUBSHELL | CMD_WANT_SUBSHELL | CMD_INVERT_RETURN);
-		cmd_for_sh = make_command_string(command);
-
-		// Copy cmd_for_sh into wincmd, with " translated into \"
-		i = strlen(wincmd);
-		for(j=0; cmd_for_sh[j]; j++)
-		{
-			if(cmd_for_sh[j]=='\"')
-				wincmd[i++] = '\\', wincmd[i++] = '\"';
-			else
-				wincmd[i++] = cmd_for_sh[j];
-		}
-		wincmd[i++] = '\"';
-		wincmd[i] = '\0';
-
-		ret = execute_wincmd(wincmd);
+	
+		win_argv[0] = nt_get_shell_binary();
+		win_argv[1] = "-c";
+		win_argv[2] = make_command_string(command);
+		win_argv[3] = NULL;
+		wincmdline = make_command_line(NULL, NULL, win_argv);
+		ret = execute_wincmd(wincmdline);
+		free(wincmdline);
 		return ret;
 
 		// [2009-12-30] Chj <<<

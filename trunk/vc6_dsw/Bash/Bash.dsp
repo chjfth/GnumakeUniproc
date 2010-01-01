@@ -295,12 +295,20 @@ SOURCE="..\..\v01\bash-1.14.2\lib\readline\vi_mode.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\v01\bash-1.14.2\win32-extra.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\v01\bash-1.14.2\y_tab.c"
 # End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-extra.h"
+# End Source File
 # End Group
 # End Target
 # End Project

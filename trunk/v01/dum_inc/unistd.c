@@ -981,27 +981,3 @@ long ulimit(int a, long b)
 	return 1000000 ;
 }
 
-////////////// Chj:
-
-int execute_wincmd(char *wincmd)
-{
-	DWORD process_exitcode = 0;
-	STARTUPINFO sti = { sizeof(STARTUPINFO) };
-	PROCESS_INFORMATION psi;
-	BOOL b = CreateProcess(NULL, wincmd, NULL, NULL,
-		FALSE,
-		0,
-		NULL, NULL,
-		&sti, &psi);
-	if(b)
-	{
-		WaitForSingleObject(psi.hProcess, INFINITE);
-		GetExitCodeProcess(psi.hProcess, &process_exitcode);
-		
-		CloseHandle(psi.hThread);
-		CloseHandle(psi.hProcess);
-		return process_exitcode;
-	}
-	else
-		return GetLastError();
-}
