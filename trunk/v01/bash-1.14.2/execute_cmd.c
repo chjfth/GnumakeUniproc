@@ -27,6 +27,7 @@
 #include <trap.h>
 #include <assert.h>
 #include <win32-extra.h>
+	#include <windows.h>
 char * find_hashed_filename_nt(const char *);
 /*#include <windows.h>*/
 #endif
@@ -478,9 +479,10 @@ execute_command_internal_from_thread (command,
 		win_argv[2] = make_command_string(command);
 		win_argv[3] = NULL;
 		wincmdline = make_command_line(NULL, NULL, win_argv);
-		ret = execute_wincmd(wincmdline);
+		ret = execute_wincmd(wincmdline); // wait it done
 		free(wincmdline);
-		return ret;
+		
+		return ret; // Chj: Yes, we're done for the subshell. We can return now.
 
 		// [2009-12-30] Chj <<<
 
@@ -3183,6 +3185,7 @@ do_redirections2 (list, for_real, internal, set_clexec, bypass_buf_dup)
         switch (error)
         {
            case AMBIGUOUS_REDIRECT:
+			   DebugBreak();
               report_error ("%s: Ambiguous redirect", filename);
               break;
               

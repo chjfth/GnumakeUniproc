@@ -74,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug/sh.exe" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib Advapi32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug/sh.exe" /pdbtype:sept
 
 !ENDIF 
 
@@ -85,6 +85,30 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "win32-subproc"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-subproc\db_level.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-subproc\misc.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-subproc\proc.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-subproc\sub_proc.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\v01\bash-1.14.2\win32-subproc\w32err.c"
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE="..\..\v01\bash-1.14.2\alias.c"
