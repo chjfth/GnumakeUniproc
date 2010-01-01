@@ -27,7 +27,9 @@
 #include <trap.h>
 #include <assert.h>
 #include <win32-extra.h>
-	#include <windows.h>
+
+#include <windows.h> // For HANDLE definition
+#include <sub_proc.h>
 char * find_hashed_filename_nt(const char *);
 /*#include <windows.h>*/
 #endif
@@ -458,12 +460,13 @@ execute_command_internal_from_thread (command,
 //	  char wincmd[32800] = "";
 	  char *wincmdline = NULL;
 	  char *win_argv[4] = {0};
+	  char **spawn_env = NULL;
 	  int i, j, ret = 254;
       pid_t paren_pid;
 
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
-	  char *ss = savestring (make_command_string (command));
+	  char *sstemp = savestring (make_command_string (command)); // chj TEMP to delete
 //fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X cmdflag=0x%X\n", ss, asynchronous, command->redirects, command->flags); fflush(stderr); //chj
 //      paren_pid = make_child (ss, 
 //			      asynchronous);
@@ -478,9 +481,12 @@ execute_command_internal_from_thread (command,
 		win_argv[1] = "-c";
 		win_argv[2] = make_command_string(command);
 		win_argv[3] = NULL;
-		wincmdline = make_command_line(NULL, NULL, win_argv);
-		ret = execute_wincmd(wincmdline); // wait it done
-		free(wincmdline);
+		
+		maybe_make_export_env();
+			// This will include those ``export VAR=value'' variables.
+		spawn_env = nt_make_spwan_env(export_env);
+		
+		process_easy(win_argv, spawn_env);
 		
 		return ret; // Chj: Yes, we're done for the subshell. We can return now.
 

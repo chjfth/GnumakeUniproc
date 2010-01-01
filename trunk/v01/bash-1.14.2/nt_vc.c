@@ -189,7 +189,7 @@ char * make_nt_env(const char ** env)
  * This is simply a copy of the original environment, but with
  * a NT-style PATH variable
  */
-static char **nt_make_spwan_env(char **orig_env)
+char **nt_make_spwan_env(char **orig_env)
 {
    int i;
    int iLength = 0;
