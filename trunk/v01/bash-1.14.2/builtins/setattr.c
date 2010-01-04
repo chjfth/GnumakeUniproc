@@ -1,5 +1,5 @@
 /* setattr.c, created from setattr.def. */
-#line 23 "./setattr.def"
+//#line 23 "./setattr.def"
 
 #include "../shell.h"
 #include "common.h"
@@ -9,7 +9,7 @@ extern int array_needs_making;
 extern char *this_command_name;
 extern char * nt_remove_cr_string(char * str);
 
-#line 42 "./setattr.def"
+//#line 42 "./setattr.def"
 
 /* For each variable name in LIST, make that variable appear in the
    environment passed to simple commands.  If there is no LIST, then
@@ -22,7 +22,7 @@ export_builtin (list)
   return (set_or_show_attributes (list, att_exported));
 }
 
-#line 65 "./setattr.def"
+//#line 65 "./setattr.def"
 
 /* For each variable name in LIST, make that variable readonly.  Given an
    empty LIST, print out all existing readonly variables. */
