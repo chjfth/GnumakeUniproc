@@ -66,4 +66,8 @@ extern Function *builtin_address ();
 extern char *single_quote ();
 extern char *double_quote ();
 
+enum { for_var_size = 4000};
+extern char g_for_dyna_var_assign[];
+
+
 #endif /* !__COMMON_H */

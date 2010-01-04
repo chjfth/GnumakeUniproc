@@ -26,7 +26,6 @@
 #include <io.h>
 #include <trap.h>
 #include <assert.h>
-#include <win32-extra.h>
 
 #include <windows.h> // For HANDLE definition
 #include <sub_proc.h>
@@ -96,6 +95,7 @@ void delete_all_aliases ();
 
 #include "unwind_prot.h"
 
+extern int array_needs_making;
 
 extern int posixly_correct;
 extern int breaking, continuing, loop_level;
@@ -466,7 +466,7 @@ execute_command_internal_from_thread (command,
 
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
-	  char *sstemp = savestring (make_command_string (command)); // chj TEMP to delete
+//	  char *sstemp = savestring (make_command_string (command)); // chj TEMP to delete
 //fprintf(stderr, "ss=[%s] asynchronous=%d redirects-ptr=0x%X cmdflag=0x%X\n", ss, asynchronous, command->redirects, command->flags); fflush(stderr); //chj
 //      paren_pid = make_child (ss, 
 //			      asynchronous);
@@ -1200,6 +1200,20 @@ execute_command_internal (command, asynchronous, pipe_in, pipe_out,
 	while (0)
 #endif /* !JOB_CONTROL */
 
+// 2010-01-04 Chj: (this function no use!)
+void export_forvar_as_envvar(const char *var, const char *val)
+{
+	char buf[4096] = {0}; // hope enough
+
+	WORD_LIST wlist_var = {0}, wlist_val = {0};
+	WORD_DESC wdesc_var = {"export"}, wdesc_val = {buf}; // buf fill later
+
+	wlist_var.next = &wlist_val; wlist_var.word = &wdesc_var;
+
+	_snprintf(buf, sizeof(buf-1), "%s=%s", var, val);
+
+	execute_builtin_or_function(wlist_var, export_builtin, NULL, NULL, NULL, 0);
+}
 
 /* Execute a FOR command.  The syntax is: FOR word_desc IN word_list;
    DO command; DONE */
@@ -1242,7 +1256,16 @@ execute_for_command (for_command)
     {
       QUIT;
       bind_variable (identifier, list->word->word);
+		//[2010-01-04] chj: list->word->word has been expanded -- if it contained var reference.
+
+	  _snprintf(g_for_dyna_var_assign, for_var_size-1, "%s=%s", identifier, list->word->word);
+	  array_needs_making = 1;
+		//[2010-01-04] Chj add.
+
       execute_command (for_command->action);
+
+	  g_for_dyna_var_assign[0] = '\0';
+
       retval = last_command_exit_value;
       REAP ();
       QUIT;
@@ -2411,7 +2434,7 @@ execute_subshell_builtin_or_function (words, redirects, builtin, var,
 
    If BUILTIN is exec_builtin, the redirections specified in REDIRECTS are
    not undone before this function returns. */
-static int
+int
 execute_builtin_or_function (words, builtin, var, redirects,
 			     fds_to_close, flags)
      WORD_LIST *words;
@@ -2875,16 +2898,6 @@ shell_execve_async (command, args, env, asynchronous)
    char **args_new = NULL;
 	int i=0, slen=0;
 	
-	char wincmd[32800] = "";
-//	sprintf(wincmd, "%s ", command);
-	for(i=0; args[i]!=NULL; i++)
-	{
-		slen = strlen(wincmd);
-		sprintf(wincmd+slen, "\"%s\" ", args[i]);
-	}
-	slen = strlen(wincmd);
-	wincmd[slen-1] = '\0';
-	
    /*fprintf(stderr, "shell_execve command %s\n", command); fflush(stderr); */
 #if defined (isc386) && defined (_POSIX_SOURCE)
   __setostype (0);		/* Turn on USGr3 semantics. */
@@ -2904,11 +2917,18 @@ shell_execve_async (command, args, env, asynchronous)
      {
         return(iRc);
      }
+	 
+	 return -1;
   }
+
+  fprintf(stderr, "winbash.Chj: 2010-01-04 Should not get here!\n"); fflush(stderr);
+//  DebugBreak();
 
   /* fprintf(stderr, "shell_execve  command %s --- %d\n", command, __LINE__); fflush(stderr); */
 #endif
 #endif /* !(isc386 && _POSIX_SOURCE) */
+
+  DebugBreak();
 
   /* If we get to this point, then start checking out the file.
      Maybe it is something we can hack ourselves. */
@@ -2981,7 +3001,8 @@ shell_execve_async (command, args, env, asynchronous)
               // fprintf(stderr, "shell_execve command [%s]\n", wincmd); fflush(stderr); //chj debug
              // report_error ("%s: cannot execute binary fileX", command);
              // return (EX_BINARY_FILE);
-             return execute_wincmd(wincmd);
+			  _assert("Chj: Unexpected! Should not get here!", __FILE__, __LINE__); // chj(old comment)
+             //return execute_wincmd(wincmd);
           }
        }
        

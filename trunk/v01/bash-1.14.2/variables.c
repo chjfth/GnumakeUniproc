@@ -49,6 +49,9 @@ extern time_t shell_start_time;
    the environment. */
 HASH_TABLE *shell_variables = (HASH_TABLE *)NULL;
 
+// 2010-01-04 Chj: 
+char g_for_dyna_var_assign[for_var_size];
+
 /* The list of shell functions that the user has created, or that came from
    the environment. */
 HASH_TABLE *shell_functions = (HASH_TABLE *)NULL;
@@ -1824,6 +1827,10 @@ maybe_make_export_env ()
       if (temporary_env)
    for (i = 0; temporary_env[i]; i++)
      export_env = add_or_supercede (temporary_env[i], export_env);
+
+		// 2010-01-04 Chj: This "exports" the variable in 'for' prelude to commands in 'for' cycle body
+		if(g_for_dyna_var_assign[0])
+			export_env = add_or_supercede(g_for_dyna_var_assign, export_env);
 
       /* If we changed the array, then sort it alphabetically. */
       if (temporary_env || function_env)
