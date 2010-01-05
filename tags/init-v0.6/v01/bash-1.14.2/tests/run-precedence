@@ -1,2 +1,0 @@
-../bash ./precedence > xx
-diff xx prec.right && rm -f xx

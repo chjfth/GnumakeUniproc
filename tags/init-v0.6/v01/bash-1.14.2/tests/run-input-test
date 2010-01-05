@@ -1,2 +1,0 @@
-../bash < ./input-line.sh > xx
-diff xx input.right && rm -f xx
