@@ -754,7 +754,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\" 1>&2;\
 				echo \"  Current:  $(_p_ThisMakefile)\" 1>&2;\
 				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(_SelfCoEvScSource)),\$$(word 2,$(_SelfCoEvScSource)),\$$(word 3,$(_SelfCoEvScSource)),\$$(word 4,$(_SelfCoEvScSource)))\" 1>&2;\
-				echo \"  Both to local dir: \$$(dir $(_p_SelfCoEvCheckTime))\" 1>&2;\
+				echo \"  Both checkout to local dir: \$$(dir $(_p_SelfCoEvCheckTime))\" 1>&2;\
 				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_p_SelfCoEvCheckTime)))\" 1>&2;\
 				)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_DoCheckout_shsubst) ;\
@@ -874,15 +874,13 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo -e "\t@echo \"  ModuleDir = $(SubprjEvCvsModuleDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  LocalDir = $(SubprjEvCvsLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo ------------------------------------------------------------------------------" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t\$$(if \$$(wildcard $(SubprjEvCvsLocalDir)),,\$$(_MD) $(SubprjEvCvsLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\tcd $(SubprjEvCvsLocalDir);\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvCvsLocalDir)' for doing cvs-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
-		echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: cvs-checkout fail.; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\t)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvCvsLocalDir)),,\$$(_MD) $(SubprjEvCvsLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\tcd $(SubprjEvCvsLocalDir);\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvCvsLocalDir)' for doing cvs-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
+			echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: cvs-checkout fail.; exit \$$\$$CmdRet; fi ;" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo -e "\t@\$$(call _AppendLogCountCompile,V)" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo  "endif # ifeq (CVS,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 \
@@ -891,17 +889,15 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SubprjEvSvnRev))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  From = $(SubprjEvSvnUrl)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  To   = $(SubprjEvSvnLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(_MD) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\tcd $(SubprjEvSvnLocalDir) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvSvnLocalDir)' for doing svn-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\techo \"    => \`pwd\`\";\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\techo ------------------------------------------------------------------------------;\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
-		echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: svn-checkout fail.; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo -e "\t)" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(_MD) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\tcd $(SubprjEvSvnLocalDir) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvSvnLocalDir)' for doing svn-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\techo \"    => \`pwd\`\";\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\techo ------------------------------------------------------------------------------;\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			$(if $(gmu_NO_LOG_CO_CMD_TO_FILE),,echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" > $(_fnameLogCheckoutCmd) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;)\
+			echo -e "\t$(_SubprjCoShcmdEvEcho) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo !GMU!Error: svn-checkout fail.; exit \$$\$$CmdRet; fi ;" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo -e "\t@\$$(call _AppendLogCountCompile,S)" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo  "endif # ifeq (SVN,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 \
@@ -922,7 +918,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\" 1>&2;\
 				echo \"  Current : \$$(_p_ParentMakefile)\" 1>&2;\
 				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(SubprjEvScSource)),\$$(word 2,$(SubprjEvScSource)),\$$(word 3,$(SubprjEvScSource)),\$$(word 4,$(SubprjEvScSource)))\" 1>&2;\
-				echo \"  Both to local dir: \$$(dir $(_SubprjEvScCheckTime))\" 1>&2;\
+				echo \"  Both checkout to local dir: \$$(dir $(_SubprjEvScCheckTime))\" 1>&2;\
 				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_SubprjEvScCheckTime)))\" 1>&2;\
 				)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
