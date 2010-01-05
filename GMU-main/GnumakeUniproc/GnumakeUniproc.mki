@@ -102,7 +102,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
     		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
     		if [ ! -d $${_shDirToCreate} ]; then $(_MD) $${_shDirToCreate}; fi; \
-    		if (echo -n "" > $$v); then echo -n ''; else echo $$v; exit; fi; \
+    		if echo -n "" > $$v; then echo -n ''; else echo $$v; exit; fi; \
     	done; )
     ifneq (,$(_temp))
       $(error !GMU!Error: Fail to clear requested `gmu_up_list_STARTUP_CLEAR_FILES': $(_temp))
@@ -1098,18 +1098,18 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 			_tmp_mkf=\$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile)); \
 			_tmp_atf=$(SubprjEvHisMakefileAttr); \
 			if [ ! -f \$$\$$_tmp_atf ] || [ \$$\$$_tmp_atf -ot $(gmu_p_BuildStartCkt) ]; \
-				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(_MD) $(SubprjEvOutdirGMUTMP);fi; (echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf); echo PrevCmdSuccess; \
+				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(_MD) $(SubprjEvOutdirGMUTMP);fi; echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf; echo PrevCmdSuccess; \
 			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] $(if $(gmu_IS_USING_POOR_SH_EXE),,|| [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]); \
 				then echo PrevCmdSuccess; \
 			else echo \"\`cat \$$\$$_tmp_atf\`\"; \
 			fi ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "    _temp2 := \$$(shell ( \
-				echo \"!GMU!Error: The following two Makefiles share the same GMU-project-name [ $(SubprjEvPrjname) ]:\"; \
-				echo \"  Existed: \$$(_temp)\"; \
-				echo \"  ToMake : \$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile))\"; \
-				echo \"  CurDir = $(CURDIR)\"; \
-			    ) 1>&2 ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _temp2 := \$$(shell \
+				echo \"!GMU!Error: The following two Makefiles share the same GMU-project-name [ $(SubprjEvPrjname) ]:\" 1>&2; \
+				echo \"  Existed: \$$(_temp)\" 1>&2; \
+				echo \"  ToMake : \$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile))\" 1>&2; \
+				echo \"  CurDir = $(CURDIR)\" 1>&2; \
+			    ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  _LoopAgainst := \$$(shell _tmp_ckf=$(SubprjEvFnCheckInProgress); \
@@ -1119,10 +1119,10 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "  ifneq (\$$(strip \$$(_LoopAgainst)),)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    $${SubPrj}_IsLooped = 1" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "   ifeq (\$$(notdir \$$(_p_ThisMakefile)),_MakeSubPrjs.gmu.mk) # if not this check, the same info will output twice" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "    _tmp := \$$(shell ( echo \"!GMU!Info: A sub-project with refname {$${SubPrj}} loop against ancestor project[ $(SubprjEvPrjname) ], whose makefile is:\"; \
-				echo \"    $(SubprjEvMakefile)\"; echo '  i.e.' ;\
-				echo \"    \`cat $(SubprjEvHisMakefileAttr)\`\"; \
-				echo "" ) 1>&2 )" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "    _tmp := \$$(shell  echo \"!GMU!Info: A sub-project with refname {$${SubPrj}} loop against ancestor project[ $(SubprjEvPrjname) ], whose makefile is:\" 1>&2; \
+				echo \"    $(SubprjEvMakefile)\" 1>&2; echo '  i.e.' 1>&2;\
+				echo \"    \`cat $(SubprjEvHisMakefileAttr)\`\" 1>&2; \
+				echo '' 1>&2 )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "   endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "endif # ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
