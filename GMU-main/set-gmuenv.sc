@@ -8,7 +8,7 @@ _gmu_rel2abs ()
 {
 	if [ "$1" = "" ]; then return 4; fi
 
-	if cd $1; then echo $(pwd)
+	if cd $1 >/dev/null; then echo $(pwd)
 	else return 5; fi
 }
 

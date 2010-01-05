@@ -304,7 +304,7 @@ gmuf_OutputInfo_e = $(shell echo -e "$(call _RevertCommaInBrackets,$(subst `,\`,
 gmuf_lastword = $(if $(_gmu_isAboveGnumake381),$(lastword $1),$(word $(words $1),$1))
 
 gmuf_ChopFinalWord = $(wordlist 2,$(words $1),x $1)
-gmuf_RemoveDuplicate = $(if $1,$(call gmuf_RemoveDuplicate,$(call gmuf_ChopFinalWord,$1)) $(if $(filter $(call gmuf_lastword,$1),$(call gmuf_ChopFinalWord,$1)),,$(call gmuf_lastword,$1)))
+gmuf_RemoveDuplicate = $(if $(strip $1),$(call gmuf_RemoveDuplicate,$(call gmuf_ChopFinalWord,$1)) $(if $(filter $(call gmuf_lastword,$1),$(call gmuf_ChopFinalWord,$1)),,$(call gmuf_lastword,$1)))
 	# Remove duplicate words in $1, but not sorting.
 	# Thanks to the GMSL library for this function
 
