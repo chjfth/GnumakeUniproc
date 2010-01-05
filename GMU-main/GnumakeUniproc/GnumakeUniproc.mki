@@ -1345,4 +1345,4 @@ gmu_ut_Always: ;
 #	(echo "" > tdir); echo 2nd
 # BTW: if the first command is not echo(actually the `echo' in that situation
 # is sh.exe's internal command), that problem does not arise.
-
+# [2010-01-05] win-bash does not have this problem!

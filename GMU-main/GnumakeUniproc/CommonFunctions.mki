@@ -4,7 +4,7 @@ _Gmu_CommonFunctions_included :=1
 
 ifdef windir # This is for GMU running on Microsoft Windows.
   tmp := $(shell echo "")
-	# [2008-08-19] This is a small trick to work around make.exe calling sh.exe, see today's comment in private-doc for detail.
+	# [2008-08-19] This is a small trick to work around make.exe calling mame.net's sh.exe, see today's comment in private-doc for detail.
 endif
 
 # [2009-12-21] Include GMSL(GNU Make Standard Library) from http://gmsl.sourceforge.net
