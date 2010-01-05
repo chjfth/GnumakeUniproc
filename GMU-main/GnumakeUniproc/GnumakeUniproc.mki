@@ -748,15 +748,15 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 		echo  "    ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo  "      _mkvPrevSc:=\$$(shell \
 				cat $(_p_SelfCoEvCheckTime) )" >> $(_p_mk_DoCheckout_shsubst) ;\
-		echo  "      _temp2 :=   \$$(shell ( \
-				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\"; \
-				echo \"  Previous: \$$(_temp)\"; \
-				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\"; \
-				echo \"  Current:  $(_p_ThisMakefile)\"; \
-				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(_SelfCoEvScSource)),\$$(word 2,$(_SelfCoEvScSource)),\$$(word 3,$(_SelfCoEvScSource)),\$$(word 4,$(_SelfCoEvScSource)))\"; \
-				echo \"  Both to local dir: \$$(dir $(_p_SelfCoEvCheckTime))\"; \
-				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_p_SelfCoEvCheckTime)))\"; \
-				) 1>&2 )" >> $(_p_mk_DoCheckout_shsubst) ;\
+		echo  "      _temp2 :=   \$$(shell \
+				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\" 1>&2;\
+				echo \"  Previous: \$$(_temp)\" 1>&2;\
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\" 1>&2;\
+				echo \"  Current:  $(_p_ThisMakefile)\" 1>&2;\
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(_SelfCoEvScSource)),\$$(word 2,$(_SelfCoEvScSource)),\$$(word 3,$(_SelfCoEvScSource)),\$$(word 4,$(_SelfCoEvScSource)))\" 1>&2;\
+				echo \"  Both to local dir: \$$(dir $(_p_SelfCoEvCheckTime))\" 1>&2;\
+				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_p_SelfCoEvCheckTime)))\" 1>&2;\
+				)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo  "    endif # NOT PrevCmdSuccess" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo  "  endif # $(_p_SelfCoEvCheckTime) not older than bulid start" >> $(_p_mk_DoCheckout_shsubst) ;\
@@ -916,15 +916,15 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo  "    ifneq (\$$(strip \$$(_temp)),PrevCmdSuccess)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo  "      _mkvPrevSc:=\$$(shell \
 				cat $(_SubprjEvScCheckTime) )" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
-		echo  "      _temp2 :=   \$$(shell ( \
-				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\"; \
-				echo \"  Previous: \$$(_temp)\"; \
-				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\"; \
-				echo \"  Current : \$$(_p_ParentMakefile)\"; \
-				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(SubprjEvScSource)),\$$(word 2,$(SubprjEvScSource)),\$$(word 3,$(SubprjEvScSource)),\$$(word 4,$(SubprjEvScSource)))\"; \
-				echo \"  Both to local dir: \$$(dir $(_SubprjEvScCheckTime))\"; \
-				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_SubprjEvScCheckTime)))\"; \
-				) 1>&2 )" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  "      _temp2 :=   \$$(shell \
+				echo \"!GMU!Error: Two makefiles attempt to checkout from different sources to the same local dir:\" 1>&2;\
+				echo \"  Previous: \$$(_temp)\" 1>&2;\
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,\$$(_mkvPrevSc)),\$$(word 2,\$$(_mkvPrevSc)),\$$(word 3,\$$(_mkvPrevSc)),\$$(word 4,\$$(_mkvPrevSc)))\" 1>&2;\
+				echo \"  Current : \$$(_p_ParentMakefile)\" 1>&2;\
+				echo -e \"\$$(call _StrEchoForScSource,\$$(word 1,$(SubprjEvScSource)),\$$(word 2,$(SubprjEvScSource)),\$$(word 3,$(SubprjEvScSource)),\$$(word 4,$(SubprjEvScSource)))\" 1>&2;\
+				echo \"  Both to local dir: \$$(dir $(_SubprjEvScCheckTime))\" 1>&2;\
+				echo \"    => \$$(call _GetAbsPathRelaToCurdir,\$$(dir $(_SubprjEvScCheckTime)))\" 1>&2;\
+				)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo  "      \$$(error !GMU!Error occured. See error reason above!)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo  "    endif # NOT PrevCmdSuccess" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo  "  endif # $(_SubprjEvScCheckTime) older than build start" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
