@@ -43,6 +43,7 @@
 #include "posixstat.h"
 #include "bashansi.h"
 #include <assert.h>
+#include <windows.h>
 
 #if defined (HAVE_VARARGS_H)
 #include <varargs.h>
@@ -271,17 +272,23 @@ static void initialize_signals ();
 static void initialize_terminating_signals ();
 
 // Chj:
-void dump_args(int argc, char **argv)
+void 
+dump_args(int argc, char **argv)
 {
 	int i;
 	FILE *fp;
 	char timestr[40];
-	time_t tnow = time(NULL);
-	struct tm *ptm = localtime(&tnow);
-	sprintf(timestr, "[%d-%02d-%02d %02d:%02d:%02d]", 
-		1900+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+//	time_t tnow = time(NULL);
+//	struct tm *ptm = localtime(&tnow);
+//	sprintf(timestr, "\r\n\r\n[%d-%02d-%02d %02d:%02d:%02d]", 
+//		1900+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+	// Use GetLocalTime() instead of time() to acquire millisecond precision
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	sprintf(timestr, "\r\n\r\n[%d-%02d-%02d %02d:%02d:%02d.%03d]", 
+		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
-	fp = fopen("winbasha.txt", "wb+");
+	fp = fopen("_winbasha.txt", "ab+");
 	if(fp)
 	{
 		fwrite(timestr, 1, strlen(timestr), fp);
@@ -291,6 +298,7 @@ void dump_args(int argc, char **argv)
 	}
 }
 
+int
 main (argc, argv, env)
    int argc;
    char **argv, **env;
@@ -300,7 +308,8 @@ main (argc, argv, env)
    int top_level_arg_index, read_from_stdin;
    FILE *default_input;
 
-  dump_args(argc, argv);
+   if(check_envvar_equal("gmu_WINBASH_DEBUG1", "1"))
+	  dump_args(argc, argv);
 
    /* There is a bug in the NeXT 2.1 rlogind that causes opens
       of /dev/tty to fail. */
@@ -1893,4 +1902,22 @@ isnetconn (fd)
 #    endif /* !S_ISSOCK */
 #  endif /* !HAVE_SOCKETS */
 #endif /* !USGr4 && !USGr4_2 */
+}
+
+int 
+check_envvar_equal(const char *varname, const char *varval)
+{
+	char buf[1024] = {0}; 
+
+	if(GetEnvironmentVariable(varname, buf, sizeof(buf)-1) > 0)
+	{
+		if(strcmp(buf, varval)==0)
+			return 1;
+		else
+			return 0;
+	}
+	else 
+	{	// varname not exist
+		return (varval==NULL || varval[0]=='\0') ? 1 : 0;
+	}
 }

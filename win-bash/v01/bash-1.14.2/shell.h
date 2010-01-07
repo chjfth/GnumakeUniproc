@@ -106,3 +106,7 @@ struct user_info {
 };
 
 extern struct user_info current_user;
+
+// Chj:
+extern int check_envvar_equal(const char *varname, const char *varval);
+	// return 1 if varname's current value equals varval, otherwise 0.
