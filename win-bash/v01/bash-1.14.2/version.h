@@ -2,10 +2,10 @@
    `make newversion' to the Makefile.  It is created by newversion.aux. */
 
 /* The distribution version number of this shell. */
-#define DISTVERSION "win-bash_0.6"
+#define DISTVERSION "win-bash(chj)_0.6"
 
 /* The patch level of this version of the shell. */
-#define PATCHLEVEL 1
+#define PATCHLEVEL 2
 
 /* The last built version of this shell. */
 #define BUILDVERSION 0

@@ -362,7 +362,6 @@ _KickoutPrjname = $(firstword $(subst /, ,$(patsubst $(gmu_ud_OUTPUT_ROOT)/%,%,$
 	# Result:
 	#	MyExe
 
-#_TrShcmd4echo = $(subst $$,\$$\$$,$(subst ",\",$(subst \,\\,$1)))
 _TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
 	# [2006-12-15]
 	# This is a very tricky function useful for generating make commands from your make file.
@@ -380,7 +379,7 @@ _TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
 	# By the way, sh.exe from www.mame.net's internal echo command is too simple to
 	# support `echo -e -n ...', therefore, you have to try this example in a bash shell.
 	#
-	#NOTE: Today(2006-12-15) I've found it is not pratical to use $ in your bash command
+	#NOTE: Today(2006-12-15) I've found it is not practical to use $ in your bash command
 	# for this function, since you can not keep $ literally when a $ is passed to GNUmake
 	# through GNUmake's command line.
 
