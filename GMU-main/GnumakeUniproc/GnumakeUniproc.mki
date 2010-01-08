@@ -1013,7 +1013,7 @@ $(_p_SubprjsAttrMade): $(gmu_p_BuildStartCkt)
 	@echo "  endif" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "endif" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "_d_ParentPrjoutput = $(gmu_Gd_PRJ_GMUTMP)" >> $(_p_mki_SubprjAttr_shsubst)
-	@echo -e "\n$(call _TrShcmd4echo,$(foreach SubPrj,$(gmu_uv_list_ALL_SUBPRJ),\n\
+	@echo -e "\n$(foreach SubPrj,$(gmu_uv_list_ALL_SUBPRJ),\n\
 $(SubPrj)_Makefile = $($(SubPrj)_Makefile)\n\
 $(SubPrj)_MakeVarDefines = $($(SubPrj)_MakeVarDefines)\n\
 $(SubPrj)_IsForcePostProc = $($(SubPrj)_IsForcePostProc)\n\
@@ -1026,7 +1026,7 @@ $(SubPrj)_svnUrl_forMakefiles = $($(SubPrj)_svnUrl_forMakefiles)\n\
 $(SubPrj)_svnLocalDir_forMakefiles = $($(SubPrj)_svnLocalDir_forMakefiles)\n\
 $(SubPrj)_svnRev_forMakefiles = $(if $($(SubPrj)_svnRev_forMakefiles),$($(SubPrj)_svnRev_forMakefiles),HEAD)\n\
 $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
-))\n" >> $(_p_mki_SubprjAttr_shsubst)
+)\n" >> $(_p_mki_SubprjAttr_shsubst)
 	@for SubPrj in $(gmu_uv_list_ALL_SUBPRJ); do \
 		echo "#################### {$${SubPrj}} start ####################" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_PrjRefname = $${SubPrj}" >> $(_p_mki_SubprjAttr_shsubst) ;\

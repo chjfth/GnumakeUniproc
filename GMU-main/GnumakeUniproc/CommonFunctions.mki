@@ -389,6 +389,8 @@ _TrShcmd4echo_4bs = $(subst `,\`,$(subst ",\",$(subst \,\\\\,$1)))
 	# in the way. For example, you can use this make command to get the same OrigShCmd.txt
 	# content as in the previous example:
 #	echo -e -n "all:\n\t$(call _TrShcmd4echo_4bs,echo -e "$(call _TrShcmd4echo_4bs,$(OrigShCmd))" > OrigShCmd.txt)" > my1.mk
+	#
+	# Now you see $(subst \,\\\\,$1)) instead of $(subst \,\\,$1)) because 'echo -e' will half the backslashes.
 
 #_TrShcmd4echo_spd = $(subst !$$!,\$$\$$,$(subst ^$$^,\$$,$(subst `,\`,$(subst ",\",$(subst \,\\,$1)))))
 _TrShcmd4echo_4bs_spd_pnt = $(subst !^t,\t,$(subst !^n,\n,$(subst !$$!,\$$\$$,$(subst ^$$^,\$$,$(call _TrShcmd4echo_4bs,$1)))))
