@@ -489,6 +489,7 @@ execute_command_internal_from_thread (command,
 		//process_easy(win_argv,spawn_env);
 		ret = process_easy_wait_process_done(win_argv, spawn_env, NULL);
 		
+		last_command_exit_value = ret;
 		return ret; // Chj: Yes, we're done for the subshell. We can return now.
 
 		// [2009-12-30] Chj <<<

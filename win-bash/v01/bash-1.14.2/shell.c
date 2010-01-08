@@ -288,7 +288,7 @@ dump_args(int argc, char **argv)
 	sprintf(timestr, "\r\n\r\n[%d-%02d-%02d %02d:%02d:%02d.%03d]", 
 		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
-	fp = fopen("_winbasha.txt", "ab+");
+	fp = fopen("_winbash_dbg.txt", "ab+");
 	if(fp)
 	{
 		fwrite(timestr, 1, strlen(timestr), fp);
