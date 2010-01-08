@@ -2935,7 +2935,7 @@ print_version (void)
      year, and none of the rest of it should be translated (including the
      word "Copyright", so it hardly seems worth it.  */
 
-  printf ("%sGNU Make %s\n\
+  printf ("%sGNU Make %s (patch v1 for GnumakeUniproc)\n\
 %sCopyright (C) 2006  Free Software Foundation, Inc.\n",
           precede, version_string, precede);
 
@@ -3126,4 +3126,20 @@ log_working_directory (int entering)
 
   /* Flush stdout to be sure this comes before any stderr output.  */
   fflush (stdout);
+}
+
+// 2010-01-08 Chj for GnumakeUniproc:
+int 
+IsGmuSuppressIncludeNotFoundWarning(void)
+{
+	static const char s_var[] = "gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING";
+	const struct variable *pv = NULL;
+	
+	pv = lookup_variable(s_var, sizeof(s_var)-1);
+
+	if(pv && strcmp(pv->value, "1")==0)
+		return 1;
+	else 
+		return 0;
+
 }

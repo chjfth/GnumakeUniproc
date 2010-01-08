@@ -36,3 +36,6 @@ extern int db_level;
                                       fflush (stdout);} }while(0)
 
 #define DB(_l,_x)   do{ if(ISDB(_l)) {printf _x; fflush (stdout);} }while(0)
+
+// 2010-01-08 Chj for GnumakeUniproc:
+extern int IsGmuSuppressIncludeNotFoundWarning(void);

@@ -833,8 +833,11 @@ eval (struct ebuffer *ebuf, int set_default)
               r = eval_makefile (name, (RM_INCLUDED | RM_NO_TILDE
                                         | (noerror ? RM_DONTCARE : 0)));
 	      if (!r && !noerror)
+		  {
+			  if(!IsGmuSuppressIncludeNotFoundWarning())
                 error (fstart, "%s: %s", name, strerror (errno));
-              free (name);
+		  }
+          free (name);
 	    }
 
 	  /* Restore conditional state.  */
