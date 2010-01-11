@@ -929,7 +929,9 @@ int my_spawnve_x(int mode, const char *pcShortCommand, char **args, char **spawn
 //                              NULL, /* current directory */
 //                              &si, /* startup info */
 //                              &pi); /* process info */
-	// [2010-01-01] Use the great GNU make 3.81's process_easy instead!
+	// [2010-01-01] Chj: No! The above CreateProcess call does not process 
+    // process parameters correctly(especially with \ and " in argv[]).
+	// So, Use the great GNU make 3.81's process_easy instead!
 
    maybe_make_export_env();
 			// This will include those ``export VAR=value'' variables.
