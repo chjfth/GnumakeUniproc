@@ -27,6 +27,7 @@
 #    include <posixstat.h>
 
 #include <stdio.h>
+#include <windows.h> // For GetFullPathName
 #include "bashtypes.h"
 
 #if !defined (STANDALONE)
@@ -692,17 +693,32 @@ binary_operator ()
 
 	  if (argv[op][2] == 'f' && !argv[op][3])
 	    {
+		  char fullpath1[32800]={0}, fullpath2[32800]={0}, *tmp;
+
 	      /* ef - hard link? */
 	      pos += 3;
 	      if (l_is_l || r_is_l)
-		test_syntax_error ("-ef does not accept -l\n", (char *)NULL);
+		  test_syntax_error ("-ef does not accept -l\n", (char *)NULL);
 	      if (test_stat (argv[op - 1], &stat_buf) < 0)
-		return (FALSE);
+			return (FALSE);
 	      if (test_stat (argv[op + 1], &stat_spare) < 0)
-		return (FALSE);
-	      return (TRUE ==
+			return (FALSE);
+	      /*
+		  return (TRUE ==
 		      (stat_buf.st_dev == stat_spare.st_dev &&
 		       stat_buf.st_ino == stat_spare.st_ino));
+			//[2009-01-11]Chj: This is wrong on Windows 2000/XP, where .st_ino is always 0.
+			//Instead, we check the file. 
+		  */
+		  GetFullPathName(argv[op-1], sizeof(fullpath1)-1, fullpath1, &tmp);
+		  GetFullPathName(argv[op+1], sizeof(fullpath2)-1, fullpath2, &tmp);
+		  strupr(fullpath1); strupr(fullpath2);
+			// This is must, because GetFullPathName does not output path string with actual 
+			// character case on the file-system.
+		  if(strcmp(fullpath1, fullpath2)==0)
+			return TRUE;
+		  else
+			return FALSE;
 	    }
 	  break;
 
