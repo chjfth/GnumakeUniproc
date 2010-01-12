@@ -31,7 +31,7 @@
 
 !define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC gmp_ud_list_CUSTOM_MKI gmp_DECO_PRJ_NAME \
     gmu_LOG_OUTPUT_FILENAME \
-    gmu_IS_USING_POOR_SH_EXE \
+    gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
 	"
 
 !define TSFX "" ;"__tsfx" ; test suffix
@@ -63,9 +63,9 @@ Var isChecked_gmp_DECO_PRJ_NAME
  !define desc_gmp_DECO_PRJ_NAME \
          "Whether project-names are be decorated with compiler-id, compiler-ver etc. \
          It should be set if you'd like to compile your C/C++ programs with more than one compiler."
-Var isChecked_gmu_IS_USING_POOR_SH_EXE
-      Var str_gmu_IS_USING_POOR_SH_EXE
- !define desc_gmu_IS_USING_POOR_SH_EXE \
+Var isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
+      Var str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
+ !define desc_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
          "Special for Windows, it is required for running GnumakeUniproc with the sh.exe\
          (a semi-hosted Bourne Shell on Windows, from www.mame.net)."
 Var isChecked_gmu_LOG_OUTPUT_FILENAME
@@ -85,7 +85,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.95(20091226)"
+!define PRODUCT_VERSION "0.96(pre-20100111)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -391,13 +391,13 @@ Function SelectEnvVar
     StrCpy $str_gmu_LOG_OUTPUT_FILENAME ""
   ${EndIf}
 
-  ; Prepare NSIS vars for gmu_DIR_ROOT, gmu_DIR_GNUMAKEUNIPROC, gmu_IS_USING_POOR_SH_EXE.
+  ; Prepare NSIS vars for gmu_DIR_ROOT, gmu_DIR_GNUMAKEUNIPROC, gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING.
   StrCpy "$isChecked_gmu_DIR_ROOT" "1"
   StrCpy "$str_gmu_DIR_ROOT" "$InstDir_fwslash"
   StrCpy "$isChecked_gmu_DIR_GNUMAKEUNIPROC" "1"
   StrCpy "$str_gmu_DIR_GNUMAKEUNIPROC" "${absdir_GmuCore}"
-  StrCpy "$isChecked_gmu_IS_USING_POOR_SH_EXE" "1"
-  StrCpy "$str_gmu_IS_USING_POOR_SH_EXE" "1"
+  StrCpy "$isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
+  StrCpy "$str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_AddPath ${fname_GmuEnvIni} "Field 11" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $str_AddPath ${fname_GmuEnvIni} "Field 12" "State"

@@ -488,8 +488,39 @@ make[2]: *** [/mnt/hdc/chj/w/CommuLib/WiPortTcpCli/examples/tcpecho_FM-300/make-
               FILE1 and FILE2 have the same device and inode numbers
 </pre>
 <p>虽然使用 <code>-ef</code> 时、在 FILE1 和 FILE2 字串完全的情况下，肯定会返回“真”，但我还是让 GnumakeUniproc 在这个 <code>-ef</code> 判断前明确比较一下 FILE1 和 FILE2 两个字串，原因是：www.mame.net 提供的 Windows 上的 Bourne Shell 实现(sh.exe)不认 <code>-ef</code> 这个东西，<code>[ FILE1 -ef FILE2 ]</code> 无论如何总是返回成功（即返回 0）。</p>
+<div class="footnoteb">
+  <p>[2010-01-11] 今天回头查，看看原 sh.exe 的 -ef 操作问题到底出在什么地方。2006时没记，现在还真想不起来了。</p>
+  <p>在 Win2K SP4, WinXP SP2 上试，硬盘上存在 G:\RAPI.H 、不存在 G:\RAPI.X ，执行如下命令：</p>
+  <pre># if [ g:/RAPI.H -ef G:/rapi.h ]; then echo yes; else echo no; fi
+yes
+# if [ g:/RAPI.H -ef G:/rapi.hx ]; then echo yes; else echo no; fi
+no
+# if [ g:/RAPI.H -ef G:/rapi.H ]; then echo yes; else echo no; fi
+yes
+# if [ g:/RAPI.x -ef G:/rap.X ]; then echo yes; else echo no; fi
+no
+# if [ g:/RAPI.x -ef G:/rapi.X ]; then echo yes; else echo no; fi
+no
+# if [ 2 = 2 ] && [ g:/RAPI.x -ef G:/rapi.X ]; then echo yes; else echo no; fi
+no
+# if [ 2 = 2 ] || [ g:/RAPI.x -ef G:/rapi.X ]; then echo yes; else echo no; fi
+yes
+# if [ 2 = 3 ] || [ g:/RAPI.x -ef G:/rapi.X ]; then echo yes; else echo no; fi
+no
+# if [ 2 = 3 ] || [ g:/RAPI.H -ef G:/rapi.h ]; then echo yes; else echo no; fi
+yes</pre>
+  <p>以上例子正确。做到这里，真怀疑当初2006记录错了。可将 r281 那个修改撤销后发现却是工作异常（工程名冲突检测不出）。仔细查，终于确认 sh.exe 是有 bug：当硬盘上也存在 G:/rapi.x 时， <span class="red">[ g:/RAPI.H -ef G:/rapi.x ]</span> 会报告true，这是错误的。</p>
+  <p>win-bash 居然有同样的表现！</p>
+  <p>幸好这回有源码了，跟踪进去发现问题出在：test.c , binary_operator ()，其中判断两个已存在文件是否为同一文件的方法为</p>
+  <pre>		  return (TRUE ==
+		      (stat_buf.st_dev == stat_spare.st_dev &&
+		       stat_buf.st_ino == stat_spare.st_ino));
+</pre>
+  <p>这在 Linux 上正确，但在 Windows 上（用）, st_dev 为盘符序号（0=A, 2=C etc)，而 st_ino 总是 0；因此，只要两个文件都存在、且同盘，-ef 就会成功。</p>
+  <p>当场改掉，用 GetFullPathName 来获取两个文件全路径，转为大写，文件全路径比较后相同才认为 true。修正于 r835 。 </p>
+</div>
 <h4>[2006-11-07]</h4>
-<p>在 svnreps v233 中修正了该问题。</p>
+<p>在 svnreps r233 中修正了该问题。（后来在 r281 又修了一次才最终好）</p>
 <h3><a name="061219"></a>[2006-12-19] 再次遭遇 sh.exe 陷阱，浪费 5 小时</h3>
 <p>昨天晚上发现运行于 sh.exe 上的 GnumakeUniproc 子工程同名冲突检测不出来了，心神大乱。今天早上将 GnumakeUniproc 历史版本抽样取出测试，终于发现问题出在 svnreps v232 -&gt; v233 的修改上。</p>
 <p>svnreps v232 line 711～712 如下：</p>

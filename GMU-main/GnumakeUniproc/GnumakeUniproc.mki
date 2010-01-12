@@ -1095,7 +1095,7 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 			_tmp_atf=$(SubprjEvHisMakefileAttr); \
 			if [ ! -f \$$\$$_tmp_atf ] || [ \$$\$$_tmp_atf -ot $(gmu_p_BuildStartCkt) ]; \
 				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(_MD) $(SubprjEvOutdirGMUTMP);fi; echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf; echo PrevCmdSuccess; \
-			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] $(if $(gmu_IS_USING_POOR_SH_EXE),,|| [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]); \
+			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] || [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]; \
 				then echo PrevCmdSuccess; \
 			else echo \"\`cat \$$\$$_tmp_atf\`\"; \
 			fi ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
