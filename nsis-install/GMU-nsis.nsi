@@ -66,8 +66,8 @@ Var isChecked_gmp_DECO_PRJ_NAME
 Var isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
       Var str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
  !define desc_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
-         "Special for Windows, it is required for running GnumakeUniproc with the sh.exe\
-         (a semi-hosted Bourne Shell on Windows, from www.mame.net)."
+         "A tweak for GNU make 3.81. If set to 1, there will be no output of verbose message \
+         $\"No such file or directory$\" when a file is not found by makefiles 'include' directive."
 Var isChecked_gmu_LOG_OUTPUT_FILENAME
       Var str_gmu_LOG_OUTPUT_FILENAME
  !define desc_gmu_LOG_OUTPUT_FILENAME \
