@@ -85,7 +85,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.96(pre-20100111)"
+!define PRODUCT_VERSION "0.96(pre-20100119)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -315,6 +315,7 @@ Section Uninstall
   Delete "$INSTDIR\Quick start guide.url"
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
+  Delete "$INSTDIR\*.txt"
 
   Delete "$SMPROGRAMS\-GnumakeUniproc-\Uninstall.lnk"
   Delete "$SMPROGRAMS\-GnumakeUniproc-\Website.lnk"
