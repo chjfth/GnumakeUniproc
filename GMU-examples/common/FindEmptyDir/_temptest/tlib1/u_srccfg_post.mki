@@ -1,0 +1,39 @@
+#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+
+#---------------------------------------------------------------------------
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks 
+# after the "compiler-config" files have been included. Commonly, you write
+# your source files and compiler/linker options in this file.
+#---------------------------------------------------------------------------
+
+############################################################################
+# GMU-var: gmu_uf_LINK_OUTPUT
+#	Define the link ouput filename for this project.
+# Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
+# Using function gmpf_MakeLibName to construct output name makes the name more portable.
+############################################################################
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,tlib1)
+
+############################################################################
+# GMU-var: gmu_ud_SRC_ROOT
+#	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
+# You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
+# not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
+############################################################################
+gmu_ud_SRC_ROOT = ..
+
+############################################################################
+# GMU-var: gmu_up_list_SRC_FROM_ROOT
+#	Define your source files to compile, source files(dir prefix allowed) separated by spaces or tabs.
+# You MUST use relative paths here, which are relative to $(gmu_ud_SRC_ROOT), 
+# however, any of the resulting absolute path should not go up beyond $(gmu_ud_SRC_ROOT),
+# e.g.
+# * You cannot use ``../myfunc.c'', which actually resides in $(gmu_ud_SRC_ROOT)'s parent dir.
+# * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
+#	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
+############################################################################
+gmu_up_list_SRC_FROM_ROOT += tlib1.c
+
