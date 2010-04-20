@@ -5,6 +5,6 @@ REM
 REM
 SETLOCAL
 
-v01\bash-1.14.2\Bash\WinDebug\Bash.exe %*
+.\vc6_dsw\Bash\Debug\sh.exe %*
 
 ENDLOCAL
