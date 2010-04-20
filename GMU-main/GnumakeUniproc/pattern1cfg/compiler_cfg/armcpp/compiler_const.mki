@@ -100,10 +100,10 @@ gmu_u_GCC_M_OPTIONS +=
 # ARM system headers so that we need not refer to them in .d files.
 ifeq '' '$(ARMINC)'
   $(warning !Env-var `ARMINC' not defined! I don't know which directories contain ARM's system headers.\
- Please set it to, e.g: ARMINC=E:\ARM250\Include (Separate multiple dirs with spaces.))
+ Please set it to, e.g: ARMINC=E:\ARM250\Include (Separate multiple dirs with semicolons.) And DO NOT use spaces in dirs)
 endif
 
-gmu_ud_list_SYS_HEADER += $(subst \,/,$(ARMINC))
+gmu_ud_list_SYS_HEADER += $(subst ;, ,$(subst \,/,$(ARMINC)))
 	# This ARMINC variable is set up by ARM SDT/ADS installer to indicate the system header dir.
 
 gmu_exe_CC = armcc
