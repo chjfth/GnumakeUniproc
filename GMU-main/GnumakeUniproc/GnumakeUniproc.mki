@@ -1218,6 +1218,8 @@ ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
 	# [2006-12-13]What if some prj in $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL) does not output $(_f_AutoLinkListForParent)
 	#I hope user can ensure that will not happen.
 
+  _Gp_list_AutoLFC_indent_debug_s = $(_Gp_list_AutoLFC_indent_debug)
+
 endif
 
 ###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
@@ -1235,13 +1237,24 @@ _p_AutoLinkListForParent = $(gmu_Gd_PRJ_GMUTMP)/$(_f_AutoLinkListForParent)
 
 ifneq ($(_SubprjUndoneYet),1) # if subprjs have been built
 
+_p_SubprjLinkageList := $(gmu_Gd_PRJ_GMUTMP)/_LinkageList.gmu.txt
 # TODO: This can be protected by `ifndef _isInCheckoutPhase'//[2006-11-02] ???
 
 gmu_Gp_list_SUBPRJ_TO_LINK = $(call _uv_SubprjList_GetOutpath,$(gmu_uv_list_SUBPRJ_TO_LINK)) \
 	$(if $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s),$(_Gp_list_AutoLinkFromChildren))
 	# libs to link by EXE/DLL project
 
-$(gmu_Gp_LINK_OUTPUT): $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_Gp_list_SUBPRJ_TO_LINK)
+_oldLinkageContent := $(shell if [ -f "$(_p_SubprjLinkageList)" ]; then cat "$(_p_SubprjLinkageList)"; fi)
+_isLinkageListChanged := $(call _IsStringNotEqual,$(_oldLinkageContent),$(_Gp_list_AutoLFC_indent_debug_s))
+	# Check if file content from $(_p_SubprjLinkageList) equals to $(_Gp_list_AutoLFC_indent_debug).
+	# If not equal, we will force a link.
+
+$(gmu_Gp_LINK_OUTPUT): \
+    	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_Gp_list_SUBPRJ_TO_LINK) \
+    	$(if $(_isLinkageListChanged),gmu_ut_Always)
+	@$(if $?,,$(if $(_isLinkageListChanged), $(call _DoVerbose1,@echo "!GMU!Info: Go relink due to linkage list changed since last build.") ))
+#		Strategy: Display "Go relink ..." when _isLinkageListChanged is the only factor causing the relink action. 
+	@echo "$(_Gp_list_AutoLFC_indent_debug_s)" > $(_p_SubprjLinkageList)
 ifdef gmu_DO_SHOW_LINK_CMD
 	$(_DO_LINK_CMD)
 else

@@ -2,5 +2,5 @@
 
 void tlib()
 {
-	printf("From tlib1.c\n");
+	printf("********From tlib1.c\n");
 }

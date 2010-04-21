@@ -120,12 +120,12 @@ gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 # Library(static lib or DLL) projects may well be your sub-projects for this EXE project
 #---------------------------------------------------------------------------
 ############################################################################
-# GMU-var: gmu_uv_list_SUBPRJ_TO_LINK
+# GMU-var: gmu_uv_list_SUBPRJ_TO_LINK (outdated)
 #	This var tells which projects are sub-project for this project(parent project), 
 # and, for sub-projects listed in this var, their output-images will automatically 
 # become link components for parent project.
 #
-# GMU-var: gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL
+# GMU-var: gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL (recommended)
 #	This one is the superset of gmu_uv_list_SUBPRJ_TO_LINK. It's powerful.
 #	Not only output-images of sub-projects explicitly listed in gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL 
 # will be linked by this project, but also sub-projects' of those explictly listed ones 

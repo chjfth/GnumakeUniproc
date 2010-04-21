@@ -15,7 +15,7 @@
 # Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
 # Using function gmpf_MakeLibName to construct output name makes the name more portable.
 ############################################################################
-gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,tlib1)
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,tlib2a)
 
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
@@ -35,5 +35,5 @@ gmu_ud_SRC_ROOT = .
 # * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
 #	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
 ############################################################################
-gmu_up_list_SRC_FROM_ROOT += tlib1.c
+gmu_up_list_SRC_FROM_ROOT += tlib2a.c
 
