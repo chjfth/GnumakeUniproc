@@ -38,8 +38,8 @@ gmu_ud_SRC_ROOT = .
 gmu_up_list_SRC_FROM_ROOT += tlib2.c
 
 
-gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += tlib2a
+gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += tlib2x
 
-tlib2a_Makefile = ../tlib2a/Makefile
-tlib2a_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
+tlib2x_Makefile = ../tlib2a/Makefile
+tlib2x_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
 
