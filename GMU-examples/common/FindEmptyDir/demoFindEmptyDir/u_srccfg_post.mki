@@ -133,7 +133,7 @@ gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 
 #gmu_uv_list_SUBPRJ_TO_LINK = # <subprj1-refname> <subprj2-refname> ...
 # or (CORE PART OF THIS DEMO BELOW)
-gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL = FindEmptyDir tlib
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL = FindEmptyDir 
 
 ######## Details of your sub-projects go here: ########
 
@@ -141,6 +141,6 @@ FindEmptyDir_Makefile = $(dirFindEmptyDirLib)/lib.$(gmp_COMPILER_ID)/Makefile
 	# where the sub-project's makefile resides
 
 #tlib_Makefile = $(gmu_ud_SRC_ROOT)/../_temptest/tlib1/Makefile
- tlib_Makefile = $(gmu_ud_SRC_ROOT)/../_temptest/tlib2/Makefile
- tlib_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
+#tlib_Makefile = $(gmu_ud_SRC_ROOT)/../_temptest/tlib2/Makefile
+#tlib_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
 

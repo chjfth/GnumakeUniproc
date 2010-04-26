@@ -14,11 +14,11 @@ FindEmptyDir_CBRET_et cbFoundEmptyDir(
 	return FindEmptyDir_CBRET_GoOn;
 }
 
-extern"C" void tlib();
+//extern"C" void tlib();
 
 int main(int argc, char *argv[])
 {
-tlib();
+//tlib();
 	const char *pAbsDir = NULL;
 	FindEmptyDir_RET_et fedret;
 	int nTotal = 0;
