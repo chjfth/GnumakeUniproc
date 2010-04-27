@@ -13,6 +13,10 @@
 _gmp_first_target: __pattern1_default_first_target # at rear part of this file
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+gmu_FREE_STYLE_MAKEFILE = $(gmu_DELIBERATE_NO_SUBPRJ)
+gmu_DO_IGNORE_SUBPRJS = $(gmu_IGNORE_SUBPRJS)
+	# 2010-04-27 Make old name gmu_DELIBERATE_NO_SUBPRJ,gmu_IGNORE_SUBPRJS inferior, (old name not tested after deprecation).
+
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
@@ -83,10 +87,10 @@ endif
 
 .PHONY: __pattern1_inc_project_count
 __pattern1_inc_project_count:
-	@$(call _AppendLogCountCompile,$(if $(gmu_DELIBERATE_NO_SUBPRJ),r,R)) \
-		# a 'R' or 'r' means a container project, 'r' is for $(gmu_DELIBERATE_NO_SUBPRJ)
-	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
-	@echo "$(if $(gmu_DELIBERATE_NO_SUBPRJ),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+	@$(call _AppendLogCountCompile,$(if $(gmu_FREE_STYLE_MAKEFILE),r,R)) \
+		# a 'R' or 'r' means a container project, 'r' is for $(gmu_FREE_STYLE_MAKEFILE)
+	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
+	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
 
 __pattern1_default_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
@@ -99,7 +103,7 @@ ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
 	@for v in $(_Gp_list_AutoLinkFromChildren); do echo $$v >> $(_p_AutoLinkListForParent); done
 endif
 #
-ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ)$(gmu_IGNORE_SUBPRJS)) # Show the following only it really contains subprjs.
+ifeq (,$(gmu_FREE_STYLE_MAKEFILE)$(gmu_DO_IGNORE_SUBPRJS)) # Show the following only it really contains subprjs.
 	@echo -e "[DONE sub-projects:] $(foreach s,$(gmu_uv_list_ALL_SUBPRJ),\n  {$s}: %/$($s_Prjname)/$(subst _gmu_NoOutput,(none),$($s_Filename))$(if $($s_UserOutputAfterLink),\n    U: $(call _StripOutputRootPrefix,$($s_UserOutputAfterLink))))"
 endif
 	@$(_GmpShowDoneUserOutputAfterLink)

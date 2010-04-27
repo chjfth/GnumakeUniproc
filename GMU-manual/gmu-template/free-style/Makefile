@@ -8,7 +8,7 @@ gmu_PRJ_NAME = <project-name-for-this-container>
 
 # Replace <your-custom-target> with you own make-target whose rule should
 # appear in u_freestyle.mki .
-gmu_DELIBERATE_NO_SUBPRJ = 1 
+gmu_FREE_STYLE_MAKEFILE = 1 
 gmp_USER_FREE_STYLE_TARGET += <your-custom-target>
 
 

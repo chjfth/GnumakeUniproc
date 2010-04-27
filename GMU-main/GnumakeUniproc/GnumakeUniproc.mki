@@ -145,7 +145,7 @@ gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped = $(filter-out $(gmu_uv_list_SUBPRJ_LOO
 gmu_u_EXTRA_LINK_MERGE_s = $(strip $(gmu_u_EXTRA_LINK_MERGE))
 	# The suffix _s imples "stripped".
 
-ifeq (,$(strip $(gmu_up_list_SRC_FROM_ROOT) $(gmu_uv_list_ALL_SUBPRJ) $(gmu_DELIBERATE_NO_SUBPRJ)))
+ifeq (,$(strip $(gmu_up_list_SRC_FROM_ROOT) $(gmu_uv_list_ALL_SUBPRJ) $(gmu_FREE_STYLE_MAKEFILE)))
   $(error !GMU!Error: Neither `gmu_up_list_SRC_FROM_ROOT' nor `gmu_uv_list_ALL_SUBPRJ' is defined, nothing meaningful can be done)
 endif
 
@@ -781,7 +781,7 @@ endif # <<< ifeq ($(_WantScCheckout),1)
 
 ###############################################################################
 ############## General stuff related to making sub-projects. ##################
-ifeq (,$(gmu_IGNORE_SUBPRJS))
+ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 ifneq (,$(strip $(gmu_uv_list_ALL_SUBPRJ)))
 ifeq (,$(_isNowGmuGetPrjAttr)) # for these goals, don't care for sub-prjs
 ###############################################################################
@@ -1225,7 +1225,7 @@ endif
 ###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
 endif # ifeq (,$(call _FindStrings,$(MAKECMDGOALS),...))
 endif # ifneq (,$(strip $(gmu_uv_list_ALL_SUBPRJ)))
-endif # ifeq (,$(gmu_IGNORE_SUBPRJS))
+endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 ###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
 
 _f_AutoLinkListForParent = _AutoLinkListForParent.gmu.txt

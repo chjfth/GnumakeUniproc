@@ -123,7 +123,7 @@
   </tr>
   <tr>
     <td valign="top"><a name="gmu_uv_list_SUBPRJ_TO_LINK"></a>gmu_uv_list_SUBPRJ_TO_LINK</td>
-    <td align="center">I</td>
+    <td align="center" valign="top">I</td>
     <td><p>List sub-projects to link. The output(LIB or DLL) of the sub-projects listed here will be automatically get linked to the current project. This mechanism eases parent-children project dependency statement in makefiles. </p>
       <p>The tokens listed here are reference names(refname), each of which represent a sub project(subprj) to make. For each <i>refname</i>, you should define the following vars: </p>
       <p>You must at least define:  </p>      <ul>
@@ -243,24 +243,26 @@
     </td>
   </tr>
   <tr>
-    <td valign="top">gmu_IGNORE_SUBPRJS </td>
-    <td align="center">I</td>
+    <td valign="top"><p>gmu_DO_IGNORE_SUBPRJS</p>
+    <p>(oldname: gmu_IGNORE_SUBPRJS)</p></td>
+    <td align="center">E</td>
     <td>If non-null, totally ignore sub-projects. This is not desired most of the time, but it may be helpful if you use <code>gmu_ut_diagnose</code> target to diagnose some make-vars, -- this time, you probably want to ignore sub-projects. </td>
   </tr>
   <tr>
     <td valign="top">gmu_NO_MAKE_SUBPRJS</td>
-    <td align="center" valign="top">I</td>
+    <td align="center" valign="top">E</td>
     <td><p>Set this to non-null so that GMU will not try to build sub-projects, or say, not check sub-projects' up-to-date status.</p>
       <p>When <code>gmu_NO_MAKE_SUBPRJS=1</code>, GMU retrieves immediate sub-projects' information(their project-name, output image path etc) then go on remaining root project's building. It is really useful when you build an EXE project a second time without any its sub-projects' code change. If you know you have not changed any subprj, <code>gmu_NO_MAKE_SUBPRJS=1</code> will bypass checking their up-to-date status so to speed up the build.</p>
       <p>Note: If you set this var without sub-projects really having been built, unpredictable build failure will arise. User himself should be aware of this. </p></td>
   </tr>
   <tr>
-    <td valign="top">gmu_DELIBERATE_NO_SUBPRJ</td>
+    <td valign="top"><p>gmu_FREE_STYLE_MAKEFILE</p>
+      <p>(oldname: gmu_DELIBERATE_NO_SUBPRJ)</p></td>
     <td align="center" valign="top">I</td>
     <td><p>Default value of this var is null.</p>
     <p>This var can be set to non-null when used with <tt>pattern-container1.mks</tt> to write a free-style GMU makefile, e.g. what the makefile does is only to CVS/SVN export some files for other projects to use. </p>
     <p>Influence: If you leave it null, GMU requires that you must either list source files in <code>gmu_up_list_SRC_FROM_ROOT</code> or define some sub-projects so that it has something to do. This check prevents the casual error by forgetting either of the two requirement. </p>
-    <p>The benefits of a free-style GMU makefile are </p>
+    <p>The benefits of a free-style GMU makefile(over free style makefile) are: </p>
     <ul>
       <li>You can give it a project-name(<code>gmu_PRJ_NAME</code>), so that it has a dedicated project output dir(<a href="#gmu_Gd_Final_PrjOutput"><code>gmu_Gd_Final_PrjOutput</code></a>) for end user to create files in it, </li>
       <li>Once the project is built, it is recorded up-to-date, so that it is run only once (normally) across one GMU run. </li>
@@ -269,13 +271,13 @@
   </tr>
   <tr>
     <td valign="top">gmu_u_SHOW_PROGRESS_CMD</td>
-    <td align="center">I(E)</td>
+    <td align="center">E</td>
     <td> <p>This var is optional. It is used when GMU pattern1 is going to feed back it progress info, once each project is done. </p>
       <p>This var is consider a shell command to execute, and if it contains <code>$(gmu_progress_info)</code> (note: retain in its unexpanded form), the  <code>$(gmu_progress_info)</code> will be dynamically expanded into GMU's progress info(e.g. <tt>Projects=3 Container=1</tt>) </p></td>
   </tr>
   <tr>
   				<td valign="top">gmu_NO_LOG_CO_CMD_TO_FILE</td>
-  				<td align="center">I</td>
+  				<td align="center">E</td>
   				<td>When doing checkout, do not generate _CheckoutCmd.gmu.txt file to check-out destination directory. </td>
   </tr>
 </table>
