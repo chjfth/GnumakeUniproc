@@ -134,6 +134,11 @@ gmu_uv_list_SUBPRJ_TO_LINK += $(gmu_uv_list_LIB_TO_LINK)
 	# [2007-03-10] I decide to make gmu_uv_list_LIB_TO_LINK obsolete, now use gmu_uv_list_SUBPRJ_TO_LINK instead.
 	# Since gmu_uv_list_LIB_TO_LINK has been used by nearly all non-LIB projects, I should keep its compatibility.
 
+ifneq (,$(gmu_DO_IGNORE_SUBPRJS))
+  gmu_uv_list_ALL_SUBPRJ=
+  gmu_uv_list_SUBPRJ_TO_LINK=
+endif
+
 gmu_uv_list_ALL_SUBPRJ_s = $(strip $(gmu_uv_list_ALL_SUBPRJ))
 gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL_s = $(strip $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL))
 
@@ -1230,7 +1235,7 @@ endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 
 _f_AutoLinkListForParent = _AutoLinkListForParent.gmu.txt
 _p_AutoLinkListForParent = $(gmu_Gd_PRJ_GMUTMP)/$(_f_AutoLinkListForParent)
-	# [2006-12-14] These two must not be place inside `ifneq (,$(gmu_uv_list_ALL_SUBPRJ))',
+	# [2006-12-14] These two must not be placed inside `ifneq (,$(gmu_uv_list_ALL_SUBPRJ))',
 	#because a leave project(project without any subprj) should have these defined!
 
 ##################### For link process ##########################

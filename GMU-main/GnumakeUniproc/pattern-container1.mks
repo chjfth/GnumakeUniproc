@@ -13,10 +13,6 @@
 _gmp_first_target: __pattern1_default_first_target # at rear part of this file
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-gmu_FREE_STYLE_MAKEFILE = $(gmu_DELIBERATE_NO_SUBPRJ)
-gmu_DO_IGNORE_SUBPRJS = $(gmu_IGNORE_SUBPRJS)
-	# 2010-04-27 Make old name gmu_DELIBERATE_NO_SUBPRJ,gmu_IGNORE_SUBPRJS inferior, (old name not tested after deprecation).
-
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki

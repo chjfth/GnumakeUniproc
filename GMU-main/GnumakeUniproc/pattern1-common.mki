@@ -7,6 +7,12 @@ unexport gmp_u_list_PLUGIN_TO_LOAD
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_POST
 
+
+gmu_FREE_STYLE_MAKEFILE += $(gmu_DELIBERATE_NO_SUBPRJ)
+gmu_DO_IGNORE_SUBPRJS += $(gmu_IGNORE_SUBPRJS)
+	# 2010-04-27 Make old name gmu_DELIBERATE_NO_SUBPRJ,gmu_IGNORE_SUBPRJS inferior, (old name not tested after deprecation).
+
+
 _dirPattern1Cfg = pattern1cfg
 gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
 gmp_p_mki_DecoUnicodeDebug = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_UNICODE_DEBUG.mki

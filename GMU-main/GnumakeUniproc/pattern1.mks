@@ -310,6 +310,8 @@ _p_list_ALLFP_NonLoopSp := $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLoope
 	
 ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 
+ ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
+
   $(_p_AutoLinkListForParent): gmu_ut_Always \
 		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALLFP_NonLoopSp))
 	@echo -n "" > $@ # clear the target file
@@ -320,6 +322,11 @@ ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(_p_list_ALLFP_NonLoopSp) >> $@)
 	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
   endif
+
+ else
+  $(_p_AutoLinkListForParent): gmu_ut_Always
+	@echo -n "" > $@
+ endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 
 endif # ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 

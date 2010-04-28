@@ -245,12 +245,12 @@
   <tr>
     <td valign="top"><p>gmu_DO_IGNORE_SUBPRJS</p>
     <p>(oldname: gmu_IGNORE_SUBPRJS)</p></td>
-    <td align="center">E</td>
+    <td align="center">I(E)</td>
     <td>If non-null, totally ignore sub-projects. This is not desired most of the time, but it may be helpful if you use <code>gmu_ut_diagnose</code> target to diagnose some make-vars, -- this time, you probably want to ignore sub-projects. </td>
   </tr>
   <tr>
     <td valign="top">gmu_NO_MAKE_SUBPRJS</td>
-    <td align="center" valign="top">E</td>
+    <td align="center" valign="top">I(E)</td>
     <td><p>Set this to non-null so that GMU will not try to build sub-projects, or say, not check sub-projects' up-to-date status.</p>
       <p>When <code>gmu_NO_MAKE_SUBPRJS=1</code>, GMU retrieves immediate sub-projects' information(their project-name, output image path etc) then go on remaining root project's building. It is really useful when you build an EXE project a second time without any its sub-projects' code change. If you know you have not changed any subprj, <code>gmu_NO_MAKE_SUBPRJS=1</code> will bypass checking their up-to-date status so to speed up the build.</p>
       <p>Note: If you set this var without sub-projects really having been built, unpredictable build failure will arise. User himself should be aware of this. </p></td>
