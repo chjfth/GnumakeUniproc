@@ -9,7 +9,7 @@ endif
 
 
 in_gmpf_LoadCenv_sdt = \
-	gmp_COMPILER_VER="$(gmp_COMPILER_VER) sdt" \
+	gmp_COMPILER_VER_armcpp="$(gmp_COMPILER_VER_armcpp) sdt" \
 	ARMINC="$1/include" ARMLIB="$1/lib" \
 	PATH="$1/bin;$(subst \,/,$(PATH))"
 	# $1: ARM SDT install dir.
@@ -18,7 +18,7 @@ gmpf_LoadCenv_sdt = $(call in_gmpf_LoadCenv_sdt,$(gmp_CENV_ARMSDT_ROOT))
 
 
 define def_ExportCenv_sdt
-  $$(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER := $(gmp_COMPILER_VER) sdt)
+  $$(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_armcpp := $(gmp_COMPILER_VER_armcpp) sdt)
   $$(call gmuf_AnounceExportEnvvar,ARMINC := $1/Include)
   $$(call gmuf_AnounceExportEnvvar,ARMLIB := $1/Lib)
   $$(call gmuf_AnounceExportEnvvar,PATH   := $1/bin;$(subst \,/,$(PATH)))

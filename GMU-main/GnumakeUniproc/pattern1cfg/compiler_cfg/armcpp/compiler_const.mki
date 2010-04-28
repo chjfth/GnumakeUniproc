@@ -9,7 +9,7 @@
 #	ARM Realview has the same command set as ADS.
 #
 #	To distinguish between SDT, ADS and Realview, the user should use the make-var:
-# gmp_COMPILER_VER. If some token in gmp_COMPILER_VER
+# gmp_COMPILER_VER_armcpp. If some token in gmp_COMPILER_VER_armcpp
 # * starts with "sdt", it means SDT.
 # * starts with "armads", it means ADS.
 # * starts with "armrv", it means Realview.
@@ -24,25 +24,25 @@ _THIS_COMPILER_ID := armcpp
 ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
   $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
 endif
-#gmp_COMPILER_VER = # Do not define it, leave it to the user
-gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+#gmp_COMPILER_VER_armcpp = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_armcpp)
 
 
-_sdtCompilerVer = $(filter sdt%,$(gmp_COMPILER_VER))
+_sdtCompilerVer = $(filter sdt%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingSDT = $(if $(_sdtCompilerVer),1,)
 
-_adsCompilerVer = $(filter armads%,$(gmp_COMPILER_VER))
+_adsCompilerVer = $(filter armads%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingARMADS = $(if $(_adsCompilerVer),1,)
 
-_armrvCompilerVer = $(filter armrv%,$(gmp_COMPILER_VER))
+_armrvCompilerVer = $(filter armrv%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingARMRV = $(if $(_armrvCompilerVer),1,)
 
 _armCompilerVers := $(strip $(_sdtCompilerVer) $(_adsCompilerVer) $(_armrvCompilerVer))
 
-# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
-ifneq (,$(gmp_COMPILER_VER))
+# Here, check whether gmp_COMPILER_VER_armcpp results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER_armcpp))
   ifeq (,$(_armCompilerVers))
-    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for ARM compiler)
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER_armcpp has value "$(gmp_COMPILER_VER_armcpp)", which contains no recognized version for ARM compiler)
   endif
 endif
 
@@ -52,12 +52,12 @@ ifeq (,$(strip $(_armCompilerVers)))
   _IsUsingARMRV = 1
 else
   ifneq (1,$(call _IsAllWordsSame,$(_armCompilerVers)))
-    $(error !GMP!Error: Multiple ARM compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _armCompilerVers=$(_armCompilerVers))
+    $(error !GMP!Error: Multiple ARM compiler versions are defined: gmp_COMPILER_VER_armcpp=$(gmp_COMPILER_VER_armcpp), _armCompilerVers=$(_armCompilerVers))
   endif
   _armCompilerVerUse = $(firstword $(_armCompilerVers))
 
   #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
-  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings.
+  #gmp_COMPILER_VER_armcpp matches one of the predefined compiler-ver strings.
   gmp_G_CompilerVerToDeco := _$(_armCompilerVerUse)
   gmp_G_CompilerVerValid  :=  $(_armCompilerVerUse)
 endif

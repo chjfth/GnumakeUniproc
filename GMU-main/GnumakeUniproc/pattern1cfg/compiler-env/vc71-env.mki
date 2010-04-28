@@ -7,5 +7,7 @@ gmp_LoadVc71Env = MSVSDir="$1" MSSdk="$2" \
 	LIB="$(if $2,$2/lib;)$1/VC7/LIB;$1/VC7/PlatformSDK/lib;$1/VC7/ATLMFC/LIB;$1/SDK/v1.1/lib;"\
 	PATH="$(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common7/IDE;$1/VC7/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/SDK/v1.1/bin;$(subst \,/,$(PATH))"
 
+# pending... until that day I/someone encounters MSVC7
+$(error This mki file is not complete yet, you can make it from vc80-env.mki )
 
 endif

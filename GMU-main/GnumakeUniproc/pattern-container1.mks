@@ -58,10 +58,10 @@ endif
 endif
 
 
-gmp_G_CompilerVerToDeco = $(addprefix _,$(gmp_COMPILER_VER))
+gmp_G_CompilerVerToDeco = $(addprefix _,$($(filter gmp_COMPILER_VER_%,$(.VARIABLES))))
 	# [2008-08-15] bc_deco_prjname.mki requires this.
-	# Although this is a container project, gmp_COMPILER_VER decoration is still desired, 
-	# because user may want to use different gmp_COMPILER_VER to go through the same container
+	# Although this is a container project, gmp_COMPILER_VER_* decoration is still desired, 
+	# because user may want to use different gmp_COMPILER_VER_* to go through the same container
 	# project(wish to result in different final prjname) so that all the container's subprjs
 	# can be built twice or more with differrent versions of the same compiler.
 include $(gmp_p_mki_DecoPrjname) # This should appear after gmp_COMPILER_ID is defined.

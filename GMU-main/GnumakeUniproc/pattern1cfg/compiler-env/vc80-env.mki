@@ -28,7 +28,7 @@ _vc80_val_PATH = $1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;
 
 
 in_gmpf_LoadCenv_vc80 = \
-	gmp_COMPILER_VER="$(gmp_COMPILER_VER) vc80" \
+	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc80" \
 	MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(_vc80_val_INCLUDE)" \
 	LIB="$(_vc80_val_LIB)" \
@@ -37,7 +37,7 @@ in_gmpf_LoadCenv_vc80 = \
 gmpf_LoadCenv_vc80 = $(call in_gmpf_LoadCenv_vc80,$(gmp_CENV_MSVC80_ROOT),$(gmp_CENV_MSVC80_PSDK_ROOT))
 
 define def_ExportCenv_vc80
-  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER := $(gmp_COMPILER_VER) vc80)
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc80)
   $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
   $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
   $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc80_val_INCLUDE))

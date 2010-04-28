@@ -3,34 +3,34 @@ _THIS_COMPILER_ID := msvc
 ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
   $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
 endif
-#gmp_COMPILER_VER = # Do not define it, leave it to the user
-gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+#gmp_COMPILER_VER_msvc = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_msvc)
 
 
 
-_msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER))
+_msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc60 := $(if $(_msvc_vc60ver),1,)
 
-_msvc_vc70ver := $(filter vc70%,$(gmp_COMPILER_VER))
+_msvc_vc70ver := $(filter vc70%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc70 := $(if $(_msvc_vc70ver),1,)
 
-_msvc_vc71ver := $(filter vc71%,$(gmp_COMPILER_VER))
+_msvc_vc71ver := $(filter vc71%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc71 := $(if $(_msvc_vc71ver),1,)
 
-_msvc_vc80ver := $(filter vc80%,$(gmp_COMPILER_VER))
+_msvc_vc80ver := $(filter vc80%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc80 := $(if $(_msvc_vc80ver),1,)
 
 _msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc70ver) $(_msvc_vc71ver) $(_msvc_vc80ver))
 
 	#(old:)
 	#_msvc_SupportedVers = vc60 vc70 vc71 vc80
-	#_msvc_CompilerVers = $(firstword $(call _FindStrings,$(_msvc_SupportedVers),$(gmp_COMPILER_VER)))
+	#_msvc_CompilerVers = $(firstword $(call _FindStrings,$(_msvc_SupportedVers),$(gmp_COMPILER_VER_msvc)))
 
 
-# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
-ifneq (,$(gmp_COMPILER_VER))
+# Here, check whether gmp_COMPILER_VER_msvc results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER_msvc))
   ifeq (,$(_msvc_CompilerVers))
-    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for MSVC compiler)
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER_msvc has value "$(gmp_COMPILER_VER_msvc)", which contains no recognized version for MSVC compiler)
   endif
 endif
 
@@ -39,12 +39,12 @@ ifeq (,$(strip $(_msvc_CompilerVers)))
   _msvc_CompilerVerUse = vc60
 else
   ifneq (1,$(call _IsAllWordsSame,$(_msvc_CompilerVers)))
-    $(error !GMP!Error: Multiple MSVC compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _msvc_CompilerVers=$(_msvc_CompilerVers))
+    $(error !GMP!Error: Multiple MSVC compiler versions are defined: gmp_COMPILER_VER_msvc=$(gmp_COMPILER_VER_msvc), _msvc_CompilerVers=$(_msvc_CompilerVers))
   endif
   _msvc_CompilerVerUse = $(firstword $(_msvc_CompilerVers))
 
   #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
-  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings.
+  #gmp_COMPILER_VER_msvc matches one of the predefined compiler-ver strings.
   gmp_G_CompilerVerToDeco := _$(_msvc_CompilerVerUse)
   gmp_G_CompilerVerValid  :=  $(_msvc_CompilerVerUse)
 endif

@@ -123,7 +123,12 @@ tt { color:#003366; }
 <li><a href="#071208">071208: 昨日重现，启用新变量，以便插件装载可以通过环境变量来指示</a></li>
 <li><a href="#080509">080509: 真正编译时用的编译开关和传给 <code>gcc -M</code> 的开关如何协调</a></li>
 <li><a href="#080719">080719: 有时候需要给用户对同一工程执行多次 make 的权利</a></li>
-<li><a href="#080813">080813: 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</a></li>
+<li><a href="#080813">080813: 关于 <code>gmp_COMPILER_VER</code> 何时设置，该明确了</a>
+  <ul>
+    <li><a href="#080814">080814: 体贴性考虑，允许多个编译器版本修饰符共存于 gmp_COMPILER_VER</a></li>
+    <li><a href="#100428">100428: 升华! 升华! 将 gmp_COMPILER_VER 拆成多个变量才是正道!</a></li>
+  </ul>
+</li>
 <li>080819: <a href="win32-make-and-sh.htm">重要发现：Windows 上 make.exe 和 sh.exe 的互关联问题</a></li>
 <li><a href="#090305">090305: 一个备忘，gmuExtractVarDefines 还是不能丢</a>
   <ul>
@@ -1454,7 +1459,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 <p><code>gmp_COMPILER_VER</code> 用于指示编译器的版本，其值可由 GMU 用户可自由设置，若其值非空，则在 gmp_DECO_PRJ_NAME=1 及 gmp_DECO_COMPILER_VER=1<span class="style-font-small">(此变量后被废除)</span>的情况下，$(<code>gmp_COMPILER_VER</code>) 会被加到工程名上。</p>
 <div class="footnoteb">gmp_COMPILER_VER 自由设置的含义是：GnumakeUniproc 核心层不关心此值的具体内容(你可留意它不是用 gmu_ 前缀) 。但具体的编译器配置文件（compiler config mki）可以定义 gmp_COMPILER_VER 的合法取值，用处是从 gmp_COMPILER_VER 的取值中判断用户当前用的是哪个编译器版本，以便对编译开关做出一些调整。 </div>
 <p>让工程名加入 <code>gmp_COMPILER_VER</code> 修饰的用途是若有人希望用同编译器的不同版本来编同一工程，<code>gmp_COMPILER_VER</code> 就可以让工程名不同，这样不同编译器版本的输出可以分处于不同目录、互不影响。</p>
-<p>以上思想最初时（2006）就已确定，但另有个相关东西则未确定，即是否能在同一轮构建中构建[使用不同版本编译器的]工程，换言之，对于 <code>gmp_COMPILER_VER</code> 在一轮构建过程是否能变化并未明确。</p>
+<p>以上思想最初时（2006）就已确定，但另有个相关东西则未确定，即是否能在同一轮构建中构建[使用同 compiler-id 但不同版本编译器的]工程（譬如混用VC6和VC8），换言之，对于 <code>gmp_COMPILER_VER</code> 在一轮构建过程是否能变化并未明确。</p>
 <p>最初，只期望在同一轮构建中 <code>gmp_COMPILER_VER</code> 保持不变，若要变，则必须手动重开一轮构建。后来(2007底)，要用 GMU 编 uTools 了，这要求同一轮构建中使用两种编译器，VC6 和 armcpp(ARM SDT) ，这还没“严重”到“同一编译器的两种版本”的情况，不过却导致当时(2007-11-25)做了一个<b>错误决定</b>，当时留下的 comment 摘录如下(bc_deco_prjname.mki)：</p>
 <blockquote>
   <pre># [2007-11-25] No longer force deco <code>$(gmp_COMPILER_VER)</code> globally. Reason: 
@@ -1478,7 +1483,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 <p>现在该是再次放远眼光的时候了，——我已经感觉到今后某一天会有那种要求的。</p>
 <p>因此决定如下：</p>
 <ul>
-  <li>同一进程的任一个特定时间点看到的 <code>gmp_COMPILER_VER</code> 应该只表示一种编译器。<span class="style-font-small">(注：该决定在 2008-08-14 就被废除了)</span></li>
+  <li><s>同一进程的任一个特定时间点看到的 <code>gmp_COMPILER_VER</code> 应该只表示一种编译器。</s><span class="style-font-small">(注：该决定在 2008-08-14 就被废除了)</span></li>
   <li><code>$(gmp_COMPILER_VER)</code> 是否加入工程名由是否设了 gmp_DECO_PRJ_NAME=1  决定，和具体的 compiler-config-mki 无关，此动作在 <tt>bc_deco_prjname.mki</tt> 中进行。<span class="style-font-small">（注：2008-08-14 的决定使得这个说法变得不准确。现在，compiler-config-mki 实际上是通过设置 <code>gmp_G_CompilerVerToDeco</code> 来指挥 <tt>bc_deco_prjname.mki</tt> 进行工程名修饰。）</span></li>
   <li>compiler-config-mki 可以判断当前 <code>gmp_COMPILER_VER</code> 的有效性并做错误提示，也可以往工程名中加入其他前后缀，但它自己别把 <code>$(gmp_COMPILER_VER)</code> 加入工程名。</li>
   <div class="footnoteb">
@@ -1498,7 +1503,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
     </ul>
   </li>
 </ul>
-<h4>[2008-08-14] 体贴性考虑，允许多个编译器版本修饰符共存于 gmp_COMPILER_VER</h4>
+<h4><a name="080814"></a>[2008-08-14] 体贴性考虑，允许多个编译器版本修饰符共存于 gmp_COMPILER_VER</h4>
 <p>不过话说回来，如果两种编译器的编译环境可以共存（像 ARMCPP 和 MSVC），允许在 GMU 运行前将两者的环境同时设好、再 umake、即免除了 GMU 运行过程切换编译环境的麻烦——这样不是更体贴用户吗？刚试过，要不允许这种共存的话，uTools 的 makefile 得改多了。 </p>
 <p>要允许共存的话，得解决一个问题，即当 <code>gmp_COMPILER_VER=sdt250 vc60</code> 时，编 VC 程序时只能将 <code>vc60</code> 加入工程名，编 ARM 程序时只能将 <code>sdt250</code> 加入工程名。</p>
 <p>想出个办法：</p>
@@ -1509,6 +1514,8 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 <p>以上改进在 v601 基本完成，初步测试通过（见 mix-compiler-ver 中的例子 ）。</p>
 <h4>[2009-04-24] 增加输出变量 gmp_G_CompilerVerValid</h4>
 <p>根据 2008-04-14 那天的决定，当环境中的 gmp_COMPILER_VER 指示不止一个编译器版本时，compiler-config-mki 会从中挑选出合适当前编译器的那个版本描述串(compiler-ver string)，并生成一个 <code>gmp_G_CompilerVerToDeco</code> 变量给用户，但这个变量总是以下划线打头的（用于添加到 <code>gmu_DECO_SUFFIX_PRJ_NAME</code> 中）。今天发现，有时用户 makefile 中需要判断 compiler-config-mki 到底挑了哪一个版本描述串（比如，当 <code>gmp_COMPILER_VER=vc60 sdt </code> 时，makefile 要直到当前 compiler-config-mki 挑的是 <code>vc60</code> 还是 <code>sdt</code>，因此，就输出一个新变量 <span class="red">gmp_G_CompilerVerValid</span> 来描述这个。 </p>
+<h4><a name="100428"></a>[2010-04-28] 升华! 升华! 将 gmp_COMPILER_VER 拆成多个变量才是正道!</h4>
+<p>&nbsp;</p>
 <h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
 <p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
 <ul>

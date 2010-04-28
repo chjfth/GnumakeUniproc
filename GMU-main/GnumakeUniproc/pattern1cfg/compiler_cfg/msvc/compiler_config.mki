@@ -24,7 +24,7 @@
 #
 #	* bc_ means build-config.
 
-# The following gmp_COMPILER_VER value is recognize to construct different default 
+# The following gmp_COMPILER_VER_msvc value is recognize to construct different default 
 # compiler options(if not set, default to vc60):
 # * vc60 // Visual studio 98
 # * vc70 // Visual studio .NET 2002
