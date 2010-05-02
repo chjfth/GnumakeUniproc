@@ -101,35 +101,7 @@ endif
 
 
 # >>>>>> Load compiler cfg here
-
-gmpf_GetCompilerCfgPrecorePath_std  = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
-gmpf_GetCompilerCfgPostcorePath_std = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
-	# [2007-01-15] I finally add it.
-	# With make-var gmp_Gp_COMPILER_CFG_LOADED and the suffix($1) you provided, 
-	# post GnumakeUniproc.mki compiler-cfg-related make-code can be loaded now.
-
-_dirDefaultCompilerCfg = $(_dirPattern1Cfg)/compiler_cfg
-
-
-gmp_Gp_COMPILER_CFG_LOADED = $(firstword \
-	$(foreach _Dir,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg),\
-		$(wildcard $(_Dir)/$(gmp_COMPILER_ID)/compiler_config.mki))\
-	)
-gmp_Gd_COMPILER_CONFIG_USED = $(patsubst %/compiler_config.mki,%,$(gmp_Gp_COMPILER_CFG_LOADED))
-ifeq (,$(gmp_Gp_COMPILER_CFG_LOADED))
-  $(error !GMU!Error: For gmp_COMPILER_ID=$(gmp_COMPILER_ID), no compiler-config-mki can be found from $$(gmp_ud_list_CUSTOM_COMPILER_CFG) or $$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg) )
-endif
-ifeq ($(_IsVerboseLevel2),$(_gmu_true))
-ifneq ($(gmp_Gp_COMPILER_CFG_LOADED),$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/$(gmp_COMPILER_ID)/compiler_config.mki)
-  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
-  ifeq (,$(MAKE_RESTARTS)) # reason: no use to output this info on every make restart
-    _info := $(call gmuf_OutputInfo,Using custom-compiler-mki from dir: $(gmp_Gd_COMPILER_CONFIG_USED))
-  endif
-  endif
-endif
-endif
-include $(gmp_Gp_COMPILER_CFG_LOADED)
-
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-compiler-cfg.mki
 # <<<<<< Load compiler cfg here
 
 
@@ -240,17 +212,23 @@ endif
 	# [2008-09-10] This pre-core mki is considered a special privilege for compiler-config-mki.
 	# It is included immediately before GnumakeUniproc.mki, so that in this pre-core mki,
 	# we can be sure all expansion-in-core gmu-vars have been established, e.g. gmu_Gp_LINK_OUTPUT
-	# is established(no gmu_DECO_SUFFIX_LINK_OUTPUT assigment with affect it, etc).
+	# is established(no gmu_DECO_SUFFIX_LINK_OUTPUT assigment will affect it, etc).
 	# Today, the idea of this pre-core file comes into being this way: 
 	#	For Windows/WinCE compiler config, applying ``gmu_DECO_SUFFIX_LINK_OUTPUT += --imp''
 	# in this file can guarantee no user makefiles can add further suffix to the link output.
  
 
+
+#############################################################################
+#################### THE CORE FILE GnumakeUniproc.mki #######################
+#############################################################################
 _p_GnumakeUniproc = $(gmu_DIR_GNUMAKEUNIPROC)/GnumakeUniproc.mki
 ifeq (,$(wildcard $(_p_GnumakeUniproc)))
   $(error !$(_p_GnumakeUniproc) not exist, I cannot continue.)
 endif
 include $(_p_GnumakeUniproc)
+
+
 
 ifeq (,$(strip $(gmu_uf_LINK_OUTPUT)))
   $(error !GMP!Error: Your gmu_uf_LINK_OUTPUT is null, but pattern1.mks requires you define gmu_uf_LINK_OUTPUT.\

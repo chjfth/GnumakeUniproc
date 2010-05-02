@@ -6,7 +6,7 @@
 <title>问题及修正</title>
 
 <style type="text/css">
-P { line-height: 110%; }
+BODY { line-height: 120%; }
 pre {
     border: #777777 1px solid;
     padding: 0.5em;
@@ -32,7 +32,11 @@ H4 {
 	font-family: Verdana, Arial, sans-serif; 
 }
 
-code { color:#660033; }
+code { 
+	font-family: "Courier New", Courier, mono; 
+	font-size: small;
+	color:#660033; 
+}
 tt { color:#003366; }
 
 .hint {
@@ -1513,9 +1517,23 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 </ul>
 <p>以上改进在 v601 基本完成，初步测试通过（见 mix-compiler-ver 中的例子 ）。</p>
 <h4>[2009-04-24] 增加输出变量 gmp_G_CompilerVerValid</h4>
-<p>根据 2008-04-14 那天的决定，当环境中的 gmp_COMPILER_VER 指示不止一个编译器版本时，compiler-config-mki 会从中挑选出合适当前编译器的那个版本描述串(compiler-ver string)，并生成一个 <code>gmp_G_CompilerVerToDeco</code> 变量给用户，但这个变量总是以下划线打头的（用于添加到 <code>gmu_DECO_SUFFIX_PRJ_NAME</code> 中）。今天发现，有时用户 makefile 中需要判断 compiler-config-mki 到底挑了哪一个版本描述串（比如，当 <code>gmp_COMPILER_VER=vc60 sdt </code> 时，makefile 要直到当前 compiler-config-mki 挑的是 <code>vc60</code> 还是 <code>sdt</code>，因此，就输出一个新变量 <span class="red">gmp_G_CompilerVerValid</span> 来描述这个。 </p>
+<p>根据 2008-04-14 那天的决定，当环境中的 gmp_COMPILER_VER 指示不止一个编译器版本时，compiler-config-mki 会从中挑选出合适当前编译器的那个版本描述串(compiler-ver string)，并生成一个 <code>gmp_G_CompilerVerToDeco</code> 变量给用户，但这个变量总是以下划线打头的（用于添加到 <code>gmu_DECO_SUFFIX_PRJ_NAME</code> 中）。今天发现，有时用户 makefile 中需要判断 compiler-config-mki 到底挑了哪一个版本描述串（比如，当 <code>gmp_COMPILER_VER=vc60 sdt </code> 时，makefile 要知道当前 compiler-config-mki 挑的是 <code>vc60</code> 还是 <code>sdt</code>，因此，就输出一个新变量 <span class="red">gmp_G_CompilerVerValid</span> 来描述这个（和<code>gmp_G_CompilerVerToDeco</code> 的差别仅仅是一个下划线）。 </p>
+<p>[2010-05-02] 补充：gmp_G_CompilerVerToDeco, gmp_G_CompilerVerValid 允许为空，——若 <code>gmp_COMPILER_VER</code> 为空。 </p>
 <h4><a name="100428"></a>[2010-04-28] 升华! 升华! 将 gmp_COMPILER_VER 拆成多个变量才是正道!</h4>
-<p>&nbsp;</p>
+<p>回顾 2008-08-14 那天的决定，两种编译器的版本指示词可以共存于 <code>gmp_COMPILER_VER</code>，这种“共存”思想是好的，它给了用户“在 根makefile 启动前就将所有编译器版本在环境中预先指示好”这样一种使用模式。但这确确实实带来一个两难之处。</p>
+<p>2008那时还决定，当一个 compiler-config-mki 发现 <code>gmp_COMPILER_VER</code> 中有自己不认识的版本指示词时，要打印出警告。这种警告是有帮助的，有助于提示潜在的错误。比如：环境中指示 <code>gmp_COMPILER_VER=vc90</code> ，然而你的 compiler-config-mki 中却只处理 vc60,vc71,vc80 ，这时的警告就会让人很明了，当前 GMU 编译器配置文件太旧了、应该更新才能正常编译。因此，我们默认不应该压制该警告。但，这同时带来的矛盾也很明显：当环境中设 <code>gmp_COMPILER_VER=sdt</code> ，的情况下，启动 VC6 工程的编译，VC6 工程就会给出 <code>sdt</code> 无法识别的警告，这个案例中的警告无疑是我们咎由自取，白白耗费我们的注意力。</p>
+<p>还好，今天想通了，终于可以彻底解决这样尴尬状况了。解决方法：</p>
+<ul>
+				<li>废除 <code>gmp_COMPILER_VER</code> ，引入 <code>gmp_COMPILER_VER_&lt;compiler-id&gt;</code> 。即：用 <code>gmp_COMPILER_VER_armcpp</code> 指示 armcpp 这种编译器的版本号，用 <code>gmp_COMPILER_VER_msvc</code> 指示 msvc 这种编译器的版本号。</li>
+                <li><code>gmp_G_CompilerVerValid</code> 和 <code>gmp_G_CompilerVerToDeco</code> 的含义不变。即，<code>gmp_COMPILER_VER_&lt;compiler-id&gt;</code> 的值仅仅被编译器配置文件（compiler-config-mki）所识别，编译器配置文件根据 <code>gmp_COMPILER_VER_&lt;compiler-id&gt;</code> 的值输出 <code>gmp_G_CompilerVerValid</code> ，其他部分的 mki 就只认 <code>gmp_G_CompilerVerValid</code> 好了。 </li>
+</ul>
+<p>澄清容器工程的工程名修饰行为：</p>
+<ul>
+				<li>当容器工程没有定义（没有检测到） <code>gmp_COMPILER_ID</code> 时，即使环境中有 <code>gmp_COMPILER_VER_<i>xxx</i></code> ，<code>$(gmp_COMPILER_<i>xxx</i>)</code> 也不会被修饰到该容器工程的工程名。对，此时做这个修饰时没有意义的。此回改之前，我记得行为也是如此。一个提示：gmp_bc_DEBUG（加修饰 _D）和 gmp_bc_UNICODE（加修饰 _U）跟 <code>gmp_COMPILER_ID/VER_xxx</code> 无关。</li>
+                <li>当容器工程定义了（检测到） <code>gmp_COMPILER_ID</code> 时，只有匹配该 <code>gmp_COMPILER_ID</code> 的 <code>gmp_COMPILER_VER_<i>xxx</i></code> 才会加入修饰。这跟之前不同了（变合理了）。之前是将 <code>gmp_COMPILER_VER</code> 里头的东西一股脑加入修饰。比如，环境中有 <code>gmp_COMPILER_VER_msvc=vc60</code> 和 <code>gmp_COMPILER_VER_armcpp=sdt</code> 的情况下，现在构建一个 <code>gmp_COMPILER_ID=msvc</code> 的容器工程时，加入修饰的东西是 <code>_msvc_vc60</code> ，而不会是 <code>_msvc_sdt_vc60</code>。</li>
+</ul>
+<p>最初没有想到分拆 gmp_COMPILER_VER 是因为最初仅仅着眼于一次构建仅使用一个编译器的场景，因而被蒙住了眼睛。</p>
+<p>此回改进在 r850, r651。</p>
 <h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
 <p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
 <ul>

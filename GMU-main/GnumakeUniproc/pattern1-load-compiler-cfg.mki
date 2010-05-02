@@ -1,0 +1,28 @@
+
+gmpf_GetCompilerCfgPrecorePath_std  = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
+gmpf_GetCompilerCfgPostcorePath_std = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
+	# [2007-01-15] I finally add it.
+	# With make-var gmp_Gp_COMPILER_CFG_LOADED and the suffix($1) you provided, 
+	# post GnumakeUniproc.mki compiler-cfg-related make-code can be loaded now.
+
+_dirDefaultCompilerCfg = $(_dirPattern1Cfg)/compiler_cfg
+
+
+gmp_Gp_COMPILER_CFG_LOADED = $(firstword \
+	$(foreach _Dir,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg),\
+		$(wildcard $(_Dir)/$(gmp_COMPILER_ID)/compiler_config.mki))\
+	)
+gmp_Gd_COMPILER_CONFIG_USED = $(patsubst %/compiler_config.mki,%,$(gmp_Gp_COMPILER_CFG_LOADED))
+ifeq (,$(gmp_Gp_COMPILER_CFG_LOADED))
+  $(error !GMU!Error: For gmp_COMPILER_ID=$(gmp_COMPILER_ID), no compiler-config-mki can be found from $$(gmp_ud_list_CUSTOM_COMPILER_CFG) or $$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg) )
+endif
+ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+ifneq ($(gmp_Gp_COMPILER_CFG_LOADED),$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/$(gmp_COMPILER_ID)/compiler_config.mki)
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS)) # reason: no use to output this info on every make restart
+    _info := $(call gmuf_OutputInfo,Using custom-compiler-mki from dir: $(gmp_Gd_COMPILER_CONFIG_USED))
+  endif
+  endif
+endif
+endif
+include $(gmp_Gp_COMPILER_CFG_LOADED)

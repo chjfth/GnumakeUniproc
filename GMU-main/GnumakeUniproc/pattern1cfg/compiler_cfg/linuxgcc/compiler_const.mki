@@ -3,21 +3,21 @@ _THIS_COMPILER_ID := linuxgcc
 ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
   $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
 endif
-#gmp_COMPILER_VER = # Do not define it, leave it to the user
-gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER)
+#gmp_COMPILER_VER_linuxgcc = # Do not define it, leave it to the user
+gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_linuxgcc)
 
 
-_gmp_gcc_vers := $(filter gcc%,$(gmp_COMPILER_VER))
+_gmp_gcc_vers := $(filter gcc%,$(gmp_COMPILER_VER_linuxgcc))
 	# User's note: 
 	# In order to use multiple gcc versions a in one GMU build, just differentiate them(actually
 	# (differentiate the project name with different gcc version) by setting 
-	#	gmp_COMPILER_VER=gccXXX
+	#	gmp_COMPILER_VER_linuxgcc=gccXXX
 	# with differnt XXX value.
 
-# Here, check whether gmp_COMPILER_VER results in a non-empty but unrecognized compiler-ver.
-ifneq (,$(gmp_COMPILER_VER))
+# Here, check whether gmp_COMPILER_VER_linuxgcc results in a non-empty but unrecognized compiler-ver.
+ifneq (,$(gmp_COMPILER_VER_linuxgcc))
   ifeq (,$(_gmp_gcc_vers))
-    $(warning !GMP!Warning: Your gmp_COMPILER_VER has value "$(gmp_COMPILER_VER)", which contains no recognized version for gcc compiler)
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER_linuxgcc has value "$(gmp_COMPILER_VER_linuxgcc)", which contains no recognized version for gcc compiler)
   endif
 endif
 
@@ -25,12 +25,12 @@ ifeq (,$(strip $(_gmp_gcc_vers)))
   # Do nothing.
 else
   ifneq (1,$(call _IsAllWordsSame,$(_gmp_gcc_vers)))
-    $(error !GMP!Error: Multiple gcc compiler versions are defined: gmp_COMPILER_VER=$(gmp_COMPILER_VER), _gmp_gcc_vers=$(_gmp_gcc_vers))
+    $(error !GMP!Error: Multiple gcc compiler versions are defined: gmp_COMPILER_VER_linuxgcc=$(gmp_COMPILER_VER_linuxgcc), _gmp_gcc_vers=$(_gmp_gcc_vers))
   endif
   _gmp_gcc_ver_use = $(firstword $(_gmp_gcc_vers))
 
   #[2008-08-14] gmp_G_CompilerVerToDeco must be defined for a compiler-config-mki if input
-  #gmp_COMPILER_VER matches one of the predefined compiler-ver strings. In this case,
+  #gmp_COMPILER_VER_linuxgcc matches one of the predefined compiler-ver strings. In this case,
   #any strings starting with gcc are considered valid(matching predefined compiler-ver).
   gmp_G_CompilerVerToDeco := _$(_gmp_gcc_ver_use)
   gmp_G_CompilerVerValid  :=  $(_gmp_gcc_ver_use)
