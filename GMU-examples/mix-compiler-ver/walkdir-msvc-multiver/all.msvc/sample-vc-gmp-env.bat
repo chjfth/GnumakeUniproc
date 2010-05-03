@@ -1,3 +1,3 @@
-set gmp_MSVC60_ROOT=e:/vs6
-set gmp_MSVC60_PSDK_ROOT=e:/MsSDK2003
-set gmp_MSVC80_ROOT=e:/vs8
+set gmp_MSVC60_ROOT=C:/Program Files/Microsoft Visual Studio
+set gmp_MSVC60_PSDK_ROOT=C:/Program Files/Microsoft SDK
+set gmp_MSVC80_ROOT=C:/Program Files/Microsoft Visual Studio 8
