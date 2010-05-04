@@ -1,5 +1,5 @@
 
-Current GnumakeUniproc version is v0.95 .
+Current GnumakeUniproc version is v0.96 .
 
 =============================================================================
 - Install process on Linux
@@ -17,7 +17,7 @@ $ source ~/GMU/GMU-main/set-gmuenv.sc  # Set required environment variables(env-
 If the above two commands does not spout any "Error" message, then it succeeds.
 Now, you've set up the environment to use GnumakeUniproc.
 
-Note: This second command should be executed every time you login to you shell.
+Note: The second command above should be executed every time you login to you shell.
 So it is suggested to run the second command in your login script(.bashrc).
 
 If you encounter errors or need more detail, refer to the install section for

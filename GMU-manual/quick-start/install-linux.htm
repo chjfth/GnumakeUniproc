@@ -74,7 +74,9 @@ cp /home/chj/GMU/GMU-main/umake_cmd/bash/umakeUD /home/chj/GMU/bin/umakeUD
 Success! To see all gmu-vars set into env, type command:   set | grep -e "^gm[a-z]_"
 </pre>
 <p>Finally, you should know that env-vars set by <tt>set-gmuenv.sc</tt> will vanish after you quit your current login shell, therefore, it is suggested to source it in your <tt>.bashrc</tt> , so that it can be done automatically when you login your linux box. </p>
-<p>If you are the system admin, you can also install GnumakeUniproc to a system wide place like <tt>/usr/local/GMU</tt>, and source <tt>set-gmuenv.sc</tt>  in a system-wide start-up script.</p>
+<p>If you are the system admin, you can also install GnumakeUniproc to a system wide place like <tt>/usr/local/GMU</tt>, like this</p>
+<pre class="fws">sudo ~/GMU/GMU-main/install-exe.sh /usr/local/GMU</pre>
+<p>and source <tt>set-gmuenv.sc</tt> in a system-wide start-up script.</p>
 <p>That's all the installation process on Linux. Now, you can go on building our first example.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>

@@ -56,7 +56,7 @@ gmu_ud_list_PRJ_HEADER += $(dirWalkdirLib)/include
 
 
 gmu_uv_list_SUBPRJ_TO_LINK = <b>libwalkdir</b> 
-	<span class="c-comment"># say: I have a sub-project(refered to as libwalkdir), and I want to link its output(a lib).</span>
+	<span class="c-comment"># say: I have a sub-project(refered to as <b>libwalkdir</b>), and I want to link its output(a lib).</span>
 
 <b>libwalkdir</b>_Makefile = $(dirWalkdirLib)/makelib/lib.$(gmp_COMPILER_ID)/Makefile 
 	<span class="c-comment"># where the sub-project(libwalkdir)'s makefile resides</span>
@@ -93,11 +93,7 @@ gmu_uv_list_SUBPRJ_TO_LINK = <b>libwalkdir</b>
 <pre class="fws">
 GnumakeUniproc started (GNUmake v3.81).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
-D:/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:791: D:/GMU/GMU-examples/common/walkdir/examples/w
-alkdir_ex1/exe.mingw/gf/walkdir_ex1_mingw/_gmu_tmp/_SubprjsMade.gmu.ckt: No such file or directory
-D:/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:925: D:/GMU/GMU-examples/common/walkdir/examples/w
-alkdir_ex1/exe.mingw/gf/walkdir_ex1_mingw/_gmu_tmp/_SubprjsAttrMade.gmu.ckt: No such file or directo
-ry
+
 ==============================================================================
   Now, BuildLevel [0]. Making sub-project: walkdir_mingw
   Expected Output: %/walkdir_mingw/libwalkdir.a
@@ -141,8 +137,17 @@ Files compiled: C++:0 C:4 ASM:0 linked:2
   </li>
 </ol>
 <div class="hint">
-  <p>About those &quot;No such file or directory&quot; warning lines:</p>
+  <p>SPECIAL NOTE: If you run this example on Linux, you will see extra &quot;No such file or directory&quot; warning lines like this:</p>
+  <pre class="fws">GnumakeUniproc started (GNUmake v3.81).
+gmu_ud_OUTPUT_ROOT(%) = ./gf
+/home/chj/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:860: /home/chj/GMU/GMU-examples/common/walk
+dir/examples/walkdir_ex1/exe.linuxgcc/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsMade.gmu.ckt: No such
+ file or directory
+/home/chj/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:1001: /home/chj/GMU/GMU-examples/common/wal
+kdir/examples/walkdir_ex1/exe.linuxgcc/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsAttrMade.gmu.ckt: No
+ such file or directory</pre>
   <p>They're totally normal, don't panic, they don't signify any threat of error. It's just that GNUmake 3.81 does not provide a way to simply suppress that boring message(when an <code>include</code> directive is used, and the to-be-included file does not exist at that moment). I hope GNUmake's future version can provide the choice to suppress it. </p>
+  <p>Why those warnings are not seen on Windows? Because you're provided with a tweaked version of GNU make. When you have env-var <code>gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1</code> , those warnings are suppressed.</p>
 </div>
 <p>To run the compiled walkdir_ex1.exe, just run it with a directory string as the parameter, for example: </p>
 <pre class="fws">D:\GMU\GMU-examples\...\walkdir_ex1\exe.mingw>gf\walkdir_ex1_mingw\walkdir_ex1.exe d:/GMU</pre>
@@ -245,11 +250,6 @@ D:\GMU\GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw>umake gmu_DO_S
 _SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 GnumakeUniproc started (GNUmake v3.81).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
-D:/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:791: D:/GMU/GMU-examples/common/walkdir/examples/w
-alkdir_ex1/exe.mingw/gf/walkdir_ex1_mingw/_gmu_tmp/_SubprjsMade.gmu.ckt: No such file or directory
-D:/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:925: D:/GMU/GMU-examples/common/walkdir/examples/w
-alkdir_ex1/exe.mingw/gf/walkdir_ex1_mingw/_gmu_tmp/_SubprjsAttrMade.gmu.ckt: No such file or directo
-ry
 ==============================================================================
   Now, BuildLevel [0]. Making sub-project: walkdir_mingw
   CurDir: D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw

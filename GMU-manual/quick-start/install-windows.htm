@@ -34,48 +34,36 @@
 <ul>
   <li>GNUmake 3.81 built natively(using Visual C++ 6, SP6) for Windows.</li>
   <li>MinGW gcc compiler 3.2 . The main purpose for using gcc is to generate header file dependency(by <tt>gcc -M</tt>), even if you don't really use gcc to compile your program. </li>
-  <li>A special sh.exe from <a href="www.mame.net">www.mame.net</a> that provides the functionality of Bourne Shell. The exact download address(from 2007-10-05) that contains that sh.exe is 
-
- 
-  <a href="http://www.mame.net/zips/mingw-over-092.zip">http://www.mame.net/zips/mingw-over-092.zip</a>. Unfortunately, someday on year 2008, that file was removed from www.mame.net, probably due to incompatible with Windows Vista.</li>
+  <li>A special version of sh.exe that acts as the Bourne Shell on Windows. The source file is derived from winbash 0.6, and is updated by GnumakeUniproc's author(add some missing functionality) so that it can work with GnumakeUniproc on Windows. Ssource files of this sh.exe can be found in win-bash folder of GnumakeUniproc distribution package. </li>
   <li> Some unix file manipulating utilities such as mkdir, cp, rm, mv, cat etc. These programs was acquired from <a href="http|//gnuwin32.sourceforge.net">gnuwin32.sourceforge.net</a> . </li>
   <li>Some EXE programs provided and required by GnumakeUniproc itself, these programs's source code(C programs) can be found in GnumakeUniproc's source tree. These EXE's name has the form gmu<i>XXX</i>.</li>
 </ul>
 <h2><a name="EnvVarSetup"></a>Environment variable(env-var) setup </h2>
-<p>NOTE: This section helps you understand the environment setup requirements running GnumakeUniproc on Windows. If you have run the NSIS installer for GnumakeUniproc, the installer has done it for you. So this section can be skipped, go on with <a href="#CheckEnvOk">Check whether environment is setup OK</a>. </p>
-
-<h3><a name="GnumakeUniprocresides"></a>Tell where GnumakeUniproc resides </h3>
-<p>You should set env-var:</p>
+<p>GnumakeUniproc needs some env-vars to work properly. The installer will prepare these env-vars for you. </p>
+<p>In a certain step of the installer, you see</p>
+<p><img src="nsis-gmuenv.gif" />
+</p>
+<p>On this page, the installer tells you can some env-vars will be prepared for you, e.g., </p>
 <pre class="fws">
 gmu_DIR_ROOT=D:/GMU
 gmu_DIR_GNUMAKEUNIPROC=D:/GMU/GMU-main/GnumakeUniproc</pre>
-<p class="chj-mark-red">Be sure you use forward slash(<code>/</code>) instead of backslash(<code>\</code>) as directory component separator. This applies to all environment variable values recognized by GnumakeUniproc and all variable values used in a makefile. It's true even if you really work on a Windows platform. </p>
-<div class="hint">Hint: To set a env-var from a command prompt you should use the command prompt syntax : 
-<pre class="fws">set gmu_DIR_GNUMAKEUNIPROC=D:/GMU/GMU-main/GnumakeUniproc</pre>
-</div>
-<p>To confirm again, the file <tt>$(gmu_DIR_GNUMAKEUNIPROC)/GnumakeUniproc.mki</tt> shoud exist. </p>
-<h3><a name="SpecialShExe"></a>Set two special env-var for working with sh.exe </h3>
-<p>Please set it as follows:</p>
-<pre class="fws">
-gmu_DIR_GMU_PRG=D:/MinGW2/bin
-gmu_IS_USING_POOR_SH_EXE=1</pre>
-<p><code>gmu_DIR_GMU_PRG</code> tells where those EXEs(make.exe, cat.exe, gmu<i>XXX</i>.exe etc) reside.</p>
-<p><code>gmu_IS_USING_POOR_SH_EXE</code> bypasses the buggy behavior relating to sh.exe's <code>FILE1 -ef FILE2</code> testing. </p>
-<h3><a name="AddPath"></a>Modify PATH env-var to contain MinGW's bin directory</h3>
-<p>Although this is not strictly necessary, it is suggested since it brings you convenience running EXEs in that directory. Set it as follows(example given in Command Prompt syntax): </p>
-<pre class="fws">set PATH=%PATH%;D:\GMU\MinGW2\bin</pre>
-<p>or you may prefer to have the new PATH dir foremost:</p>
-<pre class="fws">set PATH=D:\GMU\MinGW2\bin;%PATH%</pre>
-<p>We assume that you have set this before going on.</p>
+<p class="chj-mark-red">Yes, the directory component separator here is forward slash(<code>/</code>) instead of backslash(<code>\</code>).  This convention applies to all environment variable values recognized by GnumakeUniproc and all variable values used in a makefile. It's true even if you really work on a Windows platform. </p>
+<p><b>Windows registry</b> checkbox: If checked, installer will set these env-vars into your registry, so that you have them immediately after you logon to Windows desktop. Whether you should check it or not?</p>
+<ul>
+				<li>If you have your own gcc compiler(gcc.exe etc) on your Windows box, don't check it -- because the gcc.exe provided by GnumakeUniproc installer may conflict with yours in PATH env-var.</li>
+                <li>otherwise, leave it checked. </li>
+</ul>
+<p><b>gmuenv.bat</b> checkbox: Always have it checked. Purpose of this .bat: In case you don't check <b>Windows registry</b> above, there will be nothing regarding GnumakeUniproc added to your environment setting, so you will not be able to use GnumakeUniproc just by opening a Command Prompt. To make the environment ready, you should call <tt>D:\GMU\gmuenv.bat</tt> to set it up. </p>
 <h3><a name="CheckEnvOk"></a>Check whether environment is setup OK</h3>
 <p>GnumakeUniproc runs from a command line environment, and the environment requirement means properly setting some <code>gmu_</code> &amp; <code>gmp_</code> environment variables. so open an Command Prompt window to get ready using GnumakeUniproc.</p>
-<p>If you run the installer and opt to store the env-vars in Windows registry, then they should have been set up for you after you open a DOS Command Prompt window from Windows Start Menu. Otherwise, you have to manually execute <tt>D:\GMU\gmuenv.bat</tt> to set it up. </p>
-<p>To confirm whether the , type </p>
+<p>If you run the installer and opt to store the env-vars in Windows registry, then they should have been set up for you after you open a  Command Prompt window from Windows Start Menu. Otherwise, you have to manually execute <tt>D:\GMU\gmuenv.bat</tt> to set it up. </p>
+<p>To confirm , type </p>
 <pre class="fws">set gmu </pre>
 <p>If its output contains lines like</p>
 <pre class="fws">
 gmu_DIR_ROOT=D:/GMU
-gmu_DIR_GNUMAKEUNIPROC=D:/GMU/GMU-main/GnumakeUniproc</pre>
+gmu_DIR_GNUMAKEUNIPROC=D:/GMU/GMU-main/GnumakeUniproc
+gmu_LOG_OUTPUT_FILENAME=_gmulog.txt</pre>
 <p>then it's ready.</p>
 <p>Now, you can go on building our first example. </p>
 <p>&nbsp;</p>
