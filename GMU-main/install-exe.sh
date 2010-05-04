@@ -59,6 +59,8 @@ if [ "$DIR_GMU_PRG" = "" ]; then
 
 	DIR_GMU_PRG=$DIR_GMU/bin
 	echo "Info: You did not assign a directory as parameter, so \"$DIR_GMU_PRG\" will be used."
+else
+	DIR_GMU_MAIN=${0%/*} # Remove the trailing "/install-exe.sh"
 fi
 
 if [ ! -d $DIR_GMU_PRG ]; then
