@@ -1,3 +1,23 @@
+[2010-05-06] v0.96
+Main feature of this release is Windows Vista SP1 and Windows 7 support. A few bugs are fixed as well.
+===== Changes and Improvements: =====
+1. r850 (incompatible change)
+	Deprecate gmu-var gmp_COMPILER_VER, introduce gmp_COMPILER_VER_<compiler-id>. From now on, compiler version string for different compilers can co-exist peacefully. Update walkdir-msvc-multiver example accordingly.
+2. r803-835 (Windows specific)
+	Great improvement: Introduce new native Win32 port of Bourne Shell(winbash), code derived from http://sourceforge.net/projects/win-bash (2006-03-06 release, v0.6). With some code improvements, it works with GnumakeUniproc. From now on, GnumakeUniproc is supported on Windows Vista SP1 and later and Windows 7.
+	With this new sh.exe, the shabby gmu_IS_USING_POOR_SH_EXE=1 no longer needs to exist.
+3. r833 (Windows specific)
+	make.exe binary is recompiled with a minor code modification. When env-var gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1 is defined, make will not output those (almost-) meaningless "No such file or directory" warning. This new env-var is now set by GMU Windows installer.
+4. r842,r845
+	Improvement: When building an EXE project, if its linkage list is changed compared to last build, I will do relink.
+5. r847
+	Some gmu-var name change. Old names can still be used but discouraged.
+	* gmu_DELIBERATE_NO_SUBPRJ -> gmu_FREE_STYLE_MAKEFILE
+	* gmu_IGNORE_SUBPRJS       -> gmu_DO_IGNORE_SUBPRJS 
+6. r797,r854
+	Fix Linux install script install-exe.sh .
+
+
 [2009-12-22] v0.95
 This is mostly a maintenance and bug-fix release, fixed some very subtle bugs. Only a few new features are added.
 ===== Changes and Improvements: =====

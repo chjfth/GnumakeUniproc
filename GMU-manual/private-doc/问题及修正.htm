@@ -1533,7 +1533,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
                 <li>当容器工程定义了（检测到） <code>gmp_COMPILER_ID</code> 时，只有匹配该 <code>gmp_COMPILER_ID</code> 的 <code>gmp_COMPILER_VER_<i>xxx</i></code> 才会加入修饰。这跟之前不同了（变合理了）。之前是将 <code>gmp_COMPILER_VER</code> 里头的东西一股脑加入修饰。比如，环境中有 <code>gmp_COMPILER_VER_msvc=vc60</code> 和 <code>gmp_COMPILER_VER_armcpp=sdt</code> 的情况下，现在构建一个 <code>gmp_COMPILER_ID=msvc</code> 的容器工程时，加入修饰的东西是 <code>_msvc_vc60</code> ，而不会是 <code>_msvc_sdt_vc60</code>。</li>
 </ul>
 <p>最初没有想到分拆 gmp_COMPILER_VER 是因为最初仅仅着眼于一次构建仅使用一个编译器的场景，因而被蒙住了眼睛。</p>
-<p>此回改进在 r850, r651。</p>
+<p>此回改进在 r850, r851。</p>
 <h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
 <p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
 <ul>
