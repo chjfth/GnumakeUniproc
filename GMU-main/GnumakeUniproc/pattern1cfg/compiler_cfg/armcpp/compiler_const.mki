@@ -94,7 +94,7 @@ gmpf_MakeUpSysLibsToLink = $(addsuffix .$(gmp_extn_LIB),$1)
 gmu_u_GCC_M_OPTIONS += 
 
 
-# Check whether the env-vars for running Visual C++ command line compiler are OK.
+# Check whether the env-vars for running ARM C/C++ command line compiler are OK.
 #	[2007-12-13] This ARMINC is only meaningful to ARM SDT 2.5, so don't demand it.
 # but setting it is suggested, because this will tell ``gcc -M' which dirs contains
 # ARM system headers so that we need not refer to them in .d files.
