@@ -123,7 +123,7 @@ This is mostly a maintenance and bug-fix release, fixed some very subtle bugs. O
 5. r448
     New gmu-var gmu_DELIBERATE_NO_SUBPRJ, which makes container-project a free style one, i.e. no need to really contain sub-projects . This is useful to integrate non-gmu makefiles into GMU makefile chain.
 6. r449-451
-    Rename _gmu_log.txt to _gmu_log.txt.bak instead of overwritting it when a new GMU run starts.
+    Rename _gmulog.txt to _gmulog.txt.bak instead of overwritting it when a new GMU run starts.
 7. r456
     Change: Load custom-image-type mki inclusion adhead of compiler_config.mki, so that custom-image-type can be a virtual image-type, and real image-type can be redefined by the custom-image-type mki. This can be very helpful when maintaining some kind of cross-platform projects.
 8. r464

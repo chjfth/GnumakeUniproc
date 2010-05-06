@@ -1534,7 +1534,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
 </ul>
 <p>最初没有想到分拆 gmp_COMPILER_VER 是因为最初仅仅着眼于一次构建仅使用一个编译器的场景，因而被蒙住了眼睛。</p>
 <p>此回改进在 r850, r851。</p>
-<h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢</h2>
+<h2><a name="090305"></a>[2009-03-05] 一个备忘，gmuExtractVarDefines 还是不能丢(三天后又撤销了)</h2>
 <p>在提交 r739(2009-02-13) 时，突然觉得 gmuExtractVarDefines 可以丢掉了。理由: gmuExtractVarDefines 是为了对付在 MAKELEVEL=0 时，[用 $(shell ) 启动的进程看不到 makefile 中 export 出的变量]的问题（暂且将其成为 make 的 bug），而这种 export 的可见性在 MAKELEVEL=0 、调用目标为 <code> _gmu_ut_GetPrjAttr</code> 的子 make 时 又是必须的。 2009-02-13 那天意识到:</p>
 <ul>
   <li>根工程(RP)第一次用 <code>_gmu_ut_GetPrjAttr</code> 试图取子工程属性时其实已经是在一个“中间子 make”（_MakeSubPrjs.gmu.mk）中进行了，因此那种 bug 影响不了这里。</li>
