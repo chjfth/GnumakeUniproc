@@ -51,7 +51,7 @@ gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 #	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
 ############################################################################
 gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
-	# Don't write ``-I'' in this var; it will be prependded automatically.
+	# Don't write ``-I'' in this var; -I will be prependded automatically.
 
 gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
 	# (normally, you don't need this)
@@ -59,18 +59,19 @@ gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
 	# You must explicitly write ``-I'' before every dir in gmp_CFLAGS_INCLUDES
 
 ############################################################################
-# GMU-vars: gmp_CFLAGS_XXX
+# GMU-vars: gmp_CFLAGS_<XXX>
 #	Set specific compiler options for this project in the following vars:
 # gmp_CFLAGS_CODE_GEN_ALL:
 #	Any options that affect the generated binary code should be listed in it.
+#	Consider gmp_CFLAGS_CODE_GEN_ALL as your accustomed CFLAGS.
 # gmp_CFLAGS_NON_CODE_GEN:
 #	Any options that do not affect the generated binary code should be listed in it.
 ############################################################################
 
 gmp_CFLAGS_CODE_GEN_ALL +=
   # You may want to dispense options for gmp_CFLAGS_CODE_GEN_ALL into following 2 categories:
-  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # those macro defines, e.g. -Dxxx=yyy
-  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # other code generation related options
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # append other macro defines, e.g. -Dxxx=yyy
+  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # append other code generation related options
 
 gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
 

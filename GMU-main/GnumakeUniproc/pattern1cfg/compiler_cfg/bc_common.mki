@@ -5,7 +5,12 @@ endif
 
 _p_ExtraImageTypeMki = $(gmu_DIR_GNUMAKEUNIPROC)/$(gmp_COMPILER_ID)/extra_image_types/$(gmp_bc_IMAGE_TYPE).mki
 
-define bcfShowLibrariesToLink
+_gmp_Gp_objliblist = $(gmu_Gd_Final_PrjOutput)/objlist.lst
+_gmpf_cmd_write_objliblist = echo -e "$(subst $(_GmuSpace),\n,$1)" > $2
+	# $1: what string to write. $2: what file to write to
+
+
+define _gmpf_bcfShowLibrariesToLink
 	@$(call _DoVerbose1,\
 	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK):"; \
 	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
@@ -26,7 +31,8 @@ define bcfShowLibrariesToLink
 	$(if $(gmp_bc_EXTRALIBS),echo ''; for v in $(gmp_bc_EXTRALIBS); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
 	)
 endef
-
+bcfShowLibrariesToLink = $(_gmpf_bcfShowLibrariesToLink)
+	# bcfShowLibrariesToLink is for backward compatibility, use of it is discouraged.
 
 gmu_SHOW_LINKING_IMAGE_TYPE = $(gmp_bc_IMAGE_TYPE)
 
