@@ -21,6 +21,11 @@
 
 _THIS_COMPILER_ID := armcpp
 
+# >>> Compatibility code for deprecated gmu-var gmp_COMPILER_VER,
+#     so that GnumakeUniproc v0.96 can work correctly with old makefiles using gmp_COMPILER_VER.
+gmp_COMPILER_VER_armcpp += $(filter sdt%,$(gmp_COMPILER_VER))
+# <<< Compatibility code end.
+
 ifneq ($(gmp_COMPILER_ID),$(_THIS_COMPILER_ID))
   $(error !You have set a gmp_COMPILER_ID other than "$(_THIS_COMPILER_ID)")
 endif
