@@ -187,11 +187,21 @@ gmuf_GetAbsDir = $(_GetAbsDir)
 gmuf_ConcatePath = $(gmuf_GetAbsPathByRela_so)
 gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
 	while [ $${dirRel$(_GmuSharp)../} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)../}; dirGo=$${dirGo%/*}; done; \
-	if [ "$${dirRel}" = ".." ]; then echo "$${dirGo%/*} "; \
-	else echo "$${dirGo}/$${dirRel}"; fi )
+	if [ "$${dirRel}" = ".." ]; then echo "$${dirGo%/*}"; \
+	else \
+		if [ "$${dirRel$(_GmuSharp)?:/}" = "$${dirRel}" ] && [ "$${dirRel$(_GmuSharp)/}" = "$${dirRel}" ]; then \
+			echo "$${dirGo}/$${dirRel}"; \
+		else \
+			echo "$${dirRel}"; \
+		fi; \
+	fi )
 	# $1: Starting absolute dir
-	# $2: Relative dir
+	# $2: Relative dir or absolute dir
 	# 'so' means string operation
+	#
+	# If $2 is an absolute dir(start with ?:/ or / ), just return $2.
+	# If $2 is a relative dir, calculate absolute dir with $1 as starting position.
+	#
 	# This is suitable for directory and filepath(dir+filename)
 	# LIMITATION: Don't let $2 trace back to root dir, otherwise, the behavior is wrong.
 	#   E.G. $(call gmuf_GetAbsPathByRela_so,/dir1/dir2,../..) will produce null string.
