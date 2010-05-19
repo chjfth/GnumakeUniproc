@@ -385,7 +385,7 @@ _list_REQ_tmp := $(patsubst %,$(_Gd_OBJ_OUTPUT)/%,$(gmu_up_list_SRC_FROM_ROOT))
 _list_ExtUnrecognized := $(foreach file,$(_list_REQ_tmp),$(if $(findstring $(file).$(gmu_extn_OBJ),$(gmu_Gp_list_REQOBJS)),,$(file)))
 ifneq (,$(strip $(_list_ExtUnrecognized))) # there will be as many spaces in $(_list_ExtUnrecognized) as there are source files, therefore, we have to use strip.
   _list_ExtUnrecognized := $(patsubst $(_Gd_OBJ_OUTPUT)/%,%,$(_list_ExtUnrecognized)) # strip the $(_Gd_Deco_PrjOutput) prefix
-  _temp := $(shell echo "The following source files(gmu_up_list_SRC_FROM_ROOT) have unrecognized extension:" 1>&2)
+  _temp := $(shell echo "The following source files(defined in gmu_up_list_SRC_FROM_ROOT) have unrecognized extension:" 1>&2)
   $(foreach file,$(_list_ExtUnrecognized),$(shell echo "  $(file)" 1>&2))
   	  #You know, $(shell ...)'s output to stdout with be captured by Make if we do not redirect is to stderr.
   $(error !GMU!Error: The above source files do not have valid extension-name, valid ext-names are: $(strip $(gmu_u_list_C_EXTN) $(gmu_u_list_CXX_EXTN) $(gmu_u_list_ASM_EXTN)))
