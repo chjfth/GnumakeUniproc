@@ -1,14 +1,19 @@
-ifndef __COMPILER_ENV_ALL_LOADED
-__COMPILER_ENV_ALL_LOADED := 1
+ifndef _compiler-env-all.mki
+_compiler-env-all.mki := 1
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
-
-# All mki in this directory gets included.
-include $(_d_ThisMki)/vc60-env.mki
-include $(_d_ThisMki)/vc71-env.mki
-include $(_d_ThisMki)/vc80-env.mki
-include $(_d_ThisMki)/sdt-env.mki
+# All mki in this directory get included.
 
 
+d_ThisMki := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
-endif # ifndef __PLUGIN_ALWAYS_COMPILE_LOADED
+
+include $(d_ThisMki)/vc60-env.mki
+
+#include $(d_ThisMki)/vc71-env.mki
+
+include $(d_ThisMki)/vc80-env.mki
+
+include $(d_ThisMki)/sdt-env.mki
+
+
+endif

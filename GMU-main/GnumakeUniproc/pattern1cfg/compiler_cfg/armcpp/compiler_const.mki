@@ -47,7 +47,7 @@ _armCompilerVers := $(strip $(_sdtCompilerVer) $(_adsCompilerVer) $(_armrvCompil
 # Here, check whether gmp_COMPILER_VER_armcpp results in a non-empty but unrecognized compiler-ver.
 ifneq (,$(gmp_COMPILER_VER_armcpp))
   ifeq (,$(_armCompilerVers))
-    $(warning !GMP!Warning: Your gmp_COMPILER_VER_armcpp has value "$(gmp_COMPILER_VER_armcpp)", which contains no recognized version for ARM compiler)
+    $(warning !GMP!Warning: Your gmp_COMPILER_VER_armcpp has value "$(gmp_COMPILER_VER_armcpp)", which contains no recognized version for ARM compiler.)
   endif
 endif
 
@@ -104,8 +104,8 @@ gmu_u_GCC_M_OPTIONS +=
 # but setting it is suggested, because this will tell ``gcc -M' which dirs contains
 # ARM system headers so that we need not refer to them in .d files.
 ifeq '' '$(ARMINC)'
-  $(warning !Env-var `ARMINC' not defined! I don't know which directories contain ARM's system headers.\
- Please set it to, e.g: ARMINC=E:\ARM250\Include (Separate multiple dirs with semicolons.) And DO NOT use spaces in dirs)
+  $(warning !GMP!Warning: Env-var `ARMINC' not defined! I don't know which directories contain ARM's system headers.\
+ Please set it to, e.g: ARMINC=E:\ARM250\Include (Separate multiple dirs with semicolons), and DO NOT use spaces in dirs.)
 endif
 
 gmu_ud_list_SYS_HEADER += $(subst ;, ,$(subst \,/,$(ARMINC)))

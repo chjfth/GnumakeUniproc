@@ -362,6 +362,9 @@ _p_ThisMki = $(call gmuf_lastword,$(MAKEFILE_LIST))
 _d_ThisMki_ = $(dir $(_p_ThisMki))
 	# The trailing _ in make-var name implies there is a trail slash in its value.
 _d_ThisMki = $(patsubst %/,%,$(_d_ThisMki_))
+# Tip: Actually, user should copy the following make statement to FIRST line of his mki:
+# d_ThisMki := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
 
 
 _KickoutPrjname = $(firstword $(subst /, ,$(patsubst $(gmu_ud_OUTPUT_ROOT)/%,%,$1)))
