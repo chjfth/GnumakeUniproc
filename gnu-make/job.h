@@ -1,19 +1,20 @@
 /* Definitions for managing subprocesses in GNU Make.
 Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+Foundation, Inc.
 This file is part of GNU Make.
 
 GNU Make is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2, or (at your option) any later version.
+Foundation; either version 3 of the License, or (at your option) any later
+version.
 
 GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-GNU Make; see the file COPYING.  If not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
+this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef SEEN_JOB_H
 #define SEEN_JOB_H
@@ -53,6 +54,7 @@ struct child
 #ifdef VMS
     int efn;			/* Completion event flag number */
     int cstatus;		/* Completion status */
+    char *comname;              /* Temporary command file name */
 #endif
     char *sh_batch_file;        /* Script file for shell commands */
     unsigned int remote:1;	/* Nonzero if executing remotely.  */
@@ -66,31 +68,33 @@ struct child
 
 extern struct child *children;
 
-extern void new_job PARAMS ((struct file *file));
-extern void reap_children PARAMS ((int block, int err));
-extern void start_waiting_jobs PARAMS ((void));
+int is_bourne_compatible_shell(const char *path);
+void new_job (struct file *file);
+void reap_children (int block, int err);
+void start_waiting_jobs (void);
 
-extern char **construct_command_argv PARAMS ((char *line, char **restp, struct file *file, char** batch_file));
+char **construct_command_argv (char *line, char **restp, struct file *file,
+                               int cmd_flags, char** batch_file);
 #ifdef VMS
-extern int child_execute_job PARAMS ((char *argv, struct child *child));
+int child_execute_job (char *argv, struct child *child);
 #elif defined(__EMX__)
-extern int child_execute_job PARAMS ((int stdin_fd, int stdout_fd, char **argv, char **envp));
+int child_execute_job (int stdin_fd, int stdout_fd, char **argv, char **envp);
 #else
-extern void child_execute_job PARAMS ((int stdin_fd, int stdout_fd, char **argv, char **envp));
+void child_execute_job (int stdin_fd, int stdout_fd, char **argv, char **envp);
 #endif
 #ifdef _AMIGA
-extern void exec_command PARAMS ((char **argv));
+void exec_command (char **argv);
 #elif defined(__EMX__)
-extern int exec_command PARAMS ((char **argv, char **envp));
+int exec_command (char **argv, char **envp);
 #else
-extern void exec_command PARAMS ((char **argv, char **envp));
+void exec_command (char **argv, char **envp);
 #endif
 
 extern unsigned int job_slots_used;
 
-extern void block_sigs PARAMS ((void));
+void block_sigs (void);
 #ifdef POSIX
-extern void unblock_sigs PARAMS ((void));
+void unblock_sigs (void);
 #else
 #ifdef	HAVE_SIGSETMASK
 extern int fatal_signal_mask;

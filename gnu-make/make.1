@@ -164,7 +164,7 @@ for debugging while remaking makefiles.
 Give variables taken from the environment precedence
 over variables from makefiles.
 .TP 0.5i
-+\fB\-f\fR \fIfile\fR, \fB\-\-file\fR=\fIfile\fR, \fB\-\-makefile\fR=\fIFILE\fR
+\fB\-f\fR \fIfile\fR, \fB\-\-file\fR=\fIfile\fR, \fB\-\-makefile\fR=\fIFILE\fR
 Use
 .I file
 as a makefile.
@@ -223,7 +223,8 @@ With no argument, removes a previous load limit.
 Use the latest mtime between symlinks and target.
 .TP 0.5i
 .BR \-n , " \-\-just\-print" , " \-\-dry\-run" , " \-\-recon"
-Print the commands that would be executed, but do not execute them.
+Print the commands that would be executed, but do not execute them (except in
+certain circumstances).
 .TP 0.5i
 \fB\-o\fR \fIfile\fR, \fB\-\-old\-file\fR=\fIfile\fR, \fB\-\-assume\-old\fR=\fIfile\fR
 Do not remake the file
@@ -340,26 +341,19 @@ This manual page contributed by Dennis Morse of Stanford University.
 It has been reworked by Roland McGrath.  Further updates contributed by
 Mike Frysinger.
 .SH "COPYRIGHT"
-Copyright (C) 1992, 1993, 1996, 1999 Free Software Foundation, Inc.
+Copyright (C) 1992, 1993, 1996, 1999, 2007 Free Software Foundation, Inc.
 This file is part of GNU
 .IR make .
 .LP
-GNU
-.I make
-is free software; you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
 version.
 .LP
-GNU
-.I make
-is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 .LP
-You should have received a copy of the GNU General Public License
-along with GNU
-.IR make ;
-see the file COPYING.  If not, write to the Free Software Foundation,
-Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see
+.IR http://www.gnu.org/licenses/ .

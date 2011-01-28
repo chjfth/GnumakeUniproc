@@ -1,20 +1,20 @@
 /* Definition of target file data structures for GNU Make.
 Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
-1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
-Foundation, Inc.
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+2010 Free Software Foundation, Inc.
 This file is part of GNU Make.
 
 GNU Make is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2, or (at your option) any later version.
+Foundation; either version 3 of the License, or (at your option) any later
+version.
 
 GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-GNU Make; see the file COPYING.  If not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
+this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 
 /* Structure that represents the info on one file
@@ -25,14 +25,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 struct file
   {
-    char *name;
-    char *hname;                /* Hashed filename */
-    char *vpath;                /* VPATH/vpath pathname */
+    const char *name;
+    const char *hname;          /* Hashed filename */
+    const char *vpath;          /* VPATH/vpath pathname */
     struct dep *deps;		/* all dependencies, including duplicates */
     struct commands *cmds;	/* Commands to execute for this target.  */
     int command_flags;		/* Flags OR'd in for cmds; see commands.h.  */
-    char *stem;			/* Implicit stem, if an implicit
-    				   rule has been used */
+    const char *stem;		/* Implicit stem, if an implicit
+                                   rule has been used */
     struct dep *also_make;	/* Targets that are made by making this.  */
     FILE_TIMESTAMP last_mtime;	/* File's modtime, if already known.  */
     FILE_TIMESTAMP mtime_before_update;	/* File's modtime before any updating
@@ -94,24 +94,28 @@ struct file
                                    pattern-specific variables.  */
     unsigned int considered:1;  /* equal to 'considered' if file has been
                                    considered on current scan of goal chain */
+    unsigned int no_diag:1;     /* True if the file failed to update and no
+                                   diagnostics has been issued (dontcare). */
   };
 
 
-extern struct file *default_goal_file, *suffix_file, *default_file;
-extern char **default_goal_name;
+extern struct file *suffix_file, *default_file;
 
 
-extern struct file *lookup_file PARAMS ((char *name));
-extern struct file *enter_file PARAMS ((char *name));
-extern struct dep *parse_prereqs PARAMS ((char *prereqs));
-extern void remove_intermediates PARAMS ((int sig));
-extern void snap_deps PARAMS ((void));
-extern void rename_file PARAMS ((struct file *file, char *name));
-extern void rehash_file PARAMS ((struct file *file, char *name));
-extern void set_command_state PARAMS ((struct file *file, enum cmd_state state));
-extern void notice_finished_file PARAMS ((struct file *file));
-extern void init_hash_files PARAMS ((void));
-extern char *build_target_list PARAMS ((char *old_list));
+struct file *lookup_file (const char *name);
+struct file *enter_file (const char *name);
+struct dep *split_prereqs (char *prereqstr);
+struct dep *enter_prereqs (struct dep *prereqs, const char *stem);
+void remove_intermediates (int sig);
+void snap_deps (void);
+void rename_file (struct file *file, const char *name);
+void rehash_file (struct file *file, const char *name);
+void set_command_state (struct file *file, enum cmd_state state);
+void notice_finished_file (struct file *file);
+void init_hash_files (void);
+char *build_target_list (char *old_list);
+void print_prereqs (const struct dep *deps);
+void print_file_data_base (void);
 
 #if FILE_TIMESTAMP_HI_RES
 # define FILE_TIMESTAMP_STAT_MODTIME(fname, st) \
@@ -152,10 +156,9 @@ extern char *build_target_list PARAMS ((char *old_list));
     * 302 / 1000) \
    + 1 + 1 + 4 + 25)
 
-extern FILE_TIMESTAMP file_timestamp_cons PARAMS ((char const *,
-						   time_t, int));
-extern FILE_TIMESTAMP file_timestamp_now PARAMS ((int *));
-extern void file_timestamp_sprintf PARAMS ((char *p, FILE_TIMESTAMP ts));
+FILE_TIMESTAMP file_timestamp_cons (char const *, time_t, int);
+FILE_TIMESTAMP file_timestamp_now (int *);
+void file_timestamp_sprintf (char *p, FILE_TIMESTAMP ts);
 
 /* Return the mtime of file F (a struct file *), caching it.
    The value is NONEXISTENT_MTIME if the file does not exist.  */
@@ -165,7 +168,7 @@ extern void file_timestamp_sprintf PARAMS ((char *p, FILE_TIMESTAMP ts));
    we don't find it.
    The value is NONEXISTENT_MTIME if the file does not exist.  */
 #define file_mtime_no_search(f) file_mtime_1 ((f), 0)
-extern FILE_TIMESTAMP f_mtime PARAMS ((struct file *file, int search));
+FILE_TIMESTAMP f_mtime (struct file *file, int search);
 #define file_mtime_1(f, v) \
   ((f)->last_mtime == UNKNOWN_MTIME ? f_mtime ((f), v) : (f)->last_mtime)
 

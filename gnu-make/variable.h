@@ -1,20 +1,20 @@
 /* Definitions for using variables in GNU Make.
 Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
-1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
-Foundation, Inc.
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+2010 Free Software Foundation, Inc.
 This file is part of GNU Make.
 
 GNU Make is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2, or (at your option) any later version.
+Foundation; either version 3 of the License, or (at your option) any later
+version.
 
 GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-GNU Make; see the file COPYING.  If not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
+this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "hash.h"
 
@@ -59,10 +59,12 @@ struct variable
                                    variable.  */
     unsigned int conditional:1; /* Nonzero if set with a ?=. */
     unsigned int per_target:1;	/* Nonzero if a target-specific variable.  */
-    unsigned int special:1;     /* Nonzero if this is a special variable. */
+    unsigned int special:1;     /* Nonzero if this is a special variable.  */
     unsigned int exportable:1;  /* Nonzero if the variable _could_ be
                                    exported.  */
     unsigned int expanding:1;	/* Nonzero if currently being expanded.  */
+    unsigned int private_var:1; /* Nonzero avoids inheritance of this
+                                   target-specific variable.  */
     unsigned int exp_count:EXP_COUNT_BITS;
                                 /* If >1, allow this many self-referential
                                    expansions.  */
@@ -92,6 +94,7 @@ struct variable_set_list
   {
     struct variable_set_list *next;	/* Link in the chain.  */
     struct variable_set *set;		/* Variable set.  */
+    int next_is_parent;                 /* True if next is a parent target.  */
   };
 
 /* Structure used for pattern-specific variables.  */
@@ -99,70 +102,88 @@ struct variable_set_list
 struct pattern_var
   {
     struct pattern_var *next;
-    char *target;
+    const char *suffix;
+    const char *target;
     unsigned int len;
-    char *suffix;
     struct variable variable;
   };
 
 extern char *variable_buffer;
 extern struct variable_set_list *current_variable_set_list;
+extern struct variable *default_goal_var;
 
 /* expand.c */
-extern char *variable_buffer_output PARAMS ((char *ptr, char *string, unsigned int length));
-extern char *variable_expand PARAMS ((char *line));
-extern char *variable_expand_for_file PARAMS ((char *line, struct file *file));
-extern char *allocated_variable_expand_for_file PARAMS ((char *line, struct file *file));
+char *variable_buffer_output (char *ptr, const char *string, unsigned int length);
+char *variable_expand (const char *line);
+char *variable_expand_for_file (const char *line, struct file *file);
+char *allocated_variable_expand_for_file (const char *line, struct file *file);
 #define	allocated_variable_expand(line) \
   allocated_variable_expand_for_file (line, (struct file *) 0)
-extern char *expand_argument PARAMS ((const char *str, const char *end));
-extern char *variable_expand_string PARAMS ((char *line, char *string,
-                                             long length));
-extern void install_variable_buffer PARAMS ((char **bufp, unsigned int *lenp));
-extern void restore_variable_buffer PARAMS ((char *buf, unsigned int len));
+char *expand_argument (const char *str, const char *end);
+char *variable_expand_string (char *line, const char *string, long length);
+void install_variable_buffer (char **bufp, unsigned int *lenp);
+void restore_variable_buffer (char *buf, unsigned int len);
 
 /* function.c */
-extern int handle_function PARAMS ((char **op, char **stringp));
-extern int pattern_matches PARAMS ((char *pattern, char *percent, char *str));
-extern char *subst_expand PARAMS ((char *o, char *text, char *subst, char *replace,
-		unsigned int slen, unsigned int rlen, int by_word));
-extern char *patsubst_expand PARAMS ((char *o, char *text, char *pattern, char *replace,
-		char *pattern_percent, char *replace_percent));
+int handle_function (char **op, const char **stringp);
+int pattern_matches (const char *pattern, const char *percent, const char *str);
+char *subst_expand (char *o, const char *text, const char *subst,
+                    const char *replace, unsigned int slen, unsigned int rlen,
+                    int by_word);
+char *patsubst_expand_pat (char *o, const char *text, const char *pattern,
+                           const char *replace, const char *pattern_percent,
+                           const char *replace_percent);
+char *patsubst_expand (char *o, const char *text, char *pattern, char *replace);
 
 /* expand.c */
-extern char *recursively_expand_for_file PARAMS ((struct variable *v,
-                                                  struct file *file));
+char *recursively_expand_for_file (struct variable *v, struct file *file);
 #define recursively_expand(v)   recursively_expand_for_file (v, NULL)
 
 /* variable.c */
-extern struct variable_set_list *create_new_variable_set PARAMS ((void));
-extern void free_variable_set PARAMS ((struct variable_set_list *));
-extern struct variable_set_list *push_new_variable_scope PARAMS ((void));
-extern void pop_variable_scope PARAMS ((void));
-extern void define_automatic_variables PARAMS ((void));
-extern void initialize_file_variables PARAMS ((struct file *file, int read));
-extern void print_file_variables PARAMS ((struct file *file));
-extern void print_variable_set PARAMS ((struct variable_set *set, char *prefix));
-extern void merge_variable_set_lists PARAMS ((struct variable_set_list **to_list, struct variable_set_list *from_list));
-extern struct variable *do_variable_definition PARAMS ((const struct floc *flocp, const char *name, char *value, enum variable_origin origin, enum variable_flavor flavor, int target_var));
-extern struct variable *parse_variable_definition PARAMS ((struct variable *v, char *line));
-extern struct variable *try_variable_definition PARAMS ((const struct floc *flocp, char *line, enum variable_origin origin, int target_var));
-extern void init_hash_global_variable_set PARAMS ((void));
-extern void hash_init_function_table PARAMS ((void));
-extern struct variable *lookup_variable PARAMS ((const char *name, unsigned int length));
-extern struct variable *lookup_variable_in_set PARAMS ((const char *name,
-                                                        unsigned int length,
-                                                        const struct variable_set *set));
+struct variable_set_list *create_new_variable_set (void);
+void free_variable_set (struct variable_set_list *);
+struct variable_set_list *push_new_variable_scope (void);
+void pop_variable_scope (void);
+void define_automatic_variables (void);
+void initialize_file_variables (struct file *file, int reading);
+void print_file_variables (const struct file *file);
+void print_variable_set (struct variable_set *set, char *prefix);
+void merge_variable_set_lists (struct variable_set_list **to_list,
+                               struct variable_set_list *from_list);
+struct variable *do_variable_definition (const struct floc *flocp,
+                                         const char *name, const char *value,
+                                         enum variable_origin origin,
+                                         enum variable_flavor flavor,
+                                         int target_var);
+char *parse_variable_definition (const char *line,
+                                 enum variable_flavor *flavor);
+struct variable *assign_variable_definition (struct variable *v, char *line);
+struct variable *try_variable_definition (const struct floc *flocp, char *line,
+                                          enum variable_origin origin,
+                                          int target_var);
+void init_hash_global_variable_set (void);
+void hash_init_function_table (void);
+struct variable *lookup_variable (const char *name, unsigned int length);
+struct variable *lookup_variable_in_set (const char *name, unsigned int length,
+                                         const struct variable_set *set);
 
-extern struct variable *define_variable_in_set
-    PARAMS ((const char *name, unsigned int length, char *value,
-             enum variable_origin origin, int recursive,
-             struct variable_set *set, const struct floc *flocp));
+struct variable *define_variable_in_set (const char *name, unsigned int length,
+                                         const char *value,
+                                         enum variable_origin origin,
+                                         int recursive,
+                                         struct variable_set *set,
+                                         const struct floc *flocp);
 
 /* Define a variable in the current variable set.  */
 
 #define define_variable(n,l,v,o,r) \
           define_variable_in_set((n),(l),(v),(o),(r),\
+                                 current_variable_set_list->set,NILF)
+
+/* Define a variable with a constant name in the current variable set.  */
+
+#define define_variable_cname(n,v,o,r) \
+          define_variable_in_set((n),(sizeof (n) - 1),(v),(o),(r),\
                                  current_variable_set_list->set,NILF)
 
 /* Define a variable with a location in the current variable set.  */
@@ -181,6 +202,15 @@ extern struct variable *define_variable_in_set
 #define define_variable_for_file(n,l,v,o,r,f) \
           define_variable_in_set((n),(l),(v),(o),(r),(f)->variables->set,NILF)
 
+void undefine_variable_in_set (const char *name, unsigned int length,
+                               enum variable_origin origin,
+                               struct variable_set *set);
+
+/* Remove variable from the current variable set. */
+
+#define undefine_variable_global(n,l,o) \
+          undefine_variable_in_set((n),(l),(o),NULL)
+
 /* Warn that NAME is an undefined variable.  */
 
 #define warn_undefined(n,l) do{\
@@ -190,9 +220,10 @@ extern struct variable *define_variable_in_set
                                 (int)(l), (n)); \
                               }while(0)
 
-extern char **target_environment PARAMS ((struct file *file));
+char **target_environment (struct file *file);
 
-extern struct pattern_var *create_pattern_var PARAMS ((char *target, char *suffix));
+struct pattern_var *create_pattern_var (const char *target,
+                                        const char *suffix);
 
 extern int export_all_variables;
 

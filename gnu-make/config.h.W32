@@ -1,20 +1,20 @@
 /* config.h.W32 -- hand-massaged config.h file for Windows builds       -*-C-*-
 
 Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-2006 Free Software Foundation, Inc.
+2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 This file is part of GNU Make.
 
 GNU Make is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2, or (at your option) any later version.
+Foundation; either version 3 of the License, or (at your option) any later
+version.
 
 GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-GNU Make; see the file COPYING.  If not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
+this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Suppress some Visual C++ warnings.
    Maybe after the code cleanup for ISO C we can remove some/all of these.  */
@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 # pragma warning(disable:4127) /* conditional expression is constant */
 # pragma warning(disable:4131) /* uses old-style declarator */
 # pragma warning(disable:4702) /* unreachable code */
+# define _CRT_SECURE_NO_WARNINGS  /* function or variable may be unsafe */
+# define _CRT_NONSTDC_NO_WARNINGS /* functions w/o a leading underscore */
 #endif
 
 /* Define to 1 if the `closedir' function returns void instead of `int'. */
@@ -80,6 +82,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
 #define HAVE_DIRENT_H 1
+
+/* Define to 1 if you have the <direct.h> header file, and it defines getcwd()
+   and chdir().
+   */
+#if (defined(_MSC_VER) || defined(__BORLANDC__)) && !defined(__INTERIX)
+# define HAVE_DIRECT_H 1
+#endif
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -218,6 +227,21 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 /* Define to 1 if you have the `strcasecmp' function. */
 /* #undef HAVE_STRCASECMP */
+
+/* Define to 1 if you have the `strcmpi' function. */
+/* #undef HAVE_STRCMPI */
+
+/* Define to 1 if you have the `stricmp' function. */
+#define HAVE_STRICMP 1
+
+/* Define to 1 if you have the `strncasecmp' function. */
+/* #undef HAVE_STRNCASECMP */
+
+/* Define to 1 if you have the `strncmpi' function. */
+/* #undef HAVE_STRNCMPI */
+
+/* Define to 1 if you have the `strnicmp' function. */
+#define HAVE_STRNICMP 1
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
@@ -371,7 +395,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 /* #undef UMAX4_3 */
 
 /* Version number of package */
-#define VERSION "3.81"
+#define VERSION "3.82"
 
 /* Define if using the dmalloc debugging malloc package */
 /* #undef WITH_DMALLOC */
@@ -405,11 +429,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
+#include <sys/types.h>
+
 /* Define to `int' if <sys/types.h> doesn't define. */
 #define gid_t int
 
 /* Define to `int' if <sys/types.h> does not define. */
+/* GCC 4.x reportedly defines pid_t.  */
+#ifndef _PID_T_
+#ifdef _WIN64
+#define pid_t __int64
+#else
 #define pid_t int
+#endif
+#endif
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 #define uid_t int
