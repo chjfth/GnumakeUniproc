@@ -40,11 +40,13 @@ gmp_DECO_UNICODE_FOR_LINK_OUTPUT =
 gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
 
-# >>> optional for win32 lib (enable as you will)
+# >>> optional for MSVC (enable as you will)
 #gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
 #gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = [dir-prefix]/ExportDefs.txt
 #gmi_WDFL_up_EXPORT_STUB_FROM_ROOT = export-stub.cpp #<export stub C/C++ file>
-# <<< optional for win32 lib
+gmp_bc_CRT_STATIC_LIB =
+  # Set to 1 if you want to use static CRT(add compiler option /MTd or /MT)
+# <<< optional for MSVC
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
 
