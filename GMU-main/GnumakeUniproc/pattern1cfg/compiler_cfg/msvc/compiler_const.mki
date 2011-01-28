@@ -136,7 +136,7 @@ gmp_CFLAGS_NON_CODE_GEN_preset += /nologo
 # Category(dor): Debug-Build or Release-Build
 cfc_for_Debug_codegen = /Od /Zi
 cfc_for_Debug_defs = /D_DEBUG
-cfc_for_Release_codegen = /O2
+cfc_for_Release_codegen = /O2 $(if $(gmp_msvc_WANT_RELEASE_PDB),/Zi)
 cfc_for_Release_defs = /DNDEBUG
 
 # Category(chr): MBCS or Unicode

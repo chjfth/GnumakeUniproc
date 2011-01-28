@@ -106,7 +106,7 @@ gmp_CFLAGS_NON_CODE_GEN_preset += /Fd"$(gmp_MSVC_Gp_VCx0_pdb)"
 	# [2007-11-23] Today, I decided to name those VCx0.pdb specifically with prjname,
 	# -- if not, you will not be able to place pdb files from several projects into the same 
 	# directory for ease of debuging on other machines.
-	# [2007-11-25] Today, I decide to use a explicit name(VCx0_$(gmu_G_Deco_PrjName).pdb) for 
+	# [2007-11-25] Today, I decide to use a explicit name( $(gmu_G_Deco_PrjName).pdb ) for 
 	# the pdb file instead of VCx0.pdb, so that multiple VCx0.pdb can be placed into the
 	# same dir when distributing the debug library to the end-user.
 

@@ -7,12 +7,6 @@ _pluginId_sync_debug_info := $(gmpv_ThisPluginId)
 # NOTE: In order to use this plugin, user should also load plugin PI_sync_devoutput .
 # (because Make-target gmi_SYDO_target_SyncOutput is from PI_sync_devoutput.)
 
-# User input vars: 
-# gmi_SDBI_LOAD_ANYHOW (optional, default to null)
-	# If this is null, this plugin will be effective only when gmp_bc_DEBUG=1.
-	# If non-null, this plugin will be effective anyway, for example, if you
-	# require generating pdb files for a release-build.
-#
 # gmi_SYDO_ud_SYNC_DBGINFO_TO (must)
 	# This tells to where the debug output info will be copied.
 	# This is actually a make-var introduced by plugin PI_sync_devoutput.
@@ -35,7 +29,7 @@ _d_ThisPlugin = $(dir $(call gmuf_lastword,$(MAKEFILE_LIST)))
 
 _p_sdbi_mkiToLoad := $(_d_ThisPlugin)sdbi.$(gmp_COMPILER_ID).mki
 
-ifneq (,$(gmp_bc_DEBUG)$(gmi_SDBI_LOAD_ANYHOW))
+ifneq (,$(gmp_bc_DEBUG)$(gmp_msvc_WANT_RELEASE_PDB))
 
   ifneq (,$(wildcard $(_p_sdbi_mkiToLoad)))
     include $(_p_sdbi_mkiToLoad)

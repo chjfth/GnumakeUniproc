@@ -35,6 +35,23 @@
     </ul></td>
   </tr>
 </table>
+<h4><code>gmp_</code> vars for Visual C++</h4>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Var name </th>
+    <th scope="col">Apply to </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmp_msvc_WANT_RELEASE_PDB</td>
+    <td align="center" valign="top">MSVC</td>
+    <td><ul>
+      <li>null(default): Will not append <code>/Zi</code> when <code>gmp_bc_DEBUG</code> is null.</li>
+      <li>1:  Will  append <code>/Zi</code> even when <code>gmp_bc_DEBUG</code> is null, so that PDB files will be generated.</li>
+    </ul></td>
+  </tr>
+</table>
+<p></p>
 <p>&nbsp; </p>
 <h4><code>gmp_</code> vars related to DLL building </h4>
 <table width="100%"  border="1">

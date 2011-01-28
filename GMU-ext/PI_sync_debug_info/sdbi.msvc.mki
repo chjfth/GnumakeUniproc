@@ -31,9 +31,9 @@ sdbi_isExeOutput = $(if $(call gmuf_IsFileExist_sh,$(sdbi_pdbExeOutput)),1)
 gmi_SDBI_Gps_DBG_FILE = $(if $(sdbi_isExeOutput),$(sdbi_pdbExeOutput),$(sdbi_pdbLibOutput))
 	# The first check is for EXE or DLL output, and if not I think that is a LIB output
 	#
-	# Example: A project outputs foo.exe, then the corresponding pdb is foo.pdb.
-	# Copying foo.pdb is enough, don't copy the VCx0.pdb since the info in VCx0.pdb
-	# has been merged into foo.pdb when generting an EXE/DLL. 
+	# Example: A project outputs foo.exe, then the corresponding pdb is foo.exe.pdb.
+	# Copying foo.exe.pdb is enough, don't copy the VCx0.pdb since the info in VCx0.pdb
+	# has been merged into foo.exe.pdb when generting an EXE/DLL. 
 	# But if you're linking a static LIB(bar.lib for example), then no bar.pdb is
 	# generated when linking the lib, so the VCx0.pdb is the one you should keep.
 	#
