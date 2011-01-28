@@ -92,8 +92,7 @@ gmp_CFLAGS_CODE_GEN_preset += $(if $(isAboveVC8),/Wp64)# Detect 64-bit portabili
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM))
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
 
-#gmp_MSVC_Gp_VCx0_pdb = $(dir $(gmu_Gp_LINK_OUTPUT))$(gmu_Gf_Deco_LinkOutput).VCx0.pdb //!2009-05-13 verbose, gmu_Gp_LINK_OUTPUT is already the decorated form, not necessary
-gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).VCx0.pdb
+gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
 	# NOTE: gmp_MSVC_Gp_VCx0_pdb is for cl compile process(not for link process); it is used with /Fd compile flag.
 	# [2009-12-16] Side note: 
 	# For PDBs generated with EXE and DLL, we use gmp_MSVC_Gp_LINK_OUTPUT_pdb instead to tell the pdb file path, 
