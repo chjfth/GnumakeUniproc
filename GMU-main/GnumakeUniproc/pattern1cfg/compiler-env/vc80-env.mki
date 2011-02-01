@@ -20,10 +20,10 @@ endif
 
 _vc80_val_INCLUDE = $(if $2,$2/Include;)$1/VC/include;$1/VC/PlatformSDK/Include;$1/VC/atlmfc/include;
 _vc80_val_LIB = $(if $2,$2/Lib;)$1/VC/lib;$1/VC/PlatformSDK/Lib;$1/VC/atlmfc/lib;$1/SDK/v2.0/lib;
-_vc80_val_PATH = $1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
+_vc80_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
 	# Values of the above three is allowed to have spaces.
 	# $1: VC8 install dir(root-dir)
-	# $2: PSDK root dir.
+	# $2: PSDK root dir(preferred WinSDK Feb 2007).
 
 
 in_gmpf_LoadCenv_vc80 = \
