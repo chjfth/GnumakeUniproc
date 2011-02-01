@@ -23,8 +23,7 @@ _vc80_val_LIB = $(if $2,$2/Lib;)$1/VC/lib;$1/VC/PlatformSDK/Lib;$1/VC/atlmfc/lib
 _vc80_val_PATH = $1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
 	# Values of the above three is allowed to have spaces.
 	# $1: VC8 install dir(root-dir)
-	# $2: PSDK(preferred one is PSDK March 2006, also called PSDK Windows Server 2003 R2) install dir
-	# [2009-04-08]pending: $2 has not been prepended in _vc80_val_PATH
+	# $2: PSDK root dir.
 
 
 in_gmpf_LoadCenv_vc80 = \

@@ -1,0 +1,52 @@
+ifndef __vc90-env_included_
+__vc90-env_included_ := 1
+
+
+# For Visual C++ 9.0 (VS2008) 32-bit
+
+ifeq (,$(gmp_CENV_MSVC90_ROOT))
+  $(error !GMP!Error: gmp_CENV_MSVC90_ROOT is not defined, so I cannot find Visual C++ 9 compiler)
+endif
+
+ifeq (,$(gmp_CENV_MSVC90_PSDK_ROOT))
+  $(warning !GMP!info: gmp_CENV_MSVC90_PSDK_ROOT is not defined, so you are not using a PlatformSDK)
+  # For VS2008, this should be a $(warning ) instead of $(info ), because PSDK for VS2008
+  # (windows.h, kernel32.lib etc) is in a separate location. The default bundled PSDK location
+  # by VS2008 installer is
+  #   C:\Program Files\Microsoft SDKs\Windows\v6.0A
+endif
+
+
+_vc90_val_INCLUDE = $(if $2,$2/Include;)$1/VC/include;$1/VC/atlmfc/include;
+_vc90_val_LIB = $(if $2,$2/Lib;)$1/VC/lib;$1/VC/atlmfc/lib;
+_vc90_val_PATH = $(if $2,$2/bin;)$1/VC/bin;$1/Common7/Tools;$1/Common7/IDE;$(subst \,/,$(PATH))
+     # Values of the above three is allowed to have spaces.
+     # $1: VC9 install dir(root-dir)
+     # $2: PSDK root dir.
+     #
+     # Note: Some dirs appearing in VS9 IDE actually does not exist on the FS, so I do not
+     # add them here. e.g. LIB dir: $(VCInstallDir)atlmfc\lib\i386
+
+
+in_gmpf_LoadCenv_vc90 = \
+     gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc90" \
+     MSVSDir="$1" MSSdk="$2" \
+     INCLUDE="$(_vc90_val_INCLUDE)" \
+     LIB="$(_vc90_val_LIB)" \
+     PATH="$(_vc90_val_PATH)"
+
+gmpf_LoadCenv_vc90 = $(call in_gmpf_LoadCenv_vc90,$(gmp_CENV_MSVC90_ROOT),$(gmp_CENV_MSVC90_PSDK_ROOT))
+
+
+define def_ExportCenv_vc90
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc90)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc90_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc90_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc90_val_PATH))
+endef
+
+gmpf_ExportCenv_vc90 = $(eval $(call def_ExportCenv_vc90,$(gmp_CENV_MSVC90_ROOT),$(gmp_CENV_MSVC90_PSDK_ROOT)))
+
+endif
