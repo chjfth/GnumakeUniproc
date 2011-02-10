@@ -123,14 +123,14 @@ Files compiled: C++:0 C:4 ASM:0 linked:2
 				<p>Also, since the build of EXE project is launch by us directly, we also call the EXE project, in this example, root project. </p>
   </li>
   <li>
-  				<p>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir); root project and all child projects' output(.o .obj .lib .exe etc) will be generated into that directory. You can override, if you like, this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>(must assign a full path in this case).  This output root dir is represented by a <b><code>% </code></b>character in the screen output. </p>
+  				<img src="gf-dir.png" align="right" style="padding:5px" /><p>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir); root project and all child projects' output(.o .obj .lib .exe etc) will be generated into that directory. You can override, if you like, this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>(must be a absolute path in this case).  This output root dir is represented by a <b><code>%</code></b> character in the screen output. </p>
 				<p>Hint: <code>gf</code> means &quot;generated files&quot;.</p>
   </li>
   <li>
   				<p>In the output root dir, every project's output is stored in a dedicated &quot;project output directory&quot;, so that different projects output will not get mixed. In this example, the two project output dirs are named <tt>walkdir_mingw</tt> and <tt>walkdir_ex1_mingw</tt> respectively, these names are determined by make-var <code>gmu_PRJ_NAME</code> in <tt>exe.mki</tt>(with some decoration). </p>
   </li>
   <li>
-  				<p>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target<code>(_gmu_ut_GetPrjAttr)</code> for the sub-project) . </p>
+  				<p>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target(<code>_gmu_ut_GetPrjAttr)</code> for the sub-project) . </p>
   </li>
   <li>
   				<p>The final two screen lines tells how many <tt>Projects</tt> were built in this run, how many <tt>C++</tt>, <tt>C</tt>, and <tt>ASM </tt>files were compiled, finally, how many linking processes(<tt>linked</tt>) were carried out. </p>
@@ -166,7 +166,7 @@ gmu_ud_OUTPUT_ROOT(%) = ./gf
 Files compiled: C++:0 C:0 ASM:0 linked:0
 </pre>
 
-<p>You can see that the second run compiles no files and links nothing, because all output files are up-to-date at this time. But if you modify any source file or header file(that of EXE project or LIB project, but not &quot;system headers&quot;), those(and only those) obj files and link images(.lib or .exe) will be regenerated &mdash; that is what we expect from a &quot;make system&quot;. </p>
+<p>You can see that the second run compiles no files and links nothing, because all output files are up-to-date at this time. But if you modify any source file or header file(that of EXE project or LIB project, but not &quot;system headers&quot;), those(and only those) corresponding obj files and link images(.lib or .exe) will be regenerated &mdash; that is what we expect from a &quot;make system&quot;. </p>
 <div class="footnoteb">
   <p>Why execute <tt>umake</tt>? Can I execute just <tt>make</tt>?</p>
   <p>umake is a batch file/shell script wrapping the <tt>make</tt> executable. umake does the following:</p>
