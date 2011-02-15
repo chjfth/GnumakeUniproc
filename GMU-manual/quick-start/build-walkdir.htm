@@ -24,7 +24,7 @@
   </li>
 </ul>
 <h3><a name="Preface"></a>Preface</h3>
-<p>The example program is called <b>walkdir_ex1</b>, which is an executable file, it calls function <code>walkdir_start</code> to walk an directory tree and print all files within that directory, including all its sub-directories. The function <code>walkdir_start</code> is implemented in a static library called <b>walkdir</b>. During the build of walkdir_ex1 project, walkdir project will be built on the fly then get linked into walkdir_ex1, and later every time you want to build walkdir_ex1, walkdir lib project is checked and gets rebuilt if any of its source files have changed. That is the model we desire. </p>
+<p>The example program is called <b>walkdir_ex1</b>, which is an executable file, it calls function <code>walkdir_start</code> to walk a directory tree and print all files within that directory, including all its sub-directories. The function <code>walkdir_start</code> is implemented in a static library called <b>walkdir</b>. During the build of walkdir_ex1 project, walkdir project will be built on the fly then get linked into walkdir_ex1, and later every time you want to build walkdir_ex1, walkdir lib project is checked and gets rebuilt if any of its source files have changed. That is the model we desire. </p>
 <p>The relation of the C/C++ projects here are illustrated below:</p>
 <p><img src="walkdir.gif" width="379" height="241"> </p>
 <p>Since the building procedure on Windows and Linux are quite similar, I'll take Windows for example, only referring to Linux specific instructions when required. </p>
@@ -66,7 +66,7 @@ gmu_uv_list_SUBPRJ_TO_LINK = <b>libwalkdir</b>
 <div class="hint">
   <ul>
     <li>The reserved filename <tt>u_srccfg_post.mki</tt> is recognized by  GnumakeUniproc and it will be automatically included into the whole makefile.</li>
-    <li>Those make variable names starting with <code>gmu_</code> all have special meanings to GnumakeUniproc. </li>
+    <li>Those make variable recognized by GnumakeUniproc have special naming patterns, with prefixing  <code>gmu_</code> or <code>gmp_</code> .</li>
   </ul>
 </div>
 <h3><a name="StartBuiding"></a>Start building the example project </h3>
@@ -127,10 +127,10 @@ Files compiled: C++:0 C:4 ASM:0 linked:2
 				<p>Hint: <code>gf</code> means &quot;generated files&quot;.</p>
   </li>
   <li>
-  				<p>In the output root dir, every project's output is stored in a dedicated &quot;project output directory&quot;, so that different projects output will not get mixed. In this example, the two project output dirs are named <tt>walkdir_mingw</tt> and <tt>walkdir_ex1_mingw</tt> respectively, these names are determined by make-var <code>gmu_PRJ_NAME</code> in <tt>exe.mki</tt>(with some decoration). </p>
+  				<p>In the output root dir, every project's output is stored in their dedicated &quot;project output directory&quot;, so that different projects output will not get mixed. In this example, the two project output dirs are named <tt>walkdir_mingw</tt> and <tt>walkdir_ex1_mingw</tt> respectively, these names are determined by make-var <code>gmu_PRJ_NAME</code> in <tt>exe.mki</tt>(with some suffix decoration). </p>
   </li>
   <li>
-  				<p>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target(<code>_gmu_ut_GetPrjAttr)</code> for the sub-project) . </p>
+  				<p>Makefiles of your EXE project does not need to tell what library name the LIB project will output, nor where the library will be generated. Those two factors will be deduced automatically from its sub-project's makefile(through making a special target(<code>_gmu_ut_GetPrjAttr</code>) for the sub-project) . </p>
   </li>
   <li>
   				<p>The final two screen lines tells how many <tt>Projects</tt> were built in this run, how many <tt>C++</tt>, <tt>C</tt>, and <tt>ASM </tt>files were compiled, finally, how many linking processes(<tt>linked</tt>) were carried out. </p>
@@ -223,7 +223,7 @@ gmu_uf_LINK_OUTPUT = [libwalkdir.a]
 ******************************************************************************
 =====GnumakeUniproc diagnose for [walkdir_ex1]=====
 gmu_uf_LINK_OUTPUT = [<b>walkdir_ex1.exe</b>]</pre>
-<p>The bold text above indicates <code>gmu_uf_LINK_OUTPUT</code>'s value is <tt>walkdir_ex1.exe</tt> . </p>
+<p>Notice the text above marked bold. It says, for <tt>walkdir_ex1</tt> project, <code>gmu_uf_LINK_OUTPUT</code>'s value is <tt>walkdir_ex1.exe</tt> . </p>
 <p>Replace <code>gmu_uf_LINK_OUTPUT</code> with other make variables interested, then you can know their value.</p>
 <p>NOTE: Since walkdir_ex1 has a sub-project, the sub-project is also run with <code>gmu_u_DIAGNOSE_VARS=gmu_uf_LINK_OUTPUT</code>, so you see  <code>gmu_uf_LINK_OUTPUT</code> value of two projects. In order to diagnose for only the root project, you can pass option </p>
 <ul>
