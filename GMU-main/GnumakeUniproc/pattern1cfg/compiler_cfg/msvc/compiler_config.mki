@@ -99,7 +99,7 @@ gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
 	# whose value is defined later separately for EXE and DLL.
 gmp_MSVC_Gp_VCx0_idb = $(call gmuf_ChangeFilenameExt,$(gmp_MSVC_Gp_VCx0_pdb),idb)
 	# note: gmp_MSVC_Gp_VCx0_idb is defined for user convenience, in case user wants to copy .idb to other places.
-	# But idb seems to be a quite old format used on VC5 and prior, so I have not test it yet.
+	# The .idb is for incremental build.
 
 gmp_CFLAGS_NON_CODE_GEN_preset += /Fd"$(gmp_MSVC_Gp_VCx0_pdb)"
 	# /Fd tells where VC50.pdb, vc60.pdb, vc70.pdb, vc80.pdb etc is generated.
