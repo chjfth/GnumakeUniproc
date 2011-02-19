@@ -18,6 +18,9 @@ svn export --force %SvnUrlPrefix%/GMU-uBase-IT/%BranchToGet%  %OutputDir%/GMU/GM
 svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/nlscan  %OutputDir%/GMU/GMU-main/GnumakeUniproc/nlscan
 @if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
 
+svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons
+@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+
 svn export --force %SvnUrlPrefix%/GMU-wince-cfg/%BranchToGet%/wince  %OutputDir%/GMU/GMU-main/GnumakeUniproc/pattern1cfg/compiler_cfg/wince
 @if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
 
