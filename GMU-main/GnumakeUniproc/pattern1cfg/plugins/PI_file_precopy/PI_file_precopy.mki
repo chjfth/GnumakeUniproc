@@ -1,0 +1,18 @@
+ifndef __PLUGIN_FILE_PRECOPY_LOADED
+__PLUGIN_FILE_PRECOPY_LOADED = 1
+
+_pluginId_file_precopy := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: FPCP
+
+# User input vars:
+
+# gmi_FPCP_upp_list_FROM_ROOT = 
+	# (upp: User path pair)
+	# Example:
+	#
+	#
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_file_precopy),postcore)
+
+
+endif #__PLUGIN_FILE_PRECOPY_LOADED
