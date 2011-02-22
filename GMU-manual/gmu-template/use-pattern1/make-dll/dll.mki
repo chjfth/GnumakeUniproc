@@ -32,7 +32,7 @@ endif
 # from $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins .
 ############################################################################
 gmp_u_list_PLUGIN_TO_LOAD += 
-	# PI_sync_devoutput PI_always_compile
+	# PI_sync_devoutput PI_always_compile PI_file_precopy
 
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1

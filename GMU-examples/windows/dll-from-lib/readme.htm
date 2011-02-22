@@ -89,7 +89,7 @@ CODE { color:#660000; }
 <p>Actually, only two things added.</p>
 <p>First, in <tt>$dirDemo/libsrc-walkdir/lib.mki</tt> , we load the plugin and set require parameters for that plugin.</p>
 <pre>gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
-gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt
+gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt <span class="c-comment">#optional</span>
 </pre>
 <p>Second, we create the file <tt>ExportDefs.txt</tt> just referred as the <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> parameter(make-var). The file has the content:</p>
 <pre>walkdir_start
