@@ -7,10 +7,23 @@ _pluginId_file_precopy := $(gmpv_ThisPluginId)
 # User input vars:
 
 # gmi_FPCP_upp_list_FROM_ROOT = 
-	# (upp: User path pair)
+	# (upp: User filepath pair)
+	# List filepath pairs indicating what files to copy before compiling any C/C++ files, in format
+	#	<srcfile1>|<destfile1> <srcfile2>|<destfile2> ...
+	#
 	# Example:
+	#	gmi_FPCP_upp_list_FROM_ROOT = ../../orig/aaa.h|../cmm/aaa.h ../../orig/bbb.h|../cmn/bbb.h
 	#
+	# This will cause the following copy commands to execute:
+	#	cp ../../orig/aaa.h ../cmm/aaa.h 
+	#	cp ../../orig/bbb.h ../cmn/bbb.h 
 	#
+	# Note:
+	# * <srcfile> and <destfile> must be a file, not a directory.
+	# * If <srcfile> does not exist or is a directory, makefile stops with error.
+	# * If <srcfile> is newer than <destfile>, copy operation launches automatically.
+	#
+	# If null, nothing extra will be done.
 
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_file_precopy),postcore)
 
