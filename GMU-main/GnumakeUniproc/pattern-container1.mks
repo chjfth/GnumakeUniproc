@@ -97,6 +97,11 @@ __pattern1_default_first_target: \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
 ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
 # Write sub-prj outputs for its parent. Always doing this does not cause harm.(to be optimized)
+#[2011-02-24] Possible concept error here!! 
+# _p_AutoLinkPjnmForParent's content is sth like(all one line):
+#	@@.../a.lib @@.../b.lib @@@@.../a.lib 
+# but I seems to want the !LINKREF: format(like that of _AutoLinkPjnmForParent.gmu.txt) here.
+# Not actually get trial in practice! Pending!
 	@echo "" > $(_p_AutoLinkListForParent) 
 	@echo "" > $(_p_AutoLinkPjnmForParent)
 	@for v in $(_Gp_list_AutoLinkFromChildren); do echo $$v >> $(_p_AutoLinkListForParent); done
