@@ -3,7 +3,7 @@ define _gmi_prcp_GenCopyRuleL0
   # $2: Destination file path
   _tmp := $$(shell if [ -f "$1" ] ;then echo -n '1';fi)
   ifeq ($$(_tmp),)
-    $$(error !Error from $(_pluginId_file_precopy): You assign $1 as a source file(in gmi_FPCP_upp_list_FROM_ROOT), but that file does not exist)
+    $$(error !Error from $(_pluginId_file_precopy): You assign $1 as a source file(in gmi_FPCP_upp_list_COPY), but that file does not exist)
   endif
   $2: $1
 	@echo "PI_file_precopy for $2 ..."
@@ -14,9 +14,9 @@ _gmi_prcp_GenCopyRuleL1 = $(eval $(call _gmi_prcp_GenCopyRuleL0,$(word 1,$(call 
 	#$1: tells the file pair, in format:
 	#	<sourcefile>|<destifile>
 
-_gmi_prcp_list_destfile = $(foreach p,$(gmi_FPCP_upp_list_FROM_ROOT),$(word 2,$(call split,|,$p)))
+_gmi_prcp_list_destfile = $(foreach p,$(gmi_FPCP_upp_list_COPY),$(word 2,$(call split,|,$p)))
 
-$(foreach p,$(gmi_FPCP_upp_list_FROM_ROOT),$(call _gmi_prcp_GenCopyRuleL1,$p))
+$(foreach p,$(gmi_FPCP_upp_list_COPY),$(call _gmi_prcp_GenCopyRuleL1,$p))
 
 $(gmu_Gp_list_REQOBJS): $(_gmi_prcp_list_destfile)
 

@@ -6,13 +6,13 @@ _pluginId_file_precopy := $(gmpv_ThisPluginId)
 
 # User input vars:
 
-# gmi_FPCP_upp_list_FROM_ROOT = 
+# gmi_FPCP_upp_list_COPY = 
 	# (upp: User filepath pair)
 	# List filepath pairs indicating what files to copy before compiling any C/C++ files, in format
 	#	<srcfile1>|<destfile1> <srcfile2>|<destfile2> ...
 	#
 	# Example:
-	#	gmi_FPCP_upp_list_FROM_ROOT = ../../orig/aaa.h|../cmm/aaa.h ../../orig/bbb.h|../cmn/bbb.h
+	#	gmi_FPCP_upp_list_COPY = ../../orig/aaa.h|../cmm/aaa.h ../../orig/bbb.h|../cmn/bbb.h
 	#
 	# This will cause the following copy commands to execute:
 	#	cp ../../orig/aaa.h ../cmm/aaa.h 
