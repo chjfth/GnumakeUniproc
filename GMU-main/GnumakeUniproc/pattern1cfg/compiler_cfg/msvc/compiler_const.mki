@@ -20,10 +20,13 @@ _msvc_IsUsing_vc71 := $(if $(_msvc_vc71ver),1,)
 _msvc_vc80ver := $(filter vc80%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc80 := $(if $(_msvc_vc80ver),1,)
 
-_msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc70ver) $(_msvc_vc71ver) $(_msvc_vc80ver))
+_msvc_vc90ver := $(filter vc90%,$(gmp_COMPILER_VER_msvc))
+_msvc_IsUsing_vc90 := $(if $(_msvc_vc90ver),1,)
+
+_msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc70ver) $(_msvc_vc71ver) $(_msvc_vc80ver) $(_msvc_vc90ver))
 
 	#(old:)
-	#_msvc_SupportedVers = vc60 vc70 vc71 vc80
+	#_msvc_SupportedVers = vc60 vc70 vc71 vc80 vc90
 	#_msvc_CompilerVers = $(firstword $(call _FindStrings,$(_msvc_SupportedVers),$(gmp_COMPILER_VER_msvc)))
 
 
@@ -50,9 +53,10 @@ else
 endif
 
 
-_gmp_isAboveVC70 = $(if $(_msvc_vc80ver)$(_msvc_vc71ver)$(_msvc_vc70ver),1)
-_gmp_isAboveVC71 = $(if $(_msvc_vc80ver)$(_msvc_vc71ver),1)
-_gmp_isAboveVC80 = $(if $(_msvc_vc80ver),1)
+_gmp_isAboveVC70 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver)$(_msvc_vc71ver)$(_msvc_vc70ver),1)
+_gmp_isAboveVC71 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver)$(_msvc_vc71ver),1)
+_gmp_isAboveVC80 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver),1)
+_gmp_isAboveVC90 = $(if $(_msvc_vc90ver),1)
 
 
 
