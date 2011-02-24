@@ -295,8 +295,7 @@ ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 
   #NOTE: Notice the similarity of the two "big" rules below. When modify, keep in sync carefully.
 
-  $(_p_AutoLinkListForParent): gmu_ut_Always \
-		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALLFP_NonLoopSp))
+  $(_p_AutoLinkListForParent): gmu_ut_Always
 	@echo -n "" > $@ # clear the target file
 	@echo "$(_gmuBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" >> $@
 	@$(if $(gmu_u_EXTRA_LINK_MERGE),echo "$(_gmuBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE)" >> $@)
@@ -306,8 +305,7 @@ ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
   endif
 
-  $(_p_AutoLinkPjnmForParent): gmu_ut_Always \
-		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALpjnmFP_NonLoopSp)) #既然已经依赖 Always了，这个已无需依赖了吧
+  $(_p_AutoLinkPjnmForParent): gmu_ut_Always
 	@echo -n "" > $@ # clear the target file
 	@echo "$(_gmuBuildListIndent)$(gmu_G_Final_PrjName)" >> $@
   ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))

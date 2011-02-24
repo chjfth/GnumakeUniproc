@@ -1184,18 +1184,12 @@ gmuf_GetAllSubprjOutputImagePath = $(_Gp_list_SubprjOutput)
 gmuf_GetAllSubprjNameForLink = $(call _uv_SubprjList_GetPrjname,$(_gmu_uv_list_AllSubprjsForLink))
 	# [2007-03-10] Use gmuf_GetAllSubprjNameForLink instead of gmuf_GetAllSubprjName in plugin PI_windll_from_lib.
 
-
-ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
-  #[2008-12-09] Suppress this section at some times, because it may be time consuming(read lots of subprj attributes from file etc).
-  #For example, when doing checkout, I do not have this section enabled.
-#该函数要挪到ifneq外头
-  # _GetFileListInPrjOutputDir_with_linkref function: (can be recursively called)
-  # $1 is an item. 
-  # * If it starts with !LINKREF: , it is link-reference to a project(linkref) the link process requires.
-  # * Otherwise, it is a full path of $2 that should be linked.
-  # $2: a partial filepath beneath project out dir.
-  define _GetFileListInPrjOutputDir_with_linkref
-  	tmptail := $$2
+# _GetFileListInPrjOutputDir_with_linkref function: (can be recursively called)
+# $1 is an item. 
+# * If it starts with !LINKREF: , it is link-reference to a project(linkref) the link process requires.
+# * Otherwise, it is a full path of $2 that should be linked.
+# $2: a partial filepath beneath project out dir.
+define _GetFileListInPrjOutputDir_with_linkref
     tmpfile := $(patsubst !LINKREF:%,%,$1)
     ifeq ($1,$$(tmpfile))
       # $1 is a LIB/DLL filename(with full path) to link.
@@ -1213,7 +1207,12 @@ ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
         _ret := # This is must, otherwise $(_ret) from previous call level will be returned to caller
       endif
     endif
-  endef
+endef
+
+
+ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
+  #[2008-12-09] Suppress this section at some times, because it may be time consuming(read lots of subprj attributes from file etc).
+  #For example, when doing checkout, I do not have this section enabled.
 
   define Start_GetLinkagePaths
     # $1 is a prjname
