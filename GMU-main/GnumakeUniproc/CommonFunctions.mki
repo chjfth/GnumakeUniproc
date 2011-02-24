@@ -119,6 +119,18 @@ gmuf_IsSubString = $(if $(call _IsStringEqual,$(subst $1,,$2),$2),,1)
 	# 	$(call gmuf_IsSubString,ab,xyz)	=> false
 	# If $1 is null, return null.
 
+_gmuf_addc = $(if $(call _IsStringEqual,$(words $1),1),$1,$(word 1,$1)$2$(call _gmuf_addc,$(wordlist 2,$(words $1),$1),$2))
+gmuf_ConcateWithChars = $(if $(strip $1),$(call _gmuf_addc,$1,$2))
+	# $1: source containing strings separated by space or tabs
+	# $2: Chars in between
+	# Example:
+	#	$(call gmuf_ConcateWithChars,11 22	33,|)
+	# Output:
+	#	11|22|33
+
+gmu_ud_SRC_ROOT=/PRX
+gmi_NLVS_WinRcListToSyncList = $(call gmuf_ConcateWithChar,$(patsubst %,$(gmu_ud_SRC_ROOT)/%,$1),|)
+
 _MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
 _ClearFile = echo -n "" > $(1)

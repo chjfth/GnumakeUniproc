@@ -26,4 +26,13 @@ _pluginId_nls_version_sync := $(gmpv_ThisPluginId)
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_nls_version_sync),postcore)
 
 
+gmif_NLVS_WinRcListToSyncList = $(call gmuf_ConcateWithChars,$(patsubst %,$(gmu_ud_SRC_ROOT)/%,$1),|)
+	# Example:
+	# gmu_ud_SRC_ROOT = ../src
+	#	$(call gmif_NLVS_WinRcListToSyncList,a1.rc b1.rc)
+	# return:
+	#	../src/a1.rc|../src/b1.rc
+	#
+	# The return value is convenient for setting gmi_NLVS_upp_list_SYNC.
+
 endif #__PLUGIN_NLS_VERSION_SYNC_LOADED
