@@ -22,6 +22,15 @@ _pluginId_nls_version_sync := $(gmpv_ThisPluginId)
 	# * If <srcfile> is newer than any <destfile>, copy operation launches automatically.
 	#
 	# If null, nothing extra will be done.
+	#
+	# [2011-02-24]NOTE: If some <destfile> does not exist, it will not assert error,
+	# just like you have written a rule with an arbitrary target name. Such rule will not
+	# cause make's error.
+	
+# gmi_NLVS_add_current_datetime =
+	# (optional, default to null)
+	# If set to 1, current date time(YYYY-MM-DD hh:mm:ss) will be appended to version strings.
+
 
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_nls_version_sync),postcore)
 

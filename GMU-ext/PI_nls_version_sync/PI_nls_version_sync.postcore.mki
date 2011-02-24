@@ -1,4 +1,6 @@
 
+version_sync_pycmd = version-sync.py $(if $(gmi_NLVS_add_current_datetime),--add-datetime) --input=$< $@
+	#[2011-02-24]NOTE: Currently, spaces in $$< and $$@ will cause problem!
 
 define _gmi_nlvs_GenSyncRuleL0
   # $1: Source file path, 
@@ -8,8 +10,8 @@ define _gmi_nlvs_GenSyncRuleL0
     $$(error !Error from $(_pluginId_nls_version_sync): You assign $1 as a source file(in gmi_NLVS_upp_list_SYNC), but that file does not exist)
   endif
   $2: $1
-	@echo "$(_pluginId_nls_version_sync): version-sync.py --input=$$< $$@"
-	@cmd.exe /C "version-sync.py --input=$$< $$@"
+	@echo "$(_pluginId_nls_version_sync) executing command: $$(version_sync_pycmd)"
+	@cmd.exe /C "$$(version_sync_pycmd)"
 endef
 
 _gmi_nlvs_GenCopyRuleL1 = $(eval $(call _gmi_nlvs_GenSyncRuleL0,$(word 1,$(call split,|,$1)),$(wordlist 2,999,$(call split,|,$1))))
