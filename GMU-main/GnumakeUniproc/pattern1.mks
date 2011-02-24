@@ -284,11 +284,16 @@ __pattern1_inc_project_count:
 
 
 _p_list_ALLFP_NonLoopSp := $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),$($v_OutdirGMUTMP)/$(_f_AutoLinkListForParent))
-	# ALLFP: Auto-LinkList F`or Parent. _NonLoopSp: of/from Non-looped subprjs.
+	# ALLFP: Auto-LinkList For Parent. _NonLoopSp: of/from Non-looped subprjs.
+_p_list_ALpjnmFP_NonLoopSp := $(foreach v,$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),$($v_OutdirGMUTMP)/$(_f_AutoLinkPjnmForParent))
+	# ALpjnmFP: Auto-Linklist project name For Parent
+
 	
 ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 
  ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
+
+  #NOTE: Notice the similarity of the two "big" rules below. When modify, keep in sync carefully.
 
   $(_p_AutoLinkListForParent): gmu_ut_Always \
 		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALLFP_NonLoopSp))
@@ -301,8 +306,21 @@ ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
   endif
 
+  $(_p_AutoLinkPjnmForParent): gmu_ut_Always \
+		$(if $(gmu_IS_SUBPRJ_AUTO_LINK_MERGE),$(_p_list_ALpjnmFP_NonLoopSp)) #既然已经依赖 Always了，这个已无需依赖了吧
+	@echo -n "" > $@ # clear the target file
+	@echo "$(_gmuBuildListIndent)$(gmu_G_Final_PrjName)" >> $@
+  ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
+#	@echo "%%%%%%%%%%%%%%%% $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
+	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(_p_list_ALpjnmFP_NonLoopSp) >> $@)
+	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
+  endif
+
  else
   $(_p_AutoLinkListForParent): gmu_ut_Always
+	@echo -n "" > $@
+
+  $(_p_AutoLinkPjnmForParent): gmu_ut_Always
 	@echo -n "" > $@
  endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 
@@ -318,7 +336,7 @@ endif
 __pattern1_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
 		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \
-		$(if $(gmu_I_AM_A_LINK_COMPONENT),$(_p_AutoLinkListForParent)) \
+		$(if $(gmu_I_AM_A_LINK_COMPONENT),$(_p_AutoLinkListForParent) $(_p_AutoLinkPjnmForParent)) \
 		$(gmp_USER_POST_TARGETS) \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
 	@echo "[DONE:] $(call _StripOutputRootPrefix,$(gmu_Gp_LINK_OUTPUT))"

@@ -97,8 +97,10 @@ __pattern1_default_first_target: \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
 ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
 # Write sub-prj outputs for its parent. Always doing this does not cause harm.(to be optimized)
-	@echo "" > $(_p_AutoLinkListForParent)
+	@echo "" > $(_p_AutoLinkListForParent) 
+	@echo "" > $(_p_AutoLinkPjnmForParent)
 	@for v in $(_Gp_list_AutoLinkFromChildren); do echo $$v >> $(_p_AutoLinkListForParent); done
+	@for v in $(_Gp_list_AutoPjnmAllChidren); do echo $$v >> $(_p_AutoLinkPjnmForParent); done
 endif
 #
 ifeq (,$(gmu_FREE_STYLE_MAKEFILE)$(gmu_DO_IGNORE_SUBPRJS)) # Show the following only it really contains subprjs.
