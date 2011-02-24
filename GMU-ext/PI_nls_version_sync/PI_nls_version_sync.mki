@@ -1,0 +1,29 @@
+ifndef __PLUGIN_NLS_VERSION_SYNC_LOADED
+__PLUGIN_NLS_VERSION_SYNC_LOADED = 1
+
+_pluginId_nls_version_sync := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: NLVS
+
+# User input vars:
+
+# gmi_NLVS_upp_list_SYNC = 
+	# (upp: User filepath pair)
+	# List filepath pairs indicating what files to tune(get version number sync-ed) before 
+	# compiling any C/C++ files, in format
+	#	<srcfile1>|<destfile1a>|<destfile1b>|... <srcfile2>|<destfile2a>|<destfile2b> ...
+	#
+	# Example:
+	#	gmi_NLVS_upp_list_SYNC = ../../libver.h|../../libverA.rc|../../libverB.rc ../../exever.h|../../exeverA.rc|../../exeverB.rc
+	#
+	#
+	# Note:
+	# * <srcfile> and <destfile>s must be files, not directory.
+	# * If <srcfile> does not exist or is a directory, makefile stops with error.
+	# * If <srcfile> is newer than any <destfile>, copy operation launches automatically.
+	#
+	# If null, nothing extra will be done.
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_nls_version_sync),postcore)
+
+
+endif #__PLUGIN_NLS_VERSION_SYNC_LOADED

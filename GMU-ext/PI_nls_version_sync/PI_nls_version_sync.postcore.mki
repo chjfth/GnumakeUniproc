@@ -1,0 +1,22 @@
+
+
+define _gmi_nlvs_GenSyncRuleL0
+  # $1: Source file path, 
+  # $2: Destination file path list, separated by space
+  _tmp := $$(shell if [ -f "$1" ] ;then echo -n '1';fi)
+  ifeq ($$(_tmp),)
+    $$(error !Error from $(_pluginId_nls_version_sync): You assign $1 as a source file(in gmi_NLVS_upp_list_SYNC), but that file does not exist)
+  endif
+  $2: $1
+	@echo "$(_pluginId_nls_version_sync): version-sync.py --input=$$< $$@"
+	@cmd.exe /C "version-sync.py --input=$$< $$@"
+endef
+
+_gmi_nlvs_GenCopyRuleL1 = $(eval $(call _gmi_nlvs_GenSyncRuleL0,$(word 1,$(call split,|,$1)),$(wordlist 2,999,$(call split,|,$1))))
+	#$1: tells the file pair, in format:
+	#	<srcfile>|<destfile1>|<destfile2>|...
+
+$(foreach p,$(gmi_NLVS_upp_list_SYNC),$(call _gmi_nlvs_GenCopyRuleL1,$p))
+
+
+
