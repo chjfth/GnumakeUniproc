@@ -5,13 +5,13 @@ version_sync_pycmd = version-sync.py $(if $(gmi_NLVS_add_current_datetime),--add
 define _gmi_nlvs_GenSyncRuleL0
   # $1: Source file path, 
   # $2: Destination file path list, separated by space
-  _tmp := $$(shell if [ -f "$1" ] ;then echo -n '1';fi)
+  _tmp := $$(call gmuf_IsFileExist_sh,$1)
   ifeq ($$(_tmp),)
     $$(error !Error from $(_pluginId_nls_version_sync): You assign $1 as a source file(in gmi_NLVS_upp_list_SYNC), but that file does not exist)
   endif
   $2: $1
 	@echo "$(_pluginId_nls_version_sync) executing command: $$(version_sync_pycmd)"
-	@cmd.exe /C "$$(version_sync_pycmd)"
+	@$$(call gmuf_ScriptCmd,$$(version_sync_pycmd))
 endef
 
 _gmi_nlvs_GenCopyRuleL1 = $(eval $(call _gmi_nlvs_GenSyncRuleL0,$(word 1,$(call split,|,$1)),$(wordlist 2,999,$(call split,|,$1))))

@@ -471,5 +471,22 @@ gmuf_SvnDatetimeParam = -r "{$1}"
 gmu_SvnCmdUseGmuGivenTime = -r "{$(gmu_SC_CHECKOUT_DATETIME)}"
 
 
+#gmuf_EnvVal_ci = $($(filter $1,$(call gmuf_ToCapital,$(.VARIABLES))))
+_gmuf_EnvVal_ci = $(strip $(foreach v,$(.VARIABLES),$(if $(call _IsStringEqual,$(call gmuf_ToCapital,$v),$1),$($v))))
+gmuf_EnvVal_ci = $(call _gmuf_EnvVal_ci,$(call gmuf_ToCapital,$1))
+	# Get env-var's value, regardless of case of env-var name (useful on Windows)
+	# $1: Env-var name, case does not matter!
+	#
+	# Note: If you have two env-vars with the same name except case, only one value of them will be returned.
+
+gmuf_IsUsingWindowsCmd = $(call gmuf_IsSubString,\cmd.exe,$(call gmuf_EnvVal_ci,ComSpec))
+	# Check if we are running from a Windows cmd.exe shell.
+
+gmuf_ScriptCmd = $(if $(gmuf_IsUsingWindowsCmd),cmd /C "$1",$1)
+	# $1: the shell command
+	# Example:
+	#	$(call gmuf_ScriptCmd,version-sync.py --version)
+	# return on Windows:
+	#	cmd /C "version-sync.py --version"
 
 endif # ifndef _CommonFunctions_included 
