@@ -103,3 +103,10 @@ gmu_progress_info = $(join Projects= Containers=,$(_gmu_dyn_title_count))  Now: 
 _gmuBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmuDotList)))
 
 _PrjnameShowInList = [$(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))]
+
+
+define _ExecuteShcmdArray
+	$(foreach c,$1,$(eval $($c)))# PENDING...
+endef
+	
+	# $1 contains a list of makevars; each makevar in turn contains a shell command.

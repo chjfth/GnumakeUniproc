@@ -1,5 +1,5 @@
 
-ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+ifeq ($(_WDFL_isDLL),1)
 ############################################################################
 ### Code for DLL project >>>>>>
 ############################################################################
@@ -78,6 +78,18 @@ $(gmu_Gp_LINK_OUTPUT): $(_WDFL_p_Abs_ExportDefsForDll)
 # since $(_WDFL_p_Abs_ExportDefsForDll) should be re-created when 
 # $(_WDFL_p_LibExportDefs_fcd), changes, we should should depend on 
 # $(_WDFL_p_Abs_ExportDefsForDll) here.
+
+
+ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
+  
+  _WDFL_export_collect_cmd = export-collect.py --update=$@ $?
+  
+  $(_WDFL_p_ExportObjList): $(patsubst %,$(gmu_ud_SRC_ROOT)/%,$(filter %.c %.cpp,$(gmu_up_list_SRC_FROM_ROOT)))
+	@echo "PI_windll_from_lib: Collect auto export file list into $(notdir $@) ..."
+	$(call _DoVerbose1,@echo "$(_WDFL_export_collect_cmd)")
+	@$(call gmuf_ScriptCmd,$(_WDFL_export_collect_cmd))
+  
+endif # ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 
 ############################################################################
 ### Code for LIB project <<<<<<

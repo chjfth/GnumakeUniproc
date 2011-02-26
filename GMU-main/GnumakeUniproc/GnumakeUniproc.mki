@@ -365,6 +365,8 @@ _REQOBJS_ASM = $(call gmuf_ASM_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT))
 gmu_Gp_list_REQOBJS = $(_REQOBJS_C) $(_REQOBJS_CXX) $(_REQOBJS_ASM)
 gmu_Gp_list_REQOBJS_C = $(_REQOBJS_C)
 gmu_Gp_list_REQOBJS_CXX = $(_REQOBJS_CXX)
+gmu_Gp_list_REQOBJS_C_CXX = $(_REQOBJS_C) $(_REQOBJS_CXX)
+gmu_Gp_list_REQOBJS_CXX_C = $(_REQOBJS_CXX) $(_REQOBJS_C)
 
 gmu_Gp_list_AllSource = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmu_up_list_SRC_FROM_ROOT))
 	#[2007-03-28] Path of all source files, starting with $(gmu_ud_SRC_ROOT). If the user wants
@@ -460,6 +462,7 @@ ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 else
 	@$(_GEN_HDEPEND_DOT_D)
 endif
+	$(gmu_t_C_PRIOR_PROCESS) #temp!
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(_DO_C_COMPILE)
 else

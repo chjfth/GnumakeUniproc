@@ -34,6 +34,17 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 		# Oops, this is a bit profound. Tells a C/C++ file from whom the call graph can cover
 		# all functions to be exported.
 
+#	gmi_WDFL_DO_AUTO_EXPORT =
+		# (default to null)
+		# If 1, This plugin is will carry on "auto-export" procedure described in 
+		#	http://webs.dev.nls:8080/pages/viewpage.action?pageId=48366265
+		# 
+		# Note: LIB and DLL project must both define this to 1 to have such "auto-export"
+		# feature. If only LIB or only DLL has it set to 1, DLL will benefit nothing.
+		#
+		# [2011-02-26] Some drawback of this feature:
+		# 1. A C/C++ file is analyzed twice, first on compile, second on lib packing.
+
 # Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
 # msvc/compiler_config.mki or mingw/compiler_config.mki)
 
@@ -69,8 +80,13 @@ _WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EX
 	# we use $(addprefix ) instead of concatenating so that [ _WDFL_p_LibExportDefs_fcd
 	# will be null if gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT is null ].
 
+_WDFL_isDLL = $(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE))
+_WDFL_isLIB = $(if $(_WDFL_isDLL),,1)
 
-ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+_f_ExportObjList = _AutoExportObjList.txt
+
+
+ifeq ($(_WDFL_isDLL),1)
 ############################################################################
 ### Code for DLL project >>>>>>
 ############################################################################
@@ -88,15 +104,27 @@ else
 
 _WDFL_p_Abs_ExportDefsForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibExportsDef_fpo)
 
-
 gmu_up_list_SRC_FROM_ROOT += $(gmi_WDFL_up_EXPORT_STUB_FROM_ROOT)
 
 _WDFL_p_LibStubObj = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibStubObj_fpo)
+
+export_tamper_cmd = export-tamper.py $<
+
+ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
+  
+  _WDFL_p_ExportObjList = $(gmu_Gd_PRJ_GMUTMP)/$(_f_ExportObjList)
+  gmp_USER_POST_TARGETS += $(_WDFL_p_ExportObjList)
+
+  gmu_t_C_PRIOR_PROCESS = $(call _DoVerbose1,echo "$(export_tamper_cmd)"); $(call gmuf_ScriptCmd,$(export_tamper_cmd))
+
+  
+endif # ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 
 ############################################################################
 ### Code for LIB project <<<<<<
 ############################################################################
 endif
+
 
 
 endif #__PLUGIN_WINDLL_FROM_LIB_LOADED
