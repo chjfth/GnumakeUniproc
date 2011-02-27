@@ -462,7 +462,7 @@ ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 else
 	@$(_GEN_HDEPEND_DOT_D)
 endif
-	$(gmu_uc_C_PRIOR_PROCESS)
+	$(call _gmuf_ExecuteShcmdList,$(gmu_uc_elst_C_PRIOR_PROCESS))
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(_DO_C_COMPILE)
 else
@@ -475,7 +475,7 @@ ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 else
 	@$(_GEN_HDEPEND_DOT_D)
 endif
-	$(gmu_uc_CXX_PRIOR_PROCESS)
+	$(call _gmuf_ExecuteShcmdList,$(gmu_uc_elst_CXX_PRIOR_PROCESS))
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(_DO_CXX_COMPILE)
 else
@@ -483,7 +483,7 @@ else
 endif
 
 $(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
-	$(gmu_uc_ASM_PRIOR_PROCESS)
+	$(call _gmuf_ExecuteShcmdList,$(gmu_uc_elst_ASM_PRIOR_PROCESS))
 ifdef gmu_DO_SHOW_COMPILE_CMD
 	$(_DO_ASM_COMPILE)
 else

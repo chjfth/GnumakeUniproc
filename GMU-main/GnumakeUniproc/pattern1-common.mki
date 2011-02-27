@@ -105,8 +105,10 @@ _gmuBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmu
 _PrjnameShowInList = [$(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))]
 
 
-define _ExecuteShcmdArray
-	$(foreach c,$1,$(eval $($c)))# PENDING...
+define _gmuf_ExecuteShcmdList
+$(foreach c,$1,@$($c)
+)
 endef
-	
-	# $1 contains a list of makevars; each makevar in turn contains a shell command.
+	# $1 contains a list of makevars; each makevar in turn expands to a shell command.
+	# One shell command in $1 is executed in its own subshell.
+	# Note: the ')' must be on a separate line to accomplish that "individial shell" requirement.

@@ -44,7 +44,6 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 #  _WDFL_compile_stub_cmd = $(gmu_u_CC_CMD)
 
   _WDFL_p_list_AllSubprjExportObj = $(patsubst %,%/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportObjList),$(gmuf_GetAllSubprjGMUTMP))
-$(info %%%%%%%%%%%$(_WDFL_p_list_AllSubprjExportObj))
 
   # Reason for rule $(_WDFL_p_list_AllSubprjExportObj): Some subprj may not export any functions, 
   # so they don't have _AutoExportObjList.txt, so we should touch them to build up a dependency chain.
@@ -53,7 +52,7 @@ $(info %%%%%%%%%%%$(_WDFL_p_list_AllSubprjExportObj))
 	@echo -n "" > $@
 
   $(_WDFL_p_auto_export_stub_c): $(_WDFL_p_list_AllSubprjExportObj)
-	$(call _MkdirIfNotExist,$(dir $@))
+	$(call _MkdirIfNotExist,$(@D))
 	@$(call gmuf_ScriptCmd,$(_WDFL_export_stub_gen_cmd))
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
