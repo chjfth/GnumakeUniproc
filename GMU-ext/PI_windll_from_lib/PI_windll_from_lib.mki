@@ -65,15 +65,19 @@ endif
 # Define some vars required by this plugin:
 
 _WDFL_dirTmp = _gmu_tmp/$(_pluginId_windll_from_lib)
+_WDFL_dirTmp_arcwd = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_dirTmp)
+	# arcwd: absolute dir or relative to current working dir,
+	# that is, this directory is effective from current working directory.
 
 _WDFL_f_LibExportsDef = _LibExportDefs.gmi.txt
 _WDFL_p_LibExportsDef_fpo = $(_WDFL_dirTmp)/$(_WDFL_f_LibExportsDef)#fpo: from prj-output dir
 
 _WDFL_p_LibStubObj_fpo = $(_WDFL_dirTmp)/export-stub.$(gmu_extn_OBJ)
 
-_WDFL_p_FinalDefForDll = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_dirTmp)/FinalDefForDll.def
+_WDFL_p_FinalDefForDll = $(_WDFL_dirTmp_arcwd)/FinalDefForDll.def
 	# [2007-02-19] We'll make it an absolute path. This cannot result in a relative dir to cur-dir,
 	# because it will be generated in $(gmu_Gd_Final_PrjOutput) -- which probably not resides within cur-dir.
+	# [2011-02-27] Wrong comment above? $(gmu_Gd_Final_PrjOutput) will decide by itself automatically whether it is a rel-dir or abs-dir!
 
 _WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT))#fcd: from current dir
 	# Although $(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT) can only be one word(one file),
@@ -83,7 +87,13 @@ _WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EX
 _WDFL_isDLL = $(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE))
 _WDFL_isLIB = $(if $(_WDFL_isDLL),,1)
 
-_f_ExportObjList = _AutoExportObjList.txt
+_WDFL_f_ExportObjList = _AutoExportObjList.txt
+
+_WDFL_f_auto_export_stub_c = _auto_export_stub_.c
+_WDFL_d_auto_export_stub_c = $(_WDFL_dirTmp_arcwd)
+_WDFL_p_auto_export_stub_c = $(_WDFL_d_auto_export_stub_c)/$(_WDFL_f_auto_export_stub_c)
+_WDFL_p_auto_export_stub_obj = $(call gmuf_ChangeFilenameExt,$(_WDFL_p_auto_export_stub_c),$(gmu_extn_OBJ))
+	# Above .c and .obj are both generated automatically by this plugin
 
 
 ifeq ($(_WDFL_isDLL),1)
@@ -93,6 +103,12 @@ ifeq ($(_WDFL_isDLL),1)
 
 _WDFL_GetPrjStubObj = $(call gmuf_GetPrjOutputDir,$1)/$(_WDFL_p_LibStubObj_fpo)
 	# $1: final project name of a sub-project
+
+ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
+
+  gmu_up_list_EXTRA_OBJ_TO_LINK += $(_WDFL_p_auto_export_stub_obj)
+
+endif # ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 
 ############################################################################
 ### Code for DLL project <<<<<<
@@ -108,14 +124,14 @@ gmu_up_list_SRC_FROM_ROOT += $(gmi_WDFL_up_EXPORT_STUB_FROM_ROOT)
 
 _WDFL_p_LibStubObj = $(gmu_Gd_Final_PrjOutput)/$(_WDFL_p_LibStubObj_fpo)
 
-export_tamper_cmd = export-tamper.py $<
+export_tamper_cmd = export-tamper.py --mute $<
 
 ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
-  _WDFL_p_ExportObjList = $(gmu_Gd_PRJ_GMUTMP)/$(_f_ExportObjList)
+  _WDFL_p_ExportObjList = $(_WDFL_dirTmp_arcwd)/$(_WDFL_f_ExportObjList)
   gmp_USER_POST_TARGETS += $(_WDFL_p_ExportObjList)
 
-  gmu_t_C_PRIOR_PROCESS = $(call _DoVerbose1,echo "$(export_tamper_cmd)"); $(call gmuf_ScriptCmd,$(export_tamper_cmd))
+  gmu_uc_C_PRIOR_PROCESS = $(call _DoVerbose1,echo "PI_windll_from_lib: Tampering $(notdir $<) ..."); $(call gmuf_ScriptCmd,$(export_tamper_cmd))
 
   
 endif # ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)

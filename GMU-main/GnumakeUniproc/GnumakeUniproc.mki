@@ -462,7 +462,7 @@ ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 else
 	@$(_GEN_HDEPEND_DOT_D)
 endif
-	$(gmu_t_C_PRIOR_PROCESS) #temp!
+	$(gmu_uc_C_PRIOR_PROCESS)
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(_DO_C_COMPILE)
 else
@@ -475,6 +475,7 @@ ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 else
 	@$(_GEN_HDEPEND_DOT_D)
 endif
+	$(gmu_uc_CXX_PRIOR_PROCESS)
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(_DO_CXX_COMPILE)
 else
@@ -482,6 +483,7 @@ else
 endif
 
 $(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+	$(gmu_uc_ASM_PRIOR_PROCESS)
 ifdef gmu_DO_SHOW_COMPILE_CMD
 	$(_DO_ASM_COMPILE)
 else
@@ -1165,7 +1167,7 @@ endif
 
 _uv_SubprjList_GetOutname = $(foreach v,$1,$($v_Filename))
 _uv_SubprjList_GetOutpath = $(foreach v,$1,$($v_Outpath))
-#_uv_SubprjList_GetOutdirGMUTMP = $(foreach v,$1,$($v_Outdir)/_gmu_tmp)
+_uv_SubprjList_GetGMUTMP  = $(foreach v,$1,$($v_OutdirGMUTMP))
 _uv_SubprjList_GetUpjname = $(foreach v,$1,$($v_Upjname))
 _uv_SubprjList_GetPrjname = $(foreach v,$1,$($v_Prjname))
 
@@ -1179,6 +1181,7 @@ gmuf_GetSubprjOutputPathByRefname = $(_uv_SubprjList_GetOutpath)
 gmuf_GetSubprjUserOutputByRefname = $(foreach v,$1,$($v_UserOutputAfterLink))
 
 gmuf_GetAllSubprjName = $(call _uv_SubprjList_GetPrjname,$(gmu_uv_list_ALL_SUBPRJ))
+gmuf_GetAllSubprjGMUTMP = $(call _uv_SubprjList_GetGMUTMP,$(gmu_uv_list_ALL_SUBPRJ))
 gmuf_GetAllSubprjOutputImagePath = $(_Gp_list_SubprjOutput)
 	# [2007-01-16] added when writing PI_windll_from_lib
 	# [2007-03-10] Should not use gmuf_GetAllSubprjOutputImagePath in PI_windll_from_lib, 
