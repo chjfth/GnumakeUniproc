@@ -1217,6 +1217,7 @@ endef
 
 
 ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
+ifneq ($(_SubprjUndoneYet),1) # if subprjs have been built
   #[2008-12-09] Suppress this section at some times, because it may be time consuming(read lots of subprj attributes from file etc).
   #For example, when doing checkout, I do not have this section enabled.
 
@@ -1243,10 +1244,12 @@ ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
 	) # _Gp_list_AutoPjnm_indent_debug has indents marked by @@s, it can aid your debugging.
   _Gp_list_AutoPjnmAllChidren = $(subst @@, ,$(_Gp_list_AutoPjnm_indent_debug))
 
-endif
+endif # ifneq ($(_SubprjUndoneYet),1) # if subprjs have been built
+endif # ifneq (,$(_isMakeTarget_LinkImage)$(findstring $(MAKECMDGOALS),gmu_ut_diagnose))
+
 
 ###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
-endif # ifeq (,$(call _FindStrings,$(MAKECMDGOALS),...))
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif # ifneq (,$(strip $(gmu_uv_list_ALL_SUBPRJ)))
 endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 ###############^^^^^^^^ End of sub-project related stuff ^^^^^^^^###############
