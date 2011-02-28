@@ -35,7 +35,7 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 		# all functions to be exported.
 
 #	gmi_WDFL_DO_AUTO_EXPORT =
-		# (default to null)
+		# (for both LIB and DLL project, default to null)
 		# If 1, This plugin is will carry on "auto-export" procedure described in 
 		#	http://webs.dev.nls:8080/pages/viewpage.action?pageId=48366265
 		# 
@@ -44,6 +44,12 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 		#
 		# [2011-02-26] Some drawback of this feature:
 		# 1. A C/C++ file is analyzed twice, first on compile, second on lib packing.
+
+#	gmi_WDFL_COPY_AUTOSTUB_TO_DLLSRCROOT =
+		# (only for DLL project, default to null)
+		# If 1, when DLL is built, make a copy of _auto_export_stub_.c to $(gmu_ud_SRC_ROOT).
+		# If you use VC IDE to maintain a DLL project as well, you can add this copy
+		# of _auto_export_stub_.c to your VC project so that DLL can be built in VC IDE.
 
 # Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
 # msvc/compiler_config.mki or mingw/compiler_config.mki)
