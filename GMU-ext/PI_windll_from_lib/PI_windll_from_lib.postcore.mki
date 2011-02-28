@@ -54,7 +54,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 	@echo -n "" > $@
 
   $(_WDFL_p_auto_export_stub_c): $(_WDFL_p_list_AllSubprjExportObj)
-	$(call _MkdirIfNotExist,$(@D))
+	@$(call _MkdirIfNotExist,$(@D))
 	@$(call gmuf_ScriptCmd,$(_WDFL_export_stub_gen_cmd))
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
