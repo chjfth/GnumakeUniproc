@@ -131,7 +131,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   _WDFL_p_ExportObjList = $(_WDFL_dirTmp_arcwd)/$(_WDFL_f_ExportObjList)
   gmp_USER_POST_TARGETS += $(_WDFL_p_ExportObjList)
 
-  _WDFL_csrc_tamper_cmd = $(call _DoVerbose1,echo "PI_windll_from_lib: Tampering $(notdir $<) ..."); $(call gmuf_ScriptCmd,$(export_tamper_cmd))
+  _WDFL_csrc_tamper_cmd = $(call _DoVerbose1,echo "PI_windll_from_lib: Tampering $(notdir $<) ...";) $(call gmuf_ScriptCmd,$(export_tamper_cmd))
   gmu_uc_elst_C_PRIOR_PROCESS   += _WDFL_csrc_tamper_cmd # Yes, cannot use $(_WDFL_csrc_tamper_cmd) here!
   gmu_uc_elst_CXX_PRIOR_PROCESS += _WDFL_csrc_tamper_cmd
 
