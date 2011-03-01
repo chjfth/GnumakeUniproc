@@ -40,7 +40,7 @@ gmu_up_list_EXTRA_OBJ_TO_LINK += \
 
 ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
-  _WDFL_export_stub_gen_cmd = export-stub-gen.py --update=$@ $^
+  _WDFL_export_stub_gen_cmd = export-stub-gen.py --update=$@ --prjname=$(gmu_PRJ_NAME) $^
 #  _WDFL_compile_stub_cmd = $(gmu_u_CC_CMD)
 
   _WDFL_p_list_AllSubprjExportObj = $(if $(_Gp_list_AutoPjnmAllChidren),\
