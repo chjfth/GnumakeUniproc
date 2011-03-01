@@ -40,7 +40,7 @@ gmu_up_list_EXTRA_OBJ_TO_LINK += \
 
 ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
-  _WDFL_export_stub_gen_cmd = export-stub-gen.py --update=$@ --prjname=$(gmu_PRJ_NAME) $^
+  _WDFL_export_stub_gen_cmd = export-stub-gen.py --update=$@ $^
 #  _WDFL_compile_stub_cmd = $(gmu_u_CC_CMD)
 
   _WDFL_p_list_AllSubprjExportObj = $(if $(_Gp_list_AutoPjnmAllChidren),\
@@ -50,12 +50,16 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   # Reason for rule $(_WDFL_p_list_AllSubprjExportObj): Some subprj may not export any functions, 
   # so they don't have _AutoExportObjList.txt, so we should touch them to build up a dependency chain.
   $(_WDFL_p_list_AllSubprjExportObj):
-	$(call _DoVerbose1,PI_windll_from_lib: Info: Sub-project $(patsubst $(gmu_ud_OUTPUT_ROOT)/%/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportObjList),%,$@) does not auto-export. )
+	@$(call _MkdirIfNotExist,$(@D))
+	@$(call _DoVerbose1,echo "PI_windll_from_lib: Info: Sub-project $(patsubst $(gmu_ud_OUTPUT_ROOT)/%/_gmu_tmp/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportObjList),'%',$@) does not auto-export.")
 	@echo -n "" > $@
 
   $(_WDFL_p_auto_export_stub_c): $(_WDFL_p_list_AllSubprjExportObj)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(call gmuf_ScriptCmd,$(_WDFL_export_stub_gen_cmd))
+  ifneq (,$(gmi_WDFL_COPY_AUTOSTUB_TO_DLLSRCROOT))
+	$(if $(_IsNotVerbose),@)cp $@ $(gmu_ud_SRC_ROOT)
+  endif
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
   ifneq (,$(gmu_DO_SHOW_VERBOSE))
