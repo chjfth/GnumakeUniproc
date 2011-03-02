@@ -7,7 +7,8 @@ define _gmi_prcp_GenCopyRuleL0
   # $2: Destination file path
   _tmp := $$(shell if [ -f "$1" ] ;then echo -n '1';fi)
   ifeq ($$(_tmp),)
-    $$(error !Error from $(_pluginId_file_precopy): You assign $1 as a source file(in gmi_FPCP_upp_list_COPY), but that file does not exist)
+    $$(error !Error from $(_pluginId_file_precopy): You assign $1 as a source file(in gmi_FPCP_upp_list_COPY), but that file does not exist.\
+ Perhaps you forget gmu_DO_CHECKOUT=1 )
   endif
   $2: $1
 	@echo "PI_file_precopy for $2 ..."
