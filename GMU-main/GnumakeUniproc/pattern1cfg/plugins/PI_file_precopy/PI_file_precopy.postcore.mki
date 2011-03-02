@@ -1,3 +1,7 @@
+# Include this file's content only after checkout procedure is done.
+ifeq ($(_isInCheckoutPhase),)
+
+
 define _gmi_prcp_GenCopyRuleL0
   # $1: Source file path, 
   # $2: Destination file path
@@ -12,7 +16,7 @@ endef
 
 _gmi_prcp_GenCopyRuleL1 = $(eval $(call _gmi_prcp_GenCopyRuleL0,$(word 1,$(call split,|,$1)),$(word 2,$(call split,|,$1))))
 	#$1: tells the file pair, in format:
-	#	<sourcefile>|<destifile>
+	#	<srcfile>|<destfile>
 
 _gmi_prcp_list_destfile = $(foreach p,$(gmi_FPCP_upp_list_COPY),$(word 2,$(call split,|,$p)))
 
@@ -21,3 +25,4 @@ $(foreach p,$(gmi_FPCP_upp_list_COPY),$(call _gmi_prcp_GenCopyRuleL1,$p))
 $(gmu_Gp_list_REQOBJS): $(_gmi_prcp_list_destfile)
 
 
+endif # ifeq ($(_isInCheckoutPhase),)
