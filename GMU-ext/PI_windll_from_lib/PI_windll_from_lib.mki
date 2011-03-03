@@ -3,7 +3,6 @@ __PLUGIN_WINDLL_FROM_LIB_LOADED = 1
 
 _pluginId_windll_from_lib := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: WDFL
-gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_windll_from_lib),postcore)
 
 # Summary
 	# 	This plugin enables you to link a Windows DLL from LIB projects. Sometimes, you'd like
@@ -53,6 +52,11 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 # Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
 # msvc/compiler_config.mki or mingw/compiler_config.mki)
+
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_windll_from_lib),postcore)
+endif
+
 
 # Deduce gmi_WDFL_THISPRJ_LIB_OR_DLL, if it's defined to neither LIB nor DLL
 

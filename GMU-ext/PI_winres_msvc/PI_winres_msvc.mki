@@ -3,8 +3,6 @@ __PLUGIN_WINRES_LOADED = 1
 
 _pluginId_use_winres_msvc := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: RCVC
-gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_winres_msvc),postcore)
-
 
 # User input vars:
 
@@ -34,6 +32,11 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 # gmi_RCVC_Gp_list_RES (output var)
 	# The path of the resulting .res files.
+
+
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_use_winres_msvc),postcore)
+endif
 
 
 gmif_RCVC_RC_to_RES = $(patsubst %.rc,$(gmu_Gd_OBJ_OUTPUT)/%.res,$1)

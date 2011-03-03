@@ -25,7 +25,8 @@ _pluginId_file_precopy := $(gmpv_ThisPluginId)
 	#
 	# If null, nothing extra will be done.
 
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_file_precopy),postcore)
-
+endif
 
 endif #__PLUGIN_FILE_PRECOPY_LOADED

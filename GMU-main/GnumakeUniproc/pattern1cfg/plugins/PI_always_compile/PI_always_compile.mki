@@ -16,9 +16,9 @@ _pluginId_always_compile := $(gmpv_ThisPluginId)
 
 
 ifeq (,$(gmi_ALCP_ALWAYS_COMPILE_DISABLED))
-
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_always_compile),postcore)
-
+endif
 endif
 
 
