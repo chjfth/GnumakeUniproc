@@ -1,0 +1,124 @@
+ifndef __PLUGIN_SO_FROM_A_LOADED
+__PLUGIN_SO_FROM_A_LOADED = 1
+
+_pluginId_so_from_a := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: SOFA
+
+# Summary
+	# 	This plugin enables you to link static libs(.a) into a shared-object(.so)
+
+# User input vars:
+
+#	gmi_SOFA_THISPRJ_LIB_OR_DLL = 
+		# (optional) Is current project a LIB or a DLL project. Its value is `LIB' or `DLL'.
+		# If not explicitly assigned, this plugin will deduce it from $(gmp_bc_IMAGE_TYPE).
+
+#	gmi_SOFA_up_EXPORT_STUB_FROM_ROOT = 
+		# (only for LIB project, optional)
+		# Oops, this is a bit profound. Tells a C/C++ file from whom the call graph can cover
+		# all functions to be exported.
+
+#	gmi_SOFA_DO_AUTO_EXPORT =
+		# (for both LIB and DLL project, default to null)
+		# The same semantic as that of PI_windll_from_lib.
+
+#	gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT =
+		# (only for DLL project, default to null)
+		# If 1, when DLL is built, make a copy of _auto_export_stub_.c to $(gmu_ud_SRC_ROOT).
+		# If you use VC IDE to maintain a DLL project as well, you can add this copy
+		# of _auto_export_stub_.c to your VC project so that DLL can be built in VC IDE.
+
+# Note: DLL project sets its .def file path in gmp_up_WINDLL_MODULE_DEF_FROM_ROOT(defined by 
+# msvc/compiler_config.mki or mingw/compiler_config.mki)
+
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_so_from_a),postcore)
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+
+# Deduce gmi_SOFA_THISPRJ_LIB_OR_DLL, if it's defined to neither LIB nor DLL
+
+ifeq (,$(findstring $(gmi_SOFA_THISPRJ_LIB_OR_DLL),LIB DLL))
+  ifeq ($(_gmu_true),$(call _IsStringEqual,LIB,$(gmp_bc_IMAGE_TYPE)))
+    gmi_SOFA_THISPRJ_LIB_OR_DLL = LIB
+  else
+  ifeq ($(_gmu_true),$(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE)))
+    gmi_SOFA_THISPRJ_LIB_OR_DLL = DLL
+  else
+    $(error !Error from $(_pluginId_so_from_a): gmi_SOFA_THISPRJ_LIB_OR_DLL is not defined by user, nor can it be deduced)
+  endif
+  endif
+endif
+
+# Define some vars required by this plugin:
+
+_SOFA_dirTmp = _gmu_tmp/$(_pluginId_so_from_a)
+_SOFA_dirTmp_arcwd = $(gmu_Gd_Final_PrjOutput)/$(_SOFA_dirTmp)
+	# arcwd: absolute dir or relative to current working dir,
+	# that is, this directory is effective from current working directory.
+
+_SOFA_p_LibStubObj_fpo = $(_SOFA_dirTmp)/export-stub.$(gmu_extn_OBJ)
+	#fpo: from prj-output dir
+
+_SOFA_isDLL = $(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE))
+_SOFA_isLIB = $(if $(_SOFA_isDLL),,1)
+
+_SOFA_f_ExportFuncList = _AutoExportFuncList.txt
+
+_SOFA_f_auto_export_stub_c = _auto_export_stub_.c
+_SOFA_d_auto_export_stub_c = $(_SOFA_dirTmp_arcwd)
+_SOFA_p_auto_export_stub_c = $(_SOFA_d_auto_export_stub_c)/$(_SOFA_f_auto_export_stub_c)
+_SOFA_p_auto_export_stub_obj = $(call gmuf_ChangeFilenameExt,$(_SOFA_p_auto_export_stub_c),$(gmu_extn_OBJ))
+	# Above .c and .obj are both generated automatically by this plugin
+
+
+
+
+ifeq ($(_SOFA_isDLL),1)
+############################################################################
+### Code for DLL project >>>>>>
+############################################################################
+
+_SOFA_GetPrjStubObj = $(call gmuf_GetPrjOutputDir,$1)/$(_SOFA_p_LibStubObj_fpo)
+	# $1: final project name of a sub-project
+
+ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
+
+  gmu_up_list_EXTRA_OBJ_TO_LINK += $(_SOFA_p_auto_export_stub_obj)
+
+endif # ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
+
+############################################################################
+### Code for DLL project <<<<<<
+############################################################################
+else
+############################################################################
+### Code for LIB project >>>>>>
+############################################################################
+
+gmu_up_list_SRC_FROM_ROOT += $(gmi_SOFA_up_EXPORT_STUB_FROM_ROOT)
+
+_SOFA_p_LibStubObj = $(gmu_Gd_Final_PrjOutput)/$(_SOFA_p_LibStubObj_fpo)
+
+export_tamper_cmd = export-tamper.py --mute --extra-prefix=$(gmu_PRJ_NAME)__ $<
+
+ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
+  
+  _SOFA_p_ExportFuncList = $(_SOFA_dirTmp_arcwd)/$(_SOFA_f_ExportFuncList)
+  gmp_USER_POST_TARGETS += $(_SOFA_p_ExportFuncList)
+
+  _SOFA_csrc_tamper_cmd = $(call _DoVerbose1,echo "PI_windll_from_lib: Tampering $(notdir $<) ...";) $(call gmuf_ScriptCmd,$(export_tamper_cmd))
+  gmu_uc_elst_C_PRIOR_PROCESS   += _SOFA_csrc_tamper_cmd # Yes, cannot use $(_SOFA_csrc_tamper_cmd) here!
+  gmu_uc_elst_CXX_PRIOR_PROCESS += _SOFA_csrc_tamper_cmd
+
+  
+endif # ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
+
+############################################################################
+### Code for LIB project <<<<<<
+############################################################################
+endif
+
+
+
+endif #__PLUGIN_SO_FROM_A_LOADED
