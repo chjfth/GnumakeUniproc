@@ -24,6 +24,8 @@ _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 # respectively.
 #
 # Note: gmi_SYDO_ud_SYNC_%_FROM & gmi_SYDO_ud_SYNC_%_TO can be assigned as relative dir to $(CURDIR).
+# If it is a relative dir, it is relative to currently building project, not meant to relative
+# to your root project. You can assign gmi_SYDO_SHOW_COPY_CMD=1 to verify this behavior. 
 
 #User input variables:
 

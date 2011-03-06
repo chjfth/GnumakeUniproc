@@ -25,6 +25,12 @@ ifndef gmp_bc_IMAGE_TYPE
   gmp_bc_IMAGE_TYPE = DLL
 endif
 
+gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
+	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
+gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
+	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
+
+
 ############################################################################
 # GMU-var: gmp_u_list_PLUGIN_TO_LOAD
 #	Designate plugins to load in this make-var, multiple plugin names separated
@@ -34,10 +40,6 @@ endif
 gmp_u_list_PLUGIN_TO_LOAD += 
 	# PI_sync_devoutput PI_always_compile PI_file_precopy
 
-gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
-	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
-gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
-	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
 
 # >>> optional for MSVC (enable as you will)
 #gmp_bc_CRT_STATIC_LIB = 1

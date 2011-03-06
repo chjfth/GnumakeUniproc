@@ -759,7 +759,8 @@
     <td valign="top">gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE<br>
     gmp_u_list_PLUGIN_TO_LOAD_AUX_POST</td>
     <td align="center" valign="top">I(E)</td>
-    <td><p>Similar to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, that is, its value will be merged to <code>gmp_u_list_PLUGIN_TO_LOAD</code>.</p>
+    <td><p>Similar to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, that is, there value will be merged to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, one before(_PRE) and one after(_POST).</p>
+      <p>These three gmu-vars mentioned above all will not influence sub--projects. Actually, they are all <code>unexport</code>ed by GnumakeUniproc.</p>
     <p>The difference is: If you assign <code>gmp_u_list_PLUGIN_TO_LOAD=<i>xxx</i></code> as make's argument, all <code>gmp_u_list_PLUGIN_TO_LOAD</code> assignment in makefiles will be overrided. <code>gmp_u_list_PLUGIN_TO_LOAD_AUX(PRE/POST) </code>does not cause such override. </p>    </td>
   </tr>
   <tr>

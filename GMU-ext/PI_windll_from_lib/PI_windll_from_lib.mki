@@ -97,7 +97,7 @@ _WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EX
 _WDFL_isDLL = $(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE))
 _WDFL_isLIB = $(if $(_WDFL_isDLL),,1)
 
-_WDFL_f_ExportObjList = _AutoExportFuncList.txt
+_WDFL_f_ExportFuncList = _AutoExportFuncList.txt
 
 _WDFL_f_auto_export_stub_c = _auto_export_stub_.c
 _WDFL_d_auto_export_stub_c = $(_WDFL_dirTmp_arcwd)
@@ -138,8 +138,8 @@ export_tamper_cmd = export-tamper.py --mute --extra-prefix=$(gmu_PRJ_NAME)__ $<
 
 ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
-  _WDFL_p_ExportObjList = $(_WDFL_dirTmp_arcwd)/$(_WDFL_f_ExportObjList)
-  gmp_USER_POST_TARGETS += $(_WDFL_p_ExportObjList)
+  _WDFL_p_ExportFuncList = $(_WDFL_dirTmp_arcwd)/$(_WDFL_f_ExportFuncList)
+  gmp_USER_POST_TARGETS += $(_WDFL_p_ExportFuncList)
 
   _WDFL_csrc_tamper_cmd = $(call _DoVerbose1,echo "PI_windll_from_lib: Tampering $(notdir $<) ...";) $(call gmuf_ScriptCmd,$(export_tamper_cmd))
   gmu_uc_elst_C_PRIOR_PROCESS   += _WDFL_csrc_tamper_cmd # Yes, cannot use $(_WDFL_csrc_tamper_cmd) here!
