@@ -4,12 +4,6 @@ ifeq ($(_WDFL_isDLL),1)
 ### Code for DLL project >>>>>>
 ############################################################################
 
-#ifeq ($(gmi_WDFL_THISPRJ_LIB_OR_DLL),DLL)
-#  ifeq (,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
-#    $(error !Error from $(gmpv_ThisPluginId): You do not provided a .def file in make-var #gmp_up_WINDLL_MODULE_DEF_FROM_ROOT )
-#  endif
-#endif
-
 $(gmu_Gp_LINK_OUTPUT): _p_WINDLL_MODULE_DEF_FromCurDir = $(_WDFL_p_FinalDefForDll)
 # make _p_WINDLL_MODULE_DEF_FromCurDir(required by compiler_config.mki) target-specific variable
 
@@ -51,7 +45,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   # so they don't have _AutoExportObjList.txt, so we should touch them to build up a dependency chain.
   $(_WDFL_p_list_AllSubprjExportObj):
 	@$(call _MkdirIfNotExist,$(@D))
-	@$(call _DoVerbose1,echo "$(gmpv_ThisPluginId): Info: Sub-project $(patsubst $(gmu_ud_OUTPUT_ROOT)/%/_gmu_tmp/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportFuncList),'%',$@) does not auto-export.")
+	@$(call _DoVerbose1,echo "$(_pluginId_windll_from_lib): Info: Sub-project $(patsubst $(gmu_ud_OUTPUT_ROOT)/%/_gmu_tmp/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportFuncList),'%',$@) does not auto-export.")
 	@echo -n "" > $@
 
   $(_WDFL_p_auto_export_stub_c): $(_WDFL_p_list_AllSubprjExportObj)
@@ -63,7 +57,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
   ifneq (,$(gmu_DO_SHOW_VERBOSE))
-	@echo "$(gmpv_ThisPluginId): Compiling $(_WDFL_f_auto_export_stub_c) ..."
+	@echo "$(_pluginId_windll_from_lib): Compiling $(_WDFL_f_auto_export_stub_c) ..."
   endif
 	$(gmu_u_CC_CMD)
 
@@ -118,7 +112,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   _WDFL_export_collect_cmd = export-collect.py --update=$@ $^
   
   $(_WDFL_p_ExportFuncList): $(patsubst %,$(gmu_ud_SRC_ROOT)/%,$(filter %.c %.cpp,$(gmu_up_list_SRC_FROM_ROOT)))
-	@echo "$(gmpv_ThisPluginId): Collect auto export file list into $(notdir $@) ..."
+	@echo "$(_pluginId_windll_from_lib): Collect auto export file list into $(notdir $@) ..."
 	$(call _DoVerbose1,@echo "$(_WDFL_export_collect_cmd)")
 	@$(call gmuf_ScriptCmd,$(_WDFL_export_collect_cmd))
   

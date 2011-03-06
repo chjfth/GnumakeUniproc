@@ -133,6 +133,8 @@ gmpf_GetPluginPostcorePath_std = $(patsubst %/$1.mki,%/$1.$2.mki,$(call gmpf_Get
 
 gmpv_ThisPluginId = $(basename $(notdir $(call gmuf_lastword,$(MAKEFILE_LIST))))
 	#[2007-02-01] This should be assigned to a make-var with := , because $(MAKEFILE_LIST) is volatile.
+	#Also be aware not to abuse this var, especially in a deferred expansion context, where it 
+	#does not produce correct result.
 
 #	For every plugin(plugin name) listed in $(gmp_u_list_PLUGIN_TO_LOAD), 
 # search all dirs listed in $(gmp_ud_list_CUSTOM_MKI) for the first occurrence
