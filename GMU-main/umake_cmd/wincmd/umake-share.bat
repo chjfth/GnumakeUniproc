@@ -1,3 +1,7 @@
+IF "%gmu_MAKE_EXE%" == "" (
+      set gmu_MAKE_EXE=make
+    )
+
 REM Delete GnumakeUniproc start-up signiture file
 IF EXIST _MainPrjBuildStart.gmu.ckt DEL _MainPrjBuildStart.gmu.ckt
 IF EXIST _MainPrjBuildStart.gmu.ckt GOTO ErrorDelGmuSig
@@ -16,11 +20,11 @@ IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% goto ErrorDelLogBak
 IF EXIST %gmu_LOG_OUTPUT_FILENAME% REN %gmu_LOG_OUTPUT_FILENAME% %gmu_LOG_OUTPUT_FILENAME_bak%
 IF NOT %ERRORLEVEL% == 0 GOTO ErrorRename
 
-make%gmu_MAKEEXESUFFIX% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+%gmu_MAKE_EXE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
 goto END
 
 :NoLogOutput
-make%gmu_MAKEEXESUFFIX% %*
+%gmu_MAKE_EXE% %*
 GOTO END
 
 :ErrorDelGmuSig
