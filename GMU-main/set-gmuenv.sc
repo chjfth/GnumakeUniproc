@@ -55,7 +55,9 @@ fi
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
 export gmp_ud_list_CUSTOM_MKI=$gmu_DIR_ROOT/GMU-ext
-# export gmp_PS_INCLUDE_SUBDIRS=linux // the old one
+
+export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
+
 export gmp_DECO_PRJ_NAME=1
 
 PATH="$gmu_DIR_ROOT/bin:$PATH"
