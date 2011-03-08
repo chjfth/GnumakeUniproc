@@ -86,3 +86,7 @@ for OnePrg in $UMAKE_CMD; do
 	fi
 done
 
+if ! cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_PRG ; then
+	echo "Cannot copy make-gmu executable!"
+	exit 1
+fi
