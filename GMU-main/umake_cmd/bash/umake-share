@@ -1,6 +1,5 @@
-export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
-if [ "$gmu_MAKEEXESUFFIX" = "" ]; then
-  gmu_MAKEEXESUFFIX=-gmu
+if [ "$gmu_MAKE_EXE" = "" ]; then
+  gmu_MAKE_EXE=make
 	# Commet above line if you want to use your system's make.
 fi
 
@@ -37,8 +36,8 @@ if [ "$gmu_LOG_OUTPUT_FILENAME" != "" ]; then
 	  exit
 	fi
 
-	make$gmu_MAKEEXESUFFIX $GMU_FORCE_BASH "$@" 2>&1 | tee $gmu_LOG_OUTPUT_FILENAME
+	$gmu_MAKE_EXE $GMU_FORCE_BASH "$@" 2>&1 | tee $gmu_LOG_OUTPUT_FILENAME
 
 else
-  make$gmu_MAKEEXESUFFIX $GMU_FORCE_BASH "$@"
+  $gmu_MAKE_EXE $GMU_FORCE_BASH "$@"
 fi

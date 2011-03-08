@@ -47,6 +47,11 @@ if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
 	return 1
 fi
 
+# Check if make-gmu can be executed. If so, let umake use it(by overriding gmu_MAKE_EXE)
+if $gmu_DIR_ROOT/bin/make-gmu --version > /dev/null; then
+	export gmu_MAKE_EXE=make-gmu
+fi
+
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
 export gmp_ud_list_CUSTOM_MKI=$gmu_DIR_ROOT/GMU-ext
@@ -58,4 +63,3 @@ PATH="$gmu_DIR_ROOT/bin:$PATH"
 echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
 
 _gmu_root=
-
