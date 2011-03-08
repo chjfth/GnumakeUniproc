@@ -1,3 +1,8 @@
+export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
+if [ "$gmu_MAKEEXESUFFIX" = "" ]; then
+  gmu_MAKEEXESUFFIX=-gmu
+	# Commet above line if you want to use your system's make.
+fi
 
 # [2009-12-19] GNU make uses /bin/sh as default command shell, and GMU requires Bourne shell or Bash.
 # so here we check whether /bin/bin really is Bourne shell or Bash. If not, we force SHELL=/bin/bash to make.
