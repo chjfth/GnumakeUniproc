@@ -21,6 +21,7 @@ _vc60_val_PATH = $(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;
 
 # Adding Common\MSDev98\Bin into PATH for MSPDB60.DLL.
 
+
 in_gmpf_LoadCenv_vc60 = \
 	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc60" \
 	MSVSDir="$1" MSSdk="$2" \
@@ -29,6 +30,7 @@ in_gmpf_LoadCenv_vc60 = \
 	PATH="$(_vc60_val_PATH)"
 
 gmpf_LoadCenv_vc60 = $(call in_gmpf_LoadCenv_vc60,$(gmp_CENV_MSVC60_ROOT),$(gmp_CENV_MSVC60_PSDK_ROOT))
+
 
 define def_ExportCenv_vc60
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc60)

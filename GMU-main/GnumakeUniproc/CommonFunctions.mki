@@ -335,7 +335,7 @@ _MakeCvsRepsPath_Svr = $(subst --user--,$(if $($1_USER),$($1_USER),anonymous),$(
 _MakeCvsRepsPath_SvrRps = $(subst --user--,$($1_USER$(subst /,_,$2)),$($1))$2
 gmuf_MakeCvsRepositoryPath = $(if $($1_USER$(subst /,_,$2)),$(call _MakeCvsRepsPath_SvrRps,$1,$2),$(call _MakeCvsRepsPath_Svr,$1,$2))
 	# $1: server-variable-name, $2: repository path in that server
-gmuf_MakeSvnRepositoryPath = $(if $($1),$($1),$(error !GMU!Error: You makefile requires env-var '$1' set to a SVN root URL in order to access $$$1$2))$2
+gmuf_MakeSvnRepositoryPath = $(if $($1),$($1),$(error !GMU!Error: Your makefile requires env-var '$1' set to a SVN root URL in order to access $$$1$2))$2
 	# $1 is the name of a env-var, and that env-var should not be null-value, otherwise,
 	# assert error.
 
@@ -450,14 +450,12 @@ _export_MakevarDefs = $(if $1,export $1;)
 	# $1 can be multiple var-assignments separated by spaces.
 
 define _AnounceExportEnvvar
-  _tmp := $1# verbose, but for demonstratio purpose
   ifneq (,$(_isNowNotGmuGetPrjAttr))
   ifeq (,$(MAKE_RESTARTS)) # only when a make project is first restarted.
-    $$(info In make: export $$(_tmp))
+    $$(info In make: export $1)
   endif
   endif
   export $1
-    # NOTE above: Writing ``export $$(_tmp)'' fails me. -- maybe a whole export assigment should not be express in a make variable
 endef
 
 gmuf_AnounceExportEnvvar = $(eval $(call _AnounceExportEnvvar,$1))
