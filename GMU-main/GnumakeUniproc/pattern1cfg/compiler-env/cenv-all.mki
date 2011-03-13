@@ -1,0 +1,19 @@
+ifndef __cenv-all_mki_included_
+__cenv-all_mki_included_ := 1
+
+# All cenv-<compiler-id>-<compiler-ver>.mki in this directory get included.
+
+
+d_ThisMki := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
+
+include $(d_ThisMki)/cenv-msvc-vc60.mki
+
+#include $(d_ThisMki)/vc71-env.mki
+
+#include $(d_ThisMki)/vc80-env.mki
+
+#include $(d_ThisMki)/sdt-env.mki
+
+
+endif
