@@ -26,7 +26,7 @@ ifneq (,$(gmp_CONTAINER_EXTRACT_COMPILER_ID))
 
   gmp_COMPILER_ID := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
 	# u_subprjs.mki may use this to determine the compiler to use
-	#	[2007-01-22] Note: If the use does not define gmp_CONTAINER_EXTRACT_COMPILER_ID,
+	#	[2007-01-22] Note: If the user does not define gmp_CONTAINER_EXTRACT_COMPILER_ID,
 	# he may choose to assign gmp_COMPILER_ID explicitly from make command line.
 
 endif

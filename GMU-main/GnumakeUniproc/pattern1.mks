@@ -58,7 +58,7 @@ ifeq (,$(gmp_COMPILER_ID))
 else
   ifeq ($(gmp_COMPILER_ID),$(call gmuf_GetExtName,$(gmu_d_StartupMakefile)))
     _d_UserPartialMakefiles := $(gmu_d_StartupParent)
-    #	[2007-01-16] This condiction can be required when you start a non-container project
+    #	[2007-01-16] This condition can be required when you start a non-container project
     # from a container project. The container project may pass gmp_COMPILER_ID=. to his 
     # non-container sub-project, and current start-up makefile dir is definitely not what the non-container requires.
   else
