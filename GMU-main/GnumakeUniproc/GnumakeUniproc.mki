@@ -150,8 +150,10 @@ gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped = $(filter-out $(gmu_uv_list_SUBPRJ_LOO
 gmu_u_EXTRA_LINK_MERGE_s = $(strip $(gmu_u_EXTRA_LINK_MERGE))
 	# The suffix _s imples "stripped".
 
+ifeq (,$(_isNowGmuGetPrjAttr))
 ifeq (,$(strip $(gmu_up_list_SRC_FROM_ROOT) $(gmu_uv_list_ALL_SUBPRJ) $(gmu_FREE_STYLE_MAKEFILE)))
   $(error !GMU!Error: Neither `gmu_up_list_SRC_FROM_ROOT' nor `gmu_uv_list_ALL_SUBPRJ' is defined, nothing meaningful can be done)
+endif
 endif
 
 _NullUser1stTarget = --
