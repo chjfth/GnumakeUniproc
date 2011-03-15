@@ -3,9 +3,11 @@
 # i.e. not making target $(gmu_Gp_LINK_OUTPUT) or $(gmu_Gp_LINK_OUTPUT_ckt) .
 
 # INCLUSION ORDER:
+# * [plugins]
 # * u_subprjs.mki            (must, sub-projects definition)
 # * GnumakeUniproc.mki       (the GnumakeUniproc core layer)
 # * u_post_gmucore.mki       (optional)
+# * [plugins post-core]
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 .PHONY: _gmp_first_target
@@ -66,6 +68,10 @@ ifneq (,$(strip $(gmp_COMPILER_ID))) # load it only if gmp_COMPILER_ID is define
 endif
 # <<<<<< Load compiler cfg here
 
+
+include $(gmp_p_mki_LoadPlugins)
+
+
 include $(gmp_p_mki_DecoPrjname) # bc_deco_prjname.mki This should appear after gmp_COMPILER_ID is defined.
 include $(gmp_p_mki_DecoUnicodeDebug) # bc_deco_UNICODE_DEBUG.mki [2008-08-14] add it, since most time it does not cause harm.
 
@@ -82,6 +88,9 @@ ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
   include $(_p_post_gmucore)
 endif
 
+
+include $(gmp_p_mki_LoadPluginsPostcore)
+	
 
 .PHONY: __pattern1_inc_project_count
 __pattern1_inc_project_count:

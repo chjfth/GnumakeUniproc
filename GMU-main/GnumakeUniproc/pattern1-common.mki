@@ -16,6 +16,8 @@ gmu_DO_IGNORE_SUBPRJS += $(gmu_IGNORE_SUBPRJS)
 _dirPattern1Cfg = pattern1cfg
 gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
 gmp_p_mki_DecoUnicodeDebug = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_UNICODE_DEBUG.mki
+gmp_p_mki_LoadPlugins = $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-plugins.mki
+gmp_p_mki_LoadPluginsPostcore = $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-plugins-postcore.mki
 
 # >>>>>> Custom action count functionality [2006-12-05]
 

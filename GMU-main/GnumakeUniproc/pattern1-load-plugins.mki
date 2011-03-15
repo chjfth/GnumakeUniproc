@@ -1,0 +1,72 @@
+ifndef __pattern1_load_plugins_mki
+__pattern1_load_plugins_mki := 1
+
+# >>>>>> Load custom plugins [2006-12-04]
+
+gmpf_GetPluginPath_std = $(filter %/$1.mki,$(gmp_Gp_list_PLUGIN_LOADED))
+	# $1: Plugin name
+
+gmpf_GetPluginParentDir = $(patsubst %/$1/$1.mki,%,$(call gmpf_GetPluginPath_std,$1))
+
+gmpf_GetPluginPostcorePath_std = $(patsubst %/$1.mki,%/$1.$2.mki,$(call gmpf_GetPluginPath_std,$1))
+	#[2006-12-04] A standard method to get the path of a plugin's post-core part.
+	# $1: plugin name; $2: the suffix appended to the plugin's name
+	# Example: If $1 is list in $(gmp_Gp_list_PLUGIN_LOADED) as `/dir1/MyPlugin/MyPlugin.mki',
+	# $2 is `postcore', then the post-core path name is `/dir1/MyPlugin/MyPlugin.postcore.mki'
+#The above three gmpf_GetPluginXXX functions can be used in plugin-mki or plugin-postcore-mki.
+
+gmpv_ThisPluginId = $(basename $(notdir $(call gmuf_lastword,$(MAKEFILE_LIST))))
+	#[2007-02-01] This should be assigned to a make-var with := , because $(MAKEFILE_LIST) is volatile.
+	#Also be aware not to abuse this var, especially in a deferred expansion context, where it 
+	#does not produce correct result.
+
+#	For every plugin(plugin name) listed in $(gmp_u_list_PLUGIN_TO_LOAD), 
+# search all dirs listed in $(gmp_ud_list_CUSTOM_MKI) for the first occurrence
+# of <dir>/<plugin>/<plugin>.mki and include it.
+#	And as a last resort, check $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin) for that plugin.
+
+gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE += $(gmp_u_list_PLUGIN_TO_LOAD_AUX)
+	# For compatibility of the old gmp_u_list_PLUGIN_TO_LOAD_AUX.
+
+# >>> Compatibility code for old var gmu_u_list_PLUGIN_TO_LOAD_ENV_PRE/POST before r651(2008-10-10)(appeared in GnumakeUniproc v0.94)
+gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE+=$(gmu_list_PLUGIN_TO_LOAD_ENV_PRE)
+gmp_u_list_PLUGIN_TO_LOAD_ENV_POST+=$(gmu_list_PLUGIN_TO_LOAD_ENV_POST)
+# <<< Compatibility code (END)
+
+gmp_u_list_PLUGIN_TO_LOAD := $(call gmuf_RemoveDuplicate,\
+	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE) \
+		$(gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE) \
+			$(gmp_u_list_PLUGIN_TO_LOAD) \
+		$(gmp_u_list_PLUGIN_TO_LOAD_AUX_POST) \
+	$(gmp_u_list_PLUGIN_TO_LOAD_ENV_POST))
+
+gmp_Gp_list_PLUGIN_LOADED := $(foreach _PlugIn,$(gmp_u_list_PLUGIN_TO_LOAD),\
+	$(firstword \
+		$(foreach _Dir,$(gmp_ud_list_CUSTOM_MKI) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin),\
+			$(wildcard $(_Dir)/$(_PlugIn)/$(_PlugIn).mki))\
+		$(_PlugIn)__gmuInvlPiM \
+	)\
+)
+gmp_G_list_PLUGIN_LOADED := $(notdir $(basename $(gmp_Gp_list_PLUGIN_LOADED)))
+
+_InvalidPluginList = $(patsubst %__gmuInvlPiM,%,$(filter %__gmuInvlPiM,$(gmp_Gp_list_PLUGIN_LOADED)))
+ifneq (,$(strip $(_InvalidPluginList)))
+  $(error !GMU!Error: The following plugin(s) cannot be loaded: $(_InvalidPluginList))
+endif
+
+ifneq (,$(gmp_Gp_list_PLUGIN_LOADED))
+  ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS))
+    $(call gmuf_OutputInfo,The following plugin(s) are to be loaded:)
+    $(foreach _PlugInPath,$(gmp_Gp_list_PLUGIN_LOADED),$(call gmuf_OutputInfo,  $(_PlugInPath)))
+  endif
+  endif
+  endif
+
+  include $(gmp_Gp_list_PLUGIN_LOADED)
+endif
+
+# <<<<<< Load custom plugins [2006-12-04]
+
+endif # __pattern1_load_plugins_mki

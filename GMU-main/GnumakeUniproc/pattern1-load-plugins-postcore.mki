@@ -1,0 +1,21 @@
+ifndef __pattern1_load_plugins_postcore_mki
+__pattern1_load_plugins_postcore_mki := 1
+
+
+# >>>>>> Load custom plugins postcore [2006-12-04]
+
+ifneq (,$(strip $(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD)))
+  ifeq ($(_IsVerboseLevel2),$(_gmu_true))
+  ifeq (,$(_isNowGmuGetPrjAttr)) #if not doing _gmu_ut_GetPrjAttr
+  ifeq (,$(MAKE_RESTARTS))
+    $(call gmuf_OutputInfo,The following plugin(s) postcore are to be loaded:)
+    $(foreach _PlugInPath,$(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD),$(call gmuf_OutputInfo,  $(_PlugInPath)))
+  endif
+  endif
+  endif
+  include $(gmp_up_list_PLUGIN_POSTCORE_TO_LOAD)
+endif
+# <<<<<< Load custom plugins postcore [2006-12-04]
+
+
+endif # ifndef __pattern1_load_plugins_postcore_mki

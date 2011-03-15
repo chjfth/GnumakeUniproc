@@ -311,8 +311,14 @@ __GMU_Unknown_SourceControl_ID)\
 )
 endif
 
-
 _RevertCommaInBrackets = $(subst (,),$(_GmuComma),$1)
+
+gmuf_OutputInfo_shechoe = $(shell echo -e '$(call _RevertCommaInBrackets,$(subst ','\'',$1))' 1>&2)
+	# sh.echo.e: 
+	# sh: Bourne shell
+	# echo: echo command 
+	# e: -e option to echo
+
 gmuf_OutputInfo380 = $(shell echo '$(call _RevertCommaInBrackets,$(subst ','\'',$1))' 1>&2)
 gmuf_OutputInfo381 = $(info $(call _RevertCommaInBrackets,$1))
 gmuf_OutputInfo = $(if $(_gmu_isGnumake380),$(gmuf_OutputInfo380),$(gmuf_OutputInfo381))

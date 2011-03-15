@@ -1,3 +1,5 @@
+ifndef __pattern1_load_compiler_cfg_mki
+__pattern1_load_compiler_cfg_mki := 1
 
 gmpf_GetCompilerCfgPrecorePath_std  = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
 gmpf_GetCompilerCfgPostcorePath_std = $(basename $(gmp_Gp_COMPILER_CFG_LOADED)).$1.mki
@@ -26,3 +28,5 @@ ifneq ($(gmp_Gp_COMPILER_CFG_LOADED),$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultComp
 endif
 endif
 include $(gmp_Gp_COMPILER_CFG_LOADED)
+
+endif # ifndef __pattern1_load_compiler_cfg_mki
