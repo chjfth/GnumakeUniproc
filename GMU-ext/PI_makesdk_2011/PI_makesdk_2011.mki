@@ -1,0 +1,50 @@
+ifndef __PLUGIN_MAKESDK_2011_LOADED
+__PLUGIN_MAKESDK_2011_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr))
+
+_pluginId_makesdk_2011 := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: MSDK1
+
+# This plugin requires python 2.6
+
+# User input vars:
+
+# gmi_MSDK1_up_BUILDSDK_INI = 
+	# (mandatory)
+	# Set this to an INI configuration file describing how to make the SDK package.
+
+# (the following set in env-var)
+# gms_compiler_ids=
+# gms_builds=
+# gms_builds_<compiler-id>=
+# gms_<compiler-id>_vers=
+# gms_syncto=
+
+
+#ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+#gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_makesdk_2011),postcore)
+#endif
+
+ifeq (,$(gmi_MSDK1_up_BUILDSDK_INI))
+  $(error Error from $(_pluginId_makesdk_2011): gmi_MSDK1_up_BUILDSDK_INI is not defined)
+endif
+
+_tmp := $(shell $(call gmuf_ScriptCmd,\
+	genmk-sdk.py --prjname=$(gmu_PRJ_NAME)-PI_makesdk $(gmi_MSDK1_up_BUILDSDK_INI) \
+	) 2>&1 )
+ifneq (,$(strip $(_tmp)))
+  $(info $(_tmp))
+  $(call gmuf_OutputInfo_shechoe,Script genmk-sdk.py execution error. Reasons may be:\n\
+    1. You do not have python 2.6 or other later 2.x installed.\n\
+    2. Your configuration file $(gmi_MSDK1_up_BUILDSDK_INI) contains errors.)
+  $(error Error occurs in $(_pluginId_makesdk_2011), see error reason above)
+endif
+
+gmu_uv_list_ALL_SUBPRJ += makesdk
+
+makesdk_Makefile = Makefile-mc
+#makesdk_MakeVarDefines = 
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
+endif #__PLUGIN_MAKESDK_2011_LOADED
