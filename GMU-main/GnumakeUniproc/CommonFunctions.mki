@@ -324,7 +324,8 @@ gmuf_OutputInfo381 = $(info $(call _RevertCommaInBrackets,$1))
 gmuf_OutputInfo = $(if $(_gmu_isGnumake380),$(gmuf_OutputInfo380),$(gmuf_OutputInfo381))
 	# Note: This should be used in a special way if used in a make-var definition context:
 	#	_info := $(call gmuf_OutputInfo,<your-message>)
-	# Note for using comma: You can use (,) in $1 to represent a comma in your message.
+	# Note for using comma: You cannot directly use a comma in $1, because a comma will be 
+	# taken as function parameter separator. You can use (,) or $(_GmuComma) instead.
 
 gmuf_OutputInfo_e = $(shell echo -e "$(call _RevertCommaInBrackets,$(subst `,\`,$(subst ",\",$1)))" 1>&2)
 	# The suffix "_e" means using -e flag for echo command.
