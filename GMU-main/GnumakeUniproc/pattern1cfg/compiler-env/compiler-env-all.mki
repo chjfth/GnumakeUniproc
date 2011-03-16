@@ -1,6 +1,10 @@
 ifndef _compiler-env-all.mki
 _compiler-env-all.mki := 1
 
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-all.mki instead.
+##############################################################################
+
 # All mki in this directory get included.
 
 

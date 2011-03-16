@@ -1,6 +1,10 @@
 ifndef __vc60-env_included_
 __vc60-env_included_ := 1
 
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-msvc-vc60.mki instead.
+##############################################################################
+
 # For Visual C++ 6.0
 
 ifeq (,$(gmp_CENV_MSVC60_ROOT))

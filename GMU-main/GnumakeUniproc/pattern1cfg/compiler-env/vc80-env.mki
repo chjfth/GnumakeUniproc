@@ -1,6 +1,10 @@
 ifndef __vc80-env_included_
 __vc80-env_included_ := 1
 
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-msvc-vc80.mki instead.
+##############################################################################
+
 
 #gmp_LoadVc80Env = MSVSDir="$1" MSSdk="$2" \
 #	INCLUDE="$(if $2,$2/Include;)$1/VC/INCLUDE;$1/VC/PlatformSDK/include;$1/VC/ATLMFC/INCLUDE;"\

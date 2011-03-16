@@ -1,0 +1,44 @@
+ifndef __cenv_msvc_vc80x64_env_included_
+__cenv_msvc_vc80x64_env_included_ := 1
+
+
+# For Visual C++ 8.0 x64(host=x86, target=x64)
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc80x64))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc80x64 is not defined, so I cannot find Visual C++ 8 compiler)
+endif
+
+ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc80x64))
+  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80x64 is not defined, so you are not using a PlatformSDK)
+endif
+
+
+_vc80x64_val_INCLUDE = $(if $2,$2/Include;)$1/VC/include;$1/VC/PlatformSDK/Include;$1/VC/atlmfc/include;
+_vc80x64_val_LIB = $(if $2,$2/Lib;)$1/VC/lib/amd64;$1/VC/PlatformSDK/lib/amd64;$1/VC/atlmfc/lib/amd64;$1/SDK/v2.0/lib/amd64;
+_vc80x64_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/bin/x86_amd64;$1/VC/bin;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VC8 install dir(root-dir)
+	# $2: PSDK root dir(preferred WinSDK Feb 2007).
+
+
+in_gmpf_LoadCenv_msvc_vc80x64 = \
+	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc80x64" \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc80x64_val_INCLUDE)" \
+	LIB="$(_vc80x64_val_LIB)" \
+	PATH="$(_vc80x64_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc80x64 = $(call in_gmpf_LoadCenv_msvc_vc80x64,$(gmp_CENV_ROOT_msvc_vc80x64),$(gmp_CENV_PSDK_ROOT_msvc_vc80x64))
+
+define def_ExportCenv_vc80x64
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc80x64)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc80x64_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc80x64_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc80x64_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc80x64 = $(eval $(call def_ExportCenv_vc80x64,$(gmp_CENV_ROOT_msvc_vc80x64),$(gmp_CENV_PSDK_ROOT_msvc_vc80x64)))
+
+endif

@@ -1,7 +1,6 @@
 ifndef __cenv_msvc_vc80_env_included_
 __cenv_msvc_vc80_env_included_ := 1
 
-
 # For Visual C++ 8.0
 
 ifeq (,$(gmp_CENV_ROOT_msvc_vc80))

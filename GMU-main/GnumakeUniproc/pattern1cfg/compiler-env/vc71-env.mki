@@ -1,6 +1,10 @@
 ifndef __vc71-env_included_
 __vc71-env_included_ := 1
 
+##############################################################################
+# NOTE: This file is incomplete, please use cenv-msvc-vc71.mki instead.
+##############################################################################
+
 
 gmp_LoadVc71Env = MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(if $2,$2/include;)$1/VC7/INCLUDE;$1/VC7/PlatformSDK/include;$1/VC7/ATLMFC/INCLUDE;"\
