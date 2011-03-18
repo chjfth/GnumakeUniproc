@@ -8,7 +8,7 @@ ifeq (,$(gmp_CENV_ROOT_msvc_vc80))
 endif
 
 ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc80))
-  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80 is not defined, so you are not using a PlatformSDK)
+  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80 is not defined, so you are not using the latest PlatformSDK for VS2005)
 endif
 
 
