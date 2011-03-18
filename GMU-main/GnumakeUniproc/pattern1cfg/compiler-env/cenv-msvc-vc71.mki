@@ -1,0 +1,43 @@
+ifndef __cenv_msvc_vc71_env_included_
+__cenv_msvc_vc71_env_included_ := 1
+
+# For Visual C++ 7.1(VS2003)
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc71))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc71 is not defined, so I cannot find Visual C++ 7.1 compiler)
+endif
+
+ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc71))
+  $(warning !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc71 is not defined, so you are not using the latest PlatformSDK for VS2003)
+endif
+
+
+_vc71_val_INCLUDE = $(if $2,$2/Include;)$1/Vc7/atlmfc/include;$1/Vc7/include;$1/Vc7/PlatformSDK/Include;
+_vc71_val_LIB = $(if $2,$2/Lib;)$1/Vc7/atlmfc/lib;$1/Vc7/lib;$1/Vc7/PlatformSDK/Lib;
+_vc71_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/Vc7/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/Vc7/PlatformSDK/bin;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VC7.1 install dir(root-dir)
+	# $2: PSDK root dir(preferred Mar 2006).
+
+
+in_gmpf_LoadCenv_msvc_vc71 = \
+	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc71" \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc71_val_INCLUDE)" \
+	LIB="$(_vc71_val_LIB)" \
+	PATH="$(_vc71_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc71 = $(call in_gmpf_LoadCenv_msvc_vc71,$(gmp_CENV_ROOT_msvc_vc71),$(gmp_CENV_PSDK_ROOT_msvc_vc71))
+
+define def_ExportCenv_vc71
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc71)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc71_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc71_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc71_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc71 = $(eval $(call def_ExportCenv_vc71,$(gmp_CENV_ROOT_msvc_vc71),$(gmp_CENV_PSDK_ROOT_msvc_vc71)))
+
+endif

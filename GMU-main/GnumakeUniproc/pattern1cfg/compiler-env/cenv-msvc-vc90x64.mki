@@ -1,0 +1,44 @@
+ifndef __cenv_msvc_vc90x64_env_included_
+__cenv_msvc_vc90x64_env_included_ := 1
+
+# For Visual C++ 9.0(VS2008) x64 compiler(host=x86 target=x64)
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc90x64))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc90x64 is not defined, so I cannot find Visual C++ 9 compiler)
+endif
+
+ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc90x64))
+  $(error !GMP!Error: gmp_CENV_PSDK_ROOT_msvc_vc90x64 is not defined, so you are not using a PlatformSDK)
+  # You must define gmp_CENV_PSDK_ROOT_msvc_vc90x64, because VS2008 install target dir does not have any PlatformSDK.
+endif
+
+
+_vc90x64_val_INCLUDE = $(if $2,$2/Include;)$1/VC/atlmfc/include;$1/VC/include;
+_vc90x64_val_LIB = $(if $2,$2/Lib/x64;)$1/VC/atlmfc/lib/amd64;$1/VC/lib/amd64;
+_vc90x64_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/BIN/x86_amd64;$1/VC/BIN;$1/Common7/Tools;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VC9 install dir(root-dir)
+	# $2: PSDK root dir(e.g. the WinSDK bundled with VS2008 install disc).
+
+
+in_gmpf_LoadCenv_msvc_vc90x64 = \
+	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc90x64" \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc90x64_val_INCLUDE)" \
+	LIB="$(_vc90x64_val_LIB)" \
+	PATH="$(_vc90x64_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc90x64 = $(call in_gmpf_LoadCenv_msvc_vc90x64,$(gmp_CENV_ROOT_msvc_vc90x64),$(gmp_CENV_PSDK_ROOT_msvc_vc90x64))
+
+define def_ExportCenv_vc90x64
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc90x64)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc90x64_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc90x64_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc90x64_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc90x64 = $(eval $(call def_ExportCenv_vc90x64,$(gmp_CENV_ROOT_msvc_vc90x64),$(gmp_CENV_PSDK_ROOT_msvc_vc90x64)))
+
+endif
