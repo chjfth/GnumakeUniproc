@@ -19,12 +19,19 @@ _DECO_PREFIX_PRJ_NAME_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_PRJ_FOR
 _DECO_SUFFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_SUFFIX_LINK_OUTPUT))
 _DECO_PREFIX_LINK_OUTPUT_NoSp = $(call _StripSpacesInDeco,$(gmu_DECO_PREFIX_LINK_OUTPUT))
 
-gmu_G_Deco_PrjName = $(_DECO_PREFIX_PRJ_NAME_NoSp)$(gmu_PRJ_NAME_s)$(_DECO_SUFFIX_PRJ_NAME_NoSp)
+_FinalPrjnamePrefix = $(if $(gmu_GFEXTRASUBDIR),$(if $(_DECO_PREFIX_PRJ_NAME_NoSp),$(_DECO_PREFIX_PRJ_NAME_NoSp)~),$(_DECO_PREFIX_PRJ_NAME_NoSp))
+_FinalPrjnameSuffix = $(if $(gmu_GFEXTRASUBDIR),$(if $(_DECO_SUFFIX_PRJ_NAME_NoSp),.$(_DECO_SUFFIX_PRJ_NAME_NoSp)),$(_DECO_SUFFIX_PRJ_NAME_NoSp))
+
+_Gf_Deco_PrjName = $(_FinalPrjnamePrefix)$(strip $1)$(_FinalPrjnameSuffix)
+	# $1 is user prjname(most time, it is $(gmu_PRJ_NAME))
+	# Behavior: If prefix not null, prepend "prefix~" ; if suffix not null, append ".suffix"
+gmu_G_Deco_PrjName = $(call _Gf_Deco_PrjName,$(gmu_PRJ_NAME))
 gmu_G_Final_PrjName = $(gmu_G_Deco_PrjName)
-_Gd_Deco_PrjOutput = $(gmu_ud_OUTPUT_ROOT)/$(gmu_G_Deco_PrjName)
+_Gd_Deco_PrjOutput = $(call gmuf_GetPrjOutputDir,$(gmu_G_Deco_PrjName))
+
+gmu_Gd_PRJ_GMUTMP = $(call gmuf_GetPrjTmpDir,$(gmu_G_Deco_PrjName))
 
 _d_OUTPUT_ROOT_GMUTMP = $(gmu_ud_OUTPUT_ROOT)/_gmu_tmp
-gmu_Gd_PRJ_GMUTMP = $(_Gd_Deco_PrjOutput)/_gmu_tmp
 
 # Some files to clear on start-up, -- should be in front of ``ifeq ($(MAKELEVEL),0)'' check.
 _p_BuiltListOutput = $(gmu_ud_OUTPUT_ROOT)/built_list.gmu.txt
@@ -198,15 +205,11 @@ gmu_Gd_LINK_OUTPUT = $(_Gd_Deco_PrjOutput)
 
 
 _Gd_OBJ_OUTPUT = $(_Gd_Deco_PrjOutput)/_obj
-
-gmu_Gd_Deco_PrjOutput = $(_Gd_Deco_PrjOutput)
-gmu_Gd_Final_PrjOutput = $(_Gd_Deco_PrjOutput)
 gmu_Gd_OBJ_OUTPUT = $(_Gd_OBJ_OUTPUT)
 	#[2006-07-24] User may use this value.
 
-gmuf_GetPrjOutputDir = $(gmu_ud_OUTPUT_ROOT)/$1
-gmuf_GetPrjTmpDir = $(gmu_ud_OUTPUT_ROOT)/$1/_gmu_tmp
-	# $1: final prjname 
+gmu_Gd_Deco_PrjOutput = $(_Gd_Deco_PrjOutput)
+gmu_Gd_Final_PrjOutput = $(_Gd_Deco_PrjOutput)
 
 
 
@@ -1048,8 +1051,8 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "_p_AttrOutput_$${SubPrj} = $(_d_OUTPUT_ROOT_GMUTMP)/$(SubprjEvPrjRefname).refname.gmu.Attr" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_Upjname = \$$(word 1,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_Prjname = \$$(word 2,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "$${SubPrj}_Outdir = \$$(gmu_ud_OUTPUT_ROOT)/$(SubprjEvPrjname)" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "$${SubPrj}_OutdirGMUTMP = \$$(gmu_ud_OUTPUT_ROOT)/$(SubprjEvPrjname)/_gmu_tmp" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_Outdir = \$$(call gmuf_GetPrjOutputDir,$(SubprjEvPrjname))" >> $(_p_mki_SubprjAttr_shsubst) ;\
+		echo "$${SubPrj}_OutdirGMUTMP = \$$(call gmuf_GetPrjTmpDir,$(SubprjEvPrjname))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_Filename = \$$(word 3,$(SubprjEvAttr))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_Outpath = $(SubprjEvOutpath)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "$${SubPrj}_UserOutputAfterLink = \$$(if \$$(call _IsStringEqual,\$$(word 4,$(SubprjEvAttr)),$(_NullUser1stTarget)),,\$$(word 4,$(SubprjEvAttr)))" >> $(_p_mki_SubprjAttr_shsubst) ;\

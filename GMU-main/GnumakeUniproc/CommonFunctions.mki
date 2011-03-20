@@ -440,6 +440,27 @@ _AppendLogCountCompile = echo -n "$(1)" >> $(gmu_Gp_COUNT_COMPILE) # add one byt
 	# Move it here because _DoCheckout.gmu.mk use this to count action as well.
 
 
+_StrAfterTilde = $(if $(findstring ~,$1),$(word 2,$(subst ~, ,$1)),$1)
+	# $1 must not contain space !
+_StrBeforeFinalDot = $(if $(findstring .,$1),$(basename $1),$1)
+	# $1 must not contain space !
+	# Return the substring before the final dot.
+_DeduceUPrjname = $(call _StrBeforeFinalDot,$(call _StrAfterTilde,$1))
+	# $1 must not contain space !
+	# $1 is the decorated prjname
+	#
+	# Example:
+	#	arm~walkdir._D         => walkdir
+	#	arm~walkdir.xyz._D     => walkdir.xyz 
+_Gf_pir_PrjOutput = $(if $(gmu_GFEXTRASUBDIR),$(call _DeduceUPrjname,$1)/)$1
+	# Return the partial dir component of the project output dir.
+	# $1 is the decorated(final) prjname.
+
+gmuf_GetPrjOutputDir = $(gmu_ud_OUTPUT_ROOT)/$(call _Gf_pir_PrjOutput,$1)
+gmuf_GetPrjTmpDir = $(call gmuf_GetPrjOutputDir,$1)/_gmu_tmp
+	# $1: final prjname 
+
+
 # Functions for source control branch management, 
 
 define gmue_SvnDeclareBranch # Use this with $(eval $(call gmue_SvnDeclareBranch,param1,param2)) .
