@@ -35,13 +35,14 @@ ifeq (,$(gmi_CTCH_dirCopyTo))
 endif
 
 
-# Load PI_file_precopy >>>
+#gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_copy_psTCHARh),postcore)
+	# Not needed now.
 
+# Load PI_file_precopy >>>
+gmp_u_list_PLUGIN_TO_LOAD += PI_file_precopy
 # Load PI_file_precopy <<<
 
-gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_copy_psTCHARh),postcore)
 
-gmp_u_list_PLUGIN_TO_LOAD += PI_file_precopy
 
 dirNlssvn = $(gmi_CTCH_dirNlssvn)
 _dirCommonInclude = $(dirNlssvn)/CommonLib/common-include
