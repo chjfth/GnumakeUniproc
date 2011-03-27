@@ -12,6 +12,7 @@ define _gmi_prcp_GenCopyRuleL0
   endif
   $2: $1
 	@echo "PI_file_precopy for $2 ..."
+	@$(call _MkdirIfNotExist,$$(@D))
 	cp "$1" "$2"
 endef
 
@@ -20,6 +21,7 @@ _gmi_prcp_GenCopyRuleL1 = $(eval $(call _gmi_prcp_GenCopyRuleL0,$(word 1,$(call 
 	#	<srcfile>|<destfile>
 
 _gmi_prcp_list_destfile = $(foreach p,$(gmi_FPCP_upp_list_COPY),$(word 2,$(call split,|,$p)))
+
 
 $(foreach p,$(gmi_FPCP_upp_list_COPY),$(call _gmi_prcp_GenCopyRuleL1,$p))
 

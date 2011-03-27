@@ -128,8 +128,6 @@ gmuf_ConcateWithChars = $(if $(strip $1),$(call _gmuf_addc,$1,$2))
 	# Output:
 	#	11|22|33
 
-gmu_ud_SRC_ROOT=/PRX
-gmi_NLVS_WinRcListToSyncList = $(call gmuf_ConcateWithChar,$(patsubst %,$(gmu_ud_SRC_ROOT)/%,$1),|)
 
 _MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
@@ -232,6 +230,27 @@ gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 	#	make: Interrupt/Exception caught (code = 0xc00000fd, addr = 0x7c92eddc)
 	# (internal ref: https://nlssvn/svnreps/CommonLib/NDSI/trunk/NDSI_Lib/make/dll.wince/domakeU.bat)
 	# [2009-03-05] (that may due to my mistake.) so still trying gmuf_GetAbsPathByRela_soc .
+
+_gmuf_IsWordInSet_rw = $(foreach w,$2,$(if $(call _IsStringEqual,$w,$1),$1))
+	# Check whether word $1 is word-set $2. Return $1(may be duplicate).
+
+gmuf_IsWordInSet_rw = $(firstword $(call _gmuf_IsWordInSet_rw,$1,$2))
+	# Check whether word $1 is word-set $2. Return $1 if yes, null if no.
+
+gmuf_IsWordInSet = $(if $(call gmuf_IsWordInSet_rw,$1,$2),1)
+	# Check whether word $1 is word-set $2. Return 1 if yes, null if no.
+
+gmuf_IntersectWords = $(foreach w,$1,$(call gmuf_IsWordInSet_rw,$w,$2))
+	# Find intersection of words provided in $1 and $2
+	#	$(call gmuf_IntersectWords,11 22 33,22 33 44)
+	# returns
+	#	22 33
+
+gmuf_GetVarAssertExist = $(if $(strip $($1)),$($1),$(error Make-var '$1' does not contain a value$(if $2, required by $2)))
+	# For make-var named $1, return its value if it is non-null, 
+	# otherwise assert error.
+	# $2: optional, telling this value is required by whom.
+
 
 #======== Something not so "common" below ========
 
