@@ -119,10 +119,10 @@ gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 # ----------- below for plugins -----------
 
 # If you use plugin PI_sync_devoutput, you may want to set:
-# gmi_SYDO_ud_SYNC_HEADER_ROOT =
+# gmi_SYDO_ud_SYNC_HEADER_FROM =
 	# The dir that your headers reside in. ( relative to $(CURDIR) )
 
-# gmi_SYDO_up_list_SYNC_HEADERS =
+# gmi_SYDO_up_list_SYNC_HEADER =
 	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_ROOT) )
 
 # gmi_SYDO_ud_SYNC_HEADER_TO = # (suggested to set as env-var or by parent project)
