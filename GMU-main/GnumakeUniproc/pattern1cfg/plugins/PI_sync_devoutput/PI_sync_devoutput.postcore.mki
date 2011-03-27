@@ -6,7 +6,6 @@ gmi_SYDO_up_list_SYNC_HEADERS += $(gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT)
     # We do this so that the old name can still be valid.
 ifneq (,$(gmi_SYDO_ud_SYNC_HEADER_ROOT))
   gmi_SYDO_ud_SYNC_HEADER_FROM = $(gmi_SYDO_ud_SYNC_HEADER_ROOT)
-  gmi_SYDO_CopyDirStruct_HEADER = 1
 endif
 ifneq (,$(gmi_SYDO_up_list_SYNC_HEADERS))
   gmi_SYDO_up_list_SYNC_HEADER = $(gmi_SYDO_up_list_SYNC_HEADERS)

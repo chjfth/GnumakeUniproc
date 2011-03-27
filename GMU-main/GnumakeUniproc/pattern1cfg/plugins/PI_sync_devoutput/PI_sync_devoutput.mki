@@ -1,5 +1,6 @@
 ifndef __PLUGIN_SYNC_DEVOUTPUT_LOADED
 __PLUGIN_SYNC_DEVOUTPUT_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
 _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: SYDO
@@ -61,12 +62,15 @@ _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 # what gmi_SYDO_ud_SYNC_XXX_TO should be. -- Yes, gmi_SYDO_ud_SYNC_XXX_TO is a matter of
 # the project's "user", not the project itself.
 
+gmi_SYDO_CopyDirStruct_HEADER = 1
+	# When "HEADER" is used as placeholder, it is treated specially, i.e. always copy recursively.
 
 gmp_USER_POST_TARGETS += gmi_SYDO_target_SyncOutput
 
-ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
-  gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_sync_devoutput),postcore)
-endif
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_sync_devoutput),postcore)
 
 
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 endif #ifndef __PLUGIN_SYNC_DEVOUTPUT_LOADED
