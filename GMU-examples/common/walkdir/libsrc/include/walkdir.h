@@ -23,10 +23,11 @@ typedef enum _walkdir_CBRET_et
 
 typedef enum _walkdir_CBReason_et
 {
-	walkdir_CBReason_MeetFile = 0,
-	walkdir_CBReason_EnterDir = 1,
-	walkdir_CBReason_LeaveDir = 2,
-	walkdir_CBReason_DirEnterFail = 0x10
+	walkdir_CBReason_MeetFile = 1,
+	walkdir_CBReason_MeetDir  = 2,
+	walkdir_CBReason_EnterDir = 3,
+	walkdir_CBReason_LeaveDir = 4,
+	walkdir_CBReason_DirEnterFail = 5,
 }walkdir_CBReason_et;
 
 typedef struct _walkdir_CBINFO_st
@@ -62,7 +63,7 @@ typedef enum _walkdir_RET_et
 	walkdir_RET_Canceled = -2
 }walkdir_RET_et;
 
-walkdir_RET_et walkdir_start(
+walkdir_RET_et walkdir_go(
 	const char *pAbsDir, 
 	PROC_WALKDIR_CALLBACK procWalkDirGotOne, 
 	void *pCallbackExtra);

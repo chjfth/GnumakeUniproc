@@ -77,6 +77,21 @@ WalkDir_OneLevel(int DirLevelNow,
 	walkdir_RET_et walkret = walkdir_RET_Success; // init not necessary
 	walkdir_CBRET_et cbret = walkdir_CBRET_GoOn; // init not necessary
 
+	if(DirLevelNow>0)
+	{
+		// Make a callback for walkdir_CBReason_EnterDir
+
+		pCbinfo->CallbackReason = walkdir_CBReason_EnterDir;
+		pCbinfo->nDirLen = strlen(pCbinfo->pszDir);
+		pCbinfo->nFileBytes = 0;
+		pCbinfo->nDirLevel = DirLevelNow;
+		// NOTE: pCbinfo->timeModified should have been filled by parent level(for efficiency),
+		// when on parent level's walkdir_CBReason_MeetDir callback.
+
+		cbret = procWalkDirGotOne(pCbinfo, pCallbackExtra);
+		if(cbret==walkdir_CBRET_Halt)
+			return walkdir_RET_Canceled;
+	}
 	// Prepare the "search string format" required for FindFirstFile.
 	// You know we have allocated FINDSTR_OVERHEAD(2) more bytes for pCbinfo->pszDir
 	pCbinfo->pszDir[pCbinfo->nDirLen] = '/';
@@ -115,7 +130,7 @@ WalkDir_OneLevel(int DirLevelNow,
 	
 		pCbinfo->CallbackReason = 
 			(finddata.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) ?
-			walkdir_CBReason_EnterDir : walkdir_CBReason_MeetFile;
+			walkdir_CBReason_MeetDir : walkdir_CBReason_MeetFile;
 		pCbinfo->pszName = finddata.cFileName;
 		pCbinfo->nNameLen = strlen(pCbinfo->pszName);
 		pCbinfo->nPathLen = pCbinfo->nDirLen+1+pCbinfo->nNameLen;
@@ -141,7 +156,7 @@ WalkDir_OneLevel(int DirLevelNow,
 
 		// Recurse the dirwalk if it is a dir and not walkdir_BypassDir
 
-		if(pCbinfo->CallbackReason==walkdir_CBReason_EnterDir
+		if(pCbinfo->CallbackReason==walkdir_CBReason_MeetDir
 			&& cbret!=walkdir_CBRET_BypassDir)
 		{
 			int origDirLen = pCbinfo->nDirLen; // to restore later
@@ -194,20 +209,24 @@ FIND_NEXT_FILE:
 	// Call user's callback again(this time with walkdir_CBReason_LeaveDir)
 	// We do this after the dir is closed, so that user can even delete the dir
 	//in the following callback.
-	if(cbret!=walkdir_CBRET_Halt)
+	if(DirLevelNow>0)
 	{
 		pCbinfo->nDirLevel = DirLevelNow;
 		pCbinfo->CallbackReason = walkdir_CBReason_LeaveDir;
 		cbret = procWalkDirGotOne(pCbinfo, pCallbackExtra);
 		if(cbret==walkdir_CBRET_Halt)
-			walkret = walkdir_RET_Canceled;
+			return walkdir_RET_Canceled;
+		else
+			return walkdir_RET_Success;
 	}
-
-	return walkret;
+	else
+	{
+		return walkret;
+	}
 }
 
 walkdir_RET_et  
-walkdir_start(const char *pAbsDir, PROC_WALKDIR_CALLBACK procWalkDirGotOne, void *pCallbackExtra)
+walkdir_go(const char *pAbsDir, PROC_WALKDIR_CALLBACK procWalkDirGotOne, void *pCallbackExtra)
 {
 	walkdir_RET_et walkret;
 	walkdir_CBINFO_st cbinfo = {sizeof(walkdir_CBINFO_st)};
@@ -219,6 +238,6 @@ walkdir_start(const char *pAbsDir, PROC_WALKDIR_CALLBACK procWalkDirGotOne, void
 
 	free(cbinfo.pszPath);
 	free(cbinfo.pszDir);
-	return 0;
+	return walkret;
 }
 

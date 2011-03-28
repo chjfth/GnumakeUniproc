@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	
 	if(argc==2)
 	{
-		walkret = walkdir_start(pAbsDir, pcbWalkdir, (void*)&nTotal);
+		walkret = walkdir_go(pAbsDir, pcbWalkdir, (void*)&nTotal);
 	}
 
 	if(walkret==walkdir_RET_Fail)

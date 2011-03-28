@@ -15,13 +15,8 @@ walkdir_CBRET_et pcbWalkdir(
 	int *pTotal = (int*)pCallbackExtra;
 	struct tm *ptm;
 
-	if(pCbinfo->CallbackReason==walkdir_CBReason_DirEnterFail)
-	{
-		fprintf(stderr, "[Level %d]Cannot enter: %s\n\n", pCbinfo->nDirLevel, pCbinfo->pszDir);
-		return walkdir_CBRET_GoOn;
-	}
-
-	if(pCbinfo->CallbackReason!=walkdir_CBReason_LeaveDir) // meet a dir or file
+	if(pCbinfo->CallbackReason==walkdir_CBReason_MeetDir
+		||pCbinfo->CallbackReason==walkdir_CBReason_MeetFile) // meet a dir or file
 	{
 		ptm = localtime(&pCbinfo->timeModified);
 
@@ -30,22 +25,37 @@ walkdir_CBRET_et pcbWalkdir(
 		PrintChars(pCbinfo->nDirLevel, ' ');
 		printf("%s/%s (%d)\n", pCbinfo->pszDir, pCbinfo->pszName, pCbinfo->nDirLen+pCbinfo->nNameLen+1);
 		PrintChars(pCbinfo->nDirLevel, ' ');
-		printf("[level %d] %d-%02d-%02d %02d:%02d:%02d\n", pCbinfo->nDirLevel,
+		printf("[level %d] %d-%02d-%02d %02d:%02d:%02d (%s)\n", pCbinfo->nDirLevel,
 			ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
-			ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+			ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
+			pCbinfo->CallbackReason==walkdir_CBReason_MeetDir?"CBReason_MeetDir":"CBReason_MeetFile");
 		printf("\n");
 
 		(*pTotal)++;
 	}
-	else // walkdir_CBReason_LeaveDir
+	else if(pCbinfo->CallbackReason==walkdir_CBReason_EnterDir) 		// walkdir_CBReason_LeaveDir
+	{
+		PrintChars(pCbinfo->nDirLevel, '>');
+		printf("[level %d] %s (CBReason_EnterDir) (%d)\n\n", pCbinfo->nDirLevel, pCbinfo->pszDir, pCbinfo->nDirLen);
+	}
+	else if(pCbinfo->CallbackReason==walkdir_CBReason_LeaveDir) 		// walkdir_CBReason_LeaveDir
 	{
 		PrintChars(pCbinfo->nDirLevel, '<');
-		printf("[level %d] %s (%d)\n\n", pCbinfo->nDirLevel, pCbinfo->pszDir, pCbinfo->nDirLen);
+		printf("[level %d] %s (CBReason_LeaveDir) (%d)\n\n", pCbinfo->nDirLevel, pCbinfo->pszDir, pCbinfo->nDirLen);
+	}
+	else if(pCbinfo->CallbackReason==walkdir_CBReason_DirEnterFail)
+	{
+		fprintf(stderr, "[Level %d]Cannot enter: %s\n\n", pCbinfo->nDirLevel, pCbinfo->pszDir);
+		return walkdir_CBRET_GoOn;
 	}
 
 	return walkdir_CBRET_GoOn;
 }
 
+
+//Usage:
+//1: exe_name path
+//2: exe_name path exttype
 int main(int argc, char *argv[])
 {
 	const char *pAbsDir = NULL;
@@ -62,7 +72,7 @@ int main(int argc, char *argv[])
 	
 	if(argc==2)
 	{
-		walkret = walkdir_start(pAbsDir, pcbWalkdir, (void*)&nTotal);
+		walkret = walkdir_go(pAbsDir, pcbWalkdir, (void*)&nTotal);
 	}
 	else
 	{
