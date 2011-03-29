@@ -154,13 +154,14 @@ WalkDir_OneLevel(int DirLevelNow,
 			break;
 		}	
 
-		// Recurse the dirwalk if it is a dir and not walkdir_BypassDir
+		// Recurse the dirwalk if it is a dir and not walkdir_CBRET_BypassDir
 
 		if(pCbinfo->CallbackReason==walkdir_CBReason_MeetDir
 			&& cbret!=walkdir_CBRET_BypassDir)
 		{
 			int origDirLen = pCbinfo->nDirLen; // to restore later
 			
+			// Prepare new pCbinfo->pszDir for next level of WalkDir_OneLevel()
 			pCbinfo->nDirLen += 1 + pCbinfo->nNameLen;
 			
 			pCbinfo->pszDir = (char*)realloc(pCbinfo->pszDir, pCbinfo->nDirLen+FINDSTR_OVERHEAD+1);
@@ -208,7 +209,7 @@ FIND_NEXT_FILE:
 
 	// Call user's callback again(this time with walkdir_CBReason_LeaveDir)
 	// We do this after the dir is closed, so that user can even delete the dir
-	//in the following callback.
+	// in the following callback.
 	if(DirLevelNow>0)
 	{
 		pCbinfo->nDirLevel = DirLevelNow;
@@ -231,8 +232,8 @@ walkdir_go(const char *pAbsDir, PROC_WALKDIR_CALLBACK procWalkDirGotOne, void *p
 	walkdir_RET_et walkret;
 	walkdir_CBINFO_st cbinfo = {sizeof(walkdir_CBINFO_st)};
 
-	//char *pszSearchString //
 	cbinfo.pszDir = TrSearchString(pAbsDir, &cbinfo.nDirLen);
+//	cbinfo.nDirLen = T_strlen(cbinfo.pszDir); // This will be set by WalkDir_OneLevel
 
 	walkret = WalkDir_OneLevel(0, &cbinfo, procWalkDirGotOne, pCallbackExtra);
 
