@@ -92,7 +92,7 @@ CODE { color:#660000; }
 gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt <span class="c-comment">#optional</span>
 </pre>
 <p>Second, we create the file <tt>ExportDefs.txt</tt> just referred as the <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> parameter(make-var). The file has the content:</p>
-<pre>walkdir_start
+<pre>walkdir_go
 walkdir_extname
 </pre>
 <p>It's just listing the export symbols which will be exported by the resulting DLL. More precisely, current PI_windll_from_lib implementation will append these lines to the .def file(used by Microsoft linker later when linking the final DLL) below the <code>EXPORTS</code> statement . </p>

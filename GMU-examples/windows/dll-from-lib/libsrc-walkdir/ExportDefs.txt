@@ -1,2 +1,2 @@
-walkdir_start
+walkdir_go
 walkdir_extname

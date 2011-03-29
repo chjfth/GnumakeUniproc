@@ -65,7 +65,7 @@ FindEmptyDir(
 	fedcbi.cbFoundEmptyDir = procFoundEmptyDir;
 	fedcbi.pcbeFindEmptyDir = pCallbackExtra;
 
-	walkdir_RET_et walkret = walkdir_start(pAbsDir, WalkdirCallback_Fed, &fedcbi);
+	walkdir_RET_et walkret = walkdir_go(pAbsDir, WalkdirCallback_Fed, &fedcbi);
 	
 	if(walkret==walkdir_RET_Success)
 		return FindEmptyDir_RET_Success;

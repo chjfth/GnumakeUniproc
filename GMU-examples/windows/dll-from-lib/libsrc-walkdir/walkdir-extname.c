@@ -89,7 +89,7 @@ walkdir_RET_et walkdir_extname(
 	pwei->user_proc = procWalkDirGotOne;
 	pwei->user_cbextra = pCallbackExtra;
 
-	walkret = walkdir_start(pAbsDir, procWalkdirExtname,pwei);
+	walkret = walkdir_go(pAbsDir, procWalkdirExtname,pwei);
 
 	return walkret;
 }

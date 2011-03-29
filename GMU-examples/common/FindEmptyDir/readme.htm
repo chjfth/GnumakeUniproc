@@ -72,7 +72,7 @@ CODE { color:#660000; }
 <p>This is exhibited by building project demoFindEmptyDir, which has the following dependency:</p>
 <ul>
   <li>demoFindEmptyDir accepts a dir as parameter, and prints out all empty subdirs(dirs containing no files or subdirs) in it. It accompishes the &quot;find-empty-dir&quot; functionality by calling function <code>FindEmptyDir</code> in FindEmptyDir library.</li>
-  <li>FindEmptyDir library yet depends on(calls) function <code>walkdir_start</code> in walkdir library in turn. </li>
+  <li>FindEmptyDir library yet depends on(calls) function <code>walkdir_go</code> in walkdir library in turn. </li>
 </ul>
 <p><img src="FindEmptyDir.gif" width="529" height="214"></p>
 <p>With traditional makefile style, demoFindEmptyDir's makefile would need to explicitly state that he depends on two libraries, FindEmptyDir and walkdir. However, there is a flaw with this style: demoFindEmptyDir calls function(s) from FindEmptyDir lib, but not from walkdir lib, but he has the burden of knowing FindEmptydir depends on walkdir so that demoFindEmptyDir's makefile can know what extra libs need to be linked. That's really not good. If libFindEmptyDir changes his implementation to depend on other libs, then demoFindEmptyDir's makefile has to be changed accordingly.</p>
