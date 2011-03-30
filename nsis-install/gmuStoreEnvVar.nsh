@@ -24,14 +24,14 @@
   ${EndIf}
 !macroend
 
-!macro DoStoreEnvVar_list v1 v2 v3 v4 v5 v6 ;v7 v8 v9 v10 v11 v12 v13
+!macro DoStoreEnvVar_list v1 v2 v3 v4 v5 v6 v7 ;v8 v9 v10 v11 v12 v13
   !insertmacro DoStoreEnvVar ${v1}
   !insertmacro DoStoreEnvVar ${v2}
   !insertmacro DoStoreEnvVar ${v3}
   !insertmacro DoStoreEnvVar ${v4}
   !insertmacro DoStoreEnvVar ${v5}
   !insertmacro DoStoreEnvVar ${v6}
-;  !insertmacro DoStoreEnvVar ${v7}
+  !insertmacro DoStoreEnvVar ${v7}
 ;  !insertmacro DoStoreEnvVar ${v8}
 ;  !insertmacro DoStoreEnvVar ${v9}
 ;  !insertmacro DoStoreEnvVar ${v10}
@@ -78,14 +78,14 @@
   Push "${varname}"
   Call un.DeleteEnvStr
 !macroend
-!macro un.DelRegistryEnvVar_list v1 v2 v3 v4 v5 v6 ;v7 v8 v9 v10 v11 v12 v13
+!macro un.DelRegistryEnvVar_list v1 v2 v3 v4 v5 v6 v7 ;v8 v9 v10 v11 v12 v13
   !insertmacro un.DelRegistryEnvVar ${v1}
   !insertmacro un.DelRegistryEnvVar ${v2}
   !insertmacro un.DelRegistryEnvVar ${v3}
   !insertmacro un.DelRegistryEnvVar ${v4}
   !insertmacro un.DelRegistryEnvVar ${v5}
   !insertmacro un.DelRegistryEnvVar ${v6}
-;  !insertmacro un.DelRegistryEnvVar ${v7}
+  !insertmacro un.DelRegistryEnvVar ${v7}
 ;  !insertmacro un.DelRegistryEnvVar ${v8}
 ;  !insertmacro un.DelRegistryEnvVar ${v9}
 ;  !insertmacro un.DelRegistryEnvVar ${v10}
@@ -101,7 +101,7 @@
   ; Really, you cannot write $\r for \r here!
 !macroend
 
-!macro AppendEnvVarDef_R0_list v1 v2 v3 v4 v5 v6 ;v7 v8 v9 v10 v11 v12 v13
+!macro AppendEnvVarDef_R0_list v1 v2 v3 v4 v5 v6 v7 ;v8 v9 v10 v11 v12 v13
   !insertmacro AppendEnvVarDef_R0 ${v1}
   !insertmacro AppendEnvVarDef_R0 ${v2}
   !insertmacro AppendEnvVarDef_R0 ${v3}
@@ -126,14 +126,14 @@
   Pop '$str_${varname}'
 !macroend
 
-!macro BkslashToFwslash_list v1 v2 v3 v4 v5 v6 ;v7 v8 v9 v10 v11 v12 v13
+!macro BkslashToFwslash_list v1 v2 v3 v4 v5 v6 v7 ;v8 v9 v10 v11 v12 v13
   !insertmacro BkslashToFwslash ${v1}
   !insertmacro BkslashToFwslash ${v2}
   !insertmacro BkslashToFwslash ${v3}
   !insertmacro BkslashToFwslash ${v4}
   !insertmacro BkslashToFwslash ${v5}
   !insertmacro BkslashToFwslash ${v6}
-;  !insertmacro BkslashToFwslash ${v7}
+  !insertmacro BkslashToFwslash ${v7}
 ;  !insertmacro BkslashToFwslash ${v8}
 ;  !insertmacro BkslashToFwslash ${v9}
 ;  !insertmacro BkslashToFwslash ${v10}

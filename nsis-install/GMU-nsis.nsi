@@ -19,6 +19,7 @@
 
 !define dirname_MinGW MinGW2
 !define suffix_dir_GMUext /GMU-ext
+!define suffix_dir_ExtraCccfg /GMU-main/GnumakeUniproc/nlscan
 !define suffix_dir_GMUbin \${dirname_MinGW}\bin
 !define absdir_MinGW_bin_bkslash "$INSTDIR${suffix_dir_GMUbin}"
 
@@ -29,7 +30,9 @@
 
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
-!define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC gmp_ud_list_CUSTOM_MKI gmp_DECO_PRJ_NAME \
+!define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC \
+    gmp_ud_list_CUSTOM_MKI gmp_ud_list_CUSTOM_COMPILER_CFG \
+    gmp_DECO_PRJ_NAME \
     gmu_LOG_OUTPUT_FILENAME \
     gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
 	"
@@ -58,6 +61,10 @@ Var isChecked_gmp_ud_list_CUSTOM_MKI
       Var str_gmp_ud_list_CUSTOM_MKI
  !define desc_gmp_ud_list_CUSTOM_MKI \
          "Tell the directories of your custom-image-mki or plugins."
+Var isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG
+      Var str_gmp_ud_list_CUSTOM_COMPILER_CFG
+ !define desc_gmp_ud_list_CUSTOM_COMPILER_CFG \
+         "Tell the directories of your extra compiler configs."
 Var isChecked_gmp_DECO_PRJ_NAME
       Var str_gmp_DECO_PRJ_NAME
  !define desc_gmp_DECO_PRJ_NAME \
@@ -85,7 +92,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre4(20110327)"
+!define PRODUCT_VERSION "0.97-pre4(20110330)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -366,6 +373,9 @@ Function SelectEnvVar
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 3" "State" "$InstDir_fwslash${suffix_dir_GMUext}"
     ; Write suggested gmp_ud_list_CUSTOM_MKI (dynamic from $InstDir).
   
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}"
+    ; Write suggested gmp_ud_list_CUSTOM_COMPILER_CFG (dynamic from $InstDir).
+  
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" "${absdir_MinGW_bin_bkslash}"
 
   !insertmacro MUI_HEADER_TEXT "Select what environment variables(env-var) to set" \
@@ -379,6 +389,13 @@ Function SelectEnvVar
   !insertmacro MUI_INSTALLOPTIONS_READ $str_gmp_ud_list_CUSTOM_MKI ${fname_GmuEnvIni} "Field 3" "State"
   ${If} "$isChecked_gmp_ud_list_CUSTOM_MKI" == 0
     StrCpy $str_gmp_ud_list_CUSTOM_MKI ""
+  ${EndIf}
+
+  ; Field 22, 23: checkbox, editbox for gmp_ud_list_CUSTOM_COMPILER_CFG
+  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG ${fname_GmuEnvIni} "Field 22" "State"
+  !insertmacro MUI_INSTALLOPTIONS_READ $str_gmp_ud_list_CUSTOM_COMPILER_CFG ${fname_GmuEnvIni} "Field 23" "State"
+  ${If} "$isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG" == 0
+    StrCpy $str_gmp_ud_list_CUSTOM_COMPILER_CFG ""
   ${EndIf}
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmp_DECO_PRJ_NAME ${fname_GmuEnvIni} "Field 6" "State"
