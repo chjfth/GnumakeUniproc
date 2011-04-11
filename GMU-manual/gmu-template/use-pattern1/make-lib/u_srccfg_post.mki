@@ -123,7 +123,7 @@ gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 	# The dir that your headers reside in. ( relative to $(CURDIR) )
 
 # gmi_SYDO_up_list_SYNC_HEADER =
-	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_ROOT) )
+	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_FROM) )
 
 # gmi_SYDO_ud_SYNC_HEADER_TO = # (suggested to set as env-var or by parent project)
 	# Where the headers will be sync-ed to.

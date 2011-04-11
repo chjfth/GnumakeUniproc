@@ -92,7 +92,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre4(20110330)"
+!define PRODUCT_VERSION "0.97-pre5(20110411)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -370,10 +370,10 @@ Function SelectEnvVar
   Push "\"
   Call StrSlash
   Pop $InstDir_fwslash ; StrSlash returns in $InstDir_fwslash
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 3" "State" "$InstDir_fwslash${suffix_dir_GMUext}"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 3" "State" "$InstDir_fwslash${suffix_dir_GMUext} $InstDir_fwslash${suffix_dir_ExtraCccfg}/gmu-ext"
     ; Write suggested gmp_ud_list_CUSTOM_MKI (dynamic from $InstDir).
   
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}/compiler-cfg"
     ; Write suggested gmp_ud_list_CUSTOM_COMPILER_CFG (dynamic from $InstDir).
   
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" "${absdir_MinGW_bin_bkslash}"
