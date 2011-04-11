@@ -312,7 +312,10 @@ FunctionEnd
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 \
     "Are you sure you want to completely remove $(^Name) and all of its components? $\n$\n \
-    CAUTION: This will remove ALL content in your installation directory!" \
+    ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! $\n \
+    CAUTION: This will remove ALL content in your installation directory! $\n\
+    ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \
+    " \
     IDYES +2
   Abort
 FunctionEnd
@@ -373,7 +376,7 @@ Function SelectEnvVar
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 3" "State" "$InstDir_fwslash${suffix_dir_GMUext} $InstDir_fwslash${suffix_dir_ExtraCccfg}/gmu-ext"
     ; Write suggested gmp_ud_list_CUSTOM_MKI (dynamic from $InstDir).
   
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}/compiler-cfg"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}/compiler-cfgs"
     ; Write suggested gmp_ud_list_CUSTOM_COMPILER_CFG (dynamic from $InstDir).
   
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" "${absdir_MinGW_bin_bkslash}"
