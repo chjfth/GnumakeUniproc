@@ -54,11 +54,6 @@ ifneq (,$(wildcard $(_p_subprjdesc)))
 else
 ifneq (,$(wildcard $(_p_freestyle_mki)))
   include $(_p_freestyle_mki)
-else
-  ifeq (,$(gmu_SUPPRESS_WARN_no_usubprjs_mki))
-    $(warning !GMP!Warning: From pattern-container1.mks: Neither Sub-projects description file `$(_p_subprjdesc)' nor free-style mki `$(_p_freestyle_mki)' is present.)
-      #[2011-04-02] These two files are not a must. Some plugins(like PI_makesdk_2011) may introduce subprjs for us.
-  endif
 endif
 endif
 

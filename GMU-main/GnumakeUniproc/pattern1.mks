@@ -124,11 +124,6 @@ ifneq (,$(wildcard $(_p_srccfg_post))) # include it if exist
   include $(_p_srccfg_post)
 endif
 
-ifeq (,$(wildcard $(_p_srccfg_pre))$(wildcard $(_p_srccfg_post)))
-  $(error !GMP!Error: Source-config files $(notdir $(_p_srccfg_pre)) or $(notdir $(_p_srccfg_post)) \
-cannot be found in dir $(_d_UserPartialMakefiles) (Absolute-dir: $(call _GetAbsPathRelaToCurdir,$(_d_UserPartialMakefiles))))
-endif
-
 ifneq (,$(wildcard $(_p_checkout_more))) # include it if exist
   include $(_p_checkout_more)
 endif
