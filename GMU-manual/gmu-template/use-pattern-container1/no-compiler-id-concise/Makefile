@@ -3,7 +3,7 @@
 # actual content, or [ at least comment them out if some of them are
 # not required] .
 ifdef gmu_DIR_GNUMAKEUNIPROC
-  include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 else
   $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
 endif

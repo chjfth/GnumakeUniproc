@@ -1,0 +1,10 @@
+# The -concise- GMU Makefiles should include this file to get GnumakeUniproc
+# specific constant, functions etc.
+
+ifndef __pattern1-concise-header-included
+__pattern1-concise-header-included = 1
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
+
+  
+endif
