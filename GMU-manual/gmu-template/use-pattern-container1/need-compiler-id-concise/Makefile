@@ -1,0 +1,41 @@
+# template file for use with pattern-container1.mks, concise version, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = <project-name-for-this-container>
+endif
+
+gmp_CONTAINER_EXTRACT_COMPILER_ID = 1
+	# [2007-01-22] Define this to extract gmp_COMPILER_ID automatically from directory ext-name.
+	# This is required, for example, if the path of some sub-project is composed of the
+	# dynamic $(gmp_COMPILER_ID) .
+
+gmu_uv_list_ALL_SUBPRJ += <subprj1-refname> <subprj2-refname> ...
+
+<subprj1-refname>_Makefile = # where the sub-project's makefile resides
+<subprj1-refname>_MakeVarDefines = # command line options passed to sub-make
+# If the sub-project's makefiles are to be checked-out from some repository, assign it here.
+# >>>> For SVN checkout
+<subprj1-refname>_svnUrl_forMakefiles = # SVN Url for the checkout
+	# Hint: $(call gmuf_MakeSvnRepositoryPath,<SVN-path-prefix-var>,<remaining-repository-path>)
+<subprj1-refname>_svnLocalDir_forMakefiles = # Local dir corresponding to the whole SVN URL
+<subprj1-refname>_svnRev_forMakefiles = # Revision to use(string after svn's -r switch)
+# <<<< For SVN checkout
+# >>>> For CVS checkout
+<subprj1-refname>_cvsRoot_forMakefiles = # CVSROOT for the checkout
+	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
+<subprj1-refname>_cvsModuleDir_forMakefiles = # CVS module name or module dir to checkout
+<subprj1-refname>_cvsLocalDir_forMakefiles = # Local dir corresponding to CVSROOT
+<subprj1-refname>_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
+# <<<< For CVS checkout
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks
+

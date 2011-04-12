@@ -78,7 +78,7 @@ gmp_u_list_PLUGIN_TO_LOAD +=
 # GMU-var: gmu_uf_LINK_OUTPUT
 #	Define the link ouput filename for this project.
 # Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
-# Using function gmpf_MakeExeName to construct output name makes the name more portable.
+# Using function gmpf_MakeDllName to construct output name makes the name more portable.
 ############################################################################
 gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllName,<your-dll-name>)
 #or
