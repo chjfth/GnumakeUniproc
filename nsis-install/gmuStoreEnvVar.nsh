@@ -24,6 +24,19 @@
   ${EndIf}
 !macroend
 
+!macro AddBat_gmu_goody
+  ${If} "$isStoreEnvVarToBat" == 1
+    Push $4
+    FileOpen $4 "${fpath_GmuEnvBat}" a
+    FileSeek $4 0 END
+    FileWrite $4 "$\r$\n" ; we write a new line
+    FileWrite $4 "call ${absdir_MinGW_bin_bkslash}\gmu-goody.bat"
+    FileWrite $4 "$\r$\n" ; we write an extra line
+    FileClose $4 ; and close the file
+    Pop $4
+  ${EndIf}
+!macroend
+
 !macro DoStoreEnvVar_list v1 v2 v3 v4 v5 v6 v7 ;v8 v9 v10 v11 v12 v13
   !insertmacro DoStoreEnvVar ${v1}
   !insertmacro DoStoreEnvVar ${v2}

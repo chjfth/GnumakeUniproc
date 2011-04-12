@@ -218,6 +218,9 @@ Section -AddEnvVars
   DetailPrint "Adding PATH env-var..."
   !insertmacro DoAddPathEnvVar AddPath
 
+  ; Add call D:\GMU\MinGW2\bin\gmu-goody.bat
+  !insertmacro AddBat_gmu_goody
+
   ; Record install target dir in registry
   WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir" "$INSTDIR"
   DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] InstallTargetDir=$InstDir_fwslash"
