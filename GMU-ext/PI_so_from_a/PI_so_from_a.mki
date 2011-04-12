@@ -23,7 +23,7 @@ _pluginId_so_from_a := $(gmpv_ThisPluginId)
 		# The same semantic as that of PI_windll_from_lib.
 
 #	gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT =
-		# (only for DLL project, default to null)
+		# (only for DLL project, default to null, optional)
 		# If 1, when DLL is built, make a copy of _auto_export_stub_.c to $(gmu_ud_SRC_ROOT).
 		# If you use VC IDE to maintain a DLL project as well, you can add this copy
 		# of _auto_export_stub_.c to your VC project so that DLL can be built in VC IDE.

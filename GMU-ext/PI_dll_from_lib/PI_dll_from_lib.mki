@@ -1,0 +1,74 @@
+ifndef __PLUGIN_DLL_FROM_LIB_LOADED
+__PLUGIN_DLL_FROM_LIB_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+_pluginId_dll_from_lib := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: DFL
+
+# Summary
+	# This plugin enables you to link static library into a dynamic library.
+	# This plugin strives to be universal across multiple platforms.
+	# Currently, it supports 
+	# * Windows, .lib -> .dll
+	# * Linux,   .a -> .so
+	#
+	# This plugin checks compiler-id and loads specific LIB->DLL plugins
+	# for that very platform.
+
+# User input vars:
+
+#	gmi_DFL_THISPRJ_LIB_OR_DLL = 
+		# (optional) Is current project a LIB or a DLL project. Its value is `LIB' or `DLL'.
+		# If not explicitly assigned, this plugin will deduce it from $(gmp_bc_IMAGE_TYPE).
+
+#	gmi_DFL_up_EXPORT_STUB_FROM_ROOT = 
+		# (only for LIB project, optional)
+		# Oops, this is a bit profound. Tells a C/C++ file from whom the call graph can cover
+		# all functions to be exported.
+
+#	gmi_DFL_DO_AUTO_EXPORT =
+		# (for both LIB and DLL project, default to null)
+		# If 1, This plugin will carry on "auto-export" procedure described in 
+		#	http://webs.dev.nls:8080/pages/viewpage.action?pageId=48366265
+		# 
+		# Note: LIB and DLL project must both define this to 1 to have such "auto-export"
+		# feature. If only LIB or only DLL has it set to 1, DLL will benefit nothing.
+		#
+		# [2011-02-26] Some drawback of this feature:
+		# 1. A C/C++ file is analyzed twice, first on compile, second on lib packing.
+
+#	gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT =
+		# (only for DLL project, default to null, optional)
+		# If 1, when DLL is built, make a copy of _auto_export_stub_.c to $(gmu_ud_SRC_ROOT).
+		# If you use VC IDE to maintain a DLL project as well, you can add this copy
+		# of _auto_export_stub_.c to your VC project so that DLL can be built in VC IDE.
+		#
+		# This is meaningful only when gmi_DFL_DO_AUTO_EXPORT=1
+
+
+ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+
+  gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
+
+  gmi_WDFL_THISPRJ_LIB_OR_DLL          = $(gmi_DFL_THISPRJ_LIB_OR_DLL)
+  gmi_WDFL_up_EXPORT_STUB_FROM_ROOT    = $(gmi_DFL_up_EXPORT_STUB_FROM_ROOT)
+  gmi_WDFL_DO_AUTO_EXPORT              = $(gmi_DFL_DO_AUTO_EXPORT)
+  gmi_WDFL_COPY_AUTOSTUB_TO_DLLSRCROOT = $(gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT)
+
+else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
+
+  gmp_u_list_PLUGIN_TO_LOAD += PI_so_from_a
+
+  gmi_SOFA_THISPRJ_LIB_OR_DLL          = $(gmi_DFL_THISPRJ_LIB_OR_DLL)
+  gmi_SOFA_up_EXPORT_STUB_FROM_ROOT    = $(gmi_DFL_up_EXPORT_STUB_FROM_ROOT)
+  gmi_SOFA_DO_AUTO_EXPORT              = $(gmi_DFL_DO_AUTO_EXPORT)
+  gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT = $(gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT)
+
+else
+  $(error !Error from$(_pluginId_dll_from_lib): Making DLL from LIB for gmp_COMPILER_ID=$(gmp_COMPILER_ID) is not supported yet)
+endif
+
+
+
+endif
+endif #__PLUGIN_DLL_FROM_LIB_LOADED
