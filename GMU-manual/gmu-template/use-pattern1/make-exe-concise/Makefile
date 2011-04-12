@@ -27,7 +27,7 @@ endif
 #	Define the "image-type" to generated for this project.
 # Common image-types are: LIB, DLL and EXE.
 ############################################################################
-gmp_bc_IMAGE_TYPE = LIB
+gmp_bc_IMAGE_TYPE = EXE
 
 ############################################################################
 # Compiler specific settings below.
@@ -40,9 +40,10 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 
   # gmp_CFLAGS_NON_CODE_GEN += /W3
   
-  # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
-
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
+  # gmi_RCVC_up_list_WINRC_FROM_ROOT = <.rc-filepath>
+	# This is a required parameter for PI_winres_msvc plugin, telling where is 
+	# the Windows resource script file, filepath relative to $(gmu_ud_SRC_ROOT).
   # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
   # gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib   # make dll from lib
   # gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
@@ -71,15 +72,13 @@ gmp_u_list_PLUGIN_TO_LOAD +=
 # GMU-var: gmu_uf_LINK_OUTPUT
 #	Define the link ouput filename for this project.
 # Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
-# Using function gmpf_MakeLibName to construct output name makes the name more portable.
+# Using function gmpf_MakeExeName to construct output name makes the name more portable.
 ############################################################################
-gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,<your-lib-name>)
-
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,<your-exe-name>)
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
 gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
-
 
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
@@ -88,6 +87,14 @@ gmp_DECO_DEBUG_FOR_LINK_OUTPUT =
 # not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
 ############################################################################
 gmu_ud_SRC_ROOT = <root-dir-for-your-source>
+
+# >>> optional for Windows exe (enable as you will)
+#gmi_RCVC_up_list_WINRC_FROM_ROOT = [dir-prefix]/1snc-wstcp.rc
+	# This is a required parameter for PI_winres_msvc plugin, telling where is 
+	# the Windows resource script file.
+#gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
+	# This tells the .H file used for precompiled header(passed as /Yc 's argument)
+# <<< optional for Windows exe
 
 ############################################################################
 # GMU-var: gmu_up_list_SRC_FROM_ROOT
@@ -141,42 +148,89 @@ gmu_u_GCC_M_OPTIONS +=
 
 
 ############################################################################
-# List extra objs to link in gmu_up_list_EXTRA_OBJ_TO_LINK:
+# GMU-vars: gmp_LINKFLAGS
+#	Set linker options for this project in this var.
+############################################################################
+gmp_LINKFLAGS += $(gmp_LINKFLAGS_preset)
+  # There are some other make-vars for easy setting linker flags:
+  gmp_ud_list_EXTRALIB += 
+  	# list library paths here, compiler_config.mki will help you prepend(for example) 
+  	# * -L for linuxgcc
+  	# * /LIBPATH: for msvc
+
+############################################################################
+#	List extra objs or libs to link below, they'll be combined into gmp_ALL_TO_LINK
 ############################################################################
 gmu_up_list_EXTRA_OBJ_TO_LINK +=
+	# Extra object files to link
+
+gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
+	# Extra libs to link
+	#
+	# The reason for using gmpf_MakeUpSysLibsToLink: 
+	# $(call gmpf_MakeUpSysLibsToLink,comfun) will become(for example):
+	# * -lcomfun         for linuxgcc & mingw
+	# * comfun.lib       for msvc
+
+gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
+	# List system libs in this make-var. 
+	# If more than one sys-lib are used, separate them with spaces.
+	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS.
+	# It is used just to imply that they are system libs(provided by compiler of OS).
 
 
+#---------------------------------------------------------------------------
+# Sub-projects definition starts here. 
+# Library(static lib or DLL) projects may well be your sub-projects for this EXE project
+#---------------------------------------------------------------------------
 ############################################################################
-# GMU-vars: gmu_uv_list_SUBPRJ_LINK_FOR_PARENT
-#	If your LIB project wants its sub-projects to be linked by
-# its parent EXE project, the LIB project can assign those sub-projects in 
-# this variable, so that your parent EXE project don't have to know what
-# (further sub-projects) your current LIB project are depending on.
-# It's amazing, really.
-# ( note: If you don't use gmu_uv_list_SUBPRJ_LINK_FOR_PARENT at first,
-# and later enable gmu_uv_list_SUBPRJ_LINK_FOR_PARENT, then you must clean 
-# the old project output-dir first in order for that change to work. )
+# GMU-var: gmu_uv_list_SUBPRJ_TO_LINK (outdated)
+#	This var tells which projects are sub-project for this project(parent project), 
+# and, for sub-projects listed in this var, their output-images will automatically 
+# become link components for parent project.
+#
+# GMU-var: gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL (recommended)
+#	This one is the superset of gmu_uv_list_SUBPRJ_TO_LINK. It's powerful.
+#	Not only output-images of sub-projects explicitly listed in gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL 
+# will be linked by this project, but also sub-projects' of those explictly listed ones 
+# -- any level of sub-projects can be linked. Anyhow, there are two factors that 
+# determines whether deeper projects' outputs will be automatically linked:
+# 1. a deeper project must claim himself a link-component(gmu_I_AM_A_LINK_COMPONENT=1).
+# You know, if you use pattern1.mks, LIB image-type has gmu_I_AM_A_LINK_COMPONENT=1 
+# already defined.
+# 2. For your sub-project(called SP), SP must define his sub-projects(called SSPs)
+# in gmu_uv_list_SUBPRJ_LINK_FOR_PARENT in order for SSPs to be linked automatically
+# by you.
 ############################################################################
-gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 
-<subprj-ref>_Makefile = # where the sub-project's makefile resides
+#gmu_uv_list_SUBPRJ_TO_LINK += # <subprj1-refname> <subprj2-refname> ...
+# or
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += # <subprj1-refname> <subprj2-refname> ...
+
+######## Details of your sub-projects go here: ########
+
+<subprj1-refname>_Makefile = # where the sub-project's makefile resides
+<subprj1-refname>_MakeVarDefines = # command line options passed to sub-make
 # If the sub-project's makefiles are to be checked-out from some repository, assign it here.
 # >>>> For SVN checkout
-<subprj-ref>_svnUrl_forMakefiles = # SVN Url for the checkout
+<subprj1-refname>_svnUrl_forMakefiles = # SVN Url for the checkout
 	# Hint: $(call gmuf_MakeSvnRepositoryPath,<SVN-path-prefix-var>,<remaining-repository-path>)
-<subprj-ref>_svnLocalDir_forMakefiles = # Local dir corresponding to the whole SVN URL
-<subprj-ref>_svnRev = # Revision to use(string after svn's -r switch)
+<subprj1-refname>_svnLocalDir_forMakefiles = # Local dir corresponding to the whole SVN URL
+<subprj1-refname>_svnRev_forMakefiles = # Revision to use(string after svn's -r switch)
 # <<<< For SVN checkout
 # >>>> For CVS checkout
-<subprj-ref>_cvsRoot_forMakefiles = # CVSROOT for the checkout
+<subprj1-refname>_cvsRoot_forMakefiles = # CVSROOT for the checkout
 	# Hint: $(call gmuf_MakeCvsRepositoryPath,<CVS-server-var>,<repository-path-on-CVS-server>)
-<subprj-ref>_cvsModuleDir_forMakefiles = # CVS module name or module dir to checkout
-<subprj-ref>_cvsLocalDir_forMakefiles = # Local dir corresponding to CVSROOT
-<subprj-ref>_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
+<subprj1-refname>_cvsModuleDir_forMakefiles = # CVS module name or module dir to checkout
+<subprj1-refname>_cvsLocalDir_forMakefiles = # Local dir corresponding to CVSROOT
+<subprj1-refname>_cvsTag_forMakefiles = # Tag or branch to checkout(string after cvs's -r switch)
 # <<<< For CVS checkout
 
+# NOTE for novice: Don't try to make sub-projects' output libs listed in gmp_ALL_TO_LINK,
+# those libs will be listed in gmp_ALL_TO_LINK automatically.
 
-# ----------- below for plugin PI_sync_devoutput -----------
+
+# ----------- below for plugins -----------
 
 # If you use plugin PI_sync_devoutput, you may want to set:
 # gmi_SYDO_ud_SYNC_HEADER_FROM =
@@ -188,8 +242,7 @@ gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 # gmi_SYDO_ud_SYNC_HEADER_TO = # (suggested to set as env-var or by parent project)
 	# Where the headers will be sync-ed to.
 
-# gmi_SYDO_ud_SYNC_LIB_TO = # (suggested to set as env-var or by parent project)
-	# Where the static LIBs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
+# gmi_SYDO_ud_SYNC_EXE_TO = # (suggested to set as env-var or by parent project)
 
 
 
