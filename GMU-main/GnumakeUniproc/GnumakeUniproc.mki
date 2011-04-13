@@ -1284,7 +1284,7 @@ _isLinkageListChanged := $(call _IsStringNotEqual,$(_oldLinkageContent),$(_Gp_li
 	# If not equal, we will force a link.
 
 $(gmu_Gp_LINK_OUTPUT): \
-    	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_Gp_list_SUBPRJ_TO_LINK) \
+    	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK_2) $(gmu_Gp_list_SUBPRJ_TO_LINK) \
     	$(if $(_isLinkageListChanged),gmu_ut_Always)
 	@$(if $?,,$(if $(_isLinkageListChanged), $(call _DoVerbose1,@echo "!GMU!Info: Go relink due to linkage list changed since last build.") ))
 #		Strategy: Display "Go relink ..." when _isLinkageListChanged is the only factor causing the relink action. 

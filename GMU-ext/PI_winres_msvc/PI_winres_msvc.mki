@@ -47,7 +47,7 @@ _RCVC_REQRES_TO_LINK = $(call gmif_RCVC_RC_to_RES,$(gmi_RCVC_up_list_WINRC_FROM_
 
 _RCVC_p_HDEPEND_FOR_WINRC = $(_RCVC_REQRES_TO_LINK:.res=.$(_RCVC_RCdotD_extn))
 
-gmu_up_list_EXTRA_OBJ_TO_LINK += $(_RCVC_REQRES_TO_LINK)
+gmu_up_list_EXTRA_OBJ_TO_LINK_2 += $(_RCVC_REQRES_TO_LINK)
 
 gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,$(gmp_bc_syslib_GUI))
 

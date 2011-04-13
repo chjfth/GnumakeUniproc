@@ -17,6 +17,11 @@ define _gmpf_bcfShowLibrariesToLink
 	)
 
 	@$(call _DoVerbose1,\
+	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK_2):"; \
+	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK_2),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK_2)); do echo "    $${v}"; done,echo "(none)")\
+	)
+
+	@$(call _DoVerbose1,\
 	echo -n "**library search directories(gmp_ud_list_EXTRALIB): "; \
 	$(if $(gmp_ud_list_EXTRALIB),echo ''; for v in $(gmp_ud_list_EXTRALIB); do echo "    $$v" ; done,echo "(none)")\
 	)
@@ -44,14 +49,15 @@ gmp_LINKFLAGS += $(c_flags_Link_Common)
 
 _gmp_ALL_LIBS_TO_LINK = $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS) $(gmp_bc_SYSLIBS)
 
-gmp_ALL_TO_LINK = $(patsubst $(CURDIR)/%,./%,$(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK) \
+gmp_ALL_TO_LINK = $(patsubst $(CURDIR)/%,./%,\
+	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK_2) \
 	$(_gmp_ALL_LIBS_TO_LINK)	$(if $(gmp_LINK_DuplicateLibList),$(_gmp_ALL_LIBS_TO_LINK)) )
 	#[2008-10-21] For linkers such as GNU ld who hastes to drop objs on LIB scanning,
 	#User can define gmp_LINK_DuplicateLibList=1 so that the LIB list is duplicated on link 
 	#command line to make ld happy.
 
 
-gmp_ALL_TO_LINK_FOR_LIB = $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK)
+gmp_ALL_TO_LINK_FOR_LIB = $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK_2)
 	# All those(obj files) to be linked in to a static lib file.
 
 
