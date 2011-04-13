@@ -47,10 +47,12 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
   # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
 
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
-  # gmi_RCVC_up_list_WINRC_FROM_ROOT = <.rc-filepath>
-	# This is a required parameter for PI_winres_msvc plugin, telling where is 
-	# the Windows resource script file, filepath relative to $(gmu_ud_SRC_ROOT).
+    # gmi_RCVC_up_list_WINRC_FROM_ROOT = <.rc-filepath>
+	#	This is a required parameter for PI_winres_msvc plugin, telling where is 
+	#	the Windows resource script file, filepath relative to $(gmu_ud_SRC_ROOT).
   # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
+    # gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
+	#	This tells the .H file used for precompiled header(passed as /Yc 's argument)
   # gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib   # make dll from lib
   # gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
 

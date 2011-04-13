@@ -44,6 +44,8 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
   # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
+    # gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
+	#	This tells the .H file used for precompiled header(passed as /Yc 's argument)
   # gmp_u_list_PLUGIN_TO_LOAD += PI_dll_from_lib      # make dll from lib
   # gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
 
