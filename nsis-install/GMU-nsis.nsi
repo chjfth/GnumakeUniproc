@@ -92,7 +92,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre5(20110411)"
+!define PRODUCT_VERSION "0.97-pre6(20110414)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -174,7 +174,11 @@ SectionEnd
 Section "GnumakeUniproc" GMU ; GnumakeUniproc required files
   SectionIn RO
   SetOverwrite try
-  
+
+  ; >>> nlscan specific. Remove any stale Scalacon template files.
+  RMDir /r "$INSTDIR\GMU-main\GnumakeUniproc\nlscan\cprjtmpl"
+  ; >>> nlscan specific.
+
   SetOutPath "$INSTDIR"
   File "nsis-data\GMU\*.txt"
   File /nonfatal "nsis-data\GMU\*.htm"
