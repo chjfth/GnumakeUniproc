@@ -1,5 +1,5 @@
 # ====== pattern1.mks , 's' means "stem". =========
-# This is the general pattern for integrating the core layer of GnumakeUniproc(GnumakeUniproc.mki) 
+# This is the general pattern for inegrating the core layer of GnumakeUniproc(GnumakeUniproc.mki) 
 # and a specific compiler, so that an program(EXE,LIB,or DLL) can be compiled and linked.
 # This "stem" chains the following things to accomplish the whole work:
 # * u_srccfg_pre.mki         (user defined)
@@ -7,14 +7,17 @@
 # * compiler_config.mki      (compiler extension author defined)
 # * [custom-image-mki (second try)]       
 # * [plugins]
-# * u_srccfg_post.mki        (user defined)
-# * u_checkout_more.mki      (user defined, to checkout extra files required by this project)
+# * u_srccfg_post.mki        [U](user defined)
+# * u_checkout_more.mki      [U](user defined, to checkout extra files required by this project)
 # * [compiler-config pre-core]  (compiler extension author defined, immediately before GnumakeUniproc.mki)
 # * GnumakeUniproc.mki       (the GnumakeUniproc core layer)
-# * u_post_gmucore.mki       (user defined)
+# * u_post_gmucore.mki       [U](user defined)
 # * [plugins post-core]
 # * [custom-image-mki post-core]
 # * [compiler-config post-core]  (compiler extension author defined)
+
+# Special: If gmp_BYPASS_USER_MKI_WHEN_GET_PRJ_ATTR=1, those marked [U] will
+#		not be included when _isNowGmuGetPrjAttr==1 .
 
 # === Q&A  ===
 #	Q: What if I(the user) want to generate my final output from $(gmu_Gp_LINK_OUTPUT),
@@ -87,10 +90,11 @@ _p_srccfg_pre = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_pre)$(gmp_MKS_PATTER
 _p_srccfg_post = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_post)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
 _p_post_gmucore = $(_d_UserPartialMakefiles)/u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
 
-ifneq (,$(wildcard $(_p_srccfg_pre))) # include it if exist
-  include $(_p_srccfg_pre)
+ifeq ($(_ShouldIncludeUserMki),1)
+  ifneq (,$(wildcard $(_p_srccfg_pre))) # include it if exist
+    include $(_p_srccfg_pre)
+  endif
 endif
-
 
 _dircDefaultPlugin = pattern1cfg/plugins
 
@@ -120,16 +124,18 @@ endif # ifeq (,$(gmu_u_LINK_CMD))
 include $(gmp_p_mki_LoadPlugins)
 
 
-ifneq (,$(wildcard $(_p_srccfg_post))) # include it if exist
-  include $(_p_srccfg_post)
-endif
+ifeq ($(_ShouldIncludeUserMki),1)
+  ifneq (,$(wildcard $(_p_srccfg_post))) # include it if exist
+    include $(_p_srccfg_post)
+  endif
 
-ifneq (,$(wildcard $(_p_checkout_more))) # include it if exist
-  include $(_p_checkout_more)
-endif
+  ifneq (,$(wildcard $(_p_checkout_more))) # include it if exist
+    include $(_p_checkout_more)
+  endif
 	# [2008-07-03] This must be placed before GnumakeUniproc.mki, in other word,
 	# gmu_uv_list_SVN_MODULES,gmu_uv_list_CVS_MODULES must be defined before GnumakeUniproc.mki,
 	# -- because gmu_uv_list_SVN/CVS_MODULES are immediately expanded in GnumakeUniproc.mki .
+endif
 
 
 include $(gmp_p_mki_DecoPrjname) # Decorate compiler-id&ver
@@ -166,8 +172,10 @@ ifeq (,$(strip $(gmu_uf_LINK_OUTPUT)))
  In case this is a container project not generating any output file, you should use pattern-container1.mks instead)
 endif
 
-ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
-  include $(_p_post_gmucore)
+ifeq ($(_ShouldIncludeUserMki),1)
+  ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
+    include $(_p_post_gmucore)
+  endif
 endif
 
 

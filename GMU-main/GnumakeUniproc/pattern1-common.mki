@@ -106,6 +106,9 @@ _gmuBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmu
 
 _PrjnameShowInList = [$(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))]
 
+_ExpectGetPrjAttrIncludeUserMki = $(if $(gmp_BYPASS_USER_MKI_WHEN_GET_PRJ_ATTR),,1)
+
+_ShouldIncludeUserMki = $(if $(_isNowNotGmuGetPrjAttr)$(_ExpectGetPrjAttrIncludeUserMki),1,)
 
 define _gmuf_ExecuteShcmdList
 $(foreach c,$1,@$($c)

@@ -4,10 +4,14 @@
 
 # INCLUSION ORDER:
 # * [plugins]
-# * u_subprjs.mki            (must, sub-projects definition)
-# * GnumakeUniproc.mki       (the GnumakeUniproc core layer)
-# * u_post_gmucore.mki       (optional)
+# * u_subprjs.mki OR u_freestyle.mki   [U] (must, sub-projects definition)
+# * GnumakeUniproc.mki                 (the GnumakeUniproc core layer)
+# * u_post_gmucore.mki                 [U] (optional)
 # * [plugins post-core]
+
+# Special: If gmp_BYPASS_USER_MKI_WHEN_GET_PRJ_ATTR=1, those marked [U] will
+#		not be included when _isNowGmuGetPrjAttr==1 .
+
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 .PHONY: _gmp_first_target
@@ -53,12 +57,14 @@ _p_freestyle_mki = $(call _gmp_PickUserMki,$(_f_freestyle_mki))
 _f_post_gmucore = u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
 _p_post_gmucore = $(call _gmp_PickUserMki,$(_f_post_gmucore))
 
-ifneq (,$(wildcard $(_p_subprjdesc)))
-  include $(_p_subprjdesc)
-else
-ifneq (,$(wildcard $(_p_freestyle_mki)))
-  include $(_p_freestyle_mki)
-endif
+ifeq ($(_ShouldIncludeUserMki),1)
+  ifneq (,$(wildcard $(_p_subprjdesc)))
+    include $(_p_subprjdesc)
+  else
+    ifneq (,$(wildcard $(_p_freestyle_mki)))
+      include $(_p_freestyle_mki)
+    endif
+  endif
 endif
 
 
@@ -85,9 +91,10 @@ gmu_IS_SUBPRJ_AUTO_LINK_MERGE = 1
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/GnumakeUniproc.mki
 
-
-ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
-  include $(_p_post_gmucore)
+ifeq ($(_ShouldIncludeUserMki),1)
+  ifneq (,$(wildcard $(_p_post_gmucore))) # include it if exist
+    include $(_p_post_gmucore)
+  endif
 endif
 
 
