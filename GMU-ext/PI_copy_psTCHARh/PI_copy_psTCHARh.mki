@@ -30,6 +30,10 @@ _pluginId_copy_psTCHARh := $(gmpv_ThisPluginId)
 	# (must if gmi_CTCH_dirNlssvn is not null)
 	# Tell the destiniation directory of the copied ps_TCHAR.h .
 
+# gmi_CTCH_COMPILER_PIR = 
+	# (optional)
+	# Assign the pir directory manually.
+
 # Output vars:
 # * dirNlssvn
 # * gmi_CTCH_G_dirCommonLib
@@ -54,10 +58,14 @@ gmi_CTCH_G_dirCommonLib = $(dirNlssvn)/CommonLib
 gmi_CTCH_G_dirCommonInclude = $(gmi_CTCH_G_dirCommonLib)/common-include
 
 define _gmi_CTCH_pirTCHARH
-  ifeq ($$(gmp_COMPILER_ID),wince)
-    _pirTCHARH = msvc
+  ifeq (,$$(gmi_CTCH_COMPILER_PIR)) # Use $(gmp_COMPILER_ID) for the partial-dir
+    ifeq ($$(gmp_COMPILER_ID),wince)
+      _pirTCHARH = msvc
+    else
+      _pirTCHARH = $$(gmp_COMPILER_ID)
+    endif
   else
-    _pirTCHARH = $$(gmp_COMPILER_ID)
+    _pirTCHARH = msvc+armcpp#$$(gmi_CTCH_COMPILER_PIR)
   endif
 endef
 	# We place this ifeq/endif check in a defined function, so that it can have 
