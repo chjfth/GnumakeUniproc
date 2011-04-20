@@ -15,7 +15,7 @@ OutputDirGMU=./GMU
 
 svnurl=$SvnUrlPrefix/GMU-addons/$BranchToGet/nlscan
 echo "SVN exporting $svnurl ..."
-svn export --force $svnurl $OutputDirGMU/GMU-main/GnumakeUniproc/nlscan
+svn export --force $svnurl $OutputDirGMU/nlscan
 if [ "$?" != 0 ]; then
 	echo "Unexpected! SVN export($svnurl) failed."
 	exit 1

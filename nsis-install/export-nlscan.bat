@@ -12,7 +12,7 @@ if NOT "x%2x" == "xx" set BranchToGet=%2
 set OutputDir=nsis-data
 
 @echo on
-svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/nlscan  %OutputDir%/GMU/GMU-main/GnumakeUniproc/nlscan
+svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/nlscan  %OutputDir%/GMU/nlscan
 @if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
 
 svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons

@@ -19,7 +19,7 @@
 
 !define dirname_MinGW MinGW2
 !define suffix_dir_GMUext /GMU-ext
-!define suffix_dir_ExtraCccfg /GMU-main/GnumakeUniproc/nlscan
+!define suffix_dir_ExtraCccfg /nlscan
 !define suffix_dir_GMUbin \${dirname_MinGW}\bin
 !define absdir_MinGW_bin_bkslash "$INSTDIR${suffix_dir_GMUbin}"
 
