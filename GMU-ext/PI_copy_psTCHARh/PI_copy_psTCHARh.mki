@@ -76,7 +76,7 @@ gmi_FPCP_upp_list_COPY = $(eval $(_gmi_CTCH_pirTCHARH))\
 	# For plugin PI_file_precopy
 
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/nlscan/nlssvn-prjs.mki
+include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 $(call NlssvnWantCheckout,CommonInclude)
 
 
