@@ -9,7 +9,7 @@ ifeq (,$(gmp_CENV_ROOT_msvc_vc80x64))
 endif
 
 ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc80x64))
-  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80x64 is not defined, so you are not using the latest PlatformSDK for VS2005)
+  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80x64 is not defined, so you are not using the latest PlatformSDK for VS2005.)
 endif
 
 

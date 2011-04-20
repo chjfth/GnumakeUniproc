@@ -8,7 +8,7 @@ ifeq (,$(gmp_CENV_ROOT_msvc_vc71))
 endif
 
 ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc71))
-  $(warning !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc71 is not defined, so you are not using the latest PlatformSDK for VS2003)
+  $(warning !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc71 is not defined, so you are not using the latest PlatformSDK for VS2003.)
 endif
 
 
