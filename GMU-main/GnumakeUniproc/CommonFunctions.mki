@@ -172,6 +172,8 @@ _StripBasenameTail = $(if $(patsubst %$2,,$(basename $1)),$1,$(patsubst %$2,%,$(
 _IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
 gmuf_IsFileExist_sh = $(_IsFileExist_sh)
 
+gmuf_Copy1File_sh = $(shell if cp --force "$1" "$2" 1>&2; then echo 1; fi)
+
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 
 _IsP1OlderThanP2_direct_sh = $(shell (if [ ! -f $1 ] || [ $1 -ot $2 ];then echo -n '1';fi))
