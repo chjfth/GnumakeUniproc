@@ -29,6 +29,7 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_sync_devoutput
 _d_ThisPlugin = $(dir $(call gmuf_lastword,$(MAKEFILE_LIST)))
 
 _p_sdbi_mkiToLoad := $(_d_ThisPlugin)sdbi.$(gmp_COMPILER_ID).mki
+	# TODO: To load sdbi.$(gmp_COMPILER_ID).mki from compiler-config-mki dir first
 
 ifneq (,$(gmp_bc_DEBUG)$(gmp_msvc_WANT_RELEASE_PDB))
 
