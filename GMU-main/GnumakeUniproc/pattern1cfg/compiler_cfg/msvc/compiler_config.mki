@@ -94,23 +94,17 @@ gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
 
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
 
-gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
-	# NOTE: gmp_MSVC_Gp_VCx0_pdb is for cl compile process(not for link process); it is used with /Fd compile flag.
-	# [2009-12-16] Side note: 
-	# For PDBs generated with EXE and DLL, we use gmp_MSVC_Gp_LINK_OUTPUT_pdb instead to tell the pdb file path, 
-	# whose value is defined later separately for EXE and DLL.
+gmp_MSVC_Gp_VCx0_pdb = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+	# [2011-04-23] Now, gmp_MSVC_Gp_VCx0_pdb is synonym of gmp_MSVC_Gp_LINK_OUTPUT_pdb
 gmp_MSVC_Gp_VCx0_idb = $(call gmuf_ChangeFilenameExt,$(gmp_MSVC_Gp_VCx0_pdb),idb)
 	# note: gmp_MSVC_Gp_VCx0_idb is defined for user convenience, in case user wants to copy .idb to other places.
 	# The .idb is for incremental build.
 
 gmp_CFLAGS_NON_CODE_GEN_preset += /Fd"$(gmp_MSVC_Gp_VCx0_pdb)"
-	# /Fd tells where VC50.pdb, vc60.pdb, vc70.pdb, vc80.pdb etc is generated.
+	# /Fd tells where vc60.pdb, vc71.pdb, vc80.pdb etc is generated.
 	# [2007-11-23] Today, I decided to name those VCx0.pdb specifically with prjname,
 	# -- if not, you will not be able to place pdb files from several projects into the same 
-	# directory for ease of debuging on other machines.
-	# [2007-11-25] Today, I decide to use a explicit name( $(gmu_G_Deco_PrjName).pdb ) for 
-	# the pdb file instead of VCx0.pdb, so that multiple VCx0.pdb can be placed into the
-	# same dir when distributing the debug library to the end-user.
+	# directory for ease of debugging on other machines.
 
 ifdef gmp_bc_WIN64
   gmp_CFLAGS_MACRO_DEFS_preset += #compiler will predefine _WIN64, and WIN64 seems not a reserved macro.
@@ -233,6 +227,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 	$(gmu_exe_LIB) /nologo /out:"$@" @$(_p_objliblist)
   endef
 
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
 else
 
   # For all image types other than static library, add /LIBPATH:xxx link params for extra library path

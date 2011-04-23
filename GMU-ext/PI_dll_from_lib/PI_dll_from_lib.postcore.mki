@@ -2,7 +2,7 @@
 ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 
   ifeq (1,$(gmp_NOW_EXPORT))
-    gmp_Gp_list_LIB_OUTPUT =
+    gmp_Gp_list_LIB_OUTPUT = # synonym of gmi_SYDO_up_list_SYNC_LIB
 		# If current LIB contains export indication in its objs, this LIB
 		# SHOULD NOT be copied to other places and use by casual users,
 		# because the output symbols may interfere with the EXE/DLL that
@@ -10,6 +10,8 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 		# e.g. If such a LIB is linked into a Windows EXE, the EXE will
 		# export functions from this LIB. Check it with Depends.exe and
 		# you will know.
+    gmi_SYDO_up_list_SYNC_DBGINFO =
+		# Same reason as gmp_Gp_list_LIB_OUTPUT
   endif
 
 endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'

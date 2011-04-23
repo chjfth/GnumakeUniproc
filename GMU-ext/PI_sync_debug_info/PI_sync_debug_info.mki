@@ -1,11 +1,9 @@
 ifndef __PLUGIN_PI_sync_debug_info_LOADED
 __PLUGIN_PI_sync_debug_info_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
 _pluginId_sync_debug_info := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: SDBI
-
-# NOTE: In order to use this plugin, user should also load plugin PI_sync_devoutput .
-# (because Make-target gmi_SYDO_target_SyncOutput is from PI_sync_devoutput.)
 
 # gmi_SYDO_ud_SYNC_DBGINFO_TO (must)
 	# This tells to where the debug output info will be copied.
@@ -25,6 +23,9 @@ _pluginId_sync_debug_info := $(gmpv_ThisPluginId)
 # error C2858: command-line option 'program database name (/Fdq:\...\gf\utoolsaddin_msvc_d\utoolsaddin_d.dll.vcx0.pdb)' inconsistent with precompiled header, which used '/Fdq:\...\gf\utoolsaddin_msvc_d\utoolsaddin.dll.vcx0.pdb'
 ####### @@@@@@@@@@@@
 
+gmp_u_list_PLUGIN_TO_LOAD += PI_sync_devoutput
+
+
 _d_ThisPlugin = $(dir $(call gmuf_lastword,$(MAKEFILE_LIST)))
 
 _p_sdbi_mkiToLoad := $(_d_ThisPlugin)sdbi.$(gmp_COMPILER_ID).mki
@@ -39,4 +40,7 @@ ifneq (,$(gmp_bc_DEBUG)$(gmp_msvc_WANT_RELEASE_PDB))
 
 endif # ifneq (,$(gmp_bc_DEBUG))
 
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif # __PLUGIN_PI_sync_debug_info_LOADED

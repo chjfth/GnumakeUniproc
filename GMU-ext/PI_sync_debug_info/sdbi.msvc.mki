@@ -10,36 +10,26 @@
 	# (file list with full path)
 	# If this var is defined, these files are considered as debug info files.
 
-# gmp_MSVC_Gp_VCx0_pdb
-	# (file list with full path)
-	# If gmp_MSVC_Gp_LINK_OUTPUT_pdb is null and this var is defined, these files are considered as debug info files.
-
 ###### USER NOTE >>>>> (2009-12-16)
-# Although gmp_MSVC_Gp_LINK_OUTPUT_pdb and gmp_MSVC_Gp_VCx0_pdb is input value for this plugin,
-# end users of GMU don't have to set them manually, instead, they are set automatically by msvc/compiler_config.mki
+# Although gmp_MSVC_Gp_LINK_OUTPUT_pdb is input value for this plugin,
+# end users of GMU don't have to set them manually, instead, 
+# they are set automatically by msvc/compiler_config.mki
 ###### USER NOTE <<<<<
 
-sdbi_pdbLibOutput =	$(gmp_MSVC_Gp_VCx0_pdb)$(if $(wildcard $(gmp_MSVC_Gp_VCx0_idb)), $(gmp_MSVC_Gp_VCx0_idb))
-
-#sdbi_pdbExeOutput = $(call gmuf_ChangeFilenameExt,$(gmu_Gp_LINK_OUTPUT),pdb) // old before 2009-05-12
-sdbi_pdbExeOutput = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
-
-#sdbi_isExeOutput = $(if $(wildcard $(sdbi_pdbExeOutput)),1)
-	# note: Don't use $(wildcard ) here due to make 3.81's perhaps buggy caching behavior. Ref: http://savannah.gnu.org/bugs/?21231
-sdbi_isExeOutput = $(if $(call gmuf_IsFileExist_sh,$(sdbi_pdbExeOutput)),1)
-
-gmi_SDBI_Gps_DBG_FILE = $(if $(sdbi_isExeOutput),$(sdbi_pdbExeOutput),$(sdbi_pdbLibOutput))
-	# The first check is for EXE or DLL output, and if not I think that is a LIB output
-	#
-	# Example: A project outputs foo.exe, then the corresponding pdb is foo.exe.pdb.
-	# Copying foo.exe.pdb is enough, don't copy the VCx0.pdb since the info in VCx0.pdb
-	# has been merged into foo.exe.pdb when generting an EXE/DLL. 
-	# But if you're linking a static LIB(bar.lib for example), then no bar.pdb is
-	# generated when linking the lib, so the VCx0.pdb is the one you should keep.
-	#
-	# Sometimes, VCx0.idb is generated with VCx0.idb when linking a LIB(I don't
-	# know why), so copy that idb as well.
 
 
-gmi_SYDO_up_list_SYNC_DBGINFO += $(gmi_SDBI_Gps_DBG_FILE)
+gmi_SYDO_up_list_SYNC_DBGINFO += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+
+
+
+# Historical notes:
+
+# Example: A project outputs foo.exe, then the corresponding pdb(by GMP1) will be foo.exe.pdb.
+# Copying foo.exe.pdb is enough, don't copy the VCx0.pdb since the info in VCx0.pdb
+# has been merged into foo.exe.pdb when generting an EXE/DLL. 
+# But if you're linking a static LIB(bar.lib for example), then no bar.pdb is
+# generated when linking the lib, so the VCx0.pdb is the one you should keep.
+#
+# VCx0.pdb is not a true name you'll see with GMP1. The actual name is the link output
+# followed by .pdb, e.g., foo.exe.pdb, foo.lib.pdb, foo.dll.pdb.
 
