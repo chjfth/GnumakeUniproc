@@ -60,6 +60,10 @@ _pluginId_dll_from_lib := $(gmpv_ThisPluginId)
 		# project want to export functions from [only its immediate LIB sub-projects] or
 		# [all levels of its descendant LIB projects]. 
 
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_dll_from_lib),postcore)
+
+
 ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 
   gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
@@ -67,7 +71,6 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
   gmi_WDFL_THISPRJ_LIB_OR_DLL          = $(gmi_DFL_THISPRJ_LIB_OR_DLL)
   gmi_WDFL_up_EXPORT_STUB_FROM_ROOT    = $(gmi_DFL_up_EXPORT_STUB_FROM_ROOT)
   gmi_WDFL_DO_AUTO_EXPORT              = $(gmi_DFL_DO_AUTO_EXPORT)
-#  gmi_WDFL_IS_DEEP_EXPORT              = $(gmi_DFL_IS_DEEP_EXPORT)
   gmi_WDFL_COPY_AUTOSTUB_TO_DLLSRCROOT = $(gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT)
 
 else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
@@ -77,7 +80,6 @@ else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
   gmi_SOFA_THISPRJ_LIB_OR_DLL          = $(gmi_DFL_THISPRJ_LIB_OR_DLL)
   gmi_SOFA_up_EXPORT_STUB_FROM_ROOT    = $(gmi_DFL_up_EXPORT_STUB_FROM_ROOT)
   gmi_SOFA_DO_AUTO_EXPORT              = $(gmi_DFL_DO_AUTO_EXPORT)
-#  gmi_SOFA_IS_DEEP_EXPORT              = $(gmi_DFL_IS_DEEP_EXPORT)
   gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT = $(gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT)
 
 else
@@ -112,5 +114,5 @@ endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 #### <<< Generic code regardless of Windows or Linux or other OS 
 #############################################################################
 
-endif
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif #__PLUGIN_DLL_FROM_LIB_LOADED
