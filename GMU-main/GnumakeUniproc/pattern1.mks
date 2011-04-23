@@ -96,7 +96,6 @@ ifeq ($(_ShouldIncludeUserMki),1)
   endif
 endif
 
-_dircDefaultPlugin = pattern1cfg/plugins
 
 # Load custom-image-mki if gmp_LOAD_CUSTOM_IMAGE_IT is defined
 ifeq (1,$(gmp_LOAD_CUSTOM_IMAGE_IT))

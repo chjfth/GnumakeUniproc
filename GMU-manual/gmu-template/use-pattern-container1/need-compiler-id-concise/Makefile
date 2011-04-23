@@ -13,7 +13,7 @@ ifndef gmu_PRJ_NAME
 endif
 
 gmp_CONTAINER_EXTRACT_COMPILER_ID = 1
-	# [2007-01-22] Define this to extract gmp_COMPILER_ID automatically from directory ext-name.
+	# Define this to extract gmp_COMPILER_ID automatically from directory ext-name.
 	# This is required, for example, if the path of some sub-project is composed of the
 	# dynamic $(gmp_COMPILER_ID) .
 
