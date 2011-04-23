@@ -14,3 +14,12 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
 
 endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
+
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+  gmu_DECO_SUFFIX_PRJ_NAME += $(if $(gmp_NOW_EXPORT),.export)
+
+endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+

@@ -149,7 +149,7 @@ endif
 	# [2008-09-10] This pre-core mki is considered a special privilege for compiler-config-mki.
 	# It is included immediately before GnumakeUniproc.mki, so that in this pre-core mki,
 	# we can be sure all expansion-in-core gmu-vars have been established, e.g. gmu_Gp_LINK_OUTPUT
-	# is established(no gmu_DECO_SUFFIX_LINK_OUTPUT assigment will affect it, etc).
+	# is established(no gmu_DECO_SUFFIX_LINK_OUTPUT assignment will affect it, etc).
 	# Today, the idea of this pre-core file comes into being this way: 
 	#	For Windows/WinCE compiler config, applying ``gmu_DECO_SUFFIX_LINK_OUTPUT += --imp''
 	# in this file can guarantee no user makefiles can add further suffix to the link output.

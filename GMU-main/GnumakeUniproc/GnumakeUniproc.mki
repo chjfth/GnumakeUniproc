@@ -1262,7 +1262,7 @@ endif # ifeq (,$(gmu_DO_IGNORE_SUBPRJS))
 _f_AutoLinkListForParent = _AutoLinkListForParent.gmu.txt
 _p_AutoLinkListForParent = $(gmu_Gd_PRJ_GMUTMP)/$(_f_AutoLinkListForParent)
 	# [2006-12-14] These two must not be placed inside `ifneq (,$(gmu_uv_list_ALL_SUBPRJ))',
-	#because a leave project(project without any subprj) should have these defined!
+	#because a leaf project(project without any subprj) should have these defined!
 _f_AutoLinkPjnmForParent = _AutoLinkPjnmForParent.gmu.txt
 _p_AutoLinkPjnmForParent = $(gmu_Gd_PRJ_GMUTMP)/$(_f_AutoLinkPjnmForParent)
 	# Pjnm: project name

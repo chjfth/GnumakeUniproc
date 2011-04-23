@@ -89,7 +89,9 @@ ifneq (,$(gmp_bc_DEBUG))
 endif
 gmp_CFLAGS_CODE_GEN_preset += $(if $(isAboveVC8),/Wp64)# Detect 64-bit portability
 
-gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM))
+gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
+	$(patsubst %,/D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM)))
+
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
 
 gmp_MSVC_Gp_VCx0_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
@@ -289,7 +291,7 @@ gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
 	ws2_32 NetAPI32 \
 	RpcRT4 \
 	SetupAPI \
-	RASAPI32 RASsAPI \
+	RASAPI32 \
 	)
 	#	[2006-11-30] Yes, don't use = here, because pattern1-inc-custom-it.mki 
 	# may add some more libs to gmp_bc_SYSLIBS which precedes this statement.
