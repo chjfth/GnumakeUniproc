@@ -283,7 +283,14 @@ gmu_u_CXX_CMD = $(gmu_u_CC_CMD)#$(gmu_exe_CXX) /c $(_gmp_CFLAGS_final) /Fo"$@" $
 
 # ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
 
-gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,kernel32 user32 gdi32 comdlg32 advapi32 shell32 uuid)
+gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
+	kernel32 user32 gdi32 comdlg32 advapi32 shell32 ShLwApi uuid \
+	winspool ole32 oleaut32 odbc32 odbccp32 \
+	ws2_32 NetAPI32 \
+	RpcRT4 \
+	SetupAPI \
+	RASAPI32 RASsAPI \
+	)
 	#	[2006-11-30] Yes, don't use = here, because pattern1-inc-custom-it.mki 
 	# may add some more libs to gmp_bc_SYSLIBS which precedes this statement.
 
@@ -292,4 +299,6 @@ gmp_bc_syslib_WIN_SYS = winspool shell32 advapi32 ole32 oleaut32
 gmp_bc_syslib_DATABASE = odbc32 odbccp32
 gmp_bc_syslib_NETWORK = ws2_32
 
+# x64 SDK does not have the following libs:
+# RichEd20.lib (VS2005 VS2008)
 
