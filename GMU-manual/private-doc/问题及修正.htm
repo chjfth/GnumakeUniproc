@@ -134,11 +134,16 @@ tt { color:#003366; }
   </ul>
 </li>
 <li>080819: <a href="win32-make-and-sh.htm">重要发现：Windows 上 make.exe 和 sh.exe 的互关联问题</a></li>
-<li><a href="#090305">090305: 一个备忘，gmuExtractVarDefines 还是不能丢</a>
+<li><a href="#090305">090305: 一个备忘，gmuExtractVarDefines 还是不能丢(三天后又撤销了!)</a>
   <ul>
     <li><a href="#090308">090308 终于，撞上 gmuExtractVarDefines 的大限，准备将其废掉！</a></li>
   </ul>
 </li>
+<li><a href="#110425">110425: dll-from-lib 思路更新</a>
+  <ul>
+    <li><a href="#110425-1">插件名称统一为 PI_dll_from_lib</a>
+    <li><a href="#110425-2">PI_dll_from_lib 自动链接深层LIB，应控制&ldquo;间接LIB工程&rdquo;不要导出符号</a>
+  </ul>
 </ol>
 
 <H2><a name="060216"></a>[2006-02-16 15:00]</H2>
@@ -1587,6 +1592,50 @@ export PATH:=zzz
 </blockquote>
 <p>这样看出来了吧，在父工程 makefile 中有时希望用 export 变量定义的方式来传递变量给子工程，而这种 export 定义变量的方式，和 make 命令行定义变量一样，同样无法被 $(shell ) 启动的子进程接受。<span class="red">这样一来 gmuExtractVarDefines 的作用就不彻底了。</span>既然不彻底，我就倾向于朝着不用它的方向前进。因此，我今天采取了 2009-03-05 那个“另外的思路”。</p>
 <p>今天的改动就在 r747 。</p>
+
+<h2><a name="110425"></a>[2011-04-25] dll-from-lib 思路更新</h2>
+<h3><a name="110425-1"></a>插件名称统一为 PI_dll_from_lib</h3>
+<p>早两年，曾经在 dll-from-lib 插件上纠结过，曾经写了两个插件 PI_windll_from_lib 和 PI_so_from_a，分别为 Visual C++ 和 Linux GCC 所用，因为 dll-from-lib 这种动作在 Windows 和 Linux 上的具体操作方式确实是不同的，即 makefile 代码无法重用，因此就写了两个插件。</p>
+<p>后来，实施 Scalacon 时，发现用两个插件名称实在不方便，因此就想着能否统一。现在想到了一个不错的方法。写一个名曰 PI_dll_from_lib 的插件，此插件装载时根据 gmp_COMPILER_ID 的不同来自动装载针对具体编译器的 dll-from-lib 插件（暂称二级插件）。这么做有个技术前提，即在插件 mki 中能够告知装载更多插件。之前是不行的，要装什么插件用户 mki 中指定完整，现在好了，r943 做到了&mdash;&mdash;多亏了强大的 <code>$(eval )</code> 。</p>
+<p>可想而知，今后要给 MinGW 提供 dll-from-lib 功能，也是新写一个二级插件来实现。</p>
+<p>现在的策略是，PI_windll_from_lib 和 PI_so_from_a 继续存在&mdash;&mdash;因为两者代码概念上应独立维护，而且有它们各自的输入参数定义。PI_dll_from_lib 也有自己的参数定义，且将自己的参数转化为 PI_windll_from_lib/PI_so_from_a 的参数来调用它们。还好，大多数时候，PI_dll_from_lib 参数已经能够涵盖大部分功能需求，若要指定具体平台的参数比如比如指示 MSVC 的 .def 文件，直接指定二级插件参数 <code>gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT</code> 即可。</p>
+<h3><a name="110425-2"></a>PI_dll_from_lib 自动链接深层LIB，应控制&ldquo;间接LIB工程&rdquo;不要导出符号</h3>
+<h4>问题描述：</h4>
+<p>有 如下工程结构</p>
+<p>[1snc-dll] &rarr; [1snc-lib] &rarr; [IThreadSync-lib]</p>
+<p>1snc-dll 用 PI_dll_from_lib 来自动链接 1snc-lib ，1snc-lib 的实现又用到了 IThreadSync-lib。按照之前的做法，链接出的 1snc-dll 有个不妙现象，会导出 IThreadSync 的函数。</p>
+<p>分析后找到原因：拿 IThreadSync 的一个函数举例，如</p>
+<pre>DLLEXPORT_IThreadSync ItsThreadId_t IsfGetThreadId(void);</pre>
+<p><code>DLLEXPORT_IThreadSync</code> 都被 Makefile 给定义成了 <code>__declspec(dllexport)</code> 了，结果，该函数所在的 obj 被链接到 DLL（甚至是EXE）时，必然会&ldquo;遭到&rdquo;导出。多数时候，我们不希望这样！按照我们的场景，生成 1snc.dll 只应该导出 1snc 的函数，IThreadSync 的函数应该被完全隐藏在 1snc.dll 里头。</p>
+<p>换言之，我们要做到：</p>
+<ul>
+  <li>【场景一】当 LIB 被<b>直接</b>链接到 DLL 时，此 LIB 的符号要导出。</li>
+  <li>【场景二】当 LIB 被<b>间接</b>链接到 DLL 、或被链接到 EXE 时，此 LIB 的符号不要导出。</li>
+</ul>
+<p>分析：以上两种场景的本质特征差别是，编译 LIB 的 源文件时，是否要对此库的接口函数安插“导出指示”（编译出的 .obj 将有差别）。一个 LIB 的源码及 makefile，自身是无法知道它将被作为以上两种场景哪种来使用的。因此，以上两种场景是 LIB 工程的&ldquo;动态特征&rdquo;而非&ldquo;静态特征&rdquo;。</p>
+<p>解决方法，在 compiler-config 层引入一个新变量 <b><code>gmp_NOW_EXPORT</code></b> ，用户通过此变量控制使用哪种场景来编译 LIB。具体行为是：</p>
+<table width="100%" border="1">
+  <tr>
+    <th scope="col">&nbsp;</th>
+    <th scope="col">gmp_NOW_EXPORT=1</th>
+    <th scope="col">gmp_NOW_EXPORT=(null)</th>
+  </tr>
+  <tr>
+    <th scope="row">当前工程名修饰</th>
+    <td>加 <tt>.export</tt> 后缀</td>
+    <td>不修饰</td>
+  </tr>
+  <tr>
+    <th scope="row">DLLEXPORT_IThreadSync 替换</th>
+    <td>替换为 <code>__declspec(dllexport)</code></td>
+    <td>替换为空</td>
+  </tr>
+</table>
+<p>可看出，两种场景的编译 可以共存于同一个 gf 目录中（因为修饰后工程名不同）。</p>
+<p>有了这种设计，PI_dll_from_lib 就可以通过引入一个辅助变量（名曰 <code>gmi_DFL_IS_DEEP_EXPORT</code>，在DLL工程上设置）来控制是希望做深层导出还是单层导出。</p>
+<p>此手段同样适用于 Linux gcc</p>
+<p>此改进在 r974,975。</p>
+<p>&nbsp;</p>
 <p>==</p>
 </body>
 
