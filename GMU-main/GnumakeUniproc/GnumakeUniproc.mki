@@ -834,7 +834,6 @@ SubprjEv_ThisPrjAttr = $(SubprjEvOutdirGMUTMP)/_ThisPrjAttr.gmu.txt
 SubprjEvMakefile = \$$($${SubPrj}_Makefile)
 SubprjEvMakeVarDefines = \$$($${SubPrj}_MakeVarDefines)
 SubprjEvIsForcePostProc = \$$($${SubPrj}_IsForcePostProc)
-SubprjEvIsPurePostProc = \$$($${SubPrj}_IsPurePostProc)
 SubprjEvIsConfirmPostProc = \$$($${SubPrj}_IsConfirmPostProc)
 SubprjEvAttr = \$$($${SubPrj}_PrjAttr)
 
@@ -1035,7 +1034,6 @@ $(_p_SubprjsAttrMade): $(gmu_p_BuildStartCkt)
 $(SubPrj)_Makefile = $($(SubPrj)_Makefile)\n\
 $(SubPrj)_MakeVarDefines = $($(SubPrj)_MakeVarDefines)\n\
 $(SubPrj)_IsForcePostProc = $($(SubPrj)_IsForcePostProc)\n\
-$(SubPrj)_IsPurePostProc = $($(SubPrj)_IsPurePostProc)\n\
 $(SubPrj)_cvsRoot_forMakefiles = $($(SubPrj)_cvsRoot_forMakefiles)\n\
 $(SubPrj)_cvsModuleDir_forMakefiles = $($(SubPrj)_cvsModuleDir_forMakefiles)\n\
 $(SubPrj)_cvsTag_forMakefiles = $(if $($(SubPrj)_cvsTag_forMakefiles),$($(SubPrj)_cvsTag_forMakefiles),HEAD)\n\
