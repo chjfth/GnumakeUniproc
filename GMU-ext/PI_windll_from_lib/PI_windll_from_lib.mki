@@ -97,7 +97,7 @@ _WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EX
 _WDFL_isDLL = $(call _IsStringEqual,DLL,$(gmp_bc_IMAGE_TYPE))
 _WDFL_isLIB = $(if $(_WDFL_isDLL),,1)
 
-_WDFL_f_ExportFuncList = _AutoExportFuncList.txt
+_WDFL_f_ExportFuncList = _AutoExportFuncList.gmi.txt
 
 _WDFL_f_auto_export_stub_c = _auto_export_stub_.c
 _WDFL_d_auto_export_stub_c = $(_WDFL_dirTmp_arcwd)
