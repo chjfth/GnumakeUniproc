@@ -6,5 +6,6 @@ __pattern1-concise-header-included = 1
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
 
-  
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
+
 endif

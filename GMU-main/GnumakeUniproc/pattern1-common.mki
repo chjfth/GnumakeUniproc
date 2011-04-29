@@ -117,3 +117,13 @@ endef
 	# $1 contains a list of makevars; each makevar in turn expands to a shell command.
 	# One shell command in $1 is executed in its own subshell.
 	# Note: the ')' must be on a separate line to accomplish that "individial shell" requirement.
+
+
+gmp_G_UDFilenameSuffix = $(if $(gmp_isfnDecoUnicode),_U)$(if $(gmp_isfnDecoDebug),_D)
+
+gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
+	# [2007-02-12] If for a EXE project, the user wants to link his libs from a dedicated 
+	# place(dir), -- i.e. not listing lib-projects as his sub-project, -- he may use this
+	# function to dynamically determine what variant of libs to link(XXX.lib, XXX_D.lib 
+	# XXX_U.lib or XXX_U_D.lib).
+

@@ -50,9 +50,7 @@
 _gmp_first_target: __pattern1_first_target # at rear part of this file
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
-
-include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 
 
 ifeq (,$(gmp_COMPILER_ID))
