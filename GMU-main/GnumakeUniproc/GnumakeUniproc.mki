@@ -733,7 +733,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 	@for OneMod in $(gmu_uv_list_SVN_MODULES); do \
 		echo "$${OneMod}_SvnCoShcmd = $(_SvnCheckoutShcmdEvEcho1)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo "$(_p_SelfCoEvCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoCheckout_shsubst) ;\
-		echo -e "\t@echo +++++++++++++++++++++++  Doing SVN checkout: +++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo ++++++++++++++++++++++++++  Doing SVN checkout: +++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SvnmakeEvRev))\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  From = $(SvnmakeEvSvnUrl)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  To   = $(SvnmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
