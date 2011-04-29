@@ -170,7 +170,7 @@ gmu_u_GCC_M_OPTIONS +=
 gmp_LINKFLAGS += $(gmp_LINKFLAGS_preset)
   # There are some other make-vars for easy setting linker flags:
   gmp_ud_list_EXTRALIB += 
-  	# list library paths here, compiler_config.mki will help you prepend(for example) 
+  	# list library paths here, compiler-config-mki will help you prepend(for example) 
   	# * -L for linuxgcc
   	# * /LIBPATH: for msvc
 
@@ -180,20 +180,23 @@ gmp_LINKFLAGS += $(gmp_LINKFLAGS_preset)
 gmu_up_list_EXTRA_OBJ_TO_LINK +=
 	# Extra object files to link
 
-gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
+gmp_bc_EXTRALIBS += # $(call gmpf_MakeLibName,<lib-list>)
 	# Extra libs to link
 	#
-	# The reason for using gmpf_MakeUpSysLibsToLink: 
-	# $(call gmpf_MakeUpSysLibsToLink,comfun) will become(for example):
-	# * -lcomfun         for linuxgcc & mingw
-	# * comfun.lib       for msvc
+	# $(call gmpf_MakeLibName,foo) will become(for example):
+	# * libfoo.a         for linuxgcc & mingw
+	# * foo.lib          for msvc
 
 gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 	# List system libs in this make-var. 
 	# If more than one sys-lib are used, separate them with spaces.
 	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS.
 	# It is used just to imply that they are system libs(provided by compiler of OS).
-
+	#
+	# The reason for using gmpf_MakeUpSysLibsToLink: 
+	# $(call gmpf_MakeUpSysLibsToLink,comfun) will become(for example):
+	# * -lcomfun         for linuxgcc & mingw
+	# * comfun.lib       for msvc
 
 #---------------------------------------------------------------------------
 # Sub-projects definition starts here. 
