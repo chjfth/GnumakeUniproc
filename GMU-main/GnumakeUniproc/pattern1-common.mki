@@ -120,6 +120,7 @@ endef
 
 
 gmp_G_UDFilenameSuffix = $(if $(gmp_isfnDecoUnicode),_U)$(if $(gmp_isfnDecoDebug),_D)
+gmp_G_UFilenameSuffix = $(if $(gmp_isfnDecoUnicode),_U)
 
 gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
 	# [2007-02-12] If for a EXE project, the user wants to link his libs from a dedicated 
@@ -127,3 +128,4 @@ gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
 	# function to dynamically determine what variant of libs to link(XXX.lib, XXX_D.lib 
 	# XXX_U.lib or XXX_U_D.lib).
 
+gmpf_Add_Unicode_Deco = $(addsuffix $(gmp_G_UFilenameSuffix),$1)
