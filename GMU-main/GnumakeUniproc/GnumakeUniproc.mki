@@ -141,7 +141,7 @@ gmu_uv_list_SUBPRJ_TO_LINK += $(gmu_uv_list_LIB_TO_LINK)
 	# [2007-03-10] I decide to make gmu_uv_list_LIB_TO_LINK obsolete, now use gmu_uv_list_SUBPRJ_TO_LINK instead.
 	# Since gmu_uv_list_LIB_TO_LINK has been used by nearly all non-LIB projects, I should keep its compatibility.
 
-ifneq (,$(gmu_DO_IGNORE_SUBPRJS))
+ifneq (,$(strip $(gmu_DO_IGNORE_SUBPRJS)))
   gmu_uv_list_ALL_SUBPRJ=
   gmu_uv_list_SUBPRJ_TO_LINK=
 endif

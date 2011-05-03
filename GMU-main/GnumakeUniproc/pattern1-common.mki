@@ -1,3 +1,6 @@
+ifndef __pattern1_common_included_
+__pattern1_common_included_ = 1
+
 # This file hold the content required by pattern1.mks and pattern-container1.mks.
 
 unexport gmp_u_list_PLUGIN_TO_LOAD
@@ -129,3 +132,6 @@ gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
 	# XXX_U.lib or XXX_U_D.lib).
 
 gmpf_Add_Unicode_Deco = $(addsuffix $(gmp_G_UFilenameSuffix),$1)
+
+
+endif

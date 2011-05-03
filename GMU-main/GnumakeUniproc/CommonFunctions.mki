@@ -505,14 +505,14 @@ _AutoRefnameFromMkfpath = $(if $(call gmuf_IsPureFilename,$1),$(strip $1),$(call
 	# produce
 	#	dir1%abc
 
-define _gmuf_Add1Subprj_PassCompilerId
+define _gmuf_Add1Subprj_Concise
   # $1: Makefile path
   # $2: (optional) extra string passed to _MakeVarDefines
   gmu_uv_list_ALL_SUBPRJ += $$(call _AutoRefnameFromMkfpath,$1)
   $$(call _AutoRefnameFromMkfpath,$1)_Makefile = $1
-  $$(call _AutoRefnameFromMkfpath,$1)_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID) $2
+  $$(call _AutoRefnameFromMkfpath,$1)_MakeVarDefines = $2
 endef
-gmuf_AddSubprjs_PassCompilerId = $(foreach makefile,$1,$(eval $(call _gmuf_Add1Subprj_PassCompilerId,$(makefile),$2)))
+gmuf_AddSubprjs_Concise = $(foreach makefile,$1,$(eval $(call _gmuf_Add1Subprj_Concise,$(makefile),$2)))
 
 
 # Functions for source control branch management, 
