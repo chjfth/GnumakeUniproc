@@ -11,9 +11,11 @@ ifneq (,$(_compiler_id_bydir))
   override gmp_COMPILER_ID := $(_compiler_id_bydir)
   gmu_Gd_UserPartialMki := $(gmu_d_StartupParent)
 
-  # Warn different gmp_COMPILER_ID from environment.
-  ifneq ($(_compiler_id_bydir),$(_compiler_id_byenv))
-    $(info !GMP!Info: Overriding gmp_COMPILER_ID from env: $(_compiler_id_byenv) -> $(_compiler_id_bydir))
+  # Warn different (and non-null) gmp_COMPILER_ID from environment.
+  ifneq (,$(_compiler_id_byenv))
+    ifneq ($(_compiler_id_bydir),$(_compiler_id_byenv))
+      $(info !GMP!Info: Overriding gmp_COMPILER_ID from env: $(_compiler_id_byenv) -> $(_compiler_id_bydir))
+    endif
   endif
 
 else
