@@ -42,7 +42,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 	) # _Gp_list_AutoPjnmAllChidren is null means subprj have not been built.
 
   # Reason for rule $(_WDFL_p_list_AllSubprjExportObj): Some subprj may not export any functions, 
-  # so they don't have _AutoExportObjList.txt, so we should touch them to build up a dependency chain.
+  # so they don't have _AutoExportObjList.txt, so we tell user this fact.
   $(_WDFL_p_list_AllSubprjExportObj):
 	@$(call _DoVerbose1,echo "$(_pluginId_windll_from_lib): Info: Sub-project $(patsubst $(gmu_ud_OUTPUT_ROOT)/%/_gmu_tmp/$(_pluginId_windll_from_lib)/$(_WDFL_f_ExportFuncList),'%',$@) does not auto-export.")
 
