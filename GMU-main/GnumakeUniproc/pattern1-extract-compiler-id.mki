@@ -1,0 +1,31 @@
+ifndef __pattern1-extract-compiler-id_included_
+__pattern1-extract-compiler-id_included_ = 1
+
+_compiler_id_bydir := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
+
+_compiler_id_byenv := $(strip $(gmp_COMPILER_ID))
+
+
+ifneq (,$(_compiler_id_bydir))
+  # Container directory indicates compiler-id
+  override gmp_COMPILER_ID := $(_compiler_id_bydir)
+  gmu_Gd_UserPartialMki := $(gmu_d_StartupParent)
+
+  # Warn different gmp_COMPILER_ID from environment.
+  ifneq ($(_compiler_id_bydir),$(_compiler_id_byenv))
+    $(info !GMP!Info: Overriding gmp_COMPILER_ID from env: $(_compiler_id_byenv) -> $(_compiler_id_bydir))
+  endif
+
+else
+  # Container directory does NOT indicate compiler-id
+
+  gmu_Gd_UserPartialMki := $(gmu_d_StartupMakefile)
+
+  # Note: Even if _compiler_id_bydir and _compiler_id_byenv does not indicate compiler-id,
+  # do not assert error/warning here, because a container don't need gmp_COMPILER_ID.
+
+endif
+
+
+endif # ifndef __pattern1-extract-compiler-id_included_
+

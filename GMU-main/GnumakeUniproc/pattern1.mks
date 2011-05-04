@@ -52,24 +52,7 @@ _gmp_first_target: __pattern1_first_target # at rear part of this file
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 
-
-ifeq (,$(gmp_COMPILER_ID))
-  gmp_COMPILER_ID := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
-  _d_UserPartialMakefiles := $(gmu_d_StartupParent)
-else
-  ifeq ($(gmp_COMPILER_ID),$(call gmuf_GetExtName,$(gmu_d_StartupMakefile)))
-    _d_UserPartialMakefiles := $(gmu_d_StartupParent)
-    #	[2007-01-16] This condition can be required when you start a non-container project
-    # from a container project. The container project may pass gmp_COMPILER_ID=. to his 
-    # non-container sub-project, and current start-up makefile dir is definitely not what the non-container requires.
-  else
-    _d_UserPartialMakefiles = $(gmu_d_StartupMakefile)
-	#	[2006-12-18] User is allowed to define gmp_COMPILER_ID explicitly.
-	# If that is the case, u_srccfg_post.mki, u_post_gmucore.mki etc will
-	# be read from current start-up makefile dir.
-  endif
-endif
-gmu_Gd_UserPartialMki = $(_d_UserPartialMakefiles)
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-extract-compiler-id.mki
 
 ifeq (,$(gmp_COMPILER_ID))
   $(error !GMU!Error: From pattern1.mks: `gmp_COMPILER_ID' can not be extracted from current dir's extension name, nor is it defined by you explicitly)
@@ -83,10 +66,10 @@ _gmu_isUmakeTargetNoReqCompiler = $(if $(_gmu_isMakeTargetReqCompiler),,1)
 _gmu_fm_srccfg_pre = u_srccfg_pre
 _gmu_fm_srccfg_post = u_srccfg_post
 
-_p_checkout_more = $(_d_UserPartialMakefiles)/u_checkout_more.mki#[2007-03-30]This should better not contain $(gmp_MKS_PATTERN_FILENAME_SUFFIX)
-_p_srccfg_pre = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_pre)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
-_p_srccfg_post = $(_d_UserPartialMakefiles)/$(_gmu_fm_srccfg_post)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
-_p_post_gmucore = $(_d_UserPartialMakefiles)/u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_checkout_more = $(gmu_Gd_UserPartialMki)/u_checkout_more.mki#[2007-03-30]This should better not contain $(gmp_MKS_PATTERN_FILENAME_SUFFIX)
+_p_srccfg_pre = $(gmu_Gd_UserPartialMki)/$(_gmu_fm_srccfg_pre)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_srccfg_post = $(gmu_Gd_UserPartialMki)/$(_gmu_fm_srccfg_post)$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
+_p_post_gmucore = $(gmu_Gd_UserPartialMki)/u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
 
 ifeq ($(_ShouldIncludeUserMki),1)
   ifneq (,$(wildcard $(_p_srccfg_pre))) # include it if exist

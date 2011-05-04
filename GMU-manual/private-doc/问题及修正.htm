@@ -144,6 +144,7 @@ tt { color:#003366; }
     <li><a href="#110425-1">插件名称统一为 PI_dll_from_lib</a>
     <li><a href="#110425-2">PI_dll_from_lib 自动链接深层LIB，应控制&ldquo;间接LIB工程&rdquo;不要导出符号</a>
   </ul>
+<li><a href="#110504">110504: gmp_COMPILER_ID 推断方法更新</a>
 </ol>
 
 <H2><a name="060216"></a>[2006-02-16 15:00]</H2>
@@ -1635,7 +1636,12 @@ export PATH:=zzz
 <p>有了这种设计，PI_dll_from_lib 就可以通过引入一个辅助变量（名曰 <code>gmi_DFL_IS_DEEP_EXPORT</code>，在DLL工程上设置）来控制是希望做深层导出还是单层导出。</p>
 <p>此手段同样适用于 Linux gcc</p>
 <p>此改进在 r974,975。</p>
-<p>&nbsp;</p>
+<h2><a name="110504"></a>[2011-05-04]  gmp_COMPILER_ID 推断方法更新</h2>
+<p>之前，GMU Makefile 启动后，gmp_COMPILER_ID 的推断方法是：先看环境或命令行是否设了 gmp_COMPILER_ID，设了则用之，没设则试图从当前目录的扩展名中抓出 gmp_COMPILER_ID。前些年如此决定的背景是：我希望用户将启动 Makefile 单独放在一个 xxx.&lt;compiler-id&gt; 目录中，因此，从目录名中取 gmp_COMPILER_ID 是常规行为，而从环境变量取 gmp_COMPILER_ID 则被认为是另类行为。</p>
+<p>这几个月设计 Scalacon 规范，越来越意识到让用户提供一个 xxx.&lt;compiler-id&gt; 子目录很不友好，因此，Scalacon 模版就采用了独立 Makefile 策略（即不需要原先的3个makefile片段才能构成一个完整makefile），同时，在这独立 Makefile 中判断 gmp_COMPILER_ID 来做不同编译器的特定处理。对于这种独立 Makefile 模型，显然 gmp_COMPILER_ID 应该通过环境或命令行指定。接下来的问题是，考虑用一种编译器来回编多个工程的情况，为了避免每次执行 Makefile 都要在命令行上指定，比如指定 <code>gmp_COMPILER_ID=msvc</code>，我们会倾向于预先将其设在环境变量中——OK，这么做很合理。不过，引起一个问题，当我们明确地进入 <tt>exe.mingw</tt> 目录中要求 make 时，按原先的做法，GMU 会顽固地使用环境中的 <code>gmp_COMPILER_ID=msvc</code>，这不好，违背了“越特定的东西越优先起作用”（more specific, more prior to take effect）的原则。</p>
+<p>OK。现在改变。先判断启动 Makefile 所在目录是否带扩展名，有的话就拿扩展名来当 gmp_COMPILER_ID，忽略环境变量和命令行的指定。不管是 container 还是 非container，都用此策略。</p>
+<p>同时，pattern-container1.mks 所用的 <code>gmp_CONTAINER_EXTRACT_COMPILER_ID</code> 可以废除了。</p>
+<p>此改进在 r992。 </p>
 <p>==</p>
 </body>
 

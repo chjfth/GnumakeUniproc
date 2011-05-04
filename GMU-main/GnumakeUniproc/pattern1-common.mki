@@ -121,7 +121,7 @@ $(foreach c,$1,@$($c)
 endef
 	# $1 contains a list of makevars; each makevar in turn expands to a shell command.
 	# One shell command in $1 is executed in its own subshell.
-	# Note: the ')' must be on a separate line to accomplish that "individial shell" requirement.
+	# Note: the ')' must be on a separate line to accomplish that "individual shell" requirement.
 
 
 gmp_G_UDFilenameSuffix = $(if $(gmp_isfnDecoUnicode),_U)$(if $(gmp_isfnDecoDebug),_D)

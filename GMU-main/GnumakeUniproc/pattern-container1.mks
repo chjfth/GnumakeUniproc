@@ -19,43 +19,23 @@
 _gmp_first_target: __pattern1_default_first_target # at rear part of this file
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki # For function `_GetExtName'
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common.mki
-
-
-ifneq (,$(gmp_CONTAINER_EXTRACT_COMPILER_ID))
-
-  gmp_COMPILER_ID_extract := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
-	# u_subprjs.mki may use this to determine the compiler to use
-	#	[2007-01-22] Note: If the user does not define gmp_CONTAINER_EXTRACT_COMPILER_ID,
-	# he may choose to assign gmp_COMPILER_ID explicitly from make command line.
-
-  ifeq (,$(gmp_COMPILER_ID))
-    gmp_COMPILER_ID := $(gmp_COMPILER_ID_extract)
-  else
-    ifneq ($(gmp_COMPILER_ID),$(gmp_COMPILER_ID_extract))
-      $(error! GMP!Error: From pattern-container1.mks: gmp_COMPILER_ID already defined to a different value($(gmp_COMPILER_ID)) when you request gmp_CONTAINER_EXTRACT_COMPILER_ID.)
-    endif
-  endif
-
-endif
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-extract-compiler-id.mki
 
 _gmu_isUmakeTargetReqCompiler = 
 _gmu_isUmakeTargetNoReqCompiler = 1
 
 ###########################################################
 
-_gmp_PickUserMki = $(if $(gmp_CONTAINER_EXTRACT_COMPILER_ID),..,.)/$1
-
 _f_subprjdesc = u_subprjs$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
-_p_subprjdesc = $(call _gmp_PickUserMki,$(_f_subprjdesc))
+_p_subprjdesc = $(gmu_Gd_UserPartialMki)/$(_f_subprjdesc)
 
 _f_freestyle_mki = u_freestyle$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
-_p_freestyle_mki = $(call _gmp_PickUserMki,$(_f_freestyle_mki))
+_p_freestyle_mki = $(gmu_Gd_UserPartialMki)/$(_f_freestyle_mki)
 
 _f_post_gmucore = u_post_gmucore$(gmp_MKS_PATTERN_FILENAME_SUFFIX).mki
-_p_post_gmucore = $(call _gmp_PickUserMki,$(_f_post_gmucore))
+_p_post_gmucore = $(gmu_Gd_UserPartialMki)/$(_f_post_gmucore)
 
 ifeq ($(_ShouldIncludeUserMki),1)
   ifneq (,$(wildcard $(_p_subprjdesc)))

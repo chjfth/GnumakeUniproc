@@ -1,3 +1,5 @@
+ifndef __pattern1_load_custom_it_mki_include_
+__pattern1_load_custom_it_mki_include_ = 1
 
 #	For every dir listed in $(gmp_ud_list_CUSTOM_MKI), checks the first occurrence
 # of <dir>/$(gmp_bc_IMAGE_TYPE)/$(gmp_bc_IMAGE_TYPE).mki and include it.
@@ -39,3 +41,5 @@ endif
 
 include $(gmp_Gp_CUSTOM_IT_MKI_USED)
 
+
+endif # ifndef __pattern1_load_custom_it_mki_include_
