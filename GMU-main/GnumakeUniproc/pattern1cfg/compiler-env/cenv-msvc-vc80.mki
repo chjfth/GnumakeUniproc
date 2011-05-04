@@ -21,7 +21,7 @@ _vc80_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Co
 
 
 in_gmpf_LoadCenv_msvc_vc80 = \
-	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc80" \
+	gmp_COMPILER_VER_msvc=vc80 \
 	MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(_vc80_val_INCLUDE)" \
 	LIB="$(_vc80_val_LIB)" \

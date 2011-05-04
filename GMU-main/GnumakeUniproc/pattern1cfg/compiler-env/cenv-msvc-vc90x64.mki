@@ -22,7 +22,7 @@ _vc90x64_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/BIN/x86_amd64;$1/VC/BIN
 
 
 in_gmpf_LoadCenv_msvc_vc90x64 = \
-	gmp_COMPILER_VER_msvc="$(gmp_COMPILER_VER_msvc) vc90x64" \
+	gmp_COMPILER_VER_msvc=vc90x64 \
 	MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(_vc90x64_val_INCLUDE)" \
 	LIB="$(_vc90x64_val_LIB)" \
