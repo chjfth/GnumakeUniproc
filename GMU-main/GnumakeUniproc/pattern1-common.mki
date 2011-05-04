@@ -17,6 +17,8 @@ gmu_DO_IGNORE_SUBPRJS += $(gmu_IGNORE_SUBPRJS)
 
 
 _dirPattern1Cfg = pattern1cfg
+_dircDefaultPlugin = pattern1cfg/plugins
+
 gmp_p_mki_DecoPrjname = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_prjname.mki
 gmp_p_mki_DecoUnicodeDebug = $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirPattern1Cfg)/bc_deco_UNICODE_DEBUG.mki
 gmp_p_mki_LoadPlugins = $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-load-plugins.mki
