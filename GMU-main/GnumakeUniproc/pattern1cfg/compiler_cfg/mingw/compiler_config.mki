@@ -26,7 +26,9 @@ endif
 
 ################################################################################
 
-gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,-D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM))
+gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
+	$(patsubst %,-D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM)))
+
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,-D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
 
 #                                  ........ gmp_bc_UNICODE ........

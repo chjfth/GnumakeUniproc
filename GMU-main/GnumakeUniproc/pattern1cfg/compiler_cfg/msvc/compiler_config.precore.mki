@@ -16,12 +16,5 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
 
-ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
-
-  _gmp_export_suffix = $(if $(gmp_NOW_EXPORT),.export)
-  gmu_DECO_SUFFIX_PRJ_NAME += $(_gmp_export_suffix)
-  gmu_DECO_SUFFIX_LINK_OUTPUT += $(_gmp_export_suffix)
-
-endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
-
+$(eval $(_gmp_NOW_EXPORT_LibSuffixDotExport))
 

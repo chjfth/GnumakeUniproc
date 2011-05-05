@@ -1,6 +1,7 @@
 
 # See notes of the same-name file from "msvc/compiler_config.mki" 
 
+gmp_up_COMPILER_CFG_PRECORE_TO_LOAD  = $(call gmpf_GetCompilerCfgPrecorePath_std,precore)
 gmp_up_COMPILER_CFG_POSTCORE_TO_LOAD = $(call gmpf_GetCompilerCfgPostcorePath_std,postcore)
 
 include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
@@ -54,7 +55,8 @@ endif
 
 ifeq (,$(gmp_GCC_OLDVER_NO_FVISIBILITY))
   gmp_CFLAGS_CODE_GEN_preset += -fvisibility=hidden
-  gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,-D"%=__attribute__((visibility(\"default\")))",$(gmp_u_list_DLL_EXPORT_SYM))
+  gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
+	$(patsubst %,-D"%=__attribute__((visibility(\"default\")))",$(gmp_u_list_DLL_EXPORT_SYM)))
 	#[2007-12-14]Our strategy is: default to "-fvisibility=hidden"; for symbols to export,
 	#you should decorate them with __attribute__((visibility("default"))) explicitly.
 endif

@@ -1,0 +1,9 @@
+ifndef __compiler_config_precore_included_
+__compiler_config_precore_included_ = 1
+
+
+$(eval $(_gmp_NOW_EXPORT_LibSuffixDotExport))
+
+
+endif
+

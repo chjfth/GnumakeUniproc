@@ -136,4 +136,15 @@ gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
 gmpf_Add_Unicode_Deco = $(addsuffix $(gmp_G_UFilenameSuffix),$1)
 
 
+define _gmp_NOW_EXPORT_LibSuffixDotExport
+  ifeq '$$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+    _gmp_export_suffix = $$(if $$(gmp_NOW_EXPORT),.export)
+    gmu_DECO_SUFFIX_PRJ_NAME += $$(_gmp_export_suffix)
+    gmu_DECO_SUFFIX_LINK_OUTPUT += $$(_gmp_export_suffix)
+
+  endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+endef
+
+
 endif

@@ -13,3 +13,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
 
 endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
+
+
+$(eval $(_gmp_NOW_EXPORT_LibSuffixDotExport))
+
