@@ -21,6 +21,7 @@ ifneq (,$(gmp_COMPILER_VER_linuxgcc))
   endif
 endif
 endif # ifdef __0 # <<<<
+_gmp_gcc_vers := $(gmp_COMPILER_VER_linuxgcc)
 
 ifeq (,$(strip $(_gmp_gcc_vers)))
   # Do nothing.
