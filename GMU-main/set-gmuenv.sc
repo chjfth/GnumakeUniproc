@@ -54,7 +54,8 @@ fi
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
-export gmp_ud_list_CUSTOM_MKI=$gmu_DIR_ROOT/GMU-ext
+export gmp_ud_list_CUSTOM_MKI="$gmu_DIR_ROOT/GMU-ext $gmu_DIR_ROOT/nlscan/gmu-ext"
+export gmp_ud_list_CUSTOM_COMPILER_CFG=$gmu_DIR_ROOT/nlscan/compiler-cfgs
 
 export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 

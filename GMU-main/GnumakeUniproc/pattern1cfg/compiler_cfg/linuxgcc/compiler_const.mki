@@ -6,7 +6,7 @@ endif
 #gmp_COMPILER_VER_linuxgcc = # Do not define it, leave it to the user
 gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_linuxgcc)
 
-
+ifdef __0         # >>>>
 _gmp_gcc_vers := $(filter gcc%,$(gmp_COMPILER_VER_linuxgcc))
 	# User's note: 
 	# In order to use multiple gcc versions a in one GMU build, just differentiate them(actually
@@ -20,6 +20,7 @@ ifneq (,$(gmp_COMPILER_VER_linuxgcc))
     $(warning !GMP!Warning: Your gmp_COMPILER_VER_linuxgcc has value "$(gmp_COMPILER_VER_linuxgcc)", which contains no recognized version for gcc compiler)
   endif
 endif
+endif # ifdef __0 # <<<<
 
 ifeq (,$(strip $(_gmp_gcc_vers)))
   # Do nothing.
