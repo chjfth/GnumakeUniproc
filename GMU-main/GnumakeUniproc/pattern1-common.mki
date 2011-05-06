@@ -1,7 +1,7 @@
 ifndef __pattern1_common_included_
 __pattern1_common_included_ = 1
 
-# This file hold the content required by pattern1.mks and pattern-container1.mks.
+# This file hold the content required by pattern1.mks and pattern1-container.mks.
 
 unexport gmp_u_list_PLUGIN_TO_LOAD
 	# Avoid user's setting gmp_u_list_PLUGIN_TO_LOAD in env-var resulting in
@@ -78,7 +78,7 @@ gmp_up_USER_OUTPUT_AFTER_LINK += $(gmp_USER_FIRST_TARGET)
 	# For compatibility of the old var gmp_USER_FIRST_TARGET .
 	# [2008-12-01]Note: Don't have $(gmp_USER_FIRST_TARGET) immediate expand here, because
 	# a custom-image-mki author will assign gmp_USER_FIRST_TARGET in his mki after pattern1-common.mki .
-	# Although I can move this backward, but writting it here makes pattern1.mks & pattern-container1.mks share it.
+	# Although I can move this backward, but writting it here makes pattern1.mks & pattern1-container.mks share it.
 
 ifneq (,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
 ifneq (,$(gmp_USER_FREE_STYLE_TARGET))

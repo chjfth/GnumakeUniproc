@@ -149,7 +149,7 @@ include $(_p_GnumakeUniproc)
 
 ifeq (,$(strip $(gmu_uf_LINK_OUTPUT)))
   $(error !GMP!Error: Your gmu_uf_LINK_OUTPUT is null, but pattern1.mks requires you define gmu_uf_LINK_OUTPUT.\
- In case this is a container project not generating any output file, you should use pattern-container1.mks instead)
+ In case this is a container project not generating any output file, you should use pattern1-container.mks instead)
 endif
 
 ifeq ($(_ShouldIncludeUserMki),1)

@@ -1,4 +1,4 @@
-# template file for use with pattern-container1.mks, concise version, [GnumakeUniproc v1.0]
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
 # ! Be sure to replace every occurrence of <angle-brackets> to be your
 # actual content, or [ at least comment them out if some of them are
 # not required] .
@@ -36,5 +36,5 @@ gmu_uv_list_ALL_SUBPRJ = <subprj1-refname> <subprj2-refname> ...
 # <<<< For CVS checkout
 
 
-include $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
 

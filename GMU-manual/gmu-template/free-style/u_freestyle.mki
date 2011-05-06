@@ -1,10 +1,10 @@
-#### template file for use with pattern-container1.mks, [GnumakeUniproc v1.0]
+#### template file for use with pattern1-container.mks, [GnumakeUniproc v1.0]
 # ! Be sure to replace every occurrence of <angle-brackets> to be your
 # actual content, or [ at least comment them out if some of them are
 # not required] .
 
 #---------------------------------------------------------------------------
-# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern-container1.mks 
+# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks 
 # as u_freestyle.mki 
 # 	You define your own make target here by replacing <your-custom-target>
 # with your custom target name and supply make rule for it.
