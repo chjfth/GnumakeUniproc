@@ -55,7 +55,7 @@ endif
 
 ifeq (,$(gmp_GCC_OLDVER_NO_FVISIBILITY))
   gmp_CFLAGS_CODE_GEN_preset += -fvisibility=hidden
-  gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
+  gmp_CFLAGS_MACRO_DEFS_preset += $(if $(_gmp_IsNowExport),\
 	$(patsubst %,-D"%=__attribute__((visibility(\"default\")))",$(gmp_u_list_DLL_EXPORT_SYM)))
 	#[2007-12-14]Our strategy is: default to "-fvisibility=hidden"; for symbols to export,
 	#you should decorate them with __attribute__((visibility("default"))) explicitly.
@@ -117,6 +117,8 @@ else
 ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
   gmu_I_AM_A_LINK_COMPONENT = 1
+
+  gmp_NOW_EXPORT = 1
 
   gmp_Gp_list_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 

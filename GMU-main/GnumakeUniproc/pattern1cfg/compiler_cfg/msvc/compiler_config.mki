@@ -89,7 +89,7 @@ ifneq (,$(gmp_bc_DEBUG))
 endif
 gmp_CFLAGS_CODE_GEN_preset += $(if $(isAboveVC8),/Wp64)# Detect 64-bit portability
 
-gmp_CFLAGS_MACRO_DEFS_preset += $(if $(gmp_NOW_EXPORT),\
+gmp_CFLAGS_MACRO_DEFS_preset += $(if $(_gmp_IsNowExport),\
 	$(patsubst %,/D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM)))
 
 gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
@@ -236,6 +236,8 @@ else
 ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
   gmu_I_AM_A_LINK_COMPONENT = 1
+
+  gmp_NOW_EXPORT = 1
 
   _p_BasenameOutput = $(basename $(gmu_Gp_LINK_OUTPUT))
   gmp_Gp_list_LIB_OUTPUT = $(if $(_isReportLibOutput),$(_p_BasenameOutput).$(gmp_extn_LIB))

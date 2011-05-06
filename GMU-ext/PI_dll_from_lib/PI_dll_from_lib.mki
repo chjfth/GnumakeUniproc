@@ -93,21 +93,13 @@ endif
 
 ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
-  export gmp_NOW_EXPORT = 1
-
-endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
-
-########
-
-ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
-
-  ifeq (1,$(gmi_DFL_IS_DEEP_EXPORT))
-    export gmp_NOW_EXPORT
+  ifeq (1,$(strip $(gmi_DFL_IS_DEEP_EXPORT)))
+    export gmp_NOW_EXPORT_ALL_LEVEL = 1
   else
-    unexport gmp_NOW_EXPORT
+    export gmp_NOW_EXPORT = 1
   endif
 
-endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
 
 #############################################################################

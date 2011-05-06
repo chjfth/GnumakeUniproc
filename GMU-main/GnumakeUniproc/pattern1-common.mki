@@ -10,6 +10,7 @@ unexport gmp_u_list_PLUGIN_TO_LOAD
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_POST
 
+unexport gmp_NOW_EXPORT
 
 gmu_FREE_STYLE_MAKEFILE += $(gmu_DELIBERATE_NO_SUBPRJ)
 gmu_DO_IGNORE_SUBPRJS += $(gmu_IGNORE_SUBPRJS)
@@ -135,11 +136,12 @@ gmpf_Add_UnicodeDebug_Deco = $(addsuffix $(gmp_G_UDFilenameSuffix),$1)
 
 gmpf_Add_Unicode_Deco = $(addsuffix $(gmp_G_UFilenameSuffix),$1)
 
+_gmp_IsNowExport = $(if $(strip $(gmp_NOW_EXPORT)$(gmp_NOW_EXPORT_ALL_LEVEL)),1)
 
 define _gmp_NOW_EXPORT_LibSuffixDotExport
   ifeq '$$(gmp_bc_IMAGE_TYPE)' 'LIB'
 
-    _gmp_export_suffix = $$(if $$(gmp_NOW_EXPORT),.export)
+    _gmp_export_suffix = $$(if $$(_gmp_IsNowExport),.export)
     gmu_DECO_SUFFIX_PRJ_NAME += $$(_gmp_export_suffix)
     gmu_DECO_SUFFIX_LINK_OUTPUT += $$(_gmp_export_suffix)
 
