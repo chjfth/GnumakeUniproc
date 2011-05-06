@@ -1,4 +1,4 @@
 # This file is here for backward compatibility(prior to GnumakeUniproc 0.97).
 # User is suggested to include pattern1-container.mks .
 
-include $(patsubst %/pattern1-container.mks,%/pattern1-container.mks,$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+include $(patsubst %/pattern-container1.mks,%/pattern1-container.mks,$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
