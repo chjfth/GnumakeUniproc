@@ -65,7 +65,7 @@ CODE { color:#660000; }
 
 <body>
 <H1 align="center">Using Multiple versions of a Same Compiler</H1>
-<p>[2010-05-03] Updated. (written for GnumakeUniproc v0.96, not compatible with v0.95 and prior) </p>
+<p>[2011-05-09]  (updated for GnumakeUniproc v0.97, not compatible with v0.96 and prior) </p>
 <H2>Task Summary</H2>
 <p>Many developers use only one compiler to develop their programs in one period of time, then GMU is just fine for them; and among other people using more than one compiler, GMU is still fine for them, they can use multiple compilers(e.g MSVC and ARM C++) in one GMU run(one session). As long as command line environment for those compilers have all set up correctly, you just start a GMU build session, then during the build session, &quot;choosing&quot; or defining different <code>gmp_COMPILER_ID</code> on starting a child project lets you switch between different compilers. </p>
 <p>So far, so good. But in case some day you have to confront any of the following situations: </p>
@@ -104,63 +104,66 @@ subprja<b>_Makefile</b> = <span class="c-comment"><i>some-prefix</i>/subprja/mak
 <pre>export myvar1=val1 mylist=<span class="c-string">&quot;token1 token2&quot; ;</span> make -f <span class="c-comment">/subprja/make.msvc/Makefile</span></pre>
 <p>So you can set those <code>INCLUDE, LIB, PATH</code> env-vars this way to forge distinctive environment for any of your sub-projects. </p>
 <h3>Review the example makefile </h3>
-<p>Now come back to our example, check <tt>walkdir-msvc-multiver/u_subprj.mki . </tt></p>
-<pre>ifeq (,$(gmp_MSVC60_ROOT))
-  $(error Visual C++ 6 (VS98) root directory not defined in gmp_MSVC60_ROOT, so I don't know how to setup VC6 compile environment)
+<p>Now come back to our example, check <tt>walkdir-msvc-multiver/Makefile . </tt></p>
+<pre>ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/compiler-env/cenv-msvc-vc60.mki
+<span class="c-comment">    # To get function gmpf_LoadCenv_msvc_vc60</span>
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/compiler-env/cenv-msvc-vc80.mki
+<span class="c-comment">    # To get function gmpf_LoadCenv_msvc_vc80
+</span>
+<span class="c-comment">  #Note: If you are using other MSVC version, add corresponding mki please.</span>
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
 endif
 
-ifeq (,$(gmp_MSVC60_PSDK_ROOT))
-  $(warning Microsoft Platform SDK root directory not defined in gmp_MSVC60_PSDK_ROOT, so you may be using too old headers and libraries)
-  # GMU author is using Platform SDK Feb 2003 with VC6.
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = walkdir-msvc-multiver
 endif
 
+<b>export gmp_COMPILER_ID=msvc</b>
+<span class="c-comment">    # We see it so that user don't have to set it in env forehand.</span>
 
-ifeq (,$(gmp_MSVC80_ROOT))
-  $(error Visual C++ 8 (VS2005) root directory not defined in gmp_MSVC80_ROOT, so I don't know how to setup VC8 compile environment)
-endif
+gmu_uv_list_ALL_SUBPRJ += walkdir_vc60 walkdir_vc80
 
+shared_makefile = ../../common/walkdir/make-all/all.$(gmp_COMPILER_ID)/Makefile
 
-dirThisDemoRoot = ../..
-dirExampleRoot = ../../..
-dirWalkdir = $(dirExampleRoot)/common/walkdir
+walkdir-vc60_Makefile = $(shared_makefile)
+walkdir-vc60_MakeVarDefines = <span class="blue">$(gmpf_LoadCenv_msvc_vc60)</span>
 
-include $(dirThisDemoRoot)/vc60-env.mki <span class="c-comment"># for function LoadVc60Env</span>
-include $(dirThisDemoRoot)/vc80-env.mki <span class="c-comment"># for function LoadVc80Env</span>
-
-
-gmu_uv_list_ALL_SUBPRJ = walkdir_vc60 walkdir_vc80
+walkdir-vc80_Makefile = $(shared_makefile)
+walkdir-vc80_MakeVarDefines = <span class="red">$(gmpf_LoadCenv_msvc_vc80)</span>
 
 
-shared_makefile = $(dirWalkdir)/make-all/all.$(gmp_COMPILER_ID)/Makefile
-
-walkdir_vc60_Makefile = $(shared_makefile)
-walkdir_vc60_MakeVarDefines = gmp_COMPILER_VER_msvc=<span class="blue">vc60</span> $(call <span class="blue">LoadVc60Env</span>,$(gmp_MSVC60_ROOT),$(gmp_MSVC60_PSDK_ROOT))
-
-walkdir_vc80_Makefile = $(shared_makefile)
-walkdir_vc80_MakeVarDefines = gmp_COMPILER_VER_msvc=<span class="red">vc80</span> $(call <span class="red">LoadVc80Env</span>,$(gmp_MSVC80_ROOT),$(gmp_MSVC80_PSDK_ROOT))
-
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
 </pre>
 <p>The two subprjs(refname <code>walkdir_vc60</code> &amp; <code>walkdir_vc80</code>) use the same makefile <code>$(shared_makefile)</code> with different env-var settings. Actually, two sets of differences:</p>
 <ol>
-  <li><code>LoadVc60Env</code> and <code>LoadVc80Env</code> result in different <code>INCLUDE=...</code> , <code>LIB=...</code> , <code>PATH=...</code> env-var assignment.</li>
-  <li>Different gmp_COMPILER_VER_msvc assignment is important as well, which makes the two subprjs result in different final project name(<code>gmu_G_Final_PrjName</code>) so that their output files are separated. </li>
+  <li><code>gmpf_LoadCenv_msvc_vc60</code> and <code>gmpf_LoadCenv_msvc_vc60</code> result in different <code>INCLUDE=...</code> , <code>LIB=...</code> , <code>PATH=...</code> env-var assignment.</li>
+  <li>Different <code>gmp_COMPILER_VER_msvc</code> assignment is important as well, which makes the two subprjs result in different final project name(<code>gmu_G_Final_PrjName</code>) so that their output files are in separated directories. </li>
 </ol>
-<p>Now we're going to run the example. But there is still one thing to explain. What are those <code>gmp_MSVC60_ROOT, gmp_MSVC60_PSDK_ROOT, gmp_MSVC80_ROOT</code> for? They are considered input condition of this make example, since this example project needs to know where your VC6 and VC8 compilers are installed. We'd better have them dynamic instead of hardcoded, thus give our users the freedom to install their compiler in any directory they like. <tt>sample-vc-gmp-env.bat</tt> present an sample .bat file to set these environment variables. </p>
+<p>Now we're going to run the example. </p>
+<p>Just run umake... Oops, we get and error:</p>
+<pre>E:/GMU/GMU-main/GnumakeUniproc/pattern1cfg/compiler-env/cenv-msvc-vc60.mki:7: *** !GMP!Error: 
+ gmp_CENV_ROOT_msvc_vc60 is not defined, so I cannot find Visual C++ 6 compiler.  Stop.</pre>
+<p>Well, remember? Our environment is clean at this moment, so GMU does not know where to look for VC6 or VC8 compiler. So, the <tt>cenv-msvc-vc60.mki</tt> designate a way to indicate where the compiler is installed, it expects you haved defined <code>gmp_CENV_ROOT_msvc_vc60</code> to indicate where Visual C++ 6 is installed. Same for VC8. </p>
+<p>So, <code>gmp_CENV_ROOT_msvc_vc60, gmp_CENV_PSDK_ROOT_msvc_vc60, gmp_CENV_ROOT_msvc_vc80</code>  etc, are considered input condition of this make example. The <tt>cenv-xxx-yyy.mki</tt> have them dynamic instead of hardcoded, thus give our users the freedom to install their compiler in any directory they like. <tt>sample-vc-gmp-env.bat</tt> present a sample .bat file to set these environment variables. </p>
 <pre>set gmp_MSVC60_ROOT=C:/Program Files/Microsoft Visual Studio
 set gmp_MSVC60_PSDK_ROOT=C:/Program Files/Microsoft SDK
 set gmp_MSVC80_ROOT=C:/Program Files/Microsoft Visual Studio 8
 </pre>
-<p>Make a copy of it and modify the directory according to your machine, then run this .bat. </p>
+<p>Make a copy of it and modify the directory according to your actual VC install target location, then run this .bat. </p>
 <div class="hint">
 				<p>The <tt>sample-vc-gmp-env.bat</tt> can be used directly if you have installed Visual Studio 6, Platform SDK 2003, and Visual Studio 2005 to default location on C: drive. If not to default location, you probably have to modify them. </p>
-				<p>Note: Platform SDK 2003 is not a must for building this example. </p>
+				<p>Note: Platform SDK 2003 is not a must for building this example. If you don't have it, just leave the <code>set</code> assignment it there. </p>
 				<p>Suggestion: Although it is feasible to have Visual Studio and PSDK installed in a directory with spaces in directory name, I suggest install them in short and non-spaced directory. </p>
 </div>
 <p>Now start <tt>umake</tt>. The outputs in <tt>gf</tt> dir is illustrated below:</p>
 <p><img src="output-vc60-and-vc80.gif" /></p>
 <p>You can see the <tt>vc60</tt> and <tt>vc80</tt> suffix appended to the project names. That is one of the effects of setting <code>gmp_COMPILER_VER_msvc</code>. One word to mention, other effects of <code>gmp_COMPILER_VER_msvc</code> is: If the value of <code>gmp_COMPILER_VER_msvc</code> is recognizable by compiler-config-mki, default compiler flags will be tuned for that very compiler. </p>
 <div class="hint">
-				<p>NOTE: If you compiler-id is not <code>msvc</code>, you should use a different variable name than <code>gmp_COMPILER_VER_msvc</code> .</p>
+				<p>NOTE: If you compiler-id is not <code>msvc</code>, you should use a different variable name other than <code>gmp_COMPILER_VER_msvc</code> .</p>
 				<p>If your <code>gmp_COMPILER_ID=armcpp</code> , you should define <code>gmp_COMPILER_VER_armcpp=<i>&lt;something&gt;</i></code> . The rule is: replace the substring after <code>gmp_COMPILER_VER_</code> to be your compiler-id string. </p>
 </div>
 <p>By the way, I sugguest you run <code>umake gmu_DO_SHOW_VERBOSE=1</code> , so that you can see sub-project environment variable switching behavior on your console output, like this:</p>

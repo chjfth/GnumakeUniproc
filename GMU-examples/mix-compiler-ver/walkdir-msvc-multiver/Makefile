@@ -22,7 +22,7 @@ endif
 export gmp_COMPILER_ID=msvc
 	# We see it so that user don't have to set it in env forehand.
 
-gmu_uv_list_ALL_SUBPRJ += walkdir-vc60 walkdir-vc80
+gmu_uv_list_ALL_SUBPRJ += walkdir_vc60 walkdir_vc80
 
 shared_makefile = ../../common/walkdir/make-all/all.$(gmp_COMPILER_ID)/Makefile
 
