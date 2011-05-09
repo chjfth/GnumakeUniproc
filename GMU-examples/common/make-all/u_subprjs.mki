@@ -20,7 +20,7 @@ use_PI_always_compile_Makefile = $(dir_common)/use_PI_always_compile/exe.$(gmp_C
 
 zlib_dll_Makefile = $(dir_common)/zlib_dll/makelib/dll.$(gmp_COMPILER_ID)/Makefile
 
-FindEmptyDir_Makefile = $(dir_common)/FindEmptyDir/demoFindEmptyDir/exe.$(gmp_COMPILER_ID)/Makefile
+FindEmptyDir_Makefile = $(dir_common)/FindEmptyDir/demoFindEmptyDir/Makefile
 
 file_spec_cflags_Makefile = $(dir_common)/file_spec_cflags/exe.$(gmp_COMPILER_ID)/Makefile
 
