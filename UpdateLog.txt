@@ -1,3 +1,60 @@
+[2011-05-xx] v0.97
+This is an aggressive upgrade. Many aspects have improve to ease future users.
+===== Changes and Improvements: =====
+1. r877 (Windows)
+	Bundled make.exe upgraded to GNU make 3.82.
+2. r924,925 (Linux, Windows) 
+	Deprecate gmu_MAKEEXESUFFIX in favor of gmu_MAKE_EXE. Now, if make-gmu can be executed on user's machine, use make-gmu by default(check executability in set-gmuenv.sc).
+3. r936
+	Allow container project to load plugins as well.
+4. r941
+	Improvement: If gmu_GFEXTRASUBDIR=1 (preferable in env-var), an extra level of subdir will be created beneath $(gmu_ud_OUTPUT_ROOT) (the default 'gf' thing). This helps reduce the number of items directly inside 'gf', in order to relief file system stress when doing very large build(thousands of projects).
+5. r943
+	Improvement: Plugins can be loaded from inside a plugin. Append extra plugins to gmp_u_list_PLUGIN_TO_LOAD(+=), and you are OK. I call this recursive plugin loading.
+5. r950
+	Add gmp_ud_list_CUSTOM_COMPILER_CFG setting in installer. 
+6. r957
+	Evolution: No longer spout error about no u_srccfg_pre.mki or u_srccfg_post.mki or u_subprjs.mki.
+	Contents belonging to those .mki-s can really be loaded by plugins.
+7. r992,993 
+	Change the strategy for deducing gmp_COMPILER_ID, more clear and concise.
+	Now, start-up makefile directory suffix-name overrides gmp_COMPILER_ID defined in env or command-line.
+	This may cause some compatibility problem for old-version users.
+
+===== Plugin update: =====
+PI_sync_debug_info:
+1, r878 (Windows)
+	Rename PDB file, XXX.lib.VCx0.pdb renamed to XXX.lib.pdb. (.VCx0 is verbose, really)
+2. r879
+	For MSVC, Introduce gmp_msvc_WANT_RELEASE_PDB. If set, generate .pdb for release build .
+3. r889-892 New plugin PI_file_precopy
+	Do some file copy before compiling any C/C++ file.
+4. r961 New plugin PI_dll_from_lib
+	This plugin is much more friendly for user makefile. It will load PI_windll_from_lib or PI_so_from_a automatically according to current gmp_COMPILER_ID.
+5. r904-906,930-932,974,975,996,1001
+	PI_dll_from_lib supports a new auto-export feature. Requires python to do the work.
+	Document pending, currently used in NLSCAN internally.
+
+===== Example and Doc Update: =====
+1. r947-949-755 
+	walkdir_start renamed to walkdir_go
+2. r1005
+	Update walkdir-msvc-multiver for GnumakeUniproc 0.97 .
+3. r1003,1004
+	Use concise makefile template for FindEmptyDir example.
+
+===== GMU makefile template update: =====
+1. r881
+	Hint for ``gmp_bc_CRT_STATIC_LIB=''. If set to 1, use static C runtime library.
+2. r958-960
+	Add concise Makefile tempalates for dll/exe/lib . So user can have only one Makefile instead of three in the past.
+3. r985
+  Template: Change
+    gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
+  to
+    gmp_bc_EXTRALIBS += # $(call gmpf_MakeLibName,<lib-list>)
+
+
 [2010-05-06] v0.96
 Main feature of this release is Windows Vista SP1 and Windows 7 support. A few bugs are fixed as well.
 ===== Changes and Improvements: =====

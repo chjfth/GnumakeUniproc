@@ -37,15 +37,15 @@ $ tar jxvf GMU-xxx.tar.bz2</pre>
 <p>The software described in this section(GNU make, bash, and gcc) are not provided in GMU-xxx.tar.bz2, so you have to make sure they have been pre-installed on your Linux system. </p>
 <h4>GNUmake(GNU make) 3.80 or above</h4>
 <p>If you do not have GNUmake 3.80 or above on your system, please do a software upgrade.</p>
-<p>Using GNU make 3.81 is strongly recommended. We have experienced some bugs with GNU make 3.80 when dealing with something complicated makefiles.</p>
+<p>Using GNU make 3.81 or 3.82 is strongly recommended. We have experienced some bugs with GNU make 3.80 when dealing with something complicated makefiles.</p>
 <h4>Bash shell and some file utilities </h4>
 <p>A shell is used when <tt>make</tt> executes a command for a rule or when <code>$(shell )</code> function is invoked. </p>
 <p>For Bash, I myself have tried Bash 2.x on SUSE 9.0, Bash 3.x on SUSE 10.1, and Bash 4.0 on Ubuntu 9.10. </p>
-<p>Bourne shell should be OK but I have not tried it on my own. I have not tried other shells(csh or ksh), I cannot tell whether that will work, and probably not, due to the discrepancy in backslash escaping scheme. </p>
+<p>Bourne shell should be OK but I have not tried it my own. I have not tried other shells(csh or ksh), I cannot tell whether that will work, and probably not, due to the discrepancy in backslash escaping scheme. </p>
 <p>Shell utilities include mkdir, cp, rm, mv, cat etc. I do not use rarely-seen switches for these command, so I think it'll be just OK as long as those executables are present. </p>
 <h4>gcc</h4>
 <p>Well, I believe you won't miss this. We'll be using this compiler to build our C/C++ programs, and, to generate header file dependency for C/C++ source files(<code>gcc -M</code>). </p>
-<p>I myself have tried gcc 3.3.1(on SUSE Linux 9.0) and gcc 4.1.0(on SUSE Linux 10.1).</p>
+<p>I myself have tried gcc 3.3.1(on SUSE Linux 9.0), gcc 4.1.0(on SUSE Linux 10.1) and gcc 4.5.0 on openSUSE 11.3.</p>
 <h2><a name="setup-gmu-self"></a>Set up GnumakeUniproc itself</h2>
 <p>Briefly, two steps: install of some special programs, then set up some environment variables. </p>
 <h3><a name="specprgs"></a>Some special programs provided by GnumakeUniproc</h3>

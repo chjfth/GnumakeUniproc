@@ -29,7 +29,7 @@
 <p>The installer for GnumakeUniproc contains the following software:</p>
 
 <ul>
-  <li>GNUmake 3.81 built natively(using Visual C++ 6, SP6) for Windows.</li>
+  <li>GNUmake 3.82 built natively(using Visual C++ .NET, SP1) for Windows.</li>
   <li>MinGW gcc compiler 3.2 . The main purpose for using gcc is to generate header file dependency(by <tt>gcc -M</tt>), even if you don't really use gcc to compile your program. </li>
   <li>A special version of sh.exe that acts as the Bourne Shell on Windows. The source file is derived from winbash 0.6, and is updated by GnumakeUniproc's author(add some missing functionality) so that it can work with GnumakeUniproc on Windows. Ssource files of this <tt>sh.exe</tt> can be found in win-bash folder of GnumakeUniproc distribution package. </li>
   <li> Some unix file manipulating utilities such as mkdir, cp, rm, mv, cat etc. These programs was acquired from <a href="http|//gnuwin32.sourceforge.net">gnuwin32.sourceforge.net</a> . </li>
@@ -45,12 +45,14 @@
 gmu_DIR_ROOT=D:/GMU
 gmu_DIR_GNUMAKEUNIPROC=D:/GMU/GMU-main/GnumakeUniproc</pre>
 <p class="chj-mark-red">Yes, the directory component separator here is forward slash(<code>/</code>) instead of backslash(<code>\</code>).  This convention applies to all environment variable values recognized by GnumakeUniproc and all variable values used in a makefile. It's true even if you really work on a Windows platform. </p>
-<p><b>Windows registry</b> checkbox: If checked, installer will set these env-vars into your registry, so that you have them immediately after you logon to Windows desktop. Whether you should check it or not?</p>
+<p><b>Windows registry</b> checkbox: If checked, installer will set these env-vars into your registry, so that you have them immediately after you logon to Windows desktop. </p>
+<p>Whether you should check it or not?</p>
 <ul>
 				<li>If you have your own gcc compiler(gcc.exe etc) on your Windows box, don't check it -- because the gcc.exe provided by GnumakeUniproc installer may conflict with yours in PATH env-var.</li>
                 <li>otherwise, leave it checked. </li>
 </ul>
 <p><b>gmuenv.bat</b> checkbox: Always have it checked. Purpose of this .bat: In case you don't check <b>Windows registry</b> above, there will be nothing regarding GnumakeUniproc added to your environment setting, so you will not be able to use GnumakeUniproc just by opening a Command Prompt. To make the environment ready, you should call <tt>D:\GMU\gmuenv.bat</tt> to set it up. </p>
+<p>What about I changed my mind later? No problem, just run the install again, tick your right decision. </p>
 <h3><a name="CheckEnvOk"></a>Check whether environment is setup OK</h3>
 <p>GnumakeUniproc runs from a command line environment, and the environment requirement means properly setting some <code>gmu_</code> &amp; <code>gmp_</code> environment variables. so open an Command Prompt window to get ready using GnumakeUniproc.</p>
 <p>If you run the installer and opt to store the env-vars in Windows registry, then they should have been set up for you after you open a  Command Prompt window from Windows Start Menu. Otherwise, you have to manually execute <tt>D:\GMU\gmuenv.bat</tt> to set it up. </p>
