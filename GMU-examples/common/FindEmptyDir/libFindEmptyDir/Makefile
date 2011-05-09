@@ -1,13 +1,73 @@
-#### template file for use with pattern1.mks, [GnumakeUniproc v1.0]
+# template file for use with pattern1.mks, concise version, [GnumakeUniproc v1.0]
 # ! Be sure to replace every occurrence of <angle-brackets> to be your
 # actual content, or [ at least comment them out if some of them are
 # not required] .
 
-#---------------------------------------------------------------------------
-# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks 
-# after the "compiler-config" files have been included. Commonly, you write
-# your source files and compiler/linker options in this file.
-#---------------------------------------------------------------------------
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+############################################################################
+# GMU-var: gmu_PRJ_NAME
+# 	Define the project name(prj-name for short).
+# project name for a project(precisely, after decoration
+# into gmu_G_Final_PrjName) should be unique 
+# across the whole build process of one GnumakeUniproc run. Prj-name
+# conflict will be detected by GMU if two or more projects have the same
+# gmu_G_Final_PrjName.
+############################################################################
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = libFindEmptyDir
+endif
+
+############################################################################
+# GMU-var: gmp_bc_IMAGE_TYPE
+#	Define the "image-type" to generated for this project.
+# Common image-types are: LIB, DLL and EXE.
+############################################################################
+gmp_bc_IMAGE_TYPE = LIB
+
+############################################################################
+# Compiler specific settings below.
+############################################################################
+ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+  # msvc, wince compiler 
+  gmp_bc_CRT_STATIC_LIB = 1
+	# 1: Use static CRT lib (compiler option /MT or /MTd)
+	# (null): use DLL CRT lib (compiler option /MD or /MDd)
+
+  # gmp_CFLAGS_NON_CODE_GEN += /W3
+  
+  # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
+
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
+    # gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
+	#	This tells the .H file used for precompiled header(passed as /Yc 's argument)
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_dll_from_lib      # make dll from lib
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
+
+else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
+  # GCC compiling linux program
+
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_gcc_strip_lo      # strip output executable
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_gcc       # use precompile header
+  
+else # ... some other gmp_COMPILER_ID processing ...
+
+endif
+
+############################################################################
+# GMU-var: gmp_u_list_PLUGIN_TO_LOAD
+#	Designate plugins to load in this make-var, multiple plugin names separated
+# by spaces. Plugins are searched from $(gmp_ud_list_CUSTOM_MKI) and then
+# from $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins .
+############################################################################
+gmp_u_list_PLUGIN_TO_LOAD += 
+	# PI_sync_devoutput PI_always_compile PI_file_precopy
+
 
 ############################################################################
 # GMU-var: gmu_uf_LINK_OUTPUT
@@ -17,13 +77,19 @@
 ############################################################################
 gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,FindEmptyDir)
 
+gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
+	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
+gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
+	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
+
+
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
 #	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
 # You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
-# not to this mki file.
+# not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
 ############################################################################
-gmu_ud_SRC_ROOT = ..
+gmu_ud_SRC_ROOT = .
 dirWalkdirLib = $(gmu_ud_SRC_ROOT)/../../walkdir
 
 ############################################################################
@@ -48,25 +114,27 @@ gmu_up_list_SRC_FROM_ROOT += FindEmptyDir.cpp
 #	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
 ############################################################################
 gmu_ud_list_PRJ_HEADER += $(dirWalkdirLib)/libsrc/include
-	# Don't write ``-I'' in this var; it will be prependded automatically.
+	# Don't write ``-I'' in this var; -I will be prependded automatically.
 
 gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
+	# (normally, you don't need this)
 	# those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
 	# You must explicitly write ``-I'' before every dir in gmp_CFLAGS_INCLUDES
 
 ############################################################################
-# GMU-vars: gmp_CFLAGS_XXX
+# GMU-vars: gmp_CFLAGS_<XXX>
 #	Set specific compiler options for this project in the following vars:
 # gmp_CFLAGS_CODE_GEN_ALL:
 #	Any options that affect the generated binary code should be listed in it.
+#	Consider gmp_CFLAGS_CODE_GEN_ALL as your accustomed CFLAGS.
 # gmp_CFLAGS_NON_CODE_GEN:
 #	Any options that do not affect the generated binary code should be listed in it.
 ############################################################################
 
 gmp_CFLAGS_CODE_GEN_ALL +=
   # You may want to dispense options for gmp_CFLAGS_CODE_GEN_ALL into following 2 categories:
-  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # those macro defines, e.g. -Dxxx=yyy
-  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # other code generation related options
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # append other macro defines, e.g. -Dxxx=yyy
+  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # append other code generation related options
 
 gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
 
@@ -92,24 +160,26 @@ gmu_up_list_EXTRA_OBJ_TO_LINK +=
 # and later enable gmu_uv_list_SUBPRJ_LINK_FOR_PARENT, then you must clean 
 # the old project output-dir first in order for that change to work. )
 ############################################################################
-# !!! CORE PART OF THIS DEMO, set sub-project in gmu_uv_list_SUBPRJ_LINK_FOR_PARENT:
-gmu_uv_list_SUBPRJ_LINK_FOR_PARENT = walkdir
+gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += walkdir
 
 walkdir_Makefile = $(dirWalkdirLib)/libsrc/makelib/lib.$(gmp_COMPILER_ID)/Makefile
 
-
-# ----------- below for plugins -----------
+# ----------- below for plugin PI_sync_devoutput -----------
 
 # If you use plugin PI_sync_devoutput, you may want to set:
-gmi_SYDO_ud_SYNC_HEADER_ROOT = $(gmu_ud_SRC_ROOT)
+# gmi_SYDO_ud_SYNC_HEADER_FROM =
 	# The dir that your headers reside in. ( relative to $(CURDIR) )
 
-gmi_SYDO_up_list_SYNC_HEADERS = FindEmptyDir.h
-	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_ROOT) )
+# gmi_SYDO_up_list_SYNC_HEADER =
+	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_FROM) )
 
 # gmi_SYDO_ud_SYNC_HEADER_TO = # (suggested to set as env-var or by parent project)
 	# Where the headers will be sync-ed to.
 
 # gmi_SYDO_ud_SYNC_LIB_TO = # (suggested to set as env-var or by parent project)
 	# Where the static LIBs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
+
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
 
