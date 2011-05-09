@@ -5,9 +5,5 @@
 
 gmu_PRJ_NAME = itclr-cntr-one
 
-#gmp_CONTAINER_EXTRACT_COMPILER_ID = 1 
-	# Do not define this since we do not need gmp_COMPILER_ID 
-	# for sub-project's attributes .
-
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
 

@@ -12,11 +12,6 @@ ifndef gmu_PRJ_NAME
   gmu_PRJ_NAME = <project-name-for-this-container>
 endif
 
-gmp_CONTAINER_EXTRACT_COMPILER_ID = 1
-	# Define this to extract gmp_COMPILER_ID automatically from directory ext-name.
-	# This is required, for example, if the path of some sub-project is composed of the
-	# dynamic $(gmp_COMPILER_ID) .
-
 gmu_uv_list_ALL_SUBPRJ += <subprj1-refname> <subprj2-refname> ...
 
 <subprj1-refname>_Makefile = # where the sub-project's makefile resides
