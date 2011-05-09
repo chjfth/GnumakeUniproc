@@ -94,14 +94,14 @@ CODE { color:#660000; }
   <li>Set <code>LIB</code> to indicate system header file directories. </li>
   <li>Add the directory containing <tt>cl.exe</tt> into <code>PATH</code> env-var so that the compiler executable can be found.</li>
 </ul>
-<p>Normally, we call the stock <tt>vcvars32.bat</tt> or <tt>vcvarsall.bat</tt> to set them up. But is it feasible to call those .bat during a GMU run? The answer is no, because the child make process spawn is hidden by GnumakeUniproc core. So, we have to use another way, that is, a special mechanism provided by GnumakeUniproc.</p>
+<p>Normally, we call the stock <tt>vcvars32.bat</tt> or <tt>vcvarsall.bat</tt> to set them up. But is it feasible to call those .bat during a GMU run? The answer is no, because the child make process spawn is managed by GnumakeUniproc core and it does not allow us to execute arbitrary programs during sub-project spawning. So, we have to use another way, that is, a special mechanism provided by GnumakeUniproc.</p>
 <p>When GMU user defines a subprj in <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code>, he can define environment variable assignment for that very subprj. For example:</p>
 <pre>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL = subprja
 &nbsp;
 subprja<b>_Makefile</b> = <span class="c-comment"><i>some-prefix</i>/subprja/make.msvc/Makefile</span>
-<subprj1-refname>subprja<b>_MakeVarDefines</b> = myvar1=val1 mylist=<span class="c-string">&quot;item1 item2&quot;</span></pre>
+<subprj1-refname>subprja<b>_MakeVarDefines</b> = myvar1=val1 mylist=<span class="c-string">&quot;token1 token2&quot;</span></pre>
 <p>This will result in such a make command to be executed:</p>
-<pre>export myvar1=val1 mylist=<span class="c-string">&quot;item1 item2&quot; ;</span> make -f <span class="c-comment">/subprja/make.msvc/Makefile</span></pre>
+<pre>export myvar1=val1 mylist=<span class="c-string">&quot;token1 token2&quot; ;</span> make -f <span class="c-comment">/subprja/make.msvc/Makefile</span></pre>
 <p>So you can set those <code>INCLUDE, LIB, PATH</code> env-vars this way to forge distinctive environment for any of your sub-projects. </p>
 <h3>Review the example makefile </h3>
 <p>Now come back to our example, check <tt>walkdir-msvc-multiver/u_subprj.mki . </tt></p>
