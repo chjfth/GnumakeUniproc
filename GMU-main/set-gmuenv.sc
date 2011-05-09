@@ -65,4 +65,10 @@ PATH="$gmu_DIR_ROOT/bin:$PATH"
 
 echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
 
+# Something extra for Scalacon:
+export gmp_NO_LoadCenv_linuxgcc_gcc45_i586=1
+	# For compiler-env of linuxgcc,gcc45_i586 pair
+export gmp_NO_LoadCenv_linuxgcc_gcc45_x64=1
+	# For compiler-env of linuxgcc,gcc45_x64 pair
+
 _gmu_root=
