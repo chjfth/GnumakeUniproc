@@ -20,6 +20,16 @@ This is an aggressive upgrade. Many aspects have improve to ease future users.
 	Change the strategy for deducing gmp_COMPILER_ID, more clear and concise.
 	Now, start-up makefile directory suffix-name overrides gmp_COMPILER_ID defined in env or command-line.
 	This may cause some compatibility problem for old-version users.
+8. r975,1001 (Windows, Linux)
+	Introduce new make-var gmp_NOW_EXPORT.
+	* If gmp_NOW_EXPORT=1, ".export" will be appended to project name and link output name.
+	* Only when gmp_NOW_EXPORT=1, Symbols listed in gmp_u_list_DLL_EXPORT_SYM will be replaced to __declspec(dllexport), __attribute__((visibility("default"))) etc.
+	  In GMU 0.96, gmp_NOW_EXPORT is not a condition.
+	* For LIB projects, user makefile determines whether gmp_NOW_EXPORT=1 is set.
+	  Setting it or not will result in different final-project-name and different set of .obj content.
+	  >> Those with gmp_NOW_EXPORT=1 is suitable to be linked into DLL and have gmp_u_list_DLL_EXPORT_SYM symbols exported.
+	  >> Those with gmp_NOW_EXPORT=(null) is just like traditional LIBs.
+	* In compiler-config-mki, DLL image-type will define gmp_NOW_EXPORT=1 for you automatically.
 
 ===== Plugin update: =====
 PI_sync_debug_info:
