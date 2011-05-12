@@ -9,32 +9,18 @@ _gmp_Gp_objliblist = $(gmu_Gd_Final_PrjOutput)/objlist.lst
 _gmpf_cmd_write_objliblist = echo -e "$(subst $(_GmuSpace),\n,$1)" > $2
 	# $1: what string to write. $2: what file to write to
 
+_shcmd_showlibstolink = $(call _DoVerbose$1,\
+	echo -n "**$3($2): "; \
+	$(if $(strip $($2)),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$($2)); do echo "    $${v}"; done,echo "(none)")\
+	)
 
 define _gmpf_bcfShowLibrariesToLink
-	@$(call _DoVerbose1,\
-	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK):"; \
-	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
-	)
-
-	@$(call _DoVerbose1,\
-	echo -n "**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK_2):"; \
-	$(if $(gmu_up_list_EXTRA_OBJ_TO_LINK_2),echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_up_list_EXTRA_OBJ_TO_LINK_2)); do echo "    $${v}"; done,echo "(none)")\
-	)
-
-	@$(call _DoVerbose1,\
-	echo -n "**library search directories(gmp_ud_list_EXTRALIB): "; \
-	$(if $(gmp_ud_list_EXTRALIB),echo ''; for v in $(gmp_ud_list_EXTRALIB); do echo "    $$v" ; done,echo "(none)")\
-	)
-
-	@$(call _DoVerbose1,\
-	echo -n "**libraries to link from sub-projects(gmu_Gp_list_SUBPRJ_TO_LINK):"; \
-	$(if $(gmu_Gp_list_SUBPRJ_TO_LINK), echo ''; for v in $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$(gmu_Gp_list_SUBPRJ_TO_LINK)); do echo "    $${v}"; done,echo "(none)")\
-	)
-
-	@$(call _DoVerbose1,\
-	echo -n "**libraries to link stand-alone(gmp_bc_EXTRALIBS):"; \
-	$(if $(gmp_bc_EXTRALIBS),echo ''; for v in $(gmp_bc_EXTRALIBS); do echo "    "$${v#`pwd`/} ; done,echo "(none)")\
-	)
+	@$(call _shcmd_showlibstolink,1,gmu_up_list_EXTRA_OBJ_TO_LINK,extra objs to link)
+	@$(call _shcmd_showlibstolink,1,gmu_up_list_EXTRA_OBJ_TO_LINK_2,extra objs to link)
+	@$(call _shcmd_showlibstolink,1,gmp_ud_list_EXTRALIB,library search directories)
+	@$(call _shcmd_showlibstolink,1,gmu_Gp_list_SUBPRJ_TO_LINK,libraries to link from sub-projects)
+	@$(call _shcmd_showlibstolink,1,gmp_bc_EXTRALIBS,libraries to link stand-alone)
+	@$(call _shcmd_showlibstolink,2,gmp_bc_SYSLIBS,System libraries to link)
 endef
 bcfShowLibrariesToLink = $(_gmpf_bcfShowLibrariesToLink)
 	# bcfShowLibrariesToLink is for backward compatibility, use of it is discouraged.
