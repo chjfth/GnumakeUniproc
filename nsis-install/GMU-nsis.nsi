@@ -35,6 +35,7 @@
     gmp_DECO_PRJ_NAME \
     gmu_LOG_OUTPUT_FILENAME \
     gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
+    NLSSVN gv1 gv2 \
 	"
 
 !define TSFX "" ;"__tsfx" ; test suffix
@@ -80,8 +81,21 @@ Var isChecked_gmu_LOG_OUTPUT_FILENAME
  !define desc_gmu_LOG_OUTPUT_FILENAME \
          "Set this env-var to be a filename, which tells umake*.bat where to log the make output(stdout & stderr)."
 
+Var isChecked_NLSSVN
+      Var str_NLSSVN
+ !define desc_NLSSVN \
+         "This is the SVN repository root URL for NLSCAN."
+Var isChecked_gv1
+      Var str_gv1
+ !define desc_gv1 ""
+Var isChecked_gv2
+      Var str_gv2
+ !define desc_gv2 ""
+
 Var isChecked_AddPath
       Var str_AddPath
+
+Var isChecked_nlscanenv
 
 
 !define desc_StoreEnvVar "You have two places to store the env-vars required by GnumakeUniproc(GMU):\r\n\
@@ -92,7 +106,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre10(20110510)"
+!define PRODUCT_VERSION "0.97-pre11(20110512)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -377,7 +391,7 @@ SectionEnd
 Function SelectEnvVar
 
   ; Convert all backslash to forward-slash for $INSTDIR, then append /GMU-ext to it.
-  ; We make this result the default the default value for evn-ver gmu_ud_list_CUSTOM_MKI.
+  ; We make this result the default the default value for env-ver gmu_ud_list_CUSTOM_MKI.
   Push '$INSTDIR'
   Push "\"
   Call StrSlash
@@ -415,6 +429,8 @@ Function SelectEnvVar
     StrCpy $str_gmp_DECO_PRJ_NAME 1
   ${EndIf}
 
+  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_nlscanenv ${fname_GmuEnvIni} "Field 7" "State"
+
   !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmu_LOG_OUTPUT_FILENAME ${fname_GmuEnvIni} "Field 8" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $str_gmu_LOG_OUTPUT_FILENAME ${fname_GmuEnvIni} "Field 9" "State"
   ${If} "$isChecked_gmu_LOG_OUTPUT_FILENAME" == 0
@@ -428,6 +444,15 @@ Function SelectEnvVar
   StrCpy "$str_gmu_DIR_GNUMAKEUNIPROC" "${absdir_GmuCore}"
   StrCpy "$isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
   StrCpy "$str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
+
+  ${If} "$isChecked_nlscanenv" == 1
+    StrCpy "$isChecked_NLSSVN" "1"
+    StrCpy       "$str_NLSSVN" "https://nlssvn/svnreps"
+    StrCpy "$isChecked_gv1" "1"
+    StrCpy       "$str_gv1" "gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
+    StrCpy "$isChecked_gv2" "1"
+    StrCpy       "$str_gv2" "gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
+  ${EndIf}
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_AddPath ${fname_GmuEnvIni} "Field 11" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $str_AddPath ${fname_GmuEnvIni} "Field 12" "State"
