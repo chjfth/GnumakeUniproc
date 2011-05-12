@@ -181,6 +181,7 @@ Section "GnumakeUniproc" GMU ; GnumakeUniproc required files
 
   SetOutPath "$INSTDIR"
   File "nsis-data\GMU\*.txt"
+  File "nsis-data\GMU\*.bat"
   File /nonfatal "nsis-data\GMU\*.htm"
   File /nonfatal "nsis-data\GMU\*.html"
   

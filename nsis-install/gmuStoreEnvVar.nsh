@@ -17,7 +17,13 @@
     FileOpen $4 "${fpath_GmuEnvBat}" a
     FileSeek $4 0 END
     FileWrite $4 "$\r$\n" ; we write a new line
-    FileWrite $4 "SET ${varname}=$str_${varname}"
+    
+    ; Replace D:/GMU and D:\GMU\ to env-var substitution form.
+    !insertmacro ReplaceSubStr "SET ${varname}=$str_${varname}" "$InstDir_fwslash" "%gmu_DIR_ROOT%"
+;	DetailPrint ">>!>> $R0...$INSTDIR\"
+;	!insertmacro ReplaceSubStr "$R0" "$INSTDIR\" "%_gmu_DIR_ROOT_bs_%"
+    
+    FileWrite $4 "$R0"
     FileWrite $4 "$\r$\n" ; we write an extra line
     FileClose $4 ; and close the file
     Pop $4
@@ -30,7 +36,7 @@
     FileOpen $4 "${fpath_GmuEnvBat}" a
     FileSeek $4 0 END
     FileWrite $4 "$\r$\n" ; we write a new line
-    FileWrite $4 "call ${absdir_MinGW_bin_bkslash}\gmu-goody.bat"
+    FileWrite $4 "call %_gmu_DIR_ROOT_bs_%MinGW2\bin\gmu-goody.bat"
     FileWrite $4 "$\r$\n" ; we write an extra line
     FileClose $4 ; and close the file
     Pop $4
@@ -75,10 +81,12 @@
     FileSeek $4 0 END
     FileWrite $4 "$\r$\n" ; we write a new line
     ${If} "$isAddToPathFront" == 1
-      FileWrite $4 "SET PATH=$str_${varname};%PATH%"
+      StrCpy $R1 "SET PATH=$str_${varname};%PATH%"
     ${Else}
-      FileWrite $4 "SET PATH=%PATH%;$str_${varname}"
+      StrCpy $R1 "SET PATH=%PATH%;$str_${varname}"
     ${EndIf}
+	!insertmacro ReplaceSubStr "$R1" "$INSTDIR\" "%_gmu_DIR_ROOT_bs_%"
+	FileWrite $4 "$R0"
     FileWrite $4 "$\r$\n" ; we write an extra line
     FileClose $4 ; and close the file
     Pop $4
