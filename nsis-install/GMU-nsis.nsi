@@ -53,19 +53,19 @@ Var InstDir_fwslash ; Store forward-slash version of $INSTDIR
 Var isChecked_gmu_DIR_ROOT ;No selection for isChecked_gmu_DIR_ROOT, take it always checked.
       Var str_gmu_DIR_ROOT
  !define desc_gmu_DIR_ROOT \
-         "This env-var tells where GnumakeUniproc is installed."
+         "Tells where GnumakeUniproc is installed."
 Var isChecked_gmu_DIR_GNUMAKEUNIPROC
       Var str_gmu_DIR_GNUMAKEUNIPROC
  !define desc_gmu_DIR_GNUMAKEUNIPROC \
-         "Vital env-var for GnumakeUniproc, which tells where GnumakeUniproc.mki resides."
+         "Tells where GnumakeUniproc.mki resides."
 Var isChecked_gmp_ud_list_CUSTOM_MKI
       Var str_gmp_ud_list_CUSTOM_MKI
  !define desc_gmp_ud_list_CUSTOM_MKI \
-         "Tell the directories of your custom-image-mki or plugins."
+         "Directories of your custom-image-mki or plugins."
 Var isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG
       Var str_gmp_ud_list_CUSTOM_COMPILER_CFG
  !define desc_gmp_ud_list_CUSTOM_COMPILER_CFG \
-         "Tell the directories of your extra compiler configs."
+         "Directories of your extra compiler configs."
 Var isChecked_gmp_DECO_PRJ_NAME
       Var str_gmp_DECO_PRJ_NAME
  !define desc_gmp_DECO_PRJ_NAME \
@@ -74,17 +74,16 @@ Var isChecked_gmp_DECO_PRJ_NAME
 Var isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
       Var str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
  !define desc_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
-         "A tweak for GNU make 3.81. If set to 1, there will be no output of verbose message \
+         "A tweak for GNU make 3.81+. If set to 1, there will be no output of verbose message \
          $\"No such file or directory$\" when a file is not found by makefiles 'include' directive."
 Var isChecked_gmu_LOG_OUTPUT_FILENAME
       Var str_gmu_LOG_OUTPUT_FILENAME
  !define desc_gmu_LOG_OUTPUT_FILENAME \
-         "Set this env-var to be a filename, which tells umake*.bat where to log the make output(stdout & stderr)."
+         "For umake*.bat, tell where to log the make screen output."
 
 Var isChecked_NLSSVN
       Var str_NLSSVN
- !define desc_NLSSVN \
-         "This is the SVN repository root URL for NLSCAN."
+ !define desc_NLSSVN "This is the SVN repository root URL for NLSCAN."
 Var isChecked_gv1
       Var str_gv1
  !define desc_gv1 ""
@@ -106,7 +105,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre11(20110512)"
+!define PRODUCT_VERSION "0.97-pre12(20110513)"
 !define PRODUCT_PUBLISHER "GnumakeUniproc's author"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

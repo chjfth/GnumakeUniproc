@@ -119,8 +119,10 @@
 ;;; Append env-vardefines to $R0
 
 !macro AppendEnvVarDef_R0 varname
-  StrCpy "$R0" "$R0${varname}=$str_${varname}\r\n        ${desc_${varname}}\r\n\r\n"
-  ; Really, you cannot write $\r for \r here!
+  ${If} "$isChecked_${varname}" == 1
+    StrCpy "$R0" "$R0${varname}=$str_${varname}\r\n        ${desc_${varname}}\r\n\r\n"
+    ; Really, you cannot write $\r for \r here!
+  ${EndIf}
 !macroend
 
 !macro AppendEnvVarDef_R0_list v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 ;v11 v12 v13
@@ -133,7 +135,7 @@
   !insertmacro AppendEnvVarDef_R0 ${v7}
   !insertmacro AppendEnvVarDef_R0 ${v8}
   !insertmacro AppendEnvVarDef_R0 ${v9}
-;  !insertmacro AppendEnvVarDef_R0 ${v10}
+  !insertmacro AppendEnvVarDef_R0 ${v10}
 ;  !insertmacro AppendEnvVarDef_R0 ${v11}
 ;  !insertmacro AppendEnvVarDef_R0 ${v12}
 ;  !insertmacro AppendEnvVarDef_R0 ${v13}
