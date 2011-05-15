@@ -516,6 +516,13 @@ else
 	@$(_DO_ASM_COMPILE)
 endif
 
+# Now, I set a rule to catch those source files that does not exist on disk yet,
+# so I can give a more friendly error message instead of the default
+#	*** No rule to make target `xxx.c', needed by `.../_obj/xxx.c.o'
+$(gmu_Gp_list_AllSource):
+	@echo "!GMU!Error: Some source file(s) in gmu_up_list_SRC_FROM_ROOT do not exist yet:"
+	@echo "$(filter-out $(wildcard $(gmu_Gp_list_AllSource)),$(gmu_Gp_list_AllSource))"
+	@[ 1 = 0 ]
 
 ########## ***** Prepare for CVS/SVN work-in-module or CVS/SVN checkout ***** ###########
 # In the following code: SC, sc or Sc means source-control.
