@@ -156,6 +156,8 @@ gmuf_IsPrefixWith = $(if $1,$(if $(patsubst $2%,,$1),,1))
 	# $(call gmuf_IsPrefixWith,sdt250,sdt)	true
 	# $(call gmuf_IsPrefixWith,sdt,sdtXX)	false
 	# $(call gmuf_IsPrefixWith,,sdt)		false
+gmuf_IsSuffixWith = $(if $1,$(if $(patsubst %$2,,$1),,1))
+	# Check whether $1 is suffixed with $2. Return 1 for true; return null for false.
 
 _addprefixsuffix = $(addprefix $1,$(addsuffix $3,$2))
 	# $1: prefix to add, $2: your data to process, $3 suffix to add.

@@ -357,6 +357,26 @@ gmuf_CnCXX_ListToHdepList = $(call gmuf_C_ListToHdepList,$1) $(call gmuf_CXX_Lis
 gmuf_SrcListToHdepList_FreeStyleExtn = $(call gmuf_SrcListToOutputList_addsuffix,$1,d)
 	#[2007-01-14] when improving MSVC pch plugin
 
+
+# Check whether gmu_ud_SRC_ROOT and gmu_up_list_SRC_FROM_ROOT has backslash, if so spout error
+ifeq (1,$(call gmuf_IsSubString,\,$(gmu_ud_SRC_ROOT)))
+  $(error !GMU!Error: gmu_ud_SRC_ROOT contains back-slash(\), please use forward-slash(/) instead)
+endif
+
+ifeq (1,$(call gmuf_IsSubString,\,$(gmu_up_list_SRC_FROM_ROOT)))
+  $(error !GMU!Error: Filepaths in gmu_up_list_SRC_FROM_ROOT contains back-slash(\), please use forward-slash(/) instead)
+endif
+
+# Check whether some src files start with .. , if so, spout error
+# This is a lose check to avoid casual violation of the _FROM_ROOT rule.
+_invalid_srcpaths = $(foreach p,$(gmu_up_list_SRC_FROM_ROOT),$(if $(call gmuf_IsPrefixWith,$p,..),$p))
+ifneq (,$(strip $(_invalid_srcpaths)))
+  $(call gmuf_OutputInfo,Some source file(s) start with .. (,) which is not allowed. You should change gmu_ud_SRC_ROOT to some upper level directory so that filepaths in gmu_up_list_SRC_FROM_ROOT are all contained within.)
+  $(call gmuf_OutputInfo,Invalid filepath(s):)
+  $(foreach p,$(_invalid_srcpaths),$(call gmuf_OutputInfo,  $p))
+  $(error !GMU!Error: See reason above)
+endif
+
 #Construct a temporary REQOBJS var with temporary meaning:
 
 _REQOBJS_C = $(call gmuf_C_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT))
@@ -397,6 +417,7 @@ ifneq (,$(strip $(_list_ExtUnrecognized))) # there will be as many spaces in $(_
   	  #You know, $(shell ...)'s output to stdout with be captured by Make if we do not redirect is to stderr.
   $(error !GMU!Error: The above source files do not have valid extension-name, valid ext-names are: $(strip $(gmu_u_list_C_EXTN) $(gmu_u_list_CXX_EXTN) $(gmu_u_list_ASM_EXTN)))
 endif
+
 
 ifneq (,$(_REQOBJS_C))
 ifndef gmu_u_CC_CMD
