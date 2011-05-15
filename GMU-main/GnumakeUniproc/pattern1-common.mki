@@ -149,4 +149,6 @@ define _gmp_NOW_EXPORT_LibSuffixDotExport
 endef
 
 
+gmu_G_anyCxxSourceFiles = $(strip $(gmu_Gp_list_REQOBJS_CXX))
+
 endif

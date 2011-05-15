@@ -63,7 +63,7 @@ gmu_ud_list_SYS_HEADER += $(gmp_linuxgcc_ud_list_SYSTEM_HEADER)
 
 gmu_exe_CC = $(gmp_GCC_PREFIX)gcc
 gmu_exe_CXX = $(gmp_GCC_PREFIX)g++
-gmu_exe_LINK = $(gmp_GCC_PREFIX)$(if $(strip $(gmu_Gp_list_REQOBJS_CXX)$(gmp_GCC_LINK_GXX)),g++,gcc)
+gmu_exe_LINK = $(gmp_GCC_PREFIX)$(if $(strip $(gmu_G_anyCxxSourceFiles)$(gmp_GCC_LINK_GXX)),g++,gcc)
 gmu_exe_LIB = $(gmp_GCC_PREFIX)ar
 
 

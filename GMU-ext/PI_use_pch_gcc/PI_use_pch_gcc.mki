@@ -14,6 +14,11 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 #	gmi_PCHG_u_GENPCH_USE_gcc_OR_g++ = #(optional) set it to `gcc' or `g++' (default to g++)
 		# Tells whether use gcc or g++ to pre-compile a header file.
+		#
+		# If null, it is determined automatically.
+		# * g++ is used if any file in gmu_up_list_SRC_FROM_ROOT has C++ extension(determined by gmu_u_list_CXX_EXTN).
+		# * gcc otherwise.
+		#
 		# You know, if you just execute ``gcc test.h'', gcc(not g++) is used,
 		# the generated .h.gch will be rejected if you later g++ compile test.cpp 
 		# which includes test.h .
@@ -26,7 +31,7 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 	# The second, gmi_PCHG_up_list_SRC_DONT_DEPPCH_FROM_ROOT(abbr. srcDontDep) is used to exclude
 	# some source files listed in srcDepPch from using pch. If some file in srcDontDep
 	# is not listed in srcDepPch, that file is just ignored, no error asserted.
-	#	In most cases when pch is prefered, source files requiring pch is the majority, 
+	#	In most cases when pch is preferred, source files requiring pch is the majority, 
 	# then you'd like to take this strategy: Let srcDepPch be null, and list those minor
 	# files that don't use precompiled header into srcDontDep.
 
@@ -62,7 +67,7 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 
 
 ifeq (,$(gmi_PCHG_u_GENPCH_USE_gcc_OR_g++))
-  gmi_PCHG_u_GENPCH_USE_gcc_OR_g++ = g++
+  gmi_PCHG_u_GENPCH_USE_gcc_OR_g++ = $(if $(gmu_G_anyCxxSourceFiles),g++,gcc)
 endif
 
 _GccCmd_for_pch = $(gmp_GCC_PREFIX)$(gmi_PCHG_u_GENPCH_USE_gcc_OR_g++)
