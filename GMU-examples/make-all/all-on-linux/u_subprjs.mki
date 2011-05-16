@@ -3,8 +3,6 @@
 # You should list sub-projects for this container in this file.
 #---------------------------------------------------------------------------
 
-export gmp_COMPILER_ID
-
 gmu_uv_list_ALL_SUBPRJ =  all-common  demo-auto-checkout
 gmu_uv_list_ALL_SUBPRJ += linux-all
 gmu_uv_list_ALL_SUBPRJ += cross-lib-ref

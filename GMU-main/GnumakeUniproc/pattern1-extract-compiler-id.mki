@@ -1,6 +1,8 @@
 ifndef __pattern1-extract-compiler-id_included_
 __pattern1-extract-compiler-id_included_ = 1
 
+export gmp_COMPILER_ID
+
 _compiler_id_bydir := $(call gmuf_GetExtName,$(gmu_d_StartupMakefile))
 
 _compiler_id_byenv := $(strip $(gmp_COMPILER_ID))

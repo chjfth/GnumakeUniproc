@@ -32,4 +32,8 @@ include $(gmp_Gp_COMPILER_CFG_LOADED)
 gmp_COMPILER_ID_VER = $(if $(gmp_COMPILER_VER_$(gmp_COMPILER_ID)),$(gmp_COMPILER_VER_$(gmp_COMPILER_ID)),null!_COMPILER_ID_VER)
 	# Means: compiler-ver string for current gmp_COMPILER_ID.
 
+export gmp_COMPILER_ID_VER
+export gmp_COMPILER_VER_$(gmp_COMPILER_ID)
+
+
 endif # ifndef __pattern1_load_compiler_cfg_mki
