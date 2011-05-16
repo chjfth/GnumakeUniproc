@@ -1,12 +1,9 @@
-#### template file for use with pattern1-container.mks, [GnumakeUniproc v1.0]
-# ! Be sure to replace every occurrence of <angle-brackets> to be your
-# actual content, or [ at least comment them out if some of them are
-# not required] .
-
 #---------------------------------------------------------------------------
 # This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks .
 # You should list sub-projects for this container in this file.
 #---------------------------------------------------------------------------
+
+export gmp_COMPILER_ID
 
 gmu_uv_list_ALL_SUBPRJ += all-common
 gmu_uv_list_ALL_SUBPRJ += $(if $(call gmuf_IsStringNotEqual,$(gmp_COMPILER_ID),mingw),all-winexe)
