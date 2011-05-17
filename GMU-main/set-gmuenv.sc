@@ -61,6 +61,9 @@ export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
 export gmp_DECO_PRJ_NAME=1
 
+export gmp_COMPILER_ID=linuxgcc
+	# Note: Change this only in case you use other compiler than gcc(linux targeted).
+
 PATH="$gmu_DIR_ROOT/bin:$PATH"
 
 echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
