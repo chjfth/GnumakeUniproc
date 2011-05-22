@@ -38,8 +38,8 @@ ifneq (,$(strip $(_tmp)))
   $(info $(_tmp))
   $(call gmuf_OutputInfo_shechoe,Script genmk-sdk.py execution error. Reasons may be:\n\
     1. You do not have python 2.6 or other later 2.x installed.\n\
-    2. Your configuration file $(gmi_MSDK1_up_BUILDSDK_INI) contains errors.)
-    3. The genmk-sdk.py python script contains bug.
+    2. Your configuration file $(gmi_MSDK1_up_BUILDSDK_INI) contains errors.\n\
+    3. The genmk-sdk.py python script contains bug.)
   $(error Error occurs in $(_pluginId_makesdk_2011), see error reason above)
 endif
 
