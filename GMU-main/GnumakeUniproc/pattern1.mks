@@ -44,12 +44,6 @@
 
 ##############################################################################
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-.PHONY: _gmp_first_target
-.PHONY: __pattern1_first_target
-_gmp_first_target: __pattern1_first_target # at rear part of this file
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-extract-compiler-id.mki
@@ -237,6 +231,7 @@ $(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT_ckt)
 # Note: We must use $(gmu_Gp_LINK_OUTPUT_ckt) as prerequisite instead of $(gmu_Gp_LINK_OUTPUT) .
 endif
 
+.PHONY: __pattern1_first_target
 __pattern1_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
 		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmu_Gp_LINK_OUTPUT_ckt)) \

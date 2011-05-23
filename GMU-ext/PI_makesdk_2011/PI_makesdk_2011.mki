@@ -32,7 +32,7 @@ ifeq (,$(gmi_MSDK1_up_BUILDSDK_INI))
 endif
 
 _tmp := $(shell $(call gmuf_ScriptCmd,\
-	genmk-sdk.py --prjname=$(gmu_PRJ_NAME)-PI_makesdk $(gmi_MSDK1_up_BUILDSDK_INI) \
+	genmk-sdk.py --prjname=$(gmu_PRJ_NAME) --gmb_syncto=$(gmb_syncto) $(gmi_MSDK1_up_BUILDSDK_INI) \
 	) 2>&1 )
 ifneq (,$(strip $(_tmp)))
   $(info $(_tmp))
@@ -45,11 +45,21 @@ endif
 
 gmp_USER_POST_TARGETS += _gmi_MSDK1_postproc
 
-gmu_uv_list_ALL_SUBPRJ += makesdk
+ifndef gmb_ignore_build_source
+  gmu_uv_list_ALL_SUBPRJ += makesdk 
+  makesdk_Makefile = Makefile-mc
+	# mc: multiple compiler build of lib source
+endif
 
-makesdk_Makefile = Makefile-mc
-#makesdk_MakeVarDefines = 
+gmu_uv_list_ALL_SUBPRJ += cpuxm
+cpuxm_Makefile = Makefile-cpuxm
+	# cpuxm: copy user examples
 
+ifndef gmb_ignore_build_uxm
+  gmu_uv_list_ALL_SUBPRJ += vbuxm
+  vbuxm_Makefile = Makefile-vbuxm
+	# vbuxm: verify building user examples
+endif
 
 endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif #__PLUGIN_MAKESDK_2011_LOADED

@@ -12,13 +12,6 @@
 # Special: If gmp_BYPASS_USER_MKI_WHEN_GET_PRJ_ATTR=1, those marked [U] will
 #		not be included when _isNowGmuGetPrjAttr==1 .
 
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-.PHONY: _gmp_first_target
-.PHONY: __pattern1_default_first_target
-_gmp_first_target: __pattern1_default_first_target # at rear part of this file
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-extract-compiler-id.mki
@@ -88,7 +81,8 @@ __pattern1_inc_project_count:
 	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
 	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
 
-__pattern1_default_first_target: \
+.PHONY: __pattern1_first_target
+__pattern1_first_target: \
 		$(gmp_USER_PRE_TARGETS) \
 		$(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_USER_FREE_STYLE_TARGET)) \
 		$(gmp_USER_POST_TARGETS) \
@@ -106,7 +100,7 @@ ifeq (,$(gmu_DELIBERATE_NO_SUBPRJ))
 	@for v in $(_Gp_list_AutoPjnmAllChidren); do echo $$v >> $(_p_AutoLinkPjnmForParent); done
 endif
 #
-ifeq (,$(gmu_FREE_STYLE_MAKEFILE)$(gmu_DO_IGNORE_SUBPRJS)) # Show the following only it really contains subprjs.
+ifeq (,$(gmu_FREE_STYLE_MAKEFILE)$(gmu_DO_IGNORE_SUBPRJS)) # Show the following only if it really contains subprjs.
 	@echo -e "[DONE sub-projects:] $(foreach s,$(gmu_uv_list_ALL_SUBPRJ),\n  {$s}: %/$($s_Prjname)/$(subst _gmu_NoOutput,(none),$($s_Filename))$(if $($s_UserOutputAfterLink),\n    U: $(call _StripOutputRootPrefix,$($s_UserOutputAfterLink))))"
 endif
 	@$(_GmpShowDoneUserOutputAfterLink)
