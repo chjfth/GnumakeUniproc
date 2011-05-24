@@ -470,14 +470,16 @@ _StrAfterTilde = $(if $(findstring ~,$1),$(word 2,$(subst ~, ,$1)),$1)
 _StrBeforeFinalDot = $(if $(findstring .,$1),$(basename $1),$1)
 	# $1 must not contain space !
 	# Return the substring before the final dot.
-_DeduceUPrjname = $(call _StrBeforeFinalDot,$(call _StrAfterTilde,$1))
+_FirstWordBeforeDot = $(word 1,$(subst ., ,$1))
+_DeduceUPrjname_lvl1 = $(call _StrBeforeFinalDot,$(call _StrAfterTilde,$1))
 	# $1 must not contain space !
 	# $1 is the decorated prjname
 	#
 	# Example:
 	#	arm~walkdir._D         => walkdir
-	#	arm~walkdir.xyz._D     => walkdir.xyz 
-_Gf_pir_PrjOutput = $(if $(gmu_GFEXTRASUBDIR),$(call _DeduceUPrjname,$1)/)$1
+	#	arm~walkdir.xyz._D     => walkdir.xyz
+_DeduceUPrjname_lvl2 = $(call _FirstWordBeforeDot,$(call _StrAfterTilde,$1))
+_Gf_pir_PrjOutput = $(if $(call _IsStringEqual,2,$(gmu_GFEXTRASUBDIR)),$(call _DeduceUPrjname_lvl2,$1)/,$(if $(gmu_GFEXTRASUBDIR),$(call _DeduceUPrjname_lvl1,$1)/))$1
 	# Return the partial dir component of the project output dir.
 	# $1 is the decorated(final) prjname.
 
