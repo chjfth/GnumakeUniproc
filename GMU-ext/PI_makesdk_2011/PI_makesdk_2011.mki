@@ -21,7 +21,8 @@ _pluginId_makesdk_2011 := $(gmpv_ThisPluginId)
 # gmb_syncto=
 
 
-gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_makesdk_2011),postcore)
+#gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_makesdk_2011),postcore)
+#gmp_USER_POST_TARGETS += _gmi_MSDK1_postproc
 
 ifeq (,$(gmb_syncto))
   $(error Error from $(_pluginId_makesdk_2011): gmb_syncto is not defined, so I don't know where to generate SDK output)
@@ -43,7 +44,6 @@ ifneq (,$(strip $(_tmp)))
   $(error Error occurs in $(_pluginId_makesdk_2011), see error reason above)
 endif
 
-gmp_USER_POST_TARGETS += _gmi_MSDK1_postproc
 
 ifndef gmb_ignore_build_source
   gmu_uv_list_ALL_SUBPRJ += makesdk 

@@ -1,3 +1,5 @@
+ifndef __compiler_config_precore_included_
+__compiler_config_precore_included_ = 1
 
 ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
@@ -12,9 +14,10 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 	# [2008-08-15] Add this suffix here so that it is guaranteed to be place at the end,
 	# i.e. later than any other suffix. -- The make func _StripImplibSuffix require it at end.
 
-
 endif # ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
 
 $(eval $(_gmp_NOW_EXPORT_LibSuffixDotExport))
 
+
+endif # ifndef __compiler_config_precore_included_
