@@ -403,12 +403,23 @@ gmu_d_StartupParent := $(call gmuf_GetParentDir,$(gmu_d_StartupMakefile))
 gmuf_IsAbsDir = $(if $(call _IsStringEqual,$1,$(call _GetAbsDirRelaToCurdir,$1)),1)
 
 _p_ThisMki = $(call gmuf_lastword,$(MAKEFILE_LIST))
+	# return the file path of current mki
 _d_ThisMki_ = $(dir $(_p_ThisMki))
 	# The trailing _ in make-var name implies there is a trail slash in its value.
 _d_ThisMki = $(patsubst %/,%,$(_d_ThisMki_))
-# Tip: Actually, user should copy the following make statement to FIRST line of his mki:
-# d_ThisMki := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-
+	# The trailing / stripped version of $(_d_ThisMki_)
+	# !!!!! NOTE using the above 3 vars. They should be used at the first line of your mki,
+	# in other word, the following usage is wrong:
+	#
+	#	include some-dir/some-file.mki
+	#	include  $(_d_ThisMki_)foo.mki
+	#
+	# This will inevitablely include some-dir/foo.mki instead of foo.mki in the same dir 
+	# of your current mki. If you really need to include foo.mki later, write in this way:
+	#
+	#	_d_ThisMki_ := $(_d_ThisMki_)
+	#	include some-dir/some-file.mki
+	#	include  $(_d_ThisMki_)foo.mki
 
 
 _KickoutPrjname = $(firstword $(subst /, ,$(patsubst $(gmu_ud_OUTPUT_ROOT)/%,%,$1)))
