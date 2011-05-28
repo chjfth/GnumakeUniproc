@@ -57,6 +57,14 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     export gmu_ud_OUTPUT_ROOT := $(CURDIR_TEMP)/gf
     gmu_d_BuildStartCkt := $(CURDIR)
   else
+    ifeq ($(_gmu_false),$(call gmuf_IsDirExist_sh,$(gmu_ud_OUTPUT_ROOT)))
+      # Since not exist, now create the directory for user. If create fail, stop.
+      _tmp_ret := $(call gmuf_ExecuteSimpleShcmd,$(_MD) $(gmu_ud_OUTPUT_ROOT))
+      ifneq (0,$(_tmp_ret))
+        $(error !GMU!Error: From your current working directory, cannot create gmu_ud_OUTPUT_ROOT directory: $(gmu_ud_OUTPUT_ROOT))
+      endif
+    endif
+    # Now, turn gmu_ud_OUTPUT_ROOT into absolute dir.
     _tmp_dir := $(call gmuf_GetAbsDirRelaToCurdir,$(gmu_ud_OUTPUT_ROOT))
     ifeq (__GMU_cd_ERROR,$(_tmp_dir))
       $(error !GMU!Error: You assigned a bad dir(not exist or not accessible) for gmu_ud_OUTPUT_ROOT: $(_tmp) )

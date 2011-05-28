@@ -2,11 +2,6 @@ ifndef _Gmu_CommonFunctions_included # avoid being include more than once
 _Gmu_CommonFunctions_included :=1
 
 
-ifdef windir # This is for GMU running on Microsoft Windows.
-  tmp := $(shell echo "")
-	# [2008-08-19] This is a small trick to work around make.exe calling mame.net's sh.exe, see today's comment in private-doc for detail.
-endif
-
 # [2009-12-21] Include GMSL(GNU Make Standard Library) from http://gmsl.sourceforge.net
 include $(patsubst %CommonFunctions.mki,%../gmsl/gmsl,$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
@@ -171,8 +166,14 @@ _StripBasenameTail = $(if $(patsubst %$2,,$(basename $1)),$1,$(patsubst %$2,%,$(
 	#	$(call _StripBasenameTail,/dir/mydll.lib,--imp)      = /dir/mydll.lib
 	#	$(call _StripBasenameTail,/dir/mydll.lib,)           = /dir/mydll.lib
 
+gmuf_ExecuteSimpleShcmd = $(strip $(shell $1 1>&2; echo $$?))
+	# $1 is a shell command.
+	# Returns exit code of the command $1
+
 _IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
 gmuf_IsFileExist_sh = $(_IsFileExist_sh)
+
+gmuf_IsDirExist_sh = $(shell if [ -d "$1" ] ;then echo -n '1';fi)
 
 gmuf_Copy1File_sh = $(shell if cp --force "$1" "$2" 1>&2; then echo 1; fi)
 
