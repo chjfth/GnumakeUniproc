@@ -1,5 +1,6 @@
-@set _gmu_DIR_ROOT_bs_=%~dp0
-@pushd %~dp0
-@for /F usebackq %%i IN (`%~dp0MinGW2\bin\pwd.exe`) DO set gmu_DIR_ROOT=%%i
-@popd
-@REM If full path of this .bat is D:\some\path\gmuenv.bat, resulting gmu_DIR_ROOT=D:/some/path
+@echo off
+set gmu_DIR_ROOT=%~dp0
+set gmu_DIR_ROOT=%gmu_DIR_ROOT:~0,-1%
+set gmu_DIR_ROOT=%gmu_DIR_ROOT:\=/%
+:If full path of this .bat is D:\some\path\gmuenv.bat, resulting gmu_DIR_ROOT=D:/some/path
+:More env-vars below are appended by GMU installer
