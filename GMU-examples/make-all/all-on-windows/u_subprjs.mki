@@ -6,7 +6,9 @@
 gmu_uv_list_ALL_SUBPRJ += all-common
 gmu_uv_list_ALL_SUBPRJ += $(if $(call gmuf_IsStringNotEqual,$(gmp_COMPILER_ID),mingw),all-winexe)
 	# mingw does not support building MFC programs, so bypass ``all-winexe''.
-gmu_uv_list_ALL_SUBPRJ += demo-auto-checkout
+ifndef BYPASS_GMUTEST_AUTO_CHECKOUT
+  gmu_uv_list_ALL_SUBPRJ += demo-auto-checkout
+endif
 gmu_uv_list_ALL_SUBPRJ += cross-lib-ref
 
 dir_ex_root = ../../..

@@ -1,4 +1,5 @@
 @echo off
+SETLOCAL EnableDelayedExpansion
 
 :Check whether GMU env has been set-up. If not, set it up.
 set p_gmuenv_bat=%~dp0gmuenv.bat
@@ -15,8 +16,7 @@ set p_PerfLog=%CD%\gmuperf.log
 
 set gmu_ud_OUTPUT_ROOT=%CD:\=/%/gf-testperf
 	: Let GMU build output be inside current dir, so user are easy to find it.
-
-SETLOCAL EnableDelayedExpansion
+set BYPASS_GMUTEST_AUTO_CHECKOUT=1
 
 :set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
 set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
