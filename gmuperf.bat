@@ -1,7 +1,14 @@
 @echo off
 SETLOCAL EnableDelayedExpansion
 
-:Check whether GMU env has been set-up. If not, set it up.
+::Check whether we are run from a directory with spaces in path. If so, stop it, since GMU does not support this.
+set curdir=%CD%
+if not "%curdir%" == "%curdir: =!%" (
+  echo Sorry, GMU does not support run from a directory with spaces in it. Please change your current directory and try again.
+  exit /b 1
+  )
+
+::Check whether GMU env has been set-up. If not, set it up.
 set p_gmuenv_bat=%~dp0gmuenv.bat
 if "%gmu_DIR_ROOT%" == "" (
   if exist %p_gmuenv_bat% (
@@ -18,7 +25,7 @@ set gmu_ud_OUTPUT_ROOT=%CD:\=/%/gf-testperf
 	: Let GMU build output be inside current dir, so user are easy to find it.
 set BYPASS_GMUTEST_AUTO_CHECKOUT=1
 
-:set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
+::set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
 set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
 set dirMakeAll=%dirMakeAll:\=/%
 
@@ -65,6 +72,7 @@ for /F "usebackq tokens=1,2,3" %%i in (`gmucountchar gf-testperf\_gmu_tmp\_Count
 echo [%DATE% %TIME:~0,-3%] %str_winver% %str_prjcount%, %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
 
 goto :eof
+
 
 :##############################################################################
 :Thanks to jeb from http://stackoverflow.com/questions/4487100/how-can-i-use-a-windows-batch-file-to-measure-the-performance-of-console-applicat for providing the timeDiff function.
