@@ -4,9 +4,7 @@
 set p_gmuenv_bat=%~dp0gmuenv.bat
 if "%gmu_DIR_ROOT%" == "" (
   if exist %p_gmuenv_bat% (
-    echo call %p_gmuenv_bat%
     call %p_gmuenv_bat%
-    echo END call %p_gmuenv_bat%
     ) else (
     echo Unexpected: %p_gmuenv_bat% does not exist. Fail to set GMU environment.
     exit /b 1
@@ -20,8 +18,8 @@ set gmu_ud_OUTPUT_ROOT=%CD:\=/%/gf-testperf
 
 SETLOCAL EnableDelayedExpansion
 
-:set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
-set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
+:set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
+set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
 set dirMakeAll=%dirMakeAll:\=/%
 
 if "%1" == "" (
