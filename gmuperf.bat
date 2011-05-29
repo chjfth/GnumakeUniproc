@@ -18,8 +18,8 @@ set gmu_ud_OUTPUT_ROOT=%CD:\=/%/gf-testperf
 	: Let GMU build output be inside current dir, so user are easy to find it.
 set BYPASS_GMUTEST_AUTO_CHECKOUT=1
 
-:set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
-set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
+set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
+:set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
 set dirMakeAll=%dirMakeAll:\=/%
 
 if "%1" == "" (
@@ -61,7 +61,8 @@ echo ^<^<^< %str_num_cycles% done, total seconds used: %_sec_%.%_msec_% ^>^>^>
 
 :Write(append) result to log file
 for /F "usebackq delims=" %%i IN (`ver`) DO set str_winver=%%i
-echo [%DATE% %TIME:~0,-3%] %str_winver% %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
+for /F "usebackq tokens=1,2,3" %%i in (`gmucountchar gf-testperf\_gmu_tmp\_CountCompile.gmu.cnt += R r`) do set str_prjcount=Projects:%%i,Containers:%%j+%%k
+echo [%DATE% %TIME:~0,-3%] %str_winver% %str_prjcount%, %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
 
 goto :eof
 
