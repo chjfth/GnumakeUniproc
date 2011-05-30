@@ -33,6 +33,8 @@ This is an aggressive upgrade. Many aspects have improve to ease future users.
 	* In compiler-config-mki, DLL image-type will define gmp_NOW_EXPORT=1 for you automatically.
 9. r1010
 	Windows installer improvement: Now, gmu_DIR_ROOT value is not hardcoded into gmuenv.bat , so the benefit is: final user can rename or move the GMU root dir, and the gmuenv.bat within will adapt to the new location automatically.
+10. r1028-1037
+	Add testperf.bat to quickly know the performance of GMU on your build machine.
 
 ===== Plugin update: =====
 PI_sync_debug_info:

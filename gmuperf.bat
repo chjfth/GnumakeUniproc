@@ -21,8 +21,11 @@ if "%gmu_DIR_ROOT%" == "" (
 
 set p_PerfLog=%CD%\gmuperf.log
 
-set gmu_ud_OUTPUT_ROOT=%CD:\=/%/gf-testperf
-	: Let GMU build output be inside current dir, so user are easy to find it.
+set pir_gfOutput=gf-gmuperf
+set gmu_ud_OUTPUT_ROOT=%CD:\=/%/%pir_gfOutput%
+	: Let GMU build output be inside current dir, so user can easily find it.
+set gmu_ud_OUTPUT_ROOT=%gmu_ud_OUTPUT_ROOT://=/%
+	: Otherwise, in case run from C:\ , gmu_ud_OUTPUT_ROOT will be C://gf-gmuperf
 set BYPASS_GMUTEST_AUTO_CHECKOUT=1
 
 ::set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
@@ -47,7 +50,7 @@ set "startTime=%time%"
 for /L %%i in (1,1,%cycles%) do (
 	cmd /C "title Starting GMU test performance cycle %%i ..."
 		:Use ``cmd /C'' so that the new title is reverted to original when this .bat quits.
-	set gmu_u_SHOW_PROGRESS_CMD=cmd /C "title [testperf cycle %%i] GMU Progress: $(gmu_progress_info)"
+	set gmu_u_SHOW_PROGRESS_CMD=cmd /C "title [gmuperf cycle %%i] GMU Progress: $(gmu_progress_info)"
 	call make -C %dirMakeAll% gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 		:Use make instead of umake, because I cannot get error code from umake.bat today.
 	if not !ERRORLEVEL! == 0 (
@@ -68,7 +71,7 @@ echo ^<^<^< %str_num_cycles% done, total seconds used: %_sec_%.%_msec_% ^>^>^>
 
 :Write(append) result to log file
 for /F "usebackq delims=" %%i IN (`ver`) DO set str_winver=%%i
-for /F "usebackq tokens=1,2,3" %%i in (`gmucountchar gf-testperf\_gmu_tmp\_CountCompile.gmu.cnt += R r`) do set str_prjcount=Projects:%%i,Containers:%%j+%%k
+for /F "usebackq tokens=1,2,3" %%i in (`gmucountchar %pir_gfOutput%\_gmu_tmp\_CountCompile.gmu.cnt += R r`) do set str_prjcount=Projects:%%i,Containers:%%j+%%k
 echo [%DATE% %TIME:~0,-3%] %str_winver% %str_prjcount%, %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
 
 goto :eof
@@ -99,3 +102,4 @@ FOR /F "tokens=1,2,3,4 delims=:,.^ " %%a IN ("!%~2!") DO (
   set %~1=%ms%
   goto :eof
 )
+
