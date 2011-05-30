@@ -72,7 +72,7 @@ echo ^<^<^< %str_num_cycles% done, total seconds used: %_sec_%.%_msec_% ^>^>^>
 :Write(append) result to log file
 for /F "usebackq delims=" %%i IN (`ver`) DO set str_winver=%%i
 for /F "usebackq tokens=1,2,3" %%i in (`gmucountchar %pir_gfOutput%\_gmu_tmp\_CountCompile.gmu.cnt += R r`) do set str_prjcount=Projects:%%i,Containers:%%j+%%k
-echo [%DATE% %TIME:~0,-3%] %str_winver% %str_prjcount%, %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
+echo [%DATE% %TIME:~0,-3%] %str_winver% GMU v0.97 %str_prjcount%, %str_num_cycles%, %_sec_%.%_msec_% seconds. >>%p_PerfLog%
 
 goto :eof
 
