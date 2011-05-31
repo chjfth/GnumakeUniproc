@@ -52,6 +52,8 @@ if $gmu_DIR_ROOT/bin/make-gmu --version > /dev/null; then
 	export gmu_MAKE_EXE=make-gmu
 fi
 
+export gmu_ver=0.97
+
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
 export gmp_ud_list_CUSTOM_MKI="$gmu_DIR_ROOT/GMU-ext $gmu_DIR_ROOT/nlscan/gmu-ext"

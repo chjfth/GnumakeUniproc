@@ -58,8 +58,6 @@ gmuf_CountInc = $(1) @
 gmuf_CountDec = $(filter-out @@,$(join $1,@))
 	# Thanks to GMSL's int_plus & int_subtract function.
 
-#.PHONY: gmu_ut_Always
-#gmu_ut_Always: ; //! Don't place the rule here, since it would override GMU user's first rule.
 
 #### >>>>>>> GNUmake version checking (We require at least GNUmake 3.80)
 

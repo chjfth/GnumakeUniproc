@@ -30,7 +30,7 @@
 
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
-!define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC \
+!define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC gmu_ver \
     gmp_ud_list_CUSTOM_MKI gmp_ud_list_CUSTOM_COMPILER_CFG \
     gmp_DECO_PRJ_NAME \
     gmu_LOG_OUTPUT_FILENAME \
@@ -81,6 +81,10 @@ Var isChecked_gmu_LOG_OUTPUT_FILENAME
  !define desc_gmu_LOG_OUTPUT_FILENAME \
          "For umake*.bat, tell where to log the make screen output."
 
+Var isChecked_gmu_ver
+      Var str_gmu_ver
+ !define desc_gmu_ver "This tells GnumakeUniproc version."
+
 Var isChecked_NLSSVN
       Var str_NLSSVN
  !define desc_NLSSVN "This is the SVN repository root URL for NLSCAN."
@@ -105,7 +109,8 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define PRODUCT_VERSION "0.97-pre16(20110530)"
+!define GMU_VER "0.97"
+!define PRODUCT_VERSION "${GMU_VER}-pre17(20110531)"
 !define PRODUCT_PUBLISHER "Jimm Chen (chenjun@nlscan.com)"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -446,6 +451,9 @@ Function SelectEnvVar
   StrCpy "$str_gmu_DIR_GNUMAKEUNIPROC" "${absdir_GmuCore}"
   StrCpy "$isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
   StrCpy "$str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
+
+  StrCpy "$isChecked_gmu_ver" "1"
+  StrCpy "$str_gmu_ver" "${GMU_VER}"
 
   ${If} "$isChecked_nlscanenv" == 1
     StrCpy "$isChecked_NLSSVN" "1"
