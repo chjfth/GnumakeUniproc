@@ -111,18 +111,6 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     	# We should clear $(gmu_Gp_COUNT_COMPILE) whether or not the main-project has some C/C++ file to compile,
     	#because the sub-projects will have some to compile.
 
-    # Clear more files requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
-    # Using absolute path is suggested.
-    _temp := $(shell \
-    	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
-    		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
-    		if [ ! -d $${_shDirToCreate} ]; then $(_MD) $${_shDirToCreate}; fi; \
-    		if echo -n "" > $$v; then echo -n ''; else echo $$v; exit; fi; \
-    	done; )
-    ifneq (,$(_temp))
-      $(error !GMU!Error: Fail to clear requested `gmu_up_list_STARTUP_CLEAR_FILES': $(_temp))
-    endif
-
 	_temp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(_MD) $(gmu_Gd_PRJ_GMUTMP); fi;\
 		echo "$(_p_ThisMakefile)" > $(gmu_Gd_PRJ_GMUTMP)/_HisMakefile.gmu.Attr )
 
@@ -135,6 +123,21 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif # ifeq ($(MAKELEVEL),0)
 
+
+ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "first restart" state.
+    # Clear files requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
+    # Using absolute path is suggested.
+    _temp := $(shell \
+    	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
+    		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
+    		if [ $${_shDirToCreate} != $${_shFileToClear%} ] && [ ! -d $${_shDirToCreate} ]; then $(_MD) $${_shDirToCreate}; fi; \
+    		if echo -n "" > $$v; then echo -n ''; else echo $$v; exit; fi; \
+    	done; )
+    	# Note: ``[ $${_shDirToCreate} != $${_shFileToClear%} ]'' signifies $${_shFileToClear} does not have a dir prefix.
+    ifneq (,$(_temp))
+      $(error !GMU!Error: Fail to clear requested gmu_up_list_STARTUP_CLEAR_FILES: $(_temp))
+    endif
+endif # ifeq ($(_gmu_isFirstMakeRestart),1)
 
 
 _gmu_uv_list_AllSubprjsForLink = $(gmu_uv_list_SUBPRJ_TO_LINK) $(gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL)
