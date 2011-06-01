@@ -72,22 +72,25 @@ DIR_GMU_PRG_SRC=$DIR_GMU_MAIN/gmu_programs
 
 GMU_PRGS="gmuAddActionWord gmuCountChar gmuExtractVarDefines"
 for OnePrg in $GMU_PRGS; do
-	echo "gcc -o $DIR_GMU_PRG/$OnePrg $DIR_GMU_PRG_SRC/$OnePrg/$OnePrg.c"
-	if ! gcc -o $DIR_GMU_PRG/$OnePrg $DIR_GMU_PRG_SRC/$OnePrg/$OnePrg.c ; then
+	cmd="gcc -o $DIR_GMU_PRG/$OnePrg $DIR_GMU_PRG_SRC/$OnePrg/$OnePrg.c"
+	echo "$cmd"
+	if ! $cmd ; then
 		exit 1
 	fi
 done
 
-UMAKE_CMD="umake-share umake umakeD umakeU umakeUD"
+UMAKE_CMD="umake-share umake umakeD umakeU umakeUD umaketime umakeDtime umakeUtime umakeUDtime"
 for OnePrg in $UMAKE_CMD; do
-	echo "cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
-	if ! cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg ; then
+	cmd="cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
+	echo "$cmd"
+	if ! $cmd ; then
 		exit 1
 	fi
 done
 
-echo "cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_PRG"
-if  ! cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_PRG ; then
+cmd="cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_PRG"
+echo "$cmd"
+if  ! $cmd ; then
 	echo "Cannot copy make-gmu executable!"
 	exit 1
 fi
