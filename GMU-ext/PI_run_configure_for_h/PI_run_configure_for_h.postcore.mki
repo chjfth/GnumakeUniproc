@@ -1,0 +1,8 @@
+
+$(_gmi_RCFH_p_header_output):
+	@$(call gmuf_MkdirIfNotExist,$(@D))
+	@echo "In '$(_gmi_RCFH_d_header_output)', run:"
+	@echo "$(_gmi_RCFH_configure_cmd_fullpath)"
+	@cd $(_gmi_RCFH_d_header_output) ; $(_gmi_RCFH_configure_cmd_fullpath)
+
+

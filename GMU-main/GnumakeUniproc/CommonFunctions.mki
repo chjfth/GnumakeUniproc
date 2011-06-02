@@ -199,7 +199,7 @@ _GetAbsDir = $(shell ( cd $1 && cd $2; CmdRet=$$?; if [ $$CmdRet = 0 ]; then pwd
 gmuf_GetAbsDir = $(_GetAbsDir)
 
 gmuf_ConcatePath = $(gmuf_GetAbsPathByRela_so)
-_gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
+_gmuf_GetAbsPathByRela_so = $(shell dirGo=$(strip $1); dirRel=$(strip $2); \
 	while [ $${dirRel$(_GmuSharp)../} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)../}; dirGo=$${dirGo%/*}; done; \
 	if [ "$${dirRel}" = ".." ]; then echo "$${dirGo%/*}"; \
 	else \
