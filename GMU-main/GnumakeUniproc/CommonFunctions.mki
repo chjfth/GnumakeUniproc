@@ -209,7 +209,7 @@ _gmuf_GetAbsPathByRela_so = $(shell dirGo=$1; dirRel=$2; \
 			echo "$${dirRel}"; \
 		fi; \
 	fi )
-gmuf_GetAbsPathByRela_so = $(if $(call _IsStringEqual,$2,.),$1,$(call _gmuf_GetAbsPathByRela_so,$1,$2))
+gmuf_GetAbsPathByRela_so = $(if $(call _IsStringEqual,$2,.)$(call gmuf_IsNull,$2),$1,$(call _gmuf_GetAbsPathByRela_so,$1,$2))
 	# $1: Starting absolute dir
 	# $2: Relative dir or absolute dir
 	# 'so' means string operation
