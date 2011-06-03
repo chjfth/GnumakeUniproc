@@ -235,6 +235,7 @@ _gmuf_IsWordInSet_rw = $(foreach w,$2,$(if $(call _IsStringEqual,$w,$1),$1))
 
 gmuf_IsWordInSet_rw = $(firstword $(call _gmuf_IsWordInSet_rw,$1,$2))
 	# Check whether word $1 is word-set $2. Return $1 if yes, null if no.
+	# _rw implies: return word $1.
 
 gmuf_IsWordInSet = $(if $(call gmuf_IsWordInSet_rw,$1,$2),1)
 	# Check whether word $1 is word-set $2. Return 1 if yes, null if no.

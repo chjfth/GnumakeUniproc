@@ -130,7 +130,6 @@ endif # ifeq ($(MAKELEVEL),0)
 
 ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "first restart" state.
     # Clear files requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
-    # Using absolute path is suggested.
     _temp := $(shell \
     	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
     		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
