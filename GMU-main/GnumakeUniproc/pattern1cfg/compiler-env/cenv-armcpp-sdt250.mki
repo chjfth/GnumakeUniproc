@@ -1,0 +1,33 @@
+ifndef __cenv-armcpp-sdt250_included_
+__cenv-armcpp-sdt250_included_ := 1
+
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-armcpp-sdt250.mki instead.
+##############################################################################
+
+# For ARM SDT 2.50
+
+ifeq (,$(gmp_CENV_ROOT_armcpp_sdt250))
+  $(error !GMP!Error: gmp_CENV_ROOT_armcpp_sdt250 is not defined, so I cannot find ARM SDT compiler)
+endif
+
+in_ADDPATH_armcpp_sdt250 = PATH="$1/bin;$(subst \,/,$(PATH))"
+
+in_gmpf_LoadCenv_armcpp_sdt250 = \
+	gmp_COMPILER_VER_armcpp=sdt250 \
+	ARMINC=$1/include ARMLIB=$1/lib \
+	# $1: ARM SDT install dir.
+
+gmpf_LoadCenv_armcpp_sdt250 = $(call in_gmpf_LoadCenv_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250))\
+	$(call in_ADDPATH_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250))
+
+
+define def_ExportCenv_armcpp_std250
+  $(call gmuf_AnounceExportEnvvars,$(call in_gmpf_LoadCenv_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250)))
+  $(call gmuf_AnounceExportEnvvar,$(call in_ADDPATH_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250)))
+endef
+
+gmpf_ExportCenv_armcpp_sdt250 = $(eval $(def_ExportCenv_armcpp_std250))
+
+
+endif

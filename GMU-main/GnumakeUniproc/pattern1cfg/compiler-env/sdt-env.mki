@@ -1,6 +1,10 @@
 ifndef __sdt-env_included_
 __sdt-env_included_ := 1
 
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-armcpp-sdt250.mki instead.
+##############################################################################
+
 # For ARM SDT 2.50
 
 ifeq (,$(gmp_CENV_ARMSDT_ROOT))

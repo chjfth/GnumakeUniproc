@@ -561,6 +561,7 @@ gmuf_AnounceExportEnvvar = $(eval $(call _AnounceExportEnvvar,$1))
 gmuf_AnounceExportEnvvars = $(foreach p,$1,$(call gmuf_AnounceExportEnvvar,$p))
 	# Export multiple env-vars(with optional value assignment)
 	# $1: Space separated var=val pairs.
+	# NOTE: If any `val' contains spaces, don't use this function, use gmuf_AnounceExportEnvvar one by one instead.
 
 gmuf_CvsDatatimeParam = -D "$1"
 gmu_CvsCmdUseGmuGivenTime = -D "$(gmu_SC_CHECKOUT_DATETIME)"

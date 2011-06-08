@@ -12,7 +12,7 @@
 # gmp_COMPILER_VER_armcpp. If some token in gmp_COMPILER_VER_armcpp
 # * starts with "sdt", it means SDT.
 # * starts with "armads", it means ADS.
-# * starts with "armrv", it means Realview.
+# * starts with "rv", it means Realview.
 #	If none above is defined, it defaults to the highest version(i.e. Realview)
 #	Some numbers can be prepended to indicate the
 # version of the compiler, e.g. "sdt250", "armads120", "armrv220". Note: the
@@ -36,10 +36,10 @@ gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_armcpp)
 _sdtCompilerVer = $(filter sdt%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingSDT = $(if $(_sdtCompilerVer),1,)
 
-_adsCompilerVer = $(filter armads%,$(gmp_COMPILER_VER_armcpp))
+_adsCompilerVer = $(filter ads%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingARMADS = $(if $(_adsCompilerVer),1,)
 
-_armrvCompilerVer = $(filter armrv%,$(gmp_COMPILER_VER_armcpp))
+_armrvCompilerVer = $(filter rv%,$(gmp_COMPILER_VER_armcpp))
 _IsUsingARMRV = $(if $(_armrvCompilerVer),1,)
 
 _armCompilerVers := $(strip $(_sdtCompilerVer) $(_adsCompilerVer) $(_armrvCompilerVer))
@@ -53,7 +53,7 @@ endif
 
 ifeq (,$(strip $(_armCompilerVers)))
   # set the default:
-  _armCompilerVerUse = armrv
+  _armCompilerVerUse = rv
   _IsUsingARMRV = 1
 else
   ifneq (1,$(call _IsAllWordsSame,$(_armCompilerVers)))
