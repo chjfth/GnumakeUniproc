@@ -24,9 +24,11 @@ _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 #	/mysdk/file1  and /mysdk/subdir1
 # respectively.
 #
-# Note: gmi_SYDO_ud_SYNC_%_FROM & gmi_SYDO_ud_SYNC_%_TO can be assigned as relative dir to $(CURDIR).
-# If it is a relative dir, it is relative to currently building project, not meant to relative
-# to your root project. You can assign gmi_SYDO_SHOW_COPY_CMD=1 to verify this behavior. 
+# Note: gmi_SYDO_ud_SYNC_%_FROM & gmi_SYDO_ud_SYNC_%_TO can be assigned as relative dir.
+# * If gmi_SYDO_ud_SYNC_%_FROM is relative-dir, it is relative to $(CURDIR) of your current project,
+#   NOT relative to your root project. You can assign gmi_SYDO_SHOW_COPY_CMD=1 to verify this behavior. 
+# * If gmi_SYDO_ud_SYNC_%_FROM is null, it will be set to . (a dot, meaning cur-dir) automatically. 
+# * If gmi_SYDO_ud_SYNC_%_TO is relative-dir, it is relative to gmi_SYDO_ud_SYNC_%_FROM . 
 
 #User input variables:
 

@@ -34,6 +34,9 @@ define SYDO_syncproc_vardef
 # $1: SID
 # Makevars defined here(e.g. -SID- will be used by SYDO_syncproc_rule.
   -SID- := $1
+  ifeq (,$$(strip $$(gmi_SYDO_ud_SYNC_$1_FROM)))
+    gmi_SYDO_ud_SYNC_$1_FROM = .
+  endif
   -dirSyncFrom- := $$(gmi_SYDO_ud_SYNC_$1_FROM)
   -dirSyncTo- := $$(gmi_SYDO_ud_SYNC_$1_TO)
   -listSyncFiles- := $$(gmi_SYDO_up_list_SYNC_$1)
@@ -90,7 +93,8 @@ define SYDO_syncproc_rule
 .PHONY: $(call SydoRuleNameForOneSid,$1)
 $(call SydoRuleNameForOneSid,$1):
 	$$(eval $$(call SYDO_syncproc_vardef,$1))
-	@$$(if $$(-ret-DontSync),,$$(SYDO_copy_commands))
+#	@echo "***********ALL_exist of $1: $$(call _IsSydoSourceAndDestExist,$1)[$$(gmi_SYDO_ud_SYNC_$1_FROM) | $$(gmi_SYDO_up_list_SYNC_$1) ]."
+	@$$(if $$(call _IsSydoSourceAndDestExist,$1),$$(if $$(-ret-DontSync),,$$(SYDO_copy_commands)))
 
 endef # define SYDO_syncproc_rule
 
@@ -107,8 +111,21 @@ endef # define SYDO_syncproc_rule
 _IsSydoSourceExist = $(if $(gmi_SYDO_ud_SYNC_$1_FROM)$(gmi_SYDO_up_list_SYNC_$1),1)
 	# $1: SID: sync operation identifier.
 
+_IsSydoSourceAndDestExist = $(call gmuf_IsAllVarsNonNull,gmi_SYDO_ud_SYNC_$1_FROM gmi_SYDO_up_list_SYNC_$1 gmi_SYDO_ud_SYNC_$1_TO)
+	# Tech Note: If parent makefile calls child makefile by writing
+	#
+	# child-target:
+	# 	pvar= $(MAKE) -f child.mk
+	#
+	# child.mk will return pvar in $(.VARIABLES), --even if pvar is null.
+	# So, will should check 'Dest' exist as well. 
+	
+
 SydoListAllSid := $(patsubst gmi_SYDO_ud_SYNC_%_TO,%,$(filter gmi_SYDO_ud_SYNC_%_TO,$(.VARIABLES)))
-SydoListAllSid := $(foreach v,$(SydoListAllSid),$(if $(call _IsSydoSourceExist,$v),$v))
+#SydoListAllSid := $(foreach v,$(SydoListAllSid),$(if $(call _IsSydoSourceAndDestExist,$v),$v))
+	# [2011-06-09] Delay this (filter) check until SYDO_SyncProcRule_<SID>, because
+	# gmi_SYDO_up_list_SYNC_LIB, gmi_SYDO_up_list_SYNC_DLL etc are not defined until compiler-config post-core. 
+#$(info !!!!!!!!!!!!!!!!!!!SydoListAllSid=[$(SydoListAllSid)])
 
 $(foreach v,$(SydoListAllSid),$(eval $(call SYDO_syncproc_rule,$v)))
 

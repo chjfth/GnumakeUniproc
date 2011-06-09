@@ -9,6 +9,12 @@ include $(patsubst %CommonFunctions.mki,%../gmsl/gmsl,$(word $(words $(MAKEFILE_
 gmuf_IsNull = $(if $1,,1)
 gmuf_IsNullAfterStrip = $(if $(strip $1),,1)
 
+gmuf_IsAllVarsNonNull = $(if $(strip $1),$(if $(strip $(foreach v,$1,$(if $(strip $($v)),,1))),,1))
+	# $1: list of make-vars, separated by spaces.
+	# Check if all make-vars in $1 are all non-null. (Pure spaces and tabs are considered null)
+	# Return 1 if yes, return null if no.
+	# If $1 is null, return null.
+
 _IsStringEqual = $(if $(subst $1,,$2)$(subst $2,,$1),,1)
 	# If two strings are equal, returns 1, else returns null value.
 _IsStringNotEqual = $(if $(subst $1,,$2)$(subst $2,,$1),1,)

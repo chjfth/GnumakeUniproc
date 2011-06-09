@@ -11,7 +11,7 @@ ifeq (,$(gmp_CENV_ROOT_armcpp_sdt250))
   $(error !GMP!Error: gmp_CENV_ROOT_armcpp_sdt250 is not defined, so I cannot find ARM SDT compiler)
 endif
 
-in_ADDPATH_armcpp_sdt250 = PATH="$1/bin;$(subst \,/,$(PATH))"
+_armcpp250_val_PATH = $1/bin;$(subst \,/,$(PATH))
 
 in_gmpf_LoadCenv_armcpp_sdt250 = \
 	gmp_COMPILER_VER_armcpp=sdt250 \
@@ -19,12 +19,15 @@ in_gmpf_LoadCenv_armcpp_sdt250 = \
 	# $1: ARM SDT install dir.
 
 gmpf_LoadCenv_armcpp_sdt250 = $(call in_gmpf_LoadCenv_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250))\
-	$(call in_ADDPATH_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250))
+	PATH="$(call _armcpp250_val_PATH,$(gmp_CENV_ROOT_armcpp_sdt250))"
+	# PATH value must be wrapped in double quotes.
 
 
 define def_ExportCenv_armcpp_std250
   $(call gmuf_AnounceExportEnvvars,$(call in_gmpf_LoadCenv_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250)))
-  $(call gmuf_AnounceExportEnvvar,$(call in_ADDPATH_armcpp_sdt250,$(gmp_CENV_ROOT_armcpp_sdt250)))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(call _armcpp250_val_PATH,$(gmp_CENV_ROOT_armcpp_sdt250)))
+    # PATH value must not be wrapped inside double quotes.
+    # See comment in cenv-msvc-vc60.mki for reason.
 endef
 
 gmpf_ExportCenv_armcpp_sdt250 = $(eval $(def_ExportCenv_armcpp_std250))
