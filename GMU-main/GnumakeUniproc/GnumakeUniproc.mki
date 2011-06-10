@@ -533,9 +533,9 @@ endif
 # Now, I set a rule to catch those source files that does not exist on disk yet,
 # so I can give a more friendly error message instead of the default
 #	*** No rule to make target `xxx.c', needed by `.../_obj/xxx.c.o'
-$(gmu_Gp_list_AllSource):
-	@echo "!GMU!Error: Some source file(s) in gmu_up_list_SRC_FROM_ROOT do not exist yet:"
-	@echo "$(filter-out $(wildcard $(gmu_Gp_list_AllSource)),$(gmu_Gp_list_AllSource))"
+$(foreach extn,$(gmu_u_list_CXX_EXTN) $(gmu_u_list_C_EXTN) $(gmu_u_list_ASM_EXTN),$(gmu_ud_SRC_ROOT)/%.$(extn)):
+#	@echo "!GMU!Error: source file $@ does not exist yet." 
+	@echo -e "!GMU!Error: Your source file $@\n  => $(call gmuf_GetAbsPathByRela_soc,$@)\ndoes not exist yet." 
 	@[ 1 = 0 ]
 
 ########## ***** Prepare for CVS/SVN work-in-module or CVS/SVN checkout ***** ###########
