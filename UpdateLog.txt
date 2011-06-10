@@ -32,9 +32,9 @@ This is an aggressive upgrade. Many aspects have improve to ease future users.
 	  >> Those with gmp_NOW_EXPORT=(null) is just like traditional LIBs.
 	* In compiler-config-mki, DLL image-type will define gmp_NOW_EXPORT=1 for you automatically.
 9. r1010
-	Windows installer improvement: Now, gmu_DIR_ROOT value is not hardcoded into gmuenv.bat , so the benefit is: final user can rename or move the GMU root dir, and the gmuenv.bat within will adapt to the new location automatically.
+	Windows installer improvement: Now, gmu_DIR_ROOT value is not hardcoded into gmuenv.bat , so the benefit is: final user can rename or move the GMU root dir, and the gmuenv.bat within will adapt to the new location automatically. In other word, the GMU install target dir is portable now, you can copy it anywhere then run gmuenv.bat to set it up.
 10. r1028-1037
-	Add testperf.bat to quickly know the performance of GMU on your build machine.
+	Add gmuperf.bat to quickly know the performance of GMU on your build machine.
 11. r1041
 	gmu_up_list_STARTUP_CLEAR_FILES now is valid in all $(MAKELEVEL), not just in MAKELEVEL 0.
 
