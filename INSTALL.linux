@@ -11,8 +11,8 @@ distributions since year 2005(with Bash 3.0).
 Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
 ~/GMU/INSTALL.linux), then do the following:
 
-$ ~/GMU/GMU-main/install-exe.sh        # Prepare required executables into ~/GMU/bin
-$ source ~/GMU/GMU-main/set-gmuenv.sc  # Set required environment variables(env-var)
+$ ~/GMU/install.sh         # Prepare required executables into ~/GMU/bin
+$ source ~/GMU/gmuenv.sc   # Set required environment variables(env-var)
 
 If the above two commands does not spout any "Error" message, then it succeeds.
 Now, you've set up the environment to use GnumakeUniproc.

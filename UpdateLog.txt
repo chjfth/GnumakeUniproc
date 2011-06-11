@@ -39,7 +39,8 @@ This is an aggressive upgrade. Many aspects have improve to ease future users.
 	Installer: Add env-var gmu_ver, so that user can known current GMU version.
 12. r1041
 	gmu_up_list_STARTUP_CLEAR_FILES now is valid in all $(MAKELEVEL), not just in MAKELEVEL 0.
-
+13. r1056 (Linux)
+	More thorough solution to systems that does not point /bin/sh to /bin/bash (like Ubuntu 9.10).
 
 ===== Plugin update: =====
 PI_sync_debug_info:
