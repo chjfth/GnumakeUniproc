@@ -52,6 +52,18 @@ if $gmu_DIR_ROOT/bin/make-gmu --version > /dev/null; then
 	export gmu_MAKE_EXE=make-gmu
 fi
 
+# [2009-12-19] GNU make uses /bin/sh as default command shell, and GMU requires 
+# Bourne shell or Bash.
+# so here we check whether /bin/bin really is Bourne shell or Bash. If not, 
+# we force GMU to use /bin/bash by setting gmu-var gmu_FORCE_BASH_PATH(if it is not set yet).
+# 
+# Case: On Ubuntu 9.10, /bin/sh defaults to /bin/dash, and dash's builtin command echo does not  
+# recognize "-e" as an option and "-e" is sent to stdout literally, so we can test it.
+if [ "$gmu_FORCE_BASH_PATH" = "" ]; then
+  toutput=`/bin/sh -c "echo -e ABC"`
+  if [ "$toutput" != "ABC" ]; then export gmu_FORCE_BASH_PATH="/bin/bash"; fi
+fi
+
 export gmu_ver=0.97
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output

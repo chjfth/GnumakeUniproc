@@ -3,6 +3,10 @@
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
 
+ifneq (,$(strip $(gmu_FORCE_BASH_PATH)))
+  SHELL=$(gmu_FORCE_BASH_PATH)
+endif
+
 gmu_PRJ_NAME_s = $(strip $(gmu_PRJ_NAME))
 ifeq (,$(gmu_PRJ_NAME_s))
   $(error !GMU!Error: Make-var: `gmu_PRJ_NAME' not defined or it is empty)

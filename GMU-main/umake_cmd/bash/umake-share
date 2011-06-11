@@ -3,16 +3,6 @@ if [ "$gmu_MAKE_EXE" = "" ]; then
 	# Commet above line if you want to use your system's make.
 fi
 
-# [2009-12-19] GNU make uses /bin/sh as default command shell, and GMU requires Bourne shell or Bash.
-# so here we check whether /bin/bin really is Bourne shell or Bash. If not, we force SHELL=/bin/bash to make.
-#
-GMU_FORCE_BASH=
-# [2009-12-19] Test for dash:
-# On Ubuntu 9.10, /bin/sh defaults to /bin/dash, and dash's builtin command echo does not  
-# recognize "-e" as an option, so we can test it.
-toutput=`/bin/sh -c "echo -e ABC"`
-if [ "$toutput" = "-e ABC" ]; then GMU_FORCE_BASH="SHELL=/bin/bash"; fi
-
 
 rm -f _MainPrjBuildStart.gmu.ckt
 if [ $? != 0 ]; then
