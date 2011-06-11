@@ -36,6 +36,12 @@
     <td><p>If 1, always use <tt>g++</tt>(instead of <tt>gcc</tt>) when linking executable or shared object.</p>
     <p>Default to null. If null, using <tt>g++</tt> or <tt>gcc</tt> is determined by source file input of the current project. If some input file has C++ extension, <tt>g++</tt> is used, otherwise <tt>gcc</tt> is used.</p></td>
   </tr>
+  <tr>
+    <td valign="top">gmp_LINK_DuplicateLibList</td>
+    <td><p>If set to 1, the linked library list is duplicated on the linker command line, so we don't have to care about the library(.a , .so) order passed to linker.</p>
+    <p>For example, lib1.a, lib2.a, lib3.a is in your link list, gmp_LINK_DuplicateLibList=1 will pass &quot;lib1.a lib2.a lib3.a lib1.a lib2.a lib3.a&quot; to the linker.</p>
+    <p>This defaults to null, but setting it to 1 should not cause problem on most cases.</p></td>
+  </tr>
 </table>
 <h4>Compatibility vars </h4>
 <p>In principles, if you're using latest gcc compiler, you don't have to set any of these vars. But if you're using older versions of gcc, the default pattern1 compiler option may contain some options that older gcc don't support, in this situation, you can look up the following table to see whether setting some gmp vars can make a work around. The benefit of setting these vars is you can hopefully avoid making changes to your makefiles </p>
