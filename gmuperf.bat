@@ -79,6 +79,7 @@ goto :eof
 
 :##############################################################################
 :Thanks to jeb from http://stackoverflow.com/questions/4487100/how-can-i-use-a-windows-batch-file-to-measure-the-performance-of-console-applicat for providing the timeDiff function.
+:But note: this function can not cope well across 00:00 boundary currently.
 
 :timeDiff
 setlocal
