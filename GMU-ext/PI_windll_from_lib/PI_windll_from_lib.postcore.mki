@@ -57,7 +57,11 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   ifneq (,$(gmu_DO_SHOW_VERBOSE))
 	@echo "$(_pluginId_windll_from_lib): Compiling $(_WDFL_f_auto_export_stub_c) ..."
   endif
+  ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 	$(gmu_u_CC_CMD)
+  else
+	@$(gmu_u_CC_CMD)
+  endif
 
   
 endif # ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
