@@ -107,7 +107,7 @@ ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
   _SOFA_p_ExportFuncList = $(_SOFA_dirTmp_arcwd)/$(_SOFA_f_ExportFuncList)
   gmp_USER_POST_TARGETS += $(_SOFA_p_ExportFuncList)
 
-  _SOFA_csrc_tamper_cmd = $(call _DoVerbose1,echo "$(_pluginId_so_from_a): Tampering $(notdir $<) ...";) $(call gmuf_ScriptCmd,$(export_tamper_cmd))
+  _SOFA_csrc_tamper_cmd = $(call _DoVerbose1,echo "$(_pluginId_so_from_a): Tampering DLL_AUTO_EXPORT_STUB for $(notdir $<) ...";) $(call gmuf_ScriptCmd,$(export_tamper_cmd))
   gmu_uc_elst_C_PRIOR_PROCESS   += _SOFA_csrc_tamper_cmd # Yes, cannot use $(_SOFA_csrc_tamper_cmd) here!
   gmu_uc_elst_CXX_PRIOR_PROCESS += _SOFA_csrc_tamper_cmd
 
