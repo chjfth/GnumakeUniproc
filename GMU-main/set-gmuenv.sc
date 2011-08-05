@@ -80,7 +80,7 @@ export gmp_COMPILER_ID=linuxgcc
 
 PATH="$gmu_DIR_ROOT/bin:$PATH"
 
-echo    "Success! To see all gmu-vars set into env, type command:   set | grep -e \"^gm[a-z]_\""
+echo    "Success! To see all gmu-vars set into env, type command 'lgmv'."
 
 # Something extra for Nlscan and Scalacon:
 export NLSSVN=https://nlssvn/svnreps
@@ -91,3 +91,30 @@ export gmp_NO_LoadCenv_linuxgcc_gcc45_x64=1
 	
 
 _gmu_root=
+
+
+################### some vars and functions for convenience ###################
+
+# lset: Find exported env-vars whose names start with specific leading words
+# Example:
+#	$ lset gmu
+#	gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
+#	gmu_DIR_ROOT=/home/chj/w/GMU
+#	gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
+#	gmu_MAKE_EXE=make-gmu
+#	gmu_DO_SHOW_LINK_CMD=1
+#	gmu_DIR_GNUMAKEUNIPROC=/home/chj/w/GMU/GMU-main/GnumakeUniproc
+#	gmu_ver=0.97
+# like a super Windows CMD 'set', so I name it "linux set".
+lset(){
+	for v in "$@"; do
+		env | grep "^$v"
+	done
+}
+
+lgmv(){
+	env | grep "^gm[a-z]_"
+}
+
+export gv1='gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1'
+export gv2='gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1'
