@@ -53,7 +53,8 @@ ifeq ($(MAKELEVEL),0)
 ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
   ifeq (1,$(call gmuf_IsSubString, ,$(CURDIR)))
-    $(error !GMU!Error: Sorry, GnumakeUniproc cannot be run from a directory with spaces in it)
+    $(error !GMU!Error: Sorry, GnumakeUniproc cannot be run from a directory with spaces in it.\
+ Your Makefile and any source files must be placed in a path with no spaces)
   endif
 
   ifeq (,$(gmu_ud_OUTPUT_ROOT)) # If user does not set gmu_ud_OUTPUT_ROOT explictly, we set it.
