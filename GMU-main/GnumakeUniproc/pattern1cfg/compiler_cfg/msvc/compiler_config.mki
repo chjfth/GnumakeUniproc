@@ -79,6 +79,12 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_common.mki
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-mswin.mki
 
+################################################################################
+
+_MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
+	# Get the pdb name to generate:
+	# If gmp_msvc_WANT_WACKY_PDBNAME is null(the default), XXX.lib/XXX.dll/XXX.exe will have name XXX.pdb .
+	# If gmp_msvc_WANT_WACKY_PDBNAME is not null, XXX.lib/XXX.dll/XXX.exe will have .pdb appended to form the pdb name, e.g. aq_autotest.exe.pdb .
 
 ################################################################################
 
@@ -172,8 +178,8 @@ _StripImplibSuffix = $(if $(_isReportLibOutput),$(call _StripBasenameTail,$1,$(g
 
 ####### DLL #######
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL = $(gmp_Gp_list_DLL_OUTPUT).pdb
-  	  # note: Don't use $(gmu_Gp_LINK_OUTPUT) for $(gmp_Gp_list_DLL_OUTPUT), since the former may be XXX.lib !
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL = $(call _MsvcPdbNameToGen,$(gmp_Gp_list_DLL_OUTPUT))
+  	  # note: Don't use $(gmu_Gp_LINK_OUTPUT) for $(gmp_Gp_list_DLL_OUTPUT), since the former may be XXX.lib besides XXX.dll !
   _tmp_Gp_list_LIB_OUTPUT = $(if $(_isReportLibOutput),$(gmp_Gp_list_LIB_OUTPUT)_tmp)
   gmp_LINKFLAGS_DLL = /dll $(if $(_tmp_Gp_list_LIB_OUTPUT),/implib:"$(_tmp_Gp_list_LIB_OUTPUT)") /PDB:"$(gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL)"
 
@@ -210,7 +216,7 @@ define _gmp_LINK_CMD_EXE_GUI
 	$(gmu_exe_LINK) /subsystem:windows /out:"$@" $(gmp_LINKFLAGS_FOR_ANY_EXE) $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
 endef
 ###### (EXE ALL) ######
-gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE += $(gmu_Gp_LINK_OUTPUT).pdb
+gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE += $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
 gmp_LINKFLAGS_FOR_ANY_EXE += /PDB:"$(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)"
 
 # <<<<<<<<<<<<<< predefine some gmp_XXX commands 
@@ -231,7 +237,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 	$(gmu_exe_LIB) /nologo /out:"$@" @$(_p_objliblist)
   endef
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(gmu_Gp_LINK_OUTPUT).pdb
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
 else
 
   # For all image types other than static library, add /LIBPATH:xxx link params for extra library path
