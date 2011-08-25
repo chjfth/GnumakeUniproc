@@ -81,10 +81,17 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-mswin.mki
 
 ################################################################################
 
-_MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
+_MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(gmp_bc_IMAGE_TYPE),LIB),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
 	# Get the pdb name to generate:
-	# If gmp_msvc_WANT_WACKY_PDBNAME is null(the default), XXX.lib/XXX.dll/XXX.exe will have name XXX.pdb .
-	# If gmp_msvc_WANT_WACKY_PDBNAME is not null, XXX.lib/XXX.dll/XXX.exe will have .pdb appended to form the pdb name, e.g. aq_autotest.exe.pdb .
+	# If gmp_bc_IMAGE_TYPE==LIB, 
+	# { 
+	#	It is XXX.lib.pdb
+	# }
+	# else // gmp_bc_IMAGE_TYPE==EXE/DLL etc
+	# {
+	#   If gmp_msvc_WANT_WACKY_PDBNAME is null(the default), XXX.lib/XXX.dll/XXX.exe will have name XXX.pdb .
+	#   If gmp_msvc_WANT_WACKY_PDBNAME is not null, XXX.lib/XXX.dll/XXX.exe will have .pdb appended to form the pdb name, e.g. aq_autotest.exe.pdb .
+	# }
 
 ################################################################################
 
