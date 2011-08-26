@@ -23,7 +23,7 @@
 !define suffix_dir_GMUbin \${dirname_MinGW}\bin
 !define absdir_MinGW_bin_bkslash "$INSTDIR${suffix_dir_GMUbin}"
 
-!define fname_GmuEnvBat gmuenv.bat
+!define fname_GmuEnvBat _gmuenv.bat
 !define fpath_GmuEnvBat "$INSTDIR\${fname_GmuEnvBat}"
 !define absdir_GmuCore "$InstDir_fwslash/GMU-main/GnumakeUniproc"
 !define absdir_DIR_GMU_PRG "$InstDir_fwslash/${dirname_MinGW}/bin"
@@ -110,7 +110,7 @@ The following env-vars are to be stored: \r\n\r\n"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
 !define GMU_VER "0.97.1"
-!define PRODUCT_VERSION "${GMU_VER}(20110825)"
+!define PRODUCT_VERSION "${GMU_VER}(20110826)"
 !define PRODUCT_PUBLISHER "Jimm Chen (chenjun@nlscan.com)"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
