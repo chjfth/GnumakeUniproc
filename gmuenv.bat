@@ -9,7 +9,7 @@ set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :More env-vars below appended by GMU installer from _gmuenv.bat
 call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 
-echo .
+echo.
 echo GnumakeUniproc %gmu_ver% environment variables set OK.
-echo To see what varialbles are set, type 'set gm' 
-echo .
+echo To see what variables are set, type command 'lgmv' .
+echo.

@@ -80,7 +80,8 @@ export gmp_COMPILER_ID=linuxgcc
 
 PATH="$gmu_DIR_ROOT/bin:$PATH"
 
-echo    "Success! To see all gmu-vars set into env, type command 'lgmv'."
+echo "GnumakeUniproc $gmu_ver environment variables set OK."
+echo "To see what variables are set, type command 'lgmv' ."
 
 # Something extra for Nlscan and Scalacon:
 export NLSSVN=https://nlssvn/svnreps
