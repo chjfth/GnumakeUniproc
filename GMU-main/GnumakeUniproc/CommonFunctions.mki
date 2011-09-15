@@ -357,6 +357,19 @@ gmuf_OutputInfo_e = $(shell echo -e "$(call _RevertCommaInBrackets,$(subst `,\`,
 
 gmuf_lastword = $(if $(_gmu_isAboveGnumake381),$(lastword $1),$(word $(words $1),$1))
 
+gmuf_LastWordBySpc = $(call gmuf_lastword,$(subst $2, ,$1))
+	# Last word by special char(spc)
+	# $1: The original string.
+	# $2: The special char.
+	# Return the last word after the original word is split by the special char.
+	#
+	# Example, for SVN URL 
+	#	svnurl=https://nlssvn/svnreps/makingsys/GMU-addons/nlscan/reposie-nlssvn.txt
+	# ,
+	#	$(call gmuf_LastWorkBySpc,$(svnurl),/)
+	# will return 
+	#	reposie-nlssvn.txt
+
 gmuf_ChopFinalWord = $(wordlist 2,$(words $1),x $1)
 gmuf_RemoveDuplicate = $(if $(strip $1),$(call gmuf_RemoveDuplicate,$(call gmuf_ChopFinalWord,$1)) $(if $(filter $(call gmuf_lastword,$1),$(call gmuf_ChopFinalWord,$1)),,$(call gmuf_lastword,$1)))
 	# Remove duplicate words in $1, but not sorting.
@@ -438,7 +451,54 @@ _KickoutPrjname = $(firstword $(subst /, ,$(patsubst $(gmu_ud_OUTPUT_ROOT)/%,%,$
 
 _TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
 	# [2006-12-15]
-	# This is a very tricky function useful for generating make commands from your make file.
+	# This is a very tricky function useful for generating make commands from your make file,
+	# or when you want to echo a shell(bash) command(abbr. shcmd) to console/file.
+	# 
+	# Suppose you have a complex shcmd to execute, like
+	#
+	#	svn export http://site/prj1@"{2011-09-15 10:15:00}" \\serverA\devshare\prj1
+	#
+	# and you want to echo this shcmd to user, how should you? You may assign the whole shcmd
+	# to a make variable(perfectly ok), like this:
+	#
+	#  svncmd = svn export http://site/prj1@"{2011-09-15 10:15:00}" \\serverA\devshare\prj1
+	#
+	#  Then, things get challenging. Obviously, you should not write in makefile:
+	#
+	#  mytarget:
+	#  	@echo $(svncmd)
+	# or
+	#  mytarget:
+	#  	@echo "$(svncmd)"
+	#
+	# Both will fail, resulting in 
+	#
+	#	svn export http://site/prj1@{2011-09-15 10:15:00} \serverAdevshareprj1
+	#
+	# and
+	#
+	#	svn export http://site/prj1@{2011-09-15 10:15:00} \serverA\devshare\prj1
+	#
+	# respectively. So _TrShcmd4echo comes to help. Now you write
+	#
+	#  mytarget:
+	#  	@echo "$(call _TrShcmd4echo,$(svncmd))"
+	#
+	# Now, you perfectly get:
+	#
+	#	svn export http://site/prj1@"{2011-09-15 10:15:00}" \\serverA\devshare\prj1
+	#
+	# on the console, or you can get this result in output.txt by modifying makefile as:
+	#
+	#  mytarget:
+	#  	@echo "$(call _TrShcmd4echo,$(svncmd))" > output.txt
+	#
+	# [[[BUT BE AWARE, _TrShcmd4echo does not support $ in shcmd yet !]]]
+	#
+	# I think this mechanism provides more flexibility than using a conditional @ to suppress 
+	# shcmd echoing, which still exhibits some bug in GNU make 3.81 .
+	#
+	# A more complex example:
 	# Suppose you have an original shell command(shcmd):
 	#	cvs ci -m "my \\gosh"
 	# and you write my2.mk as follows:
@@ -449,13 +509,6 @@ _TrShcmd4echo = $(subst `,\`,$(subst ",\",$(subst \,\\,$1)))
 	# Then you run two commands:
 	#	make -f my2.mk; make -f my1.mk
 	# Now, OrigShCmd.txt is generated with the content identical to your original shell command.
-	#
-	# By the way, sh.exe from www.mame.net's internal echo command is too simple to
-	# support `echo -e -n ...', therefore, you have to try this example in a bash shell.
-	#
-	#NOTE: Today(2006-12-15) I've found it is not practical to use $ in your bash command
-	# for this function, since you can not keep $ literally when a $ is passed to GNUmake
-	# through GNUmake's command line.
 
 _TrShcmd4echo_4bs = $(subst `,\`,$(subst ",\",$(subst \,\\\\,$1)))
 	# [2006-12-15]
@@ -587,11 +640,23 @@ gmuf_EnvVal_ci = $(call _gmuf_EnvVal_ci,$(call gmuf_ToCapital,$1))
 gmuf_IsUsingWindowsCmd = $(call gmuf_IsSubString,\cmd.exe,$(call gmuf_EnvVal_ci,ComSpec))
 	# Check if we are running from a Windows cmd.exe shell.
 
-gmuf_ScriptCmd = $(if $(gmuf_IsUsingWindowsCmd),cmd /C "$1",$1)
+gmuf_ScriptCmd = $(if $(gmuf_IsUsingWindowsCmd),cmd /C "$(subst \,\\,$1)",$1)
 	# $1: the shell command
 	# Example:
 	#	$(call gmuf_ScriptCmd,version-sync.py --version)
 	# return on Windows:
 	#	cmd /C "version-sync.py --version"
+	#
+	# LIMITATION: The script command described by $1 is not strictly portable across Windows and Linux.
+	# * If there is no special chars like ' " or \ , it is portable across Windows and Linux.
+	# * But if there are any those special chars, the caller of gmuf_ScriptCmd should care for the 
+	#   portability himself.
+	#
+	# NOTE for Windows CMD: 
+	# * Replacing \ to \\ is a must because user may pass in UNC path like 
+	#	--dir-store=\\winshad0\devshare\tmpSymbols
+	#   Without the replacement, "sh -c" will swallow them.
+	# * Replacing " to \" should not be carried out, due to the nature of``cmd /c'' !
+	
 
 endif # ifndef _CommonFunctions_included 

@@ -619,12 +619,23 @@ SvnmakeEvRev = \$$($${OneMod}_svnRev)
 
 _p_SelfCoEvCheckTime = \$$($${OneMod}_SelfCoEvCheckTime)
 
+
+_gmu_SC_CHECKOUT_DATETIME_ = $(subst ., ,$(gmu_SC_CHECKOUT_DATETIME))
+	# Benefit:
+	# Use can use
+	#	gmu_SC_CHECKOUT_DATETIME=2011-09-15.13:03:00
+	# as well as
+	#	gmu_SC_CHECKOUT_DATETIME=2011-09-15 13:03:00
+	#
+	# The embedding period makes the datetime ONE word, so no need to surround them with quotes.
+	# When passing date-time to CVS/SVN commands, I will always use the formal form in $(_gmu_SC_CHECKOUT_DATETIME_)
+
 #_CvsmakeEvTag_nn = \$$(if $(CvsmakeEvTag),$(CvsmakeEvTag),HEAD)# nn means "not null"
 #_SvnmakeEvRev_nn = \$$(if $(SvnmakeEvRev),$(SvnmakeEvRev),HEAD)
-_CvsmakeEvCheckoutTagOpt = $(if $(gmu_SC_CHECKOUT_DATETIME),-D \"$(gmu_SC_CHECKOUT_DATETIME)\",-r $(CvsmakeEvTag))
-_SvnmakeEvCheckoutRevOpt = -r $(if $(gmu_SC_CHECKOUT_DATETIME),\"{$(gmu_SC_CHECKOUT_DATETIME)}\",$(SvnmakeEvRev))
+_CvsmakeEvCheckoutTagOpt = $(if $(_gmu_SC_CHECKOUT_DATETIME_),-D \"$(_gmu_SC_CHECKOUT_DATETIME_)\",-r $(CvsmakeEvTag))
+_SvnmakeEvCheckoutRevOpt = -r $(if $(_gmu_SC_CHECKOUT_DATETIME_),\"{$(_gmu_SC_CHECKOUT_DATETIME_)}\",$(SvnmakeEvRev))
 
-_SvnAppendPegDateTime := $(if $(gmu_SC_CHECKOUT_DATETIME),$(if $(gmu_SVN_VER_REVISION),$(shell if [ ! "$(gmu_SVN_VER_REVISION)" -lt 22139 ];then echo -n "\\\"@{$(gmu_SC_CHECKOUT_DATETIME)}\\\""; fi),\"@{$(gmu_SC_CHECKOUT_DATETIME)}\"))
+_SvnAppendPegDateTime := $(if $(_gmu_SC_CHECKOUT_DATETIME_),$(if $(gmu_SVN_VER_REVISION),$(shell if [ ! "$(gmu_SVN_VER_REVISION)" -lt 22139 ];then echo -n "\\\"@{$(_gmu_SC_CHECKOUT_DATETIME_)}\\\""; fi),\"@{$(_gmu_SC_CHECKOUT_DATETIME_)}\"))
 	#	[2007-01-21] From now on, if gmu_SC_CHECKOUT_DATETIME is defined, I'll use it as 
 	# peg-revision for checkout which I think is more reasonable than not using peg-revision.
 	#	And there is a slight SVN problem however: before Subversion 1.4.2 (r22139), using
@@ -776,7 +787,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 		echo "$${OneMod}_CvsCoShcmd = $(_CvsCheckoutShcmdEvEcho1)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo "$(_p_SelfCoEvCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo -e "\t@echo +++++++++++++++++++++++  Doing CVS checkout: +++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
-		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using tag: $(CvsmakeEvTag))\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  $(if $(_gmu_SC_CHECKOUT_DATETIME_),At datetime: $(_gmu_SC_CHECKOUT_DATETIME_),Using tag: $(CvsmakeEvTag))\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  CVSROOT = $(CvsmakeEvCvsRoot)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  ModuleDir = $(CvsmakeEvModuleDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  LocalDir = $(CvsmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
@@ -799,7 +810,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 		echo "$${OneMod}_SvnCoShcmd = $(_SvnCheckoutShcmdEvEcho1)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo "$(_p_SelfCoEvCheckTime): \$$(gmu_p_BuildStartCkt)" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo -e "\t@echo ++++++++++++++++++++++++++  Doing SVN checkout: +++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
-		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SvnmakeEvRev))\"" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t@echo \"  $(if $(_gmu_SC_CHECKOUT_DATETIME_),At datetime: $(_gmu_SC_CHECKOUT_DATETIME_),Using rev: $(SvnmakeEvRev))\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  From = $(SvnmakeEvSvnUrl)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  To   = $(SvnmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@(\\" >> $(_p_mk_DoCheckout_shsubst); \
@@ -914,8 +925,8 @@ SubprjEvSvnRev = \$$($${SubPrj}_svnRev_forMakefiles)
 SubprjEvSCCMD = \$$($${SubPrj}_SCCMD)
 SubprjEvScSource = \$$(strip \$$($${SubPrj}_ScSource))
 
-_SubprjEvCheckoutTagOpt = $(if $(gmu_SC_CHECKOUT_DATETIME),-D \"$(gmu_SC_CHECKOUT_DATETIME)\",-r $(SubprjEvCvsTag))
-_SubprjEvCheckoutRevOpt = -r $(if $(gmu_SC_CHECKOUT_DATETIME),\"{$(gmu_SC_CHECKOUT_DATETIME)}\",$(SubprjEvSvnRev))
+_SubprjEvCheckoutTagOpt = $(if $(_gmu_SC_CHECKOUT_DATETIME_),-D \"$(_gmu_SC_CHECKOUT_DATETIME_)\",-r $(SubprjEvCvsTag))
+_SubprjEvCheckoutRevOpt = -r $(if $(_gmu_SC_CHECKOUT_DATETIME_),\"{$(_gmu_SC_CHECKOUT_DATETIME_)}\",$(SubprjEvSvnRev))
 
 _SubprjEvScCheckTime = \$$(_p_$${SubPrj}_ScCheckTime)
 
@@ -951,7 +962,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 \
 		echo  "ifeq (CVS,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo -e "\t@echo \"CVS Checking out makefiles for {$(SubprjEvPrjRefname)} ...\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using tag: $(SubprjEvCvsTag))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  $(if $(_gmu_SC_CHECKOUT_DATETIME_),At datetime: $(_gmu_SC_CHECKOUT_DATETIME_),Using tag: $(SubprjEvCvsTag))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  CVSROOT = $(SubprjEvCvsRoot)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  ModuleDir = $(SubprjEvCvsModuleDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  LocalDir = $(SubprjEvCvsLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
@@ -968,7 +979,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 \
 		echo  "ifeq (SVN,$(SubprjEvSCCMD))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo -e "\t@echo \"SVN Checking out makefiles for {$(SubprjEvPrjRefname)} ...\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		echo -e "\t@echo \"  $(if $(gmu_SC_CHECKOUT_DATETIME),At datetime: $(gmu_SC_CHECKOUT_DATETIME),Using rev: $(SubprjEvSvnRev))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		echo -e "\t@echo \"  $(if $(_gmu_SC_CHECKOUT_DATETIME_),At datetime: $(_gmu_SC_CHECKOUT_DATETIME_),Using rev: $(SubprjEvSvnRev))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  From = $(SubprjEvSvnUrl)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  To   = $(SubprjEvSvnLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(_MD) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
