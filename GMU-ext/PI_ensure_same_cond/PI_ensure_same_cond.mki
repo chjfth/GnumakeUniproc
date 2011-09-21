@@ -1,0 +1,52 @@
+ifndef __PLUGIN_ENSURE_SAME_COND_LOADED
+__PLUGIN_ENSURE_SAME_COND_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+_pluginId_ENSURE_SAME_COND := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: ESC
+
+# This plugin checks that some designated make-vars all have the same value
+# as last run. If not the same, it asserts error. Cond means "condition".
+# Make-var values of last run is recorded in current project's output-temp
+# directory. By saying "current project", I mean the project loading this plugin.
+#
+# Typical scenario using this plugin:
+# During a release build process, we may assign a gmu_SC_CHECKOUT_DATETIME value
+# to confine the SVN checkout time to a specific time point. But if the release
+# build fails unexpectedly, we may want to retry(without clean) umake. On this 
+# second try, we want umake to run with the same gmu_SC_CHECKOUT_DATETIME, surely.
+# So the question is, how should we guarantee the second run is not missing 
+# gmu_SC_CHECKOUT_DATETIME and not providing a different time stamp?
+# OK. PI_ensure_same_cond comes to help. You just tell which make-vars you want 
+# to ensure the same across multiple umake run, then PI_ensure_same_cond takes
+# care of it for you.
+#
+# This plugin requires GNU make 3.81, since it uses $(info ).
+
+
+# User input vars:
+
+# gmi_ESC_list_MAKEVAR = 
+	# (must)
+	# Name of make-variables to care, names separated by spaces.
+
+# gmi_ESC_REFRESH_NOW = 
+	# (options, default to null)
+	# * If set to 1, you tell PI_ensure_same_cond to forget make-var values from
+	#   last run, just like you run current project the first time.
+	# If null, execute the normal behavior.
+
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,PI_ensure_same_cond,postcore)
+
+
+# Check for mandatory params and set default params
+
+ifeq (,$(strip $(gmi_ESC_list_MAKEVAR)))
+  $(error !Error from PI_ensure_same_cond: gmi_ESC_list_MAKEVAR is not assigned)
+endif
+
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+endif #__PLUGIN_ENSURE_SAME_COND_LOADED

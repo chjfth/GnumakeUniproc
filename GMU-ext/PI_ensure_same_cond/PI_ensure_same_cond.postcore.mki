@@ -1,0 +1,37 @@
+
+_gmi_ESC_tmpdir = $(gmu_Gd_PRJ_GMUTMP)/PI_ensure_same_cond
+
+# Detail:
+# For every esc-make-var, I'll create a file in _gmi_ESC_tmpdir whose content is 
+# its value from the last run. That file is called history file.
+
+define _gmif_ESC_CheckEscVar
+  # $1: Name of the make-var
+  _histfile := $(_gmi_ESC_tmpdir)/$1.txt
+
+  ifneq (,$$(strip $$(call gmuf_IsFileNotExist_sh,$$(_histfile)) $(gmi_ESC_REFRESH_NOW)))
+    # The history file not exist, or, gmi_ESC_REFRESH_NOW is requested
+
+    $$(call gmuf_MkdirIfNotExist_sh,$(_gmi_ESC_tmpdir))
+    _ret := $$(call gmuf_WriteContentToFile,$$($1),$$(_histfile))
+    ifneq (1,$$(_ret))
+      $$(error !Error from PI_ensure_same_cond: Cannot write file: $$(_histfile) )
+    endif
+
+  else
+    # history file exists, compare it to make-var
+    
+    hist := $$(call gmuf_GetFileContent_sh,$$(_histfile))
+    ifneq ($$(hist),$$($1))
+      $$(info !Error from PI_ensure_same_cond: For make-var '$1', its value is different from that of last run.)
+      $$(info $$(_GmuSpace) Last run : $1=$$(hist))
+      $$(info $$(_GmuSpace) This time: $1=$$($1))
+      $$(info If you think it is OK for them to be different, run Makefile again with gmi_ESC_REFRESH_NOW=1 .)
+      $$(error !Error on PI_ensure_same_cond, see reason above)
+    endif
+    
+  endif
+endef
+
+$(foreach v,$(gmi_ESC_list_MAKEVAR),$(eval $(call _gmif_ESC_CheckEscVar,$v)))
+

@@ -130,8 +130,12 @@ gmuf_ConcateWithChars = $(if $(strip $1),$(call _gmuf_addc,$1,$2))
 
 _MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
+	# This can only be used in recipe. For mkdir in make statement, use gmuf_MkdirIfNotExist_sh.
 _ClearFile = echo -n "" > $(1)
 gmuf_ClearFile = $(_ClearFile)
+
+gmuf_MkdirIfNotExist_sh = $(shell if [ ! -d "$1" ];then mkdir -p "$1"; fi )
+
 
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
 	# What the internal $(suffix) function returns has a leading dot, we reject the dot here.
@@ -176,6 +180,7 @@ gmuf_ExecuteSimpleShcmd = $(strip $(shell $1 1>&2; echo $$?))
 
 _IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
 gmuf_IsFileExist_sh = $(_IsFileExist_sh)
+gmuf_IsFileNotExist_sh = $(if $(call _IsFileExist_sh,$1),,1)
 
 gmuf_IsDirExist_sh = $(shell if [ -d "$1" ] ;then echo -n '1';fi)
 
@@ -183,6 +188,21 @@ gmuf_Copy1File_sh = $(shell if cp --force "$1" "$2" 1>&2; then echo 1; fi)
 
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 gmuf_GetFileContent_sh = $(_GetFileContent_sh)
+
+gmuf_WriteContentToFile = $(shell \
+	echo "$(call _TrShcmd4echo,$1)" 2>$2 1>&2; \
+	if [ $$? = 0 ]; then echo 1; fi \
+	)
+	# $1: the content
+	# $2: the filepath
+	# Return 1 on success, return null on fail.
+	#
+	# Note: Directory of $2 should have been created.
+	#
+	# Limitation: Content can only be one line.
+	#
+	# Hint: 2>$2 must be put ahead of 1>&2 , otherwise, $1 will be dumped to console.
+
 
 _IsP1OlderThanP2_direct_sh = $(shell (if [ ! -f $1 ] || [ $1 -ot $2 ];then echo -n '1';fi))
 	# User should ensure exist. (`sh' means usING shell's file time compare function.)
@@ -351,6 +371,9 @@ gmuf_OutputInfo = $(if $(_gmu_isGnumake380),$(gmuf_OutputInfo380),$(gmuf_OutputI
 	#	_info := $(call gmuf_OutputInfo,<your-message>)
 	# Note for using comma: You cannot directly use a comma in $1, because a comma will be 
 	# taken as function parameter separator. You can use (,) or $(_GmuComma) instead.
+	#
+	# Well, with GNU make 3.80's deeming out, we would prefer just use $(info ) to display our message.
+
 
 gmuf_OutputInfo_e = $(shell echo -e "$(call _RevertCommaInBrackets,$(subst `,\`,$(subst ",\",$1)))" 1>&2)
 	# The suffix "_e" means using -e flag for echo command.
