@@ -266,5 +266,5 @@ gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += # <subprj1-refname> <subprj2-refname> ...
 	# Where the static LIBs/DLLs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
 
 
+###### DON'T DELETE THIS FINAL include. ######
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
-

@@ -195,5 +195,5 @@ gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 
 
 
+###### DON'T DELETE THIS FINAL include. ######
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
-

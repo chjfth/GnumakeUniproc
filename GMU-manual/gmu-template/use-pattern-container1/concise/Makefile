@@ -32,5 +32,5 @@ gmu_uv_list_ALL_SUBPRJ += <subprj1-refname> <subprj2-refname> ...
 # <<<< For CVS checkout
 
 
+###### DON'T DELETE THIS FINAL include. ######
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
-

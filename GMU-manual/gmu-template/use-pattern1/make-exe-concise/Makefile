@@ -243,6 +243,5 @@ gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += # <subprj1-refname> <subprj2-refname> ...
 # gmi_SYDO_ud_SYNC_EXE_TO = # (suggested to set as env-var or by parent project)
 
 
-
+###### DON'T DELETE THIS FINAL include. ######
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
-
