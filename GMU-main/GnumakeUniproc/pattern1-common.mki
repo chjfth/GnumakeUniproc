@@ -177,8 +177,8 @@ define _gmpf_CenvInclude
   # his environment. 
   # Caveat: gmp_NO_LoadCenv_<cid>_<cver> should be defined as env-var instead of in Makefile.
   # Imagine that some day you find it necessary to write something in cenv-<cid>-<cver>.mki,
-  # so you are better of cancelling that env-var define than delete all gmp_NO_LoadCenv_<cid>_<cver>=1
-  # in all you makefiles.
+  # so you are better off cancelling that env-var define than delete all gmp_NO_LoadCenv_<cid>_<cver>=1
+  # from all you makefiles.
   ifeq (,$$(strip $1))
     $$(error !GMP!Error: You do not pass a compiler-id for gmpf_CenvInclude)
   endif
