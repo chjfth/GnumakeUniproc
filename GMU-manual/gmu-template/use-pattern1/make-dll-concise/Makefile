@@ -75,6 +75,22 @@ endif
 gmp_u_list_PLUGIN_TO_LOAD += 
 	# PI_sync_devoutput PI_always_compile PI_file_precopy
 
+### >>> PI_dll_from_lib plugin
+# Load "make dll from lib" plugin, and load for subprjs as well(export ...).
+#export gmp_u_list_PLUGIN_TO_LOAD += PI_dll_from_lib #(PL)
+#  export gmi_DFL_DO_AUTO_EXPORT = 1
+	# Note: gmi_DFL_DO_AUTO_EXPORT=1 currently requires Python 2.x .
+#  gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT = $(if $(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+  	# Enable gmi_DFL_IS_DEEP_EXPORT=1 if you want this DLL to export functions from all levels 
+  	# of sub-projects. 
+  	# If null, export only those of your immediate sub-projects.
+#*#
+# OR, if you want to export all LIB levels, replace the above #(PL) line with the following two lines:
+#*#
+#export gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE += PI_dll_from_lib
+#  gmi_DFL_IS_DEEP_EXPORT = 1
+### <<< PI_dll_from_lib plugin
+
 
 ############################################################################
 # GMU-var: gmu_uf_LINK_OUTPUT
