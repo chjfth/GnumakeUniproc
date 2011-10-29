@@ -26,6 +26,15 @@ _pluginId_file_precopy := $(gmpv_ThisPluginId)
 	#
 	# If null, nothing extra will be done.
 
+# gmi_FPCP_FORCE_COPY =
+	# (optional) default to null
+	# If set to 1, copy operation is always performed, even if destfile has
+	# been newer than srcfile.
+	#
+	# Currently, this flag is global. i.e. you cannot assign this flag separately
+	# for destfile1 and destfile2.
+
+
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_file_precopy),postcore)
 
 endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr

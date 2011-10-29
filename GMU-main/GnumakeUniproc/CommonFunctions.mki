@@ -79,7 +79,7 @@ _gmu_isAboveGnumake382 := $(_gmu_isGnumake382)
 
 #################### Common Shell Commands ######################
 _MD = mkdir -p 
-_RM = rm -f -r #this will remove any files dirs assigned
+_RM = rm -fr #this will remove any files dirs assigned
 _MV = mv #move or rename
 
 ################# Common user-defined functions for GNU make ###################
@@ -135,6 +135,14 @@ _ClearFile = echo -n "" > $(1)
 gmuf_ClearFile = $(_ClearFile)
 
 gmuf_MkdirIfNotExist_sh = $(shell if [ ! -d "$1" ];then mkdir -p "$1"; fi )
+
+gmuf_DeleteFile_sh_wc = $(shell $(_RM) $1 1>&2 ; if [ "$$?" = 0 ];then echo 1; fi)
+	# Delete a file or some files, assigned in $1.
+	# Return 1 on success; return null on failure.
+	# _wc implies you can use wildcard, so 
+	#	$(_RM) $1 
+	# should not be written as
+	#	$(_RM) "$1"
 
 
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
