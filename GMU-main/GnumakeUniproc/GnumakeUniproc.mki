@@ -299,6 +299,8 @@ _gmuf_ShowCompileeFullpath = $(if $(gmu_DO_SHOW_COMPILEE_FULLPATH),\
 	# $1: Compiler string. cl, gcc, armcpp etc.
 	# $2: Relative path of the input file
 
+_gmuf_TransFeedSrc = $(if $(gmu_DO_FEED_FULL_PATH_SRC),$(call gmuf_GetAbsPathByRela_soc,$1),$1)
+	
 #------------------
 # configure actions (canned command sequence)
 #------------------
