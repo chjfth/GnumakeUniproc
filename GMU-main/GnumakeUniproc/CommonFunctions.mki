@@ -280,10 +280,11 @@ gmuf_IntersectWords = $(foreach w,$1,$(call gmuf_IsWordInSet_rw,$w,$2))
 	# returns
 	#	22 33
 
-gmuf_GetVarAssertExist = $(if $(strip $($1)),$($1),$(error Make-var '$1' does not contain a value$(if $2, required by $2)))
+gmuf_GetVarAssertExist = $(if $(strip $($1)),$($1),$(error Make-var '$1' does not contain a value$(if $2, required by $2.) $3))
 	# For make-var named $1, return its value if it is non-null, 
 	# otherwise assert error.
 	# $2: optional, telling this value is required by whom.
+	# $3: optional, arbitrary descriptive text, telling the user what this value should be etc.
 
 
 #======== Something not so "common" below ========
