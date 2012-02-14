@@ -185,10 +185,10 @@ _StripImplibSuffix = $(if $(_isReportLibOutput),$(call _StripBasenameTail,$1,$(g
 
 ####### DLL #######
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL = $(call _MsvcPdbNameToGen,$(gmp_Gp_list_DLL_OUTPUT))
+  _msvc_LINK_OUTPUT_pdb_DLL = $(call _MsvcPdbNameToGen,$(gmp_Gp_list_DLL_OUTPUT))
   	  # note: Don't use $(gmu_Gp_LINK_OUTPUT) for $(gmp_Gp_list_DLL_OUTPUT), since the former may be XXX.lib besides XXX.dll !
   _tmp_Gp_list_LIB_OUTPUT = $(if $(_isReportLibOutput),$(gmp_Gp_list_LIB_OUTPUT)_tmp)
-  gmp_LINKFLAGS_DLL = /dll $(if $(_tmp_Gp_list_LIB_OUTPUT),/implib:"$(_tmp_Gp_list_LIB_OUTPUT)") /PDB:"$(gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL)"
+  gmp_LINKFLAGS_DLL = /dll $(if $(_tmp_Gp_list_LIB_OUTPUT),/implib:"$(_tmp_Gp_list_LIB_OUTPUT)") /PDB:"$(_msvc_LINK_OUTPUT_pdb_DLL)"
 
   _p_WINDLL_MODULE_DEF_FromCurDir = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
   
@@ -223,8 +223,8 @@ define _gmp_LINK_CMD_EXE_GUI
 	$(gmu_exe_LINK) /subsystem:windows /out:"$@" $(gmp_LINKFLAGS_FOR_ANY_EXE) $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
 endef
 ###### (EXE ALL) ######
-gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE += $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
-gmp_LINKFLAGS_FOR_ANY_EXE += /PDB:"$(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)"
+_msvc_LINK_OUTPUT_pdb_EXE += $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+gmp_LINKFLAGS_FOR_ANY_EXE += /PDB:"$(_msvc_LINK_OUTPUT_pdb_EXE)"
 
 # <<<<<<<<<<<<<< predefine some gmp_XXX commands 
 
@@ -245,6 +245,8 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
   endef
 
   gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+	# Note: gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB/DLL/EXE will be used by sdbi.msvc.mki.
 else
 
   # For all image types other than static library, add /LIBPATH:xxx link params for extra library path
@@ -261,7 +263,8 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
   	# set it only when link output use LIB as ext-name.
   gmp_Gp_list_DLL_OUTPUT = $(call _StripImplibSuffix,$(_p_BasenameOutput)).$(gmp_extn_DLL)
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_DLL)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
 
@@ -270,7 +273,8 @@ ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
 
   gmp_Gp_list_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_CUI)
 
@@ -279,12 +283,13 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
 
   gmp_Gp_list_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
-  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_GUI)
 
 endif # EXE_GUI
-endif # EXE_CUI
+endif # EXE_CUI or EXE
 endif # DLL
 endif # LIB
 
