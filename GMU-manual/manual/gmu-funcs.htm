@@ -117,6 +117,64 @@ gmu_SvnCmdUseGmuGivenTime = -r &quot;{$(gmu_SC_CHECKOUT_DATETIME)}&quot;
      </pre></td>
   </tr>
 </table>
+<h3>File path operations</h3>
+<table width="100%"  border="1">
+  <tr>
+    <th scope="col">Function name </th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_GetAbsDirRelaToCurdir</td>
+    <td><p>Get absolute dir from a relative dir(relative to current dir).</p>
+      <p>$1: relative dir. This must be a existing directory, not a file, otherwise, return value is unpredictable</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_GetAbsPathRelaToCurdir</td>
+    <td>Similar to <code>gmuf_GetAbsDirRelaToCurdir</code>, but $1 should be a filepath.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_GetAbsPathByRela_so</td>
+    <td><p>Get absolute dir from a relative dir. &quot;so&quot; implies &quot;string operation&quot;. </p>
+      <ul>
+        <li>$1: Absolute dir.</li>
+        <li>$2: relative dir or filepath. This function does not require  $2 to be an existing directory, it just calculate the absolute path by string operation.</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_GetAbsPathByRela_soc</td>
+    <td><p>Get absolute dir from a relative dir(relative to current dir), by string operation.</p>
+    <p>It is defined as:</p>
+    <pre>$(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)</pre></td>
+  </tr>
+  <tr>
+    <td valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_IsFileExist_sh</td>
+    <td><p>Check file existence. Return 1 on true, null on false.</p>
+    <p>$1: filepath</p></td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_IsFileNotExist_sh</td>
+    <td>Negative of gmuf_IsFileExist_sh.</td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_IsDirExist_sh</td>
+    <td><p>Check directory existence. Return 1 on true, null on false.</p>
+      $1: directory path</td>
+  </tr>
+  <tr>
+    <td valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_GetExtName</td>
+    <td><p>Get extension name of a file.</p>
+    <p>$1: filename</p></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
 <h2><a name="gmpf%20functions"></a>gmpf functions </h2>
 
 <table width="100%"  border="1">
