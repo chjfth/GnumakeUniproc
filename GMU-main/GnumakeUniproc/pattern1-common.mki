@@ -114,7 +114,7 @@ _IsInBuildSelfStage = $(if $(gmu_uv_list_ALL_SUBPRJ),$(if $(_NowCheckIsSubprjsDo
 _gmu_dyn_title_count = $(shell gmuCountChar $(gmu_Gp_COUNT_COMPILE) += Rr)
 gmu_progress_info = $(join Projects= Containers=,$(_gmu_dyn_title_count))  Now: $(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))$(if $(_IsInBuildSelfStage),,...)
 
-_gmuBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmuDotList)))
+_gmpBuildListIndent = $(patsubst %,$(_GmuSpace),$(wordlist 1,$(MAKELEVEL),$(_gmuDotList)))
 
 _PrjnameShowInList = [$(gmu_G_Deco_PrjName)($(gmu_PRJ_NAME))]
 

@@ -79,7 +79,7 @@ __pattern1_inc_project_count:
 	@$(call _AppendLogCountCompile,$(if $(gmu_FREE_STYLE_MAKEFILE),r,R)) \
 		# a 'R' or 'r' means a container project, 'r' is for $(gmu_FREE_STYLE_MAKEFILE)
 	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*) $(_PrjnameShowInList) $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
-	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+	@echo "$(if $(gmu_FREE_STYLE_MAKEFILE),@,*)$(_gmpBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  -   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
 
 .PHONY: __pattern1_first_target
 __pattern1_first_target: \

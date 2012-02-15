@@ -169,7 +169,7 @@ endif
 __pattern1_inc_project_count: _tmp_prj_mark = $(if $(call _IsOlderThanBuildStart_direct_sh,$(gmu_Gp_LINK_OUTPUT)),=,+)
 __pattern1_inc_project_count: 
 	@echo "$(_tmp_prj_mark) $(_PrjnameShowInList) $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuiltListOutput)
-	@echo "$(_tmp_prj_mark)$(_gmuBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
+	@echo "$(_tmp_prj_mark)$(_gmpBuildListIndent)$(_PrjnameShowInList) DONE: $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)   $(if $(gmp_up_USER_OUTPUT_AFTER_LINK),$(gmp_up_USER_OUTPUT_AFTER_LINK),$(_NullUser1stTarget))" >> $(_p_BuildingListOutput)
 	@$(call _AppendLogCountCompile,$(_tmp_prj_mark))
 #	@echo "<<< $(shell msleep 95000 ) [[$(gmu_Gp_LINK_OUTPUT)]] {{$(wildcard $(gmu_Gp_LINK_OUTPUT))}}  >>>" # temp
 #[2007-06-15]GNUmake 3.81 . The above echo command with $(wildcard ) in it is for test. Very strangely, 
@@ -197,21 +197,21 @@ ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 
   $(_p_AutoLinkListForParent): gmu_ut_Always
 	@echo -n "" > $@ # clear the target file
-	@echo "$(_gmuBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" >> $@
-	@$(if $(gmu_u_EXTRA_LINK_MERGE),echo "$(_gmuBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE)" >> $@)
+	@echo "$(_gmpBuildListIndent)$(gmu_Gp_LINK_OUTPUT)" >> $@
+	@$(if $(gmu_u_EXTRA_LINK_MERGE),echo "$(_gmpBuildListIndent)$(gmu_u_EXTRA_LINK_MERGE)" >> $@)
   ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
 #	@echo "@@@@@@@@@@@@@@@@ $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
 	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(_p_list_ALLFP_NonLoopSp) >> $@)
-	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
+	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmpBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
   endif
 
   $(_p_AutoLinkPjnmForParent): gmu_ut_Always
 	@echo -n "" > $@ # clear the target file
-	@echo "$(_gmuBuildListIndent)$(gmu_G_Final_PrjName)" >> $@
+	@echo "$(_gmpBuildListIndent)$(gmu_G_Final_PrjName)" >> $@
   ifneq (,$(gmu_IS_SUBPRJ_AUTO_LINK_MERGE))
 #	@echo "%%%%%%%%%%%%%%%% $(gmu_PRJ_NAME) [$(gmu_uv_list_SUBPRJ_LINK_FOR_PARENT)] {-$(gmu_uv_list_SUBPRJ_LOOPED) =$(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped)}" #(for debug)
 	@$(if $(gmu_uv_list_SUBPRJ_LNKFORPARNT_nonLooped),cat $(_p_list_ALpjnmFP_NonLoopSp) >> $@)
-	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmuBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
+	@$(if $(gmu_uv_list_SUBPRJ_LOOPED),$(foreach v,$(gmu_uv_list_SUBPRJ_LOOPED),echo "$(_gmpBuildListIndent)!LINKREF:$($v_Prjname)" >> $@; ))
   endif
 
  else

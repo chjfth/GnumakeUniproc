@@ -4,9 +4,9 @@ ifeq (,$(MAKE_RESTARTS)) # MAKE_RESTARTS is valid since GNU make 3.81
 
 ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
   ifeq (,$(_gmu_cmdopt_NowPostProc))
-    _tmp := $(shell echo ">$(_gmuBuildListIndent)$(_PrjnameShowInList) STRT: $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)" >> $(_p_BuildingListOutput))
+    _tmp := $(shell echo ">$(_gmpBuildListIndent)$(_PrjnameShowInList) STRT: $(_p_ThisMakefile)  $(gmu_Gf_LINK_OUTPUT)" >> $(_p_BuildingListOutput))
   else
-    _tmp := $(shell echo "-$(_gmuBuildListIndent)$(_PrjnameShowInList) POSTPROC" >> $(_p_BuildingListOutput))
+    _tmp := $(shell echo "-$(_gmpBuildListIndent)$(_PrjnameShowInList) POSTPROC" >> $(_p_BuildingListOutput))
   endif
 
   _tmp := $(shell $(gmu_u_SHOW_PROGRESS_CMD) )
