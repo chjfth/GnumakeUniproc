@@ -20,6 +20,17 @@
 
 gmi_SYDO_up_list_SYNC_DBGINFO += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
 
+gmi_SYDO_up_list_SYNC_DBGINFOLIB += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB)
+gmi_SYDO_up_list_SYNC_DBGINFODLL += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL)
+gmi_SYDO_up_list_SYNC_DBGINFOEXE += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)
+	# [2012-02-14] These three seems to be more friendly than the generic gmi_SYDO_up_list_SYNC_DBGINFO.
+	# In order to sync pdbs to designated locations respectively for LIB/DLL/EXE, user can
+	# set gmi_SYDO_up_list_SYNC_DBGINFOLIB/DLL/EXE from the outer environment and go, without
+	# bothering switching gmi_SYDO_up_list_SYNC_DBGINFO's value across DLL->LIB sub-projects.
+	#
+	# Interaction with MSVC compiler-config mki:
+	# MSVC compiler-config(.msvc, .wince) should have defined the following 3 output vars:
+	# gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB, gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL, gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE 
 
 
 # Historical notes:

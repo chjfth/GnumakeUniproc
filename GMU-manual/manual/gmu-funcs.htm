@@ -116,6 +116,16 @@ gmu_CvsCmdUseGmuGivenTime = -D &quot;$(gmu_SC_CHECKOUT_DATETIME)&quot;</pre>
 gmu_SvnCmdUseGmuGivenTime = -r &quot;{$(gmu_SC_CHECKOUT_DATETIME)}&quot;
      </pre></td>
   </tr>
+  <tr>
+    <td valign="top">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td valign="top">gmuf_ExecuteSimpleShcmd</td>
+    <td><p>Use this to execute some shell command before any sub-project is built. </p>
+    <p>Note: <code>gmp_USER_PRE_TARGETS</code> can not help you with that, only gmuf_ExecuteSimpleShcmd can. </p>
+    <p>Caution with $(MAKELEVEL), if you really want your command to run only once.</p></td>
+  </tr>
 </table>
 <h3>File path operations</h3>
 <table width="100%"  border="1">
