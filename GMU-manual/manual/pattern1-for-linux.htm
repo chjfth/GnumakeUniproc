@@ -37,10 +37,9 @@
     <p>Default to null. If null, using <tt>g++</tt> or <tt>gcc</tt> is determined by source file input of the current project. If some input file has C++ extension, <tt>g++</tt> is used, otherwise <tt>gcc</tt> is used.</p></td>
   </tr>
   <tr>
-    <td valign="top">gmp_LINK_DuplicateLibList</td>
-    <td><p>If set to 1, the linked library list is duplicated on the linker command line, so we don't have to care about the library(.a , .so) order passed to linker.</p>
-    <p>For example, lib1.a, lib2.a, lib3.a is in your link list, gmp_LINK_DuplicateLibList=1 will pass &quot;lib1.a lib2.a lib3.a lib1.a lib2.a lib3.a&quot; to the linker.</p>
-    <p>This defaults to null, but setting it to 1 should not cause problem on most cases.</p></td>
+    <td valign="top">gmp_LINKER_NO_RECURSE_LIB_SEARCH</td>
+    <td><p>This defaults to null, and when passing libraries to linker, <code>--start-group</code> and <code>--end-group</code> is used so that user can write libraries in any order. This should be the preferred linker behavior in most cases.</p>
+    <p>If set to 1,  <code>--start-group</code> and <code>--end-group</code> will not be used and user have to care about the library passing order to ensure success.</p></td>
   </tr>
 </table>
 <h4>Compatibility vars </h4>

@@ -23,6 +23,4 @@ all-winexe_Makefile = $(dir_ex_root)/windows/make-all/all.$(gmp_COMPILER_ID)/Mak
 demo-auto-checkout_Makefile = $(dir_ex_root)/auto-checkout/root1-svn/make.$(gmp_COMPILER_ID)/Makefile
 
 cross-lib-ref_Makefile = $(dir_internal-test)/cross-lib-ref/cntr-one/Makefile
-cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID) \
-	$(if $(call gmuf_IsStringEqual,$(gmp_COMPILER_ID),mingw),gmp_LINK_DuplicateLibList=1)
-	# Add make option gmp_LINK_DuplicateLibList=1 if the compiler-id is mingw.
+cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)

@@ -70,6 +70,9 @@ gmp_CFLAGS_MACRO_DEFS_preset += $(addprefix -D,WIN32 _WIN32) -D__int64="long lon
 
 c_flags_Link_Common = 
 
+gmp_LINKER_LIB_GROUP_START = -Wl,--start-group
+gmp_LINKER_LIB_GROUP_END = -Wl,--end-group
+
 ################################################################################
 # For each compiler or link flag category below, you must choose one that suits 
 # your need.

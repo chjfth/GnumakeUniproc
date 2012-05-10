@@ -18,4 +18,4 @@ demo-auto-checkout_Makefile = $(dir_ex_root)/auto-checkout/root1-svn/make.$(gmp_
 linux-all_Makefile = $(dir_ex_root)/linux/make-all/Makefile
 
 cross-lib-ref_Makefile = $(dir_internal-test)/cross-lib-ref/cntr-one/Makefile
-cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID) gmp_LINK_DuplicateLibList=1
+cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
