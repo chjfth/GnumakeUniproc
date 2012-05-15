@@ -77,6 +77,9 @@ _gmu_isAboveGnumake382 := $(_gmu_isGnumake382)
 
 #### <<<<<<< GNUmake version checking
 
+gmu_isFirstLoad = $(if $(MAKE_RESTARTS),,1)
+	# Note: This function is only available from GNUmake 3.81. Prior GNU make don't have MAKE_RESTARTS.
+
 #################### Common Shell Commands ######################
 _MD = mkdir -p 
 _RM = rm -fr #this will remove any files dirs assigned
