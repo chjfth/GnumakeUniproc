@@ -493,7 +493,7 @@ define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
 endef
 	# What I do here is to generate a temporary `.d_' file first; if `gcc -M'
 	#succeeds, then rename it to `.d'. The reason for not generating .d directly
-	#is that the .d genration process may fail in the middle and leave an
+	#is that the .d generation process may fail in the middle and leave an
 	#incomplete .d file -- we don't want an incomplete .d file to be included
 	#in next make start.
 
