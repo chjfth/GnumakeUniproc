@@ -115,9 +115,9 @@ gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
 	# Don't write ``-I'' in this var; -I will be prependded automatically.
 
-gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
+#gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
 	# (normally, you don't need this)
-	# those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
+	# list those -I xxx options (in case you don't want to list them in gmu_ud_list_PRJ_HEADER)
 	# You must explicitly write ``-I'' before every dir in gmp_CFLAGS_INCLUDES
 
 ############################################################################
