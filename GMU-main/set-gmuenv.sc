@@ -114,8 +114,13 @@ lset(){
 }
 
 lgmv(){
-	env | grep "^gm[a-z]_"
+	env | grep "^gmu_"
+	env | grep "^gmp_"
+	env | grep "^gmi_"
+	env | grep "^gms_"
+	env | grep "^gv[0-9]"
 }
+# Note: I do not use one single regex because that would otherwise interleave different prefix.
 
 export gv1='gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1'
 export gv2='gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1'
