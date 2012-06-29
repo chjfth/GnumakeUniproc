@@ -93,7 +93,7 @@ cfc_for_Release_codegen = -O2
 cfc_for_Relesase_defs = -DNDEBUG
 
 # Category(chr): MBCS or Unicode
-cfc_chr_Mbcs_defs = -D_MBCS
+cfc_chr_Mbcs_defs =
 cfc_chr_Unicode_defs = -DUNICODE -D_UNICODE
 
 # Category(ldbg): Is link with /DEBUG option
