@@ -554,7 +554,7 @@ $(foreach extn,$(_gmu_all_src_extn),$(gmu_ud_SRC_ROOT)/%.$(extn)):
 #
 # %.c: #(rule IXX)
 #
-# The consequence is: For those to-be-utogenerate .d files(e.g. .../_obj/foo.c.d), make will try to 
+# The consequence is: For those to-be-autogenerate .d files(e.g. .../_obj/foo.c.d), make will try to 
 # construct an implicit chain: .../_obj/foo.d => .../_obj/foo.c.d.o => .../_obj/foo.c.d.c , well,
 # it matches the rule IXX above. Then a bogus "!GMU!Error: Your source file .../foo.c.d.c does not exist yet"
 # info is output(but does not cease the makefile). It's terrible.
@@ -1359,8 +1359,14 @@ _isLinkageListChanged := $(call _IsStringNotEqual,$(_oldLinkageContent),$(_Gp_li
 	# Check if file content from $(_p_SubprjLinkageList) equals to $(_Gp_list_AutoLFC_indent_debug).
 	# If not equal, we will force a link.
 
+$(foreach lib,$(gmp_bc_EXTRALIBS),$(lib)):
+	@echo -e "!GMU!Error: Your following lib in gmp_bc_EXTRALIBS\n  => $@\ndoes not exist yet."
+	@[ 1 = 0 ]
+
+
 $(gmu_Gp_LINK_OUTPUT): \
     	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK_2) $(gmu_Gp_list_SUBPRJ_TO_LINK) \
+    	$(gmp_bc_EXTRALIBS) \
     	$(if $(_isLinkageListChanged),gmu_ut_Always)
 	@$(if $?,,$(if $(_isLinkageListChanged), $(call _DoVerbose1,@echo "!GMU!Info: Go relink due to linkage list changed since last build.") ))
 #		Strategy: Display "Go relink ..." when _isLinkageListChanged is the only factor causing the relink action. 

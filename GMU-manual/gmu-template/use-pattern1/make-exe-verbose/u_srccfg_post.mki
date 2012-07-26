@@ -102,7 +102,7 @@ gmu_up_list_EXTRA_OBJ_TO_LINK +=
 	# Extra object files to link
 
 gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
-	# Extra libs to link
+	# Extra libs to link. Update of these libs will force re-link.
 	#
 	# The reason for using gmpf_MakeUpSysLibsToLink: 
 	# $(call gmpf_MakeUpSysLibsToLink,comfun) will become(for example):
@@ -112,8 +112,7 @@ gmp_bc_EXTRALIBS += # $(call gmpf_MakeUpSysLibsToLink,<lib-list>)
 gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 	# List system libs in this make-var. 
 	# If more than one sys-lib are used, separate them with spaces.
-	#	note: The behavior of gmp_bc_SYSLIBS is exactly the same as gmp_bc_EXTRALIBS.
-	# It is used just to imply that they are system libs(provided by compiler of OS).
+	# Note: Update of libs in gmp_bc_SYSLIBS will not force re-link.
 
 
 #---------------------------------------------------------------------------
