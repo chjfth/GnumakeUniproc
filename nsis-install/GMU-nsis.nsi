@@ -103,8 +103,8 @@ Var isChecked_nlscanenv
 
 !define desc_StoreEnvVar "You have two places to store the env-vars required by GnumakeUniproc(GMU):\r\n\
 * First, write to local user's registry, so that these env-vars are ready after you logon into Windows.\r\n\
-* Second, save the env-var settings to $INSTDIR\${fname_GmuEnvBat}, so that you can execute \
- ${fname_GmuEnvBat} to set them only when required. \r\n\r\n\
+* Second, save the env-var settings to $INSTDIR\gmuenv.bat, so that you can execute \
+ gmuenv.bat to set them only when required. \r\n\r\n\
 The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
