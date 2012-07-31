@@ -40,7 +40,6 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 
   gmp_mswin_IMPLIB_SUFFIX = --imp
 	# (suggested) This forces the import-lib name to have suffix --imp .
-	# This must not be set before pattern1.mks .
   
   # gmp_CFLAGS_NON_CODE_GEN += /W3
   
@@ -169,7 +168,7 @@ gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
 
 gmp_CFLAGS_CODE_GEN_ALL +=
   # You may want to dispense options for gmp_CFLAGS_CODE_GEN_ALL into following 2 categories:
-  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # append those macro defines, e.g. -Dxxx=yyy
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # append other macro defines, e.g. -Dxxx=yyy
   gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # append other code generation related options
 
 gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
