@@ -1359,14 +1359,25 @@ _isLinkageListChanged := $(call _IsStringNotEqual,$(_oldLinkageContent),$(_Gp_li
 	# Check if file content from $(_p_SubprjLinkageList) equals to $(_Gp_list_AutoLFC_indent_debug).
 	# If not equal, we will force a link.
 
-$(foreach lib,$(gmp_bc_EXTRALIBS),$(lib)):
+_gmp_bc_EXTRALIBS_files = $(foreach v,$(gmp_bc_EXTRALIBS),$(if $(call gmuf_IsSubString,/,$v),$v))
+	# We extra those words with slashes.  
+	# Example:
+	#	gmp_bc_EXTRALIBS =  mydll.so ./mylib.a -lmyutil
+	# results in:
+	#	_gmp_bc_EXTRALIBS_files = ./mylib.a
+	#
+	# Reason:
+	# Those words with a slash in it should be considered explicit library files on explicit folder(s).
+	# So, we can do user a favor to list those files as dependent of gmu_Gp_LINK_OUTPUT . 
+
+$(foreach lib,$(_gmp_bc_EXTRALIBS_files),$(lib)):
 	@echo -e "!GMU!Error: Your following lib in gmp_bc_EXTRALIBS\n  => $@\ndoes not exist yet."
 	@[ 1 = 0 ]
 
 
 $(gmu_Gp_LINK_OUTPUT): \
     	$(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) $(gmu_up_list_EXTRA_OBJ_TO_LINK_2) $(gmu_Gp_list_SUBPRJ_TO_LINK) \
-    	$(gmp_bc_EXTRALIBS) \
+    	$(_gmp_bc_EXTRALIBS_files) \
     	$(if $(_isLinkageListChanged),gmu_ut_Always)
 	@$(if $?,,$(if $(_isLinkageListChanged), $(call _DoVerbose1,@echo "!GMU!Info: Go relink due to linkage list changed since last build.") ))
 #		Strategy: Display "Go relink ..." when _isLinkageListChanged is the only factor causing the relink action. 
