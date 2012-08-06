@@ -1,0 +1,25 @@
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = gmuex-MakeSDK2
+endif
+
+gmu_uv_list_ALL_SUBPRJ = walkdir
+
+walkdir_Makefile = ../../walkdir/libsrc/Makefile.umk
+walkdir_MakeVarDefines = \
+	gmp_u_list_PLUGIN_TO_LOAD=PI_sync_devoutput \
+	gmi_SYDO_ud_SYNC_HEADER_TO=$(gmu_DIR_ROOT)/MySDK2/include \
+	gmi_SYDO_ud_SYNC_LIB_TO=$(gmu_DIR_ROOT)/MySDK2/lib
+walkdir_IsForcePostProc = 1
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
