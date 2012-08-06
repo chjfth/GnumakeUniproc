@@ -1,1 +1,1 @@
-`make-all' here makes the walkdir library and all examples using it.
+Makefile here makes the walkdir library and all examples using it.
