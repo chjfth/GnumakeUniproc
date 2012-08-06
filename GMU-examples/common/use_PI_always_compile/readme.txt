@@ -8,12 +8,12 @@ nowdate.c . This is useful when you use C internal macro __DATE__ or __TIME__
 to represent a program's build date. 
 In order to do this, we need extra two steps:
 
-1. Load the plugin PI_always_compile in exe.mki:
+1. Load the plugin PI_always_compile in makefile:
 =======
 gmp_u_list_PLUGIN_TO_LOAD += PI_always_compile
 =======
 
-2. In u_srccfg_post.mki, tell which files should be always compiled:
+2. Tell which files should be always compiled:
 =======
 gmi_ALCP_up_list_SRC_ALWAYS_COMPILE_FROM_ROOT = nowdate.c
 =======
