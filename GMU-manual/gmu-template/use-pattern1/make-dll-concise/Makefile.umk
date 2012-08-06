@@ -29,6 +29,8 @@ endif
 ############################################################################
 gmp_bc_IMAGE_TYPE = DLL
 
+#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
+
 ############################################################################
 # Compiler specific settings below.
 ############################################################################
@@ -38,13 +40,8 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 	# 1: Use static CRT lib (compiler option /MT or /MTd)
 	# (null): use DLL CRT lib (compiler option /MD or /MDd)
 
-  gmp_mswin_IMPLIB_SUFFIX = --imp
-	# (suggested) This forces the import-lib name to have suffix --imp .
-  
   # gmp_CFLAGS_NON_CODE_GEN += /W3
   
-  # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
-
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
     # gmi_RCVC_up_list_WINRC_FROM_ROOT = <.rc-filepath>
 	#	This is a required parameter for PI_winres_msvc plugin, telling where is 
@@ -132,8 +129,6 @@ gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 	# This tells the module-definition (.DEF) file to use for linking a DLL .
 #gmp_mswin_IMPLIB_SUFFIX = --imp
 	# (optional) This forces the import-lib name to have suffix --imp .
-	# This must not be set before pattern1.mks .
-#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
 #gmi_RCVC_up_list_WINRC_FROM_ROOT = [dir-prefix]/xxx.rc
 	# This is a required parameter for PI_winres_msvc plugin, telling where is 
 	# the Windows resource script file.
