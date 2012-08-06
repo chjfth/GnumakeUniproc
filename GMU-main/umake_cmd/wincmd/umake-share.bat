@@ -1,3 +1,5 @@
+REM Don't call this bat directly, instead, call umake.bat, umakeD.bat etc.
+
 IF "%gmu_MAKE_EXE%" == "" (
       set gmu_MAKE_EXE=make
     )
@@ -20,11 +22,32 @@ IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% goto ErrorDelLogBak
 IF EXIST %gmu_LOG_OUTPUT_FILENAME% REN %gmu_LOG_OUTPUT_FILENAME% %gmu_LOG_OUTPUT_FILENAME_bak%
 IF NOT %ERRORLEVEL% == 0 GOTO ErrorRename
 
-%gmu_MAKE_EXE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+REM A special processing from GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
+REM If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
+REM * If user provides -f xxx in command parameter, I'll pass those parameter to make .
+REM * If user does not provide -f xxx, I'll call make with all user's parameter as well as appending -f Makefile.umk as make's extra parameters.
+if exist Makefile.umk (
+	set _F_MAKEFILE=-f Makefile.umk
+	:CHECK_PARAM_AGAIN
+	if "%~1" == "" (
+	  goto CHECK_PARAM_DONE
+	) else (
+	  if "%~1" == "-f" (
+	    set _F_MAKEFILE=
+	    goto CHECK_PARAM_DONE
+	  )
+	  rem echo @@@%1
+	  shift
+	)
+)
+goto CHECK_PARAM_AGAIN
+:CHECK_PARAM_DONE
+
+%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
 goto END
 
 :NoLogOutput
-%gmu_MAKE_EXE% %*
+%gmu_MAKE_EXE% %_F_MAKEFILE% %*
 GOTO END
 
 :ErrorDelGmuSig
