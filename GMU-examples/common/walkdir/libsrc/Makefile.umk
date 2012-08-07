@@ -87,7 +87,7 @@ gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,walkdir)
 
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
-gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
+gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 1
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
 
 
