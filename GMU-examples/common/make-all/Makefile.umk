@@ -1,0 +1,35 @@
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = GMU-example-common
+endif
+
+dir_common = ..
+
+gmu_uv_list_ALL_SUBPRJ = walkdir use_PI_always_compile zlib_dll \
+	FindEmptyDir file_spec_cflags force-postproc
+
+walkdir_Makefile = $(dir_common)/walkdir/make-all/Makefile.umk
+
+use_PI_always_compile_Makefile = $(dir_common)/use_PI_always_compile/Makefile.umk
+	# where the sub-project's makefile resides
+
+zlib_dll_Makefile = $(dir_common)/zlib_dll/makelib/Makefile.umk
+
+FindEmptyDir_Makefile = $(dir_common)/FindEmptyDir/demoFindEmptyDir/Makefile.umk
+
+file_spec_cflags_Makefile = $(dir_common)/file_spec_cflags/Makefile.umk
+
+force-postproc_Makefile = $(dir_common)/force-postprocess/make-sdk-all/Makefile.umk
+
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks

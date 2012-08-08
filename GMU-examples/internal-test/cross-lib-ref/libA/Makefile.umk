@@ -1,0 +1,31 @@
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+gmu_PRJ_NAME = itclr-libA
+
+gmp_bc_IMAGE_TYPE = LIB
+
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,a)
+
+gmu_ud_SRC_ROOT = .
+
+gmu_up_list_SRC_FROM_ROOT += a1.c a2.c
+
+gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
+
+gmp_CFLAGS_CODE_GEN_ALL +=
+  # You may want to dispense options for gmp_CFLAGS_CODE_GEN_ALL into following 2 categories:
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) # append other macro defines, e.g. -Dxxx=yyy
+  gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset) # append other code generation related options
+
+gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
+
+gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += libb
+
+libb_Makefile = ../libB/Makefile.umk
+
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1.mks
