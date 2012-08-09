@@ -85,8 +85,7 @@ gmp_DECO_DEBUG_FOR_LINK_OUTPUT =
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
 #	Define the root dir where all your source files(.c, .cpp, not .h) reside in.
-# You can use a relative dir here, but note, it is relative to make-var $(CURDIR),
-# not to this mki file. Normally, $(CURDIR) is your start-up makefile directory.
+# You can use a relative dir here. Use . to represent the dir of this Makefile.
 ############################################################################
 gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 
