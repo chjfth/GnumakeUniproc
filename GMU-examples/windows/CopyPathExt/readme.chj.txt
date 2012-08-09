@@ -11,7 +11,8 @@ a compiler flag:
 
 NOTE: Currently, MIDL generated files(.h, .c, .tlb etc) are placed in source file directory, 
 therefore, doing a ``rm -fr gf'' will not clean those files, so a second run of umake 
-will not call MIDL compiler -- unless you manually delete those MIDL generated files.
+will not call MIDL compiler -- unless you manually delete those MIDL generated files, which
+includes CopyPathExt.tlb , CopyPathExt_i.c , CopyPathExt.h .
 
 Tested with Visual C++ 6 with Platform SDK Feb 2003(Core SDK, Internet Development SDK).
 
