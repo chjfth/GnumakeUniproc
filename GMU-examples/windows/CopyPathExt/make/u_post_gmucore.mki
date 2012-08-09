@@ -1,7 +1,0 @@
-
-### For PI_winres_msvc
-
-$(gmi_RCVC_Gp_list_RES) : $(gmi_MIDL_up_IDL_EXPECTED_OUTPUT)
-# This dependency is required because CopyPathExt.rc refers to "CopyPathExt.tlb" 
-# which comes into being only after running midl command.
-

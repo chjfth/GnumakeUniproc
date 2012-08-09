@@ -25,11 +25,21 @@ $(_list_objs_on_pch): gmp_CFLAGS_NON_CODE_GEN := $(gmp_CFLAGS_NON_CODE_GEN) \
 	#	[2007-01-16] Since /Fd"xxx" has turned into a "standard" option in 
 	# gmp_CFLAGS_NON_CODE_GEN today, we have to use $(patsubst ) to change it explicitly.
 
-$(_list_objs_on_pch) $(_p_PCH_GENERATED_obj): $(_p_PCH_GENERATED)
+
+$(_list_objs_on_pch): $(_p_PCH_GENERATED)
 #	We must have those objs depend on the generated pch file, so that the pch file
 # will be updated(and updated before those objs) when/before those objs should be updated.
 # (Note for GNUmake 3.81,3.80: You cannot insert a tab preceding the above command lines, which causes `overriding commands for target' error.)
-_temp:=
+
+$(_p_PCH_GENERATED_obj): $(_p_PCH_GENERATED) ;
+# Subtle fix(GnumakeUniproc 0.98), note the trailing semicolon above, which means this rule has an empty command. 
+# $(_p_PCH_GENERATED_obj) is StdAfx.h.pch.obj
+# The catch all %.c,%.cpp rule introduced in r1060 requires us to list this rule with an empty command.
+# Otherwise, GNU make's implicit rule will try to build StdAfx.h.pch.obj.o from StdAfx.h.pch.obj.c . 
+# You can know it by running 
+#   umake --debug=m,v
+# This problem arises when I use concise Makefile.umk on CopyPathExt example.
+
 
 define _MSVC_GEN_PCH
 	@echo " Precompiling $(gmu_ud_SRC_ROOT)/$(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) to $(call _StripOutputRootPrefix,$@) ... "
