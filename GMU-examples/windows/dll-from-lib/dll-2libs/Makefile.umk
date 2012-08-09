@@ -19,7 +19,7 @@ endif
 # gmu_G_Final_PrjName.
 ############################################################################
 ifndef gmu_PRJ_NAME
-  gmu_PRJ_NAME = dfl-walkdir-lib
+  gmu_PRJ_NAME = dll-from-2libs
 endif
 
 ############################################################################
@@ -27,7 +27,9 @@ endif
 #	Define the "image-type" to generated for this project.
 # Common image-types are: LIB, DLL and EXE.
 ############################################################################
-gmp_bc_IMAGE_TYPE = LIB
+gmp_bc_IMAGE_TYPE = DLL
+
+#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
 
 ############################################################################
 # Compiler specific settings below.
@@ -38,20 +40,19 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 	# 1: Use static CRT lib (compiler option /MT or /MTd)
 	# (null): use DLL CRT lib (compiler option /MD or /MDd)
 
-  gmu_up_list_SRC_FROM_ROOT += mswin/walkdir.c mswin/ps_func.c
-
   # gmp_CFLAGS_NON_CODE_GEN += /W3
   
-  # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
-
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
+    # gmi_RCVC_up_list_WINRC_FROM_ROOT = <.rc-filepath>
+	#	This is a required parameter for PI_winres_msvc plugin, telling where is 
+	#	the Windows resource script file, filepath relative to $(gmu_ud_SRC_ROOT).
   # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
     # gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
 	#	This tells the .H file used for precompiled header(passed as /Yc 's argument)
-  # gmp_u_list_PLUGIN_TO_LOAD += PI_dll_from_lib      # make dll from lib
+  # gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib   # make dll from lib
   # gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
 
-else
+else # ... some other gmp_COMPILER_ID processing ...
 
   $(error Sorry, this makefile does not support gmp_COMPILER_ID=$(gmp_COMPILER_ID))
 
@@ -63,25 +64,41 @@ endif
 # by spaces. Plugins are searched from $(gmp_ud_list_CUSTOM_MKI) and then
 # from $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/plugins .
 ############################################################################
-gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib
+gmp_u_list_PLUGIN_TO_LOAD += PI_windll_from_lib PI_winres_msvc
 	# PI_sync_devoutput PI_always_compile PI_file_precopy
 
-gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT = ExportDefs.txt
+### >>> PI_dll_from_lib plugin
+# Load "make dll from lib" plugin, and load for subprjs as well(export ...).
+#export gmp_u_list_PLUGIN_TO_LOAD += PI_dll_from_lib #(PL)
+#  export gmi_DFL_DO_AUTO_EXPORT = 1
+	# Note: gmi_DFL_DO_AUTO_EXPORT=1 currently requires Python 2.x .
+#  gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT = $(if $(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+  	# Enable gmi_DFL_IS_DEEP_EXPORT=1 if you want this DLL to export functions from all levels 
+  	# of sub-projects. 
+  	# If null, export only those of your immediate sub-projects.
+#*#
+# OR, if you want to export all LIB levels, replace the above #(PL) line with the following two lines:
+#*#
+#export gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE += PI_dll_from_lib
+#  gmi_DFL_IS_DEEP_EXPORT = 1
+### <<< PI_dll_from_lib plugin
 
 
 ############################################################################
 # GMU-var: gmu_uf_LINK_OUTPUT
 #	Define the link ouput filename for this project.
 # Decoration may be applied to this name which results in $(gmu_Gf_Final_LinkOutput).
-# Using function gmpf_MakeLibName to construct output name makes the name more portable.
+# Using function gmpf_MakeDllName to construct output name makes the name more portable.
 ############################################################################
-gmu_uf_LINK_OUTPUT = $(call gmpf_MakeLibName,walkdir)
-
+#gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllName,<your-dll-name>)
+#or
+gmu_uf_LINK_OUTPUT = $(call gmpf_MakeDllNameForLink,dll-2libs)
+# --if you, making an Windows DLL, want other projects to auto-link this
+# DLL project's import-lib. On Windows, it results in <your-import-lib-name>.lib .
 gmp_DECO_UNICODE_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _U suffix on your output-image when gmp_bc_UNICODE=1
-gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 1
+gmp_DECO_DEBUG_FOR_LINK_OUTPUT = 
 	#Set this to 1 if you want a _D suffix on your output-image when gmp_bc_DEBUG=1
-
 
 ############################################################################
 # GMU-var: gmu_ud_SRC_ROOT
@@ -101,7 +118,17 @@ gmu_ud_SRC_ROOT = .
 # * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
 #	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
 ############################################################################
-gmu_up_list_SRC_FROM_ROOT += walkdir-extname.c
+gmu_up_list_SRC_FROM_ROOT += # none
+
+# >>> optional for win32 dll (enable as you will)
+#gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = [dir-prefix]/some-name.def
+	# This tells the module-definition (.DEF) file to use for linking a DLL .
+gmp_mswin_IMPLIB_SUFFIX = --imp
+	# (optional) This forces the import-lib name to have suffix --imp .
+gmi_RCVC_up_list_WINRC_FROM_ROOT = dll-2libs.rc
+	# This is a required parameter for PI_winres_msvc plugin, telling where is 
+	# the Windows resource script file.
+# <<< optional for win32 dll
 
 ############################################################################
 # GMU-var: gmu_ud_list_PRJ_HEADER
@@ -112,7 +139,7 @@ gmu_up_list_SRC_FROM_ROOT += walkdir-extname.c
 #	1. They'll be passed to the compiler through ``-I <dir1> -I <dir2> ...'' .
 #	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
 ############################################################################
-gmu_ud_list_PRJ_HEADER += $(gmu_ud_SRC_ROOT)/include
+gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
 	# Don't write ``-I'' in this var; -I will be prependded automatically.
 
 #gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
@@ -143,41 +170,89 @@ gmu_u_GCC_M_OPTIONS +=
 
 
 ############################################################################
-# List extra objs to link in gmu_up_list_EXTRA_OBJ_TO_LINK:
+# GMU-vars: gmp_LINKFLAGS
+#	Set linker options for this project in this var.
+############################################################################
+gmp_LINKFLAGS += $(gmp_LINKFLAGS_preset)
+  # There are some other make-vars for easy setting linker flags:
+  gmp_ud_list_EXTRALIB += 
+  	# list library paths here, compiler-config-mki will help you prepend(for example) 
+  	# * -L for linuxgcc
+  	# * /LIBPATH: for msvc
+
+############################################################################
+#	List extra objs or libs to link below, they'll be combined into gmp_ALL_TO_LINK
 ############################################################################
 gmu_up_list_EXTRA_OBJ_TO_LINK +=
+	# Extra object files to link
 
+gmp_bc_EXTRALIBS += # $(call gmpf_MakeLibName,<lib-list>)
+	# Extra libs to link. Update of these libs will force re-link.
+	#
+	# $(call gmpf_MakeLibName,foo) will become(for example):
+	# * libfoo.a         for linuxgcc & mingw
+	# * foo.lib          for msvc
 
+gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
+	# List system libs in this make-var. 
+	# If more than one sys-lib are used, separate them with spaces.
+	# Note: Update of libs in gmp_bc_SYSLIBS will not force re-link.
+	#
+	# The reason for using gmpf_MakeUpSysLibsToLink: 
+	# $(call gmpf_MakeUpSysLibsToLink,comfun) will become(for example):
+	# * -lcomfun         for linuxgcc & mingw
+	# * comfun.lib       for msvc
+
+#---------------------------------------------------------------------------
+# Sub-projects definition starts here. 
+# Library(static lib or DLL) projects may well be your sub-projects for this EXE project
+#---------------------------------------------------------------------------
 ############################################################################
-# GMU-vars: gmu_uv_list_SUBPRJ_LINK_FOR_PARENT
-#	If your LIB project wants its sub-projects to be linked by
-# its parent EXE project, the LIB project can assign those sub-projects in 
-# this variable, so that your parent EXE project don't have to know what
-# (further sub-projects) your current LIB project are depending on.
-# It's amazing, really.
-# ( note: If you don't use gmu_uv_list_SUBPRJ_LINK_FOR_PARENT at first,
-# and later enable gmu_uv_list_SUBPRJ_LINK_FOR_PARENT, then you must clean 
-# the old project output-dir first in order for that change to work. )
+# GMU-var: gmu_uv_list_SUBPRJ_TO_LINK (outdated)
+#	This var tells which projects are sub-project for this project(parent project), 
+# and, for sub-projects listed in this var, their output-images will automatically 
+# become link components for parent project.
+#
+# GMU-var: gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL (recommended)
+#	This one is the superset of gmu_uv_list_SUBPRJ_TO_LINK. It's powerful.
+#	Not only output-images of sub-projects explicitly listed in gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL 
+# will be linked by this project, but also sub-projects' of those explictly listed ones 
+# -- any level of sub-projects can be linked. Anyhow, there are two factors that 
+# determines whether deeper projects' outputs will be automatically linked:
+# 1. a deeper project must claim himself a link-component(gmu_I_AM_A_LINK_COMPONENT=1).
+# You know, if you use pattern1.mks, LIB image-type has gmu_I_AM_A_LINK_COMPONENT=1 
+# already defined.
+# 2. For your sub-project(called SP), SP must define his sub-projects(called SSPs)
+# in gmu_uv_list_SUBPRJ_LINK_FOR_PARENT in order for SSPs to be linked automatically
+# by you.
 ############################################################################
-gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += # <subprj-ref> ...
 
+#gmu_uv_list_SUBPRJ_TO_LINK += # <subprj1-refname> <subprj2-refname> ...
+# or
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += walkdirLib libtest
+
+######## Details of your sub-projects go here: ########
+
+walkdirLib_Makefile = ../libsrc-walkdir/Makefile.umk
+
+libtest_Makefile = ../libsrc-test/Makefile.umk
 
 
 # ----------- below for plugin PI_sync_devoutput -----------
 
 # If you use plugin PI_sync_devoutput, you may want to set:
-gmi_SYDO_ud_SYNC_HEADER_ROOT = $(gmu_ud_SRC_ROOT)/include
+# gmi_SYDO_ud_SYNC_HEADER_FROM =
 	# The dir that your headers reside in. ( relative to $(CURDIR) )
 
-gmi_SYDO_up_list_SYNC_HEADERS = walkdir.h
-	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_ROOT) )
+# gmi_SYDO_up_list_SYNC_HEADER =
+	# List filepaths of the header files to sync. ( relative to $(gmi_SYDO_ud_SYNC_HEADER_FROM) )
 
 # gmi_SYDO_ud_SYNC_HEADER_TO = # (suggested to set as env-var or by parent project)
 	# Where the headers will be sync-ed to.
 
 # gmi_SYDO_ud_SYNC_LIB_TO = # (suggested to set as env-var or by parent project)
-	# Where the static LIBs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
-
+# gmi_SYDO_ud_SYNC_DLL_TO =
+	# Where the static LIBs/DLLs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
 
 
 ###### DON'T DELETE THIS FINAL include. ######
