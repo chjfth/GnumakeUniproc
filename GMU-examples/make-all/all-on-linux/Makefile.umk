@@ -1,0 +1,35 @@
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = GMU-example-all-on-linux
+endif
+
+gmu_uv_list_ALL_SUBPRJ =  all-common  demo-auto-checkout
+gmu_uv_list_ALL_SUBPRJ += linux-all
+gmu_uv_list_ALL_SUBPRJ += cross-lib-ref
+
+dir_ex_root = ../..
+dir_internal-test = $(dir_ex_root)/internal-test
+
+all-common_Makefile = $(dir_ex_root)/common/make-all/Makefile.umk
+        # where the sub-project's makefile resides
+
+linux-all_Makefile = $(dir_ex_root)/linux/make-all/Makefile.umk
+
+cross-lib-ref_Makefile = $(dir_internal-test)/cross-lib-ref/cntr-one/Makefile.umk
+cross-lib-ref_MakeVarDefines = gmp_COMPILER_ID=$(gmp_COMPILER_ID)
+
+
+demo-auto-checkout_Makefile = $(dir_ex_root)/auto-checkout/root1-svn/make.$(gmp_COMPILER_ID)/Makefile
+
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
