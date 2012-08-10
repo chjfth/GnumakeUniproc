@@ -1,18 +1,21 @@
-#### template file for use with pattern1-container.mks, [GnumakeUniproc v1.0]
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
 # ! Be sure to replace every occurrence of <angle-brackets> to be your
 # actual content, or [ at least comment them out if some of them are
 # not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
 
-#---------------------------------------------------------------------------
-# This file is to be included by $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks .
-# You should list sub-projects for this container in this file.
-#---------------------------------------------------------------------------
-
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = CopyPathExt-all-variant
+endif
 
 gmu_uv_list_ALL_SUBPRJ = a u d ud
 	# a: Ansi , u: Unicode , d: debug
 
-dllMakefile = ../../make/dll.msvc/Makefile
+dllMakefile = ../Makefile.umk
 
 a_Makefile = $(dllMakefile)
 u_Makefile = $(dllMakefile)
@@ -24,3 +27,7 @@ a_MakeVarDefines = gmp_bc_DEBUG=  gmp_bc_UNICODE=
 u_MakeVarDefines = gmp_bc_DEBUG=  gmp_bc_UNICODE=1
 d_MakeVarDefines = gmp_bc_DEBUG=1 gmp_bc_UNICODE=
 ud_MakeVarDefines = gmp_bc_DEBUG=1 gmp_bc_UNICODE=1
+
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
