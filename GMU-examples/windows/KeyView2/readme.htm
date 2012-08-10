@@ -36,10 +36,16 @@ CODE { color:#660000; }
 </ul>
 <p>In order to accomplish this goal, you should write your makefiles as follows:</p>
 <ol>
-  <li>Before GMU core(in <tt>exe.mki</tt>), define <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> to your customed output filename(most time, should be a fullpath) .</li>
-  <li>After GMU core(in <tt>u_post_gmucore.mki</tt>), define your rule for target <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> . In this rule, you launch the zip command to zip the EXE output.</li>
+  <li>In start-up makefile, define <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> to your customized output filename(most time, should be a fullpath) .</li>
+  <li>After GMU core(in a make partial file with reserved filename <tt>u_post_gmucore.mki</tt>), define your rule for target <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> . In this rule, you launch the zip command to zip the EXE output.</li>
 </ol>
-<p>&nbsp;</p>
+<p>The rule looks like</p>
+<pre>
+$(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT)
+	@echo "KeyView2 GMU example note: Zipping output file $(notdir $<) ..."
+	@( cd $(dir $<) && zip $@ $(notdir $<) )
+</pre>
+<p>That very rule must be present in <tt>u_post_gmucore.mki</tt>, because <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> and <code>gmu_Gp_LINK_OUTPUT</code> has not been defined in your start-up makefile. If you did that, the &quot;immediate-expansion&quot; behavior of GNU make would expand then into null string thus defeat our goal.</p>
 <p>NOTE: If you do a full install of GMU's Windows installer, zip.exe(from Info-ZIP website) is ready for you in the same dir as umakeU.bat, otherwise, you have to prepare a zip command in your PATH env-var yourself. </p>
 <p>--</p>
 </body>

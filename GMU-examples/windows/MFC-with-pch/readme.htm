@@ -57,7 +57,7 @@ H4 {
 <body>
 <H1 align="center">MFC-with-pch example readme</H1>
 
-<p>[2007-11-25] Updated for GnumakeUniproc v0.93</p>
+<p>[2012-08-10] Updated for GnumakeUniproc v0.98</p>
 
 <H2>Summary</H2>
 <p>The example demonstrates the following things by building an MFC program:</p>
@@ -85,14 +85,14 @@ H4 {
   <li>    gmi_up_list_SRC_DONT_DEPPCH_FROM_ROOT</li>
 </ul>
 <h3>The default behavior of this example </h3>
-<p>The default u_srccfg_post.mki provided is as follows: </p>
+<p>Makefile(Makefile.umk) key statements as follows: </p>
 <pre class="fws">gmu_u_list_CXX_EXTN = cxx cpp <span class="c-comment"># a deliberate cxx for test
 	# Since cxx is listed first, so this plugin will create a file named
 	# StdAfx.h.cxx instead of StdAfx.h.cpp .</span>
 
 gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,MFC-with-pch)
 
-gmu_ud_SRC_ROOT = ../..
+gmu_ud_SRC_ROOT = .
 
 gmu_up_list_SRC_FROM_ROOT += $(gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT) \
 	MainFrm.cpp MFC1.cxx MFC1Doc.cpp MFC1View.cpp
@@ -105,77 +105,69 @@ gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT = NotUsingPch.cpp
 gmi_RCVC_up_list_WINRC_FROM_ROOT = MFC1.rc
 
 gmp_CFLAGS_CODE_GEN_ALL +=
-  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) -D_WINDOWS -D_AFXDLL
+  gmp_CFLAGS_MACRO_DEFS += $(gmp_CFLAGS_MACRO_DEFS_preset) <b>-D_WINDOWS -D_AFXDLL</b>
   gmp_CFLAGS_CODE_GEN += $(gmp_CFLAGS_CODE_GEN_preset)
 
 gmp_CFLAGS_NON_CODE_GEN += $(gmp_CFLAGS_NON_CODE_GEN_preset)
 
 <span class="c-comment"># ... Remainder the same as template.</span></pre>
-<p>The default u_srccfg_post.mki provided in this example does not define <code>gmi_up_list_SRC_DEPPCH_FROM_ROOT</code>, but define <code>gmi_up_list_SRC_DONT_DEPPCH_FROM_ROOT=NotUsingPch.cpp</code> . That means all source files(those listed in <code>gmu_up_list_SRC_FROM_ROOT</code>) will all use precompiled headers(compile with /Yu option) except <tt>NotUsingPch.cpp</tt>. The build output is as follows:</p>
+<p>The default u_srccfg_post.mki provided in this example does not define <code>gmi_up_list_SRC_DEPPCH_FROM_ROOT</code>, but define <code>gmi_up_list_SRC_DONT_DEPPCH_FROM_ROOT=NotUsingPch.cpp</code> . That means all source files(those listed in <code>gmu_up_list_SRC_FROM_ROOT</code>) will all use precompiled headers(compile with <code>/Yu</code> option) except <tt>NotUsingPch.cpp</tt>. The build output is as follows:</p>
 <pre class="fws">
-D:\GMU\GMU-examples\windows\MFC-with-pch\make\exe.msvc>umake gmu_DO_SHOW_COMPILE_CMD=1
-GnumakeUniproc started (GNUmake v3.81).
+GnumakeUniproc started (GNUmake v3.82).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
- RC compiling: ../../MFC1.rc
-rc /fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/_obj/MFC1.r
-es"  ../../MFC1.rc
- GenHdepend for precompiled-header from: ../../StdAfx.h
- Precompiling ../../StdAfx.h  to %/MFC-with-pch_msvc_CrtMD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch ...
-
-cl /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL    /nologo /c /Yc"D:/GMU/GMU-e
-xamples/windows/MFC-with-pch/StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf
-/MFC-with-pch_msvc_CrtMD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch" /Fo"D:/GMU/GMU-examples/windows/MFC-
-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch.obj" /Fd"D:/
-GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msv
-c_CrtMD.pdb" D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/_gmu_
-tmp/PI_use_pch_msvc/StdAfx.h.cxx
+ GenHdepend for precompiled-header from: ./StdAfx.h
+ Precompiling ./StdAfx.h  to %/MFC-with-pch_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch ...
+cl   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL  /nologo /c /Yc"D:/GMU/GMU
+-examples/windows/MFC-with-pch/StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msv
+c_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch" /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pc
+h_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch.obj" /Fd"D:/GMU/GMU-examples/windows/MFC-with-pch/gf/MF
+C-with-pch_msvc_vc60/MFC-with-pch.pdb" D:/GMU/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60
+/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.cxx
 StdAfx.h.cxx
  GenHdepend: (MFC1.cxx.d)
- [cl] ../../MFC1.cxx
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_Crt
-MD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.ms
-vc/gf/MFC-with-pch_msvc_CrtMD/_obj/MFC1.cxx.obj" ../../MFC1.cxx
+ [cl] MFC1.cxx
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-ex
+amples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU
+/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MFC1.cxx.obj" MFC1.cxx
 MFC1.cxx
  GenHdepend: (NotUsingPch.cpp.d)
- [cl] ../../NotUsingPch.cpp
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/_obj/NotU
-singPch.cpp.obj" ../../NotUsingPch.cpp
+ [cl] NotUsingPch.cpp
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb"   /Fo"D:/GMU/GMU-examples/windo
+ws/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/NotUsingPch.cpp.obj" NotUsingPch.cpp
 NotUsingPch.cpp
  GenHdepend: (MainFrm.cpp.d)
- [cl] ../../MainFrm.cpp
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_Crt
-MD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.ms
-vc/gf/MFC-with-pch_msvc_CrtMD/_obj/MainFrm.cpp.obj" ../../MainFrm.cpp
+ [cl] MainFrm.cpp
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-ex
+amples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU
+/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MainFrm.cpp.obj" MainFrm.cpp
 MainFrm.cpp
  GenHdepend: (MFC1Doc.cpp.d)
- [cl] ../../MFC1Doc.cpp
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_Crt
-MD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.ms
-vc/gf/MFC-with-pch_msvc_CrtMD/_obj/MFC1Doc.cpp.obj" ../../MFC1Doc.cpp
+ [cl] MFC1Doc.cpp
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-ex
+amples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU
+/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MFC1Doc.cpp.obj" MFC1Doc.cpp
 MFC1Doc.cpp
  GenHdepend: (MFC1View.cpp.d)
- [cl] ../../MFC1View.cpp
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_Crt
-MD/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.ms
-vc/gf/MFC-with-pch_msvc_CrtMD/_obj/MFC1View.cpp.obj" ../../MFC1View.cpp
+ [cl] MFC1View.cpp
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb" /Yu"StdAfx.h" /Fp"D:/GMU/GMU-ex
+amples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_gmu_tmp/PI_use_pch_msvc/StdAfx.h.pch"   /Fo"D:/GMU
+/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MFC1View.cpp.obj" MFC1View.cpp
 MFC1View.cpp
-***** Linking(EXE_GUI): %/MFC-with-pch_msvc_CrtMD/MFC-with-pch.exe ...
-[DONE:] %/MFC-with-pch_msvc_CrtMD/MFC-with-pch.exe
+ GenHdepend for Windows resource script: MFC1.rc
+ RC compiling: MFC1.rc
+rc /fo"D:/GMU/GMU-examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MFC1.res"  MFC1.rc
+***** Linking(EXE_GUI): %/MFC-with-pch_msvc_vc60/MFC-with-pch.exe ...
+[DONE:] %/MFC-with-pch_msvc_vc60/MFC-with-pch.exe
 [[[END]]]                                        Projects:1,Containers:0+0
 Files compiled: C++:5 C:0 ASM:0 linked:1
 Custom action count:
-    MSVC-RC-compiled: 1
     MSVC-PCH-generated: 1
+    MSVC-RC-compiled: 1
 </pre>
 <p>From the output, you can see that /Yu compiler option is not used when compiling <tt>NotUsingPch.cpp</tt>.</p>
 <p>By the way, if you want to ask why <tt>MFC1.cxx</tt> is compiled prior to <tt>NotUsingPch.cpp</tt>, I can tell you that's because you list <code>cxx</code> prior to <code>cpp</code> in <code>gmu_u_list_CXX_EXTN</code>, which causes all cxx files are compiled before all cpp files. </p>
@@ -189,13 +181,12 @@ gmi_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
 gmi_up_list_SRC_DONT_DEPPCH_FROM_ROOT = NotUsingPch.cpp <b>MFC1View.cpp</b> 
 </pre>
 <p>This time  you can see in this build output(remember to clean the output in the previous build first):  </p>
-<pre class="fws"> [cl] ../../MFC1View.cpp
-cl /c /GR /GX /O2 /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL   /nologo /Fd"D:/GMU/GMU-ex
-amples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/VCx0_MFC-with-pch_msvc_CrtMD.pd
-b"   /Fo"D:/GMU/GMU-examples/windows/MFC-with-pch/make/exe.msvc/gf/MFC-with-pch_msvc_CrtMD/_obj/MFC1
-View.cpp.obj" ../../MFC1View.cpp
+<pre class="fws"> [cl] MFC1View.cpp
+cl /c   /GR /EHsc  /O2 /Zi /MD     /DWIN32  /D_MBCS /DNDEBUG -D_WINDOWS -D_AFXDLL /nologo /Fd"D:/GMU/GMU-
+examples/windows/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/MFC-with-pch.pdb"   /Fo"D:/GMU/GMU-examples/windo
+ws/MFC-with-pch/gf/MFC-with-pch_msvc_vc60/_obj/MFC1View.cpp.obj" MFC1View.cpp
 </pre>
-<p>You can notice that <tt>MFC1View.cpp</tt> is not longer compiled with /Yu. </p>
+<p>You can notice that <tt>MFC1View.cpp</tt> is not longer compiled with <code>/Yu</code>. </p>
 <p>To accomplish the same build process(not using pch for MFC1View.cpp), you can also use <code>gmi_up_list_SRC_DEPPCH_FROM_ROOT</code> instead of <code>gmi_up_list_SRC_DONT_DEPPCH_FROM_ROOT</code>. The u_srccfg_post.mki(partial) now appears as: </p>
 <pre class="fws">
 gmu_up_list_SRC_FROM_ROOT += NotUsingPch.cpp MFC1View.cpp \

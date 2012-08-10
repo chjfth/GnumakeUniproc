@@ -1,0 +1,39 @@
+# template file for use with pattern1-container.mks, concise version, [GnumakeUniproc v1.0]
+# ! Be sure to replace every occurrence of <angle-brackets> to be your
+# actual content, or [ at least comment them out if some of them are
+# not required] .
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef gmu_PRJ_NAME
+  gmu_PRJ_NAME = GMU-examples-windows-all
+endif
+
+gmu_uv_list_ALL_SUBPRJ = dllfromlib dll-2libs \
+	MFC-with-pch CopyPathExt-all \
+	KeyView2_ansi KeyView2_unicode \
+
+dir_windows = ..
+
+dllfromlib_Makefile = $(dir_windows)/dll-from-lib/dll-walkdir/Makefile.umk
+
+dll-2libs_Makefile = $(dir_windows)/dll-from-lib/dll-2libs/Makefile.umk
+
+MFC-with-pch_Makefile = $(dir_windows)/MFC-with-pch/Makefile.umk
+	# where the sub-project's makefile resides
+
+CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/Makefile.umk
+
+
+KeyView2_ansi_Makefile = $(dir_windows)/KeyView2/Makefile.umk
+KeyView2_ansi_MakeVarDefines = gmp_bc_UNICODE=
+
+KeyView2_unicode_Makefile = $(dir_windows)/KeyView2/Makefile.umk
+KeyView2_unicode_MakeVarDefines = gmp_bc_UNICODE=1
+
+
+###### DON'T DELETE THIS FINAL include. ######
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
