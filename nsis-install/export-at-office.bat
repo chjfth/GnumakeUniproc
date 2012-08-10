@@ -4,6 +4,8 @@ REM
 REM 2010-01-12 Memo:
 REM I have to manually build new make 3.81 and win-bash exe into MinGW-binary for a complete Windows version release.
 
+del /F /S /Q nsis-data
+
 call export-gmu.bat https://nlssvn/svnreps/makingsys/GnumakeUniproc
 @if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
 
