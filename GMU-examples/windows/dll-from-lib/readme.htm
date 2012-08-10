@@ -99,9 +99,9 @@ walkdir_extname
 <p>That's all for &quot;upgrading&quot; the LIB project, not cumbersome, right?</p>
 <p>A small hint: If you think you have no functions to be explictly listed as EXPORTS in .def file(e.g. you just want to declare functions as <code>__declspec(dllexport)</code> to accompilsh the same effect), you can leave your orignial LIB project makefiles unchanged. In other word, since your <tt>ExportDefs.txt</tt> is empty, you don't have to bother loading PI_windll_from_lib plugin for your LIB project.</p>
 <h4>How to write the DLL project? </h4>
-<p>Again, it is not difficult as well. After copying the template files for DLL project(from <tt>$gmu_ROOT/GMU-manual/gmu-template/use-pattern1/make-dll</tt>) , it boils down to the following steps:</p>
+<p>Again, it is not difficult as well. After copying the template files for DLL project(from <tt>$gmu_ROOT/GMU-manual/gmu-template/use-pattern1/make-dll-concise</tt>) , it boils down to the following steps:</p>
 <ol>
-  <li>Load PI_windll_from_lib plugin in <tt>dll.mki</tt> . </li>
+  <li>Load PI_windll_from_lib plugin in makefile .</li>
   <li>(optional) Assign the .def file to use in <code>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</code> . This is not absolutely must. If you don't assign a .def file, PI_windll_from_lib  will generate a temporary .def file(<tt>FinalDefForDll.def</tt>) for you.</li>
   <li>List walkdir as  sub-project.</li>
 </ol>
@@ -111,7 +111,7 @@ walkdir_extname
 <p>In this DLL project, some extra action are demonstrated:</p>
 <ul>
   <li><b>PI_winres_msvc</b> plugin is loaded to compile <tt>walkdir.rc</tt> into the DLL. A <code>VERSIONINFO</code> statement in the .rc describe the DLL's version info.</li>
-  <li>In <tt>u_srccfg_post.mki</tt>, an extra variable assignment <code>gmp_mswin_IMPLIB_SUFFIX=--imp</code> is introduced which causes the import library for the DLL to have the suffix <code>--imp</code> . The benifit of this is in case you intend to give both the static LIB and the DLL to your user so that they can choose a preferred one to use, the static <tt>walkdir.lib</tt> and the import-lib <tt>walkdir--imp .lib</tt> have distinguished names. </li>
+  <li>In makefile, an extra variable assignment <code>gmp_mswin_IMPLIB_SUFFIX=--imp</code> is introduced which causes the import library for the DLL to have the suffix <code>--imp</code> . The benifit of this is in case you intend to give both the static LIB and the DLL to your user so that they can choose a preferred one to use, the static <tt>walkdir.lib</tt> and the import-lib <tt>walkdir--imp .lib</tt> have distinguished names. Anyway, this is my personal preference, not a must for everyone.</li>
 </ul>
 <h2>Other issues </h2>
 <h4>How does DLL project know the content of 
@@ -149,7 +149,7 @@ walkdir_extname
   <p><img src="dll-export.gif"></p>
   <p>We generate a DLL using linker command</p>
   <pre>link /dll /out:my.dll /def:mydef.def mystub.obj my.lib</pre>
-  <p>Assume that all functions in my.lib are declared with   <code>__declspec(dllexport)</code> , then resulting DLL will have a1,  b1, b2, c1, c2 exported. (NOTE: It is so even if no function in my.lib calls b2().) </p>
+  <p>Assume that all functions in my.lib are declared with   <code>__declspec(dllexport)</code> , then resulting DLL will have a1,  b1, b2, c1, c2 exported. (Yes! b2() is drawn in even if no function in my.lib calls b2().) </p>
   <p>In the above example, the following facts apply as well: </p>
   <ul>
     <li>No one refers to d1 or d2 during DLL linking, so d.obj is actually not present in my.dll . </li>
