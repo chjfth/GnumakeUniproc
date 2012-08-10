@@ -32,22 +32,22 @@
 <h3><a name="DirBriefView"></a>A brief view of the project example directory </h3>
 <p>Go to the directory containing our example(making an EXE). </p>
 <pre class="fws">D:\GMU>cd D:\GMU\GMU-examples\common\walkdir\examples\walkdir_ex1</pre>
-<p>In the directory we just entered, we can see three files:</p>
+<p>In the directory we just entered, we can see two files:</p>
 <ul>
-  <li><tt>exe.mki</tt> Describe the project name and the image-type to link(an EXE, a LIB or a DLL) </li>
-  <li><tt>u_srccfg_post.mki</tt> Source file config file.</li>
-  <li><tt>walkdir_ex1.c</tt> The C source file for this project</li>
+  <li><tt>walkdir_ex1.c</tt> The C source file for this project. Only one .c file for the EXE.</li>
+  <li><tt>Makefile.umk</tt> The GMU-style makefile(or &quot;GMU makefile&quot; for short). We can make its name <tt>Makefile</tt> according to Unix world tradition, however, adding <tt>umk</tt> extension helps visual recognition of a GMU makefile.</li>
 </ul>
-<p>Those .mki files are called make partial files, since each of them is not a complete makefile, but to be included by other makefiles(the &quot;i&quot; in &quot;mki&quot; implies &quot;include&quot;). </p>
-<p>I think we should now have a look into <tt>u_srccfg_post.mki</tt> , listed below(with large pieces of comments stripped). </p>
-<pre class="fws"><span class="c-comment">########### u_srccfg.mki for project walkdir_ex1 #############</span>
+<p>The Makefile.umk here is a modification from the template umk from the <tt>make-exe-concise</tt> directory. Here, I show you the key statements from this Makefile.umk (with large pieces of comments stripped).</p>
+<pre class="fws"><span class="c-comment">########### Makefile.umk for project walkdir_ex1 #############</span>
 
 gmu_uf_LINK_OUTPUT = $(call gmpf_MakeExeName,walkdir_ex1)
 	<span class="c-comment"># set the link output filename: walkdir_ex1.exe(on Windows) or walkdir_ex1(on Linux)</span> 
 
-gmu_ud_SRC_ROOT = ..
+gmu_ud_SRC_ROOT = .
 	<span class="c-comment"># tell where the source files are(the root directory of all C/C++ files in this project)</span>
-dirWalkdirLib = ../../../libsrc
+	<span class="c-comment"># a dot means the directory of the start-up makefile(Makefile.umk).</span> 
+dirWalkdirLib = ../../libsrc
+	<span class="c-comment"># Set a make variable named dirWalkdirLib, to be used later.</span>
 
 gmu_up_list_SRC_FROM_ROOT += walkdir-exe.c
 	<span class="c-comment"># list source files to compile, relative to $(gmu_ud_SRC_ROOT)</span>
@@ -56,62 +56,75 @@ gmu_ud_list_PRJ_HEADER += $(dirWalkdirLib)/include
 	<span class="c-comment"># list include dirs used with compiler's -I option</span>
 
 
-gmu_uv_list_SUBPRJ_TO_LINK = <b>libwalkdir</b> 
+gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL = <b>libwalkdir</b> 
 	<span class="c-comment"># say: I have a sub-project(refered to as <b>libwalkdir</b>), and I want to link its output(a lib).</span>
 
 <b>libwalkdir</b>_Makefile = $(dirWalkdirLib)/makelib/lib.$(gmp_COMPILER_ID)/Makefile 
 	<span class="c-comment"># where the sub-project(libwalkdir)'s makefile resides</span>
 </pre>
-<p>Hint: the original <tt>u_srccfg_post.mki</tt> contains more descriptive comments than listed above, you may want to consult them to know more of their meaning. </p>
-<p>You see, <tt>u_srccfg_post.mki</tt> is really brief and concise, which contains only necessary information specifically for the current project, no redundant or repetitive things here. </p>
+<p>Hint: the template contains more descriptive comments than listed above, you may want to consult them to know more of their meaning. </p>
+<p>You see, <tt>Makefile.umk</tt> is really brief and concise, which contains only necessary information specifically for the current project, no redundant or repetitive things here. </p>
 <div class="hint">
   <ul>
-    <li>The reserved filename <tt>u_srccfg_post.mki</tt> is recognized by  GnumakeUniproc and it will be automatically included into the whole makefile.</li>
     <li>Those make variable recognized by GnumakeUniproc have special naming patterns, with prefixing  <code>gmu_</code> or <code>gmp_</code> .</li>
   </ul>
 </div>
 <h3><a name="StartBuiding"></a>Start building the example project </h3>
-<p>Now, you have to make a choice, what compiler will be used to build the example project. GnumakeUniproc has stock support for building Windows programs using Microsoft Visual C++(version 6, 7, 8 are all OK) and MinGW. If you'd like to use other compilers, you can accompilsh it by writing specific compiler-config-mki<i>s</i> for GnumakeUniproc.</p>
+<p>Now, you have to make a choice, what compiler will be used to build the example project. GnumakeUniproc has stock support for building Windows programs using Microsoft Visual C++(version 6, 7, 8 are all OK) and MinGW. If you'd like to use other compilers, you can accompilsh it by writing specific compiler-config-mki<i>s</i> for GnumakeUniproc, but that is quite advanced topic.</p>
+<p>GMU makefile checks a make variable(make-var for short) named <code>gmp_COMPILER_ID</code> to determine what compiler to use:</p>
 <ul>
-  <li>Using VC++, cd the dir called <tt>exe.msvc</tt> from current dir. </li>
-  <li>Using MinGW, cd the dir called <tt>exe.mingw</tt> from current dir.</li>
-  <li>Using gcc on Linux, cd the dir called <tt>exe.linuxgcc</tt> from current dir. </li>
+  <li>For Visual C++, <code>gmp_COMPILER_ID=msvc</code> .</li>
+  <li>For MinGW, <code>gmp_COMPILER_ID=mingw</code>.</li>
+  <li>For gcc on Linux, <code>gmp_COMPILER_ID=linuxgcc</code>. </li>
 </ul>
-<p>In the new current dir, you can see a file called <tt>Makefile</tt>, and it contains just one line: <code>include ../exe.mki</code>. We call it startup-makefile, since it is this file that we pass to make through make's <tt>-f</tt> option. Recall that there are several relative path references in <tt>u_srccfg_post.mki</tt>(e.g. <code>gmu_ud_list_PRJ_HEADER += <b>../../include</b></code>), I must tell you now: those relative paths are relative to the startup-makefile here, not relative to where <tt>u_srccfg_post.mki</tt> itself is. </p>
-<div class="hint">
-  <p>About the <code>$(gmp_COMPILER_ID)</code> appearing on the last line of <tt>u_srccfg_post.mki</tt> :</p>
-  <p><code>gmp_COMPILER_ID</code> is one of GnumakeUniproc's reserved make variable, it is set automatically by GnumakeUniproc. In our example, </p>
-  <ul>
-    <li>if you've entered dir <tt>exe.msvc</tt>, <code>gmp_COMPILER_ID</code> will be <code>msvc</code>,</li>
-    <li>if you've entered dir <tt>exe.mingw</tt>, <code>gmp_COMPILER_ID</code> will be <code>mingw</code>.</li>
-    <li>if you've entered dir <tt>exe.linuxgcc</tt>, <code>gmp_COMPILER_ID</code> will be <code>linuxgcc</code>.</li>
-  </ul>
-  <p>Using the dynamic <code>gmp_COMPILER_ID</code> makes a single user makefile adaptive for building with many compilers.</p>
-</div>
-<p>Now, we are going to start make. Just execute make. Take MinGW for instance: </p>
+<p>GMU does not provide compiler for you(except the demonstration-purporse MinGW 3.2 on Windows), instead, GMU provides sets of rules to construct compile and link command for various compilers. That means:</p>
+<ul>
+  <li>When <code>gmp_COMPILER_ID=msvc</code>, GMU calls <tt>cl.exe</tt> to compile and <tt>link.exe</tt> to link.</li>
+  <li>When <code>gmp_COMPILER_ID=linuxgcc</code>, GMU call <tt>gcc</tt> executable to compile and link.</li>
+</ul>
+<p>So, you have to set up compiler command line environment in advance so that those compiler executable can be executed successfully.</p>
+<p>Now the question: how do we tell GMU the <code>gmp_COMPILER_ID</code> value? </p>
+<p>There are three methods:</p>
+<ol>
+  <li>set <code>gmp_COMPILER_ID</code> in environment variable.</li>
+  <li>set <code>gmp_COMPILER_ID</code> on make command line.</li>
+  <li>set <code>gmp_COMPILER_ID</code> in makefile (set on first line if you insist this way).</li>
+</ol>
+<p>Method 2 overrides method 1, and method 3 overrides method 2.</p>
+<p>I suggest method 1 or 2, because it makes your makefile not bound to a specific compiler, so your makefile becomes cross platformed.</p>
+<p>In this guide, I take method 1, the benefit of which is you don't have to append <code>gmp_COMPILER_ID=xxx</code> to every make command line. To do that:</p>
+<p>on Windows with MinGW,</p>
+<pre class="fws">set gmp_COMPILER_ID=mingw</pre>
+<p>on Linux with gcc,</p>
+<pre class="fws">export gmp_COMPILER_ID=linuxgcc</pre>
+<p>In case you miss <code>gmp_COMPILER_ID</code> assignment, GMU will quickly prompt you with error message:</p>
+<blockquote>
+  <p class="fws">!GMU!Error: From pattern1.mks: `gmp_COMPILER_ID'
+can not be extracted from current dir's extension name, nor is it defined by you explicitly.  Stop.</p>
+</blockquote>
+<p>Now, we are going to start make. Just execute make. Take MinGW on Windows for instance: </p>
 <pre class="fws">D:\GMU\GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw&gt;<b>umake</b></pre>
 <p>You can see the following output(Command Prompt window width set to 100 chars): </p>
 <pre class="fws">
-GnumakeUniproc started (GNUmake v3.81).
+GnumakeUniproc started (GNUmake v3.82).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
-
 ==============================================================================
   Now, BuildLevel [0]. Making sub-project: walkdir_mingw
   Expected Output: %/walkdir_mingw/libwalkdir.a
 ==============================================================================
  GenHdepend: (walkdir.c.d)
- [gcc] ../../mswin/walkdir.c
+ [gcc] mswin/walkdir.c
  GenHdepend: (ps_func.c.d)
- [gcc] ../../mswin/ps_func.c
+ [gcc] mswin/ps_func.c
  GenHdepend: (walkdir-extname.c.d)
- [gcc] ../../walkdir-extname.c
+ [gcc] walkdir-extname.c
 ***** Linking(LIB): %/walkdir_mingw/libwalkdir.a ...
 [DONE:] %/walkdir_mingw/libwalkdir.a
 
  GenHdepend: (walkdir_ex1.c.d)
- [gcc] ../walkdir_ex1.c
-../walkdir_ex1.c: In function `main':
-../walkdir_ex1.c:69: warning: passing arg 2 of `walkdir_extname' from incompatible pointer type
+ [gcc] walkdir_ex1.c
+walkdir_ex1.c: In function `main':
+walkdir_ex1.c:79: warning: passing arg 2 of `walkdir_extname' from incompatible pointer type
 ***** Linking(EXE): %/walkdir_ex1_mingw/walkdir_ex1.exe ...
 [DONE:] %/walkdir_ex1_mingw/walkdir_ex1.exe
 [[[END]]]                                        Projects:2,Containers:0+0
@@ -120,11 +133,11 @@ Files compiled: C++:0 C:4 ASM:0 linked:2
 <p>Some basic facts regarding the above build process: </p>
 <ol>
   <li>
-  				<p>In the above build process(one run), a LIB project is built followed by an EXE project. You can see two <tt>[DONE:] %/...</tt> lines, each indicating completion of a project's build. Since the EXE project refers to the LIB project in make-var <code>gmu_uv_list_SUBPRJ_TO_LINK</code>, we call the EXE project parent-project and the LIB project its sub-project(or child-project). </p>
-				<p>Also, since the build of EXE project is launch by us directly, we also call the EXE project, in this example, root project. </p>
+  				<p>In the above build process(one run), a LIB project is built followed by an EXE project. You can see two <tt>[DONE:] %/...</tt> lines, each indicating completion of a project's build. Since the EXE project refers to the LIB project in make-var <code>gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL</code>, we call the EXE project parent-project and the LIB project its sub-project(or child-project). </p>
+				<p>Also, since the build of EXE project is launched by us directly, we also call the EXE project the root project. </p>
   </li>
   <li>
-  				<img src="gf-dir.png" align="right" style="padding:5px" /><p>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir); root project and all child projects' output(.o .obj .lib .exe etc) will be generated into that directory. You can override, if you like, this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>(must be a absolute path in this case).  This output root dir is represented by a <b><code>%</code></b> character in the screen output. </p>
+  				<img src="gf-dir.png" align="right" style="padding:5px" /><p>GMU creates a dir named <tt>gf</tt> in current dir to store all its output(<tt>gf</tt> here is called output root dir); root project and all child projects' output(.o .obj .lib .exe etc) will be generated into that directory. You can override, if you like, this dir using make-var <code>gmu_ud_OUTPUT_ROOT</code>(must be a absolute path).  This output root dir is represented by a <b><code>%</code></b> character in the screen output. </p>
 				<p>Hint: <code>gf</code> means &quot;generated files&quot;.</p>
   </li>
   <li>
@@ -138,23 +151,21 @@ Files compiled: C++:0 C:4 ASM:0 linked:2
   </li>
 </ol>
 <div class="hint">
-  <p>SPECIAL NOTE: If you run this example on Linux, you will see extra &quot;No such file or directory&quot; warning lines like this:</p>
+  <p>SPECIAL NOTE: If you run this example on Linux, you may see extra &quot;No such file or directory&quot; warning lines like this:</p>
   <pre class="fws">GnumakeUniproc started (GNUmake v3.81).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
 /home/chj/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:860: /home/chj/GMU/GMU-examples/common/walk
-dir/examples/walkdir_ex1/exe.linuxgcc/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsMade.gmu.ckt: No such
- file or directory
+dir/examples/walkdir_ex1/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsMade.gmu.ckt: No such file or directory
 /home/chj/GMU/GMU-main/GnumakeUniproc/GnumakeUniproc.mki:1001: /home/chj/GMU/GMU-examples/common/wal
-kdir/examples/walkdir_ex1/exe.linuxgcc/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsAttrMade.gmu.ckt: No
- such file or directory</pre>
-  <p>They're totally normal, don't panic, they don't signify any threat of error. It's just that GNUmake 3.81 does not provide a way to simply suppress that boring message(when an <code>include</code> directive is used, and the to-be-included file does not exist at that moment). I hope GNUmake's future version can provide the choice to suppress it. </p>
+kdir/examples/walkdir_ex1/gf/walkdir_ex1_linuxgcc/_gmu_tmp/_SubprjsAttrMade.gmu.ckt: No such file or directory</pre>
+  <p>They're totally normal, don't panic, they don't signify any threat of error. It's just that GNUmake 3.81 and 3.82 does not provide a way to simply suppress that boring message(when an <code>include</code> directive is used, and the to-be-included file does not exist at that moment). I hope GNUmake's future version can provide the choice to suppress it. </p>
   <p>Why those warnings are not seen on Windows? Because you're provided with a tweaked version of GNU make. When you have env-var <code>gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1</code> , those warnings are suppressed.</p>
 </div>
 <p>To run the compiled walkdir_ex1.exe, just run it with a directory string as the parameter, for example: </p>
-<pre class="fws">D:\GMU\GMU-examples\...\walkdir_ex1\exe.mingw>gf\walkdir_ex1_mingw\walkdir_ex1.exe d:/GMU</pre>
+<pre class="fws">D:\GMU\GMU-examples\...\walkdir_ex1>gf\walkdir_ex1_mingw\walkdir_ex1.exe d:/GMU</pre>
 <p>This will walk the directory of <tt>d:/GMU</tt> on your system, listing all sub-dirs and files in it. </p>
 <p>If you run <code>umake</code> a second time, you will see on screen: </p>
-<pre class="fws">GnumakeUniproc started (GNUmake v3.81).
+<pre class="fws">GnumakeUniproc started (GNUmake v3.82).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
 ==============================================================================
   Now, BuildLevel [0]. Making sub-project: walkdir_mingw
@@ -173,6 +184,7 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
   <p>umake is a batch file/shell script wrapping the <tt>make</tt> executable. umake does the following:</p>
   <ul>
   		<li>Do running environment adjustment for GnumakeUniproc.</li>
+  		<li>Check if <tt>Makefile.umk</tt> exists, if yes, use it instead of <tt>Makefile</tt> .</li>
   		<li>Provide some useful facilities such as storing the screen output to a log file defautly named <tt>_gmulog.txt</tt> . </li>
   </ul>
   <p>In one word, you should always use umake to avoid problems. </p>
@@ -181,9 +193,8 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
 <h4>About the LIB project</h4>
 <p>Some facts about the LIB project used in this example:</p>
 <ul>
-  <li>The LIB project's makefile is at <tt>D:\GMU\GMU-examples\common\walkdir\libsrc\makelib\lib.mingw\Makefile</tt>, which is referred to in the parent project by relative path, that is: <tt>../../../libsrc/makelib/lib.mingw/Makefile</tt> . Note that this relative path string does not appears in our makefile, instead, it is refered to using some makefile variable substitutions, i.e., the line:</li>
-  <pre>libwalkdir_Makefile = $(dirWalkdirLib)/makelib/lib.$(gmp_COMPILER_ID)/Makefile</pre>
-  <li>The LIB project 's makefiles have very similar structure as EXE projects, except that LIB's makefiles are usually simpler than that of EXE's. </li>
+  <li>The LIB project's makefile is at <tt>D:\GMU\GMU-examples\common\walkdir\libsrc\makelib\Makefile.umk</tt>, which is referred to in the parent project by relative path, that is: <tt>../../libsrc/makelib/Makefile.umk</tt> . </li>
+  <li>The LIB project 's makefile has very similar structure as EXE projects, except that LIB's makefiles are usually simpler than that of EXE's. </li>
   <li>Key difference between the LIB project and EXE project:
     <ul>
       <li>You must define different project name(<code>gmu_PRJ_NAME</code>) for them. </li>
@@ -191,14 +202,8 @@ Files compiled: C++:0 C:0 ASM:0 linked:0
       <li>You list different source files and different header dirs for the two different projects, --sure thing. </li>
     </ul>
   </li>
-  <li>The LIB project's makefile sets <code>gmu_PRJ_NAME = walkdir</code> , while the output info shows you &quot;<tt>Making sub-project: walkdir_mingw</tt>&quot; . I tell you that <tt>walkdir_mingw</tt> is the LIB project's decorated(or final) project name; <tt>_mingw</tt> is added as suffix because you're using MinGW compiler. The idea of project name decoration enables us to build the &quot;same&quot; makefile with more than one compiler without cleaning one compiler's output before building with another.</li>
+  <li>The LIB project's makefile sets <code>gmu_PRJ_NAME=walkdir</code> , while the output info shows you &quot;<tt>Making sub-project: walkdir_mingw</tt>&quot; . I tell you that <tt>walkdir_mingw</tt> is the LIB project's decorated(or final) project name; <tt>_mingw</tt> is added as suffix because you're using MinGW compiler. The idea of project name decoration enables us to build the &quot;same&quot; makefile with more than one compiler without cleaning one compiler's output before building with another.</li>
 </ul>
-<p>One little trick to explain: If you check <tt>u_srccfg_post.mki</tt> of the walkdir LIB project, you'll see only <tt>walkdir-extname.c</tt> is assigned to <code>gmu_up_list_SRC_FROM_ROOT</code> , whereas you see three C files get compiled for the LIB, then where are the other two(<tt>walkdir.c, ps_func.c</tt>) assigned? Actually, the other two are assigned in the following two files:</p>
-<ul>
-  <li><tt>makelib/lib.mingw/Makefile</tt></li>
-  <li><tt>makelib/lib.linuxgcc/Makefile</tt></li>
-</ul>
-<p>The reason they are separated from <tt>u_srccfg_post.mki</tt> is they're &quot;platform-specific&quot;, that is, their implementations on Windows and Linux are different. Therefore, it is wise to prepare two sets of <tt>walkdir.c</tt> and <tt>ps_func.c</tt> and two places of assignment, -- one for Windows and the other for Linux. The bright side of this method is: If you want to implement walkdir LIB on a new OS platform, you probably don't have to touch the &quot;central&quot; <tt>u_srccfg_post.mki</tt> but instead, extend makefile statement at peripherals.</p>
 <h3><a name="HandyTips"></a>Some handy tips for using GMU </h3>
 <h4><a name="HowtoClean"></a>How to do a clean </h4>
 <p>There isn't concept of <code>make clean</code> for GnumakeUniproc, instead, in order to clean the output files, just remove the whole <code>gmu_ud_OUTPUT_ROOT</code> directory. In our example, you can do: </p>
@@ -247,60 +252,57 @@ gmu_uf_LINK_OUTPUT = [<b>walkdir_ex1.exe</b>]</pre>
 </ul>
 <p>For example, we run with <code>gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> this time(after a clean), we can see: </p>
 <pre class="fws">
-D:\GMU\GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw>umake gmu_DO_SHOW_VERBOSE=1 gmu_DO
-_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
-GnumakeUniproc started (GNUmake v3.81).
+GnumakeUniproc started (GNUmake v3.82).
 gmu_ud_OUTPUT_ROOT(%) = ./gf
 ==============================================================================
   Now, BuildLevel [0]. Making sub-project: walkdir_mingw
-  CurDir: D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw
-  Makefile: ../../../libsrc/makelib/lib.mingw/Makefile
-       => D:/GMU/GMU-examples/common/walkdir/libsrc/makelib/lib.mingw/Makefile
+  CurDir: D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1
+  Makefile: ../../libsrc/Makefile.umk
+       => D:/GMU/GMU-examples/common/walkdir/libsrc/Makefile.umk
   Expected Output: %/walkdir_mingw/libwalkdir.a
   MakeVarDefs:
 ==============================================================================
  GenHdepend: %/walkdir_mingw/_obj/mswin/walkdir.c.d
- [gcc] ../../mswin/walkdir.c
-gcc  -c -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB    -I../../include  -
-o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/_obj/mswin/wal
-kdir.c.o" ../../mswin/walkdir.c
+ [gcc] mswin/walkdir.c
+gcc  -c   -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB   -I./include  -o "
+D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/mswin/walkdir.c.o" msw
+in/walkdir.c
  GenHdepend: %/walkdir_mingw/_obj/mswin/ps_func.c.d
- [gcc] ../../mswin/ps_func.c
-gcc  -c -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB    -I../../include  -
-o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/_obj/mswin/ps_
-func.c.o" ../../mswin/ps_func.c
+ [gcc] mswin/ps_func.c
+gcc  -c   -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB   -I./include  -o "
+D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/mswin/ps_func.c.o" msw
+in/ps_func.c
  GenHdepend: %/walkdir_mingw/_obj/walkdir-extname.c.d
- [gcc] ../../walkdir-extname.c
-gcc  -c -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB    -I../../include  -
-o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/_obj/walkdir-e
-xtname.c.o" ../../walkdir-extname.c
+ [gcc] walkdir-extname.c
+gcc  -c   -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG -D_LIB   -I./include  -o "
+D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/walkdir-extname.c.o" w
+alkdir-extname.c
 ***** Linking(LIB): %/walkdir_mingw/libwalkdir.a ...
-ar -crs "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/libwalkd
-ir.a" D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/_obj/mswin/
-walkdir.c.o D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw/_obj/
-mswin/ps_func.c.o D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_mingw
-/_obj/walkdir-extname.c.o
+ar -crs "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/libwalkdir.a"  D:/
+GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/mswin/walkdir.c.o D:/GMU/
+GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/mswin/ps_func.c.o D:/GMU/GMU-
+examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_mingw/_obj/walkdir-extname.c.o
 [DONE:] %/walkdir_mingw/libwalkdir.a
 
 ^^^^^^^^^^BuildLevel[0] Done Sub-project[ walkdir_mingw ]^^^^^^^^^^
 ~~~~~~~~~~ Return to parent project [ walkdir_ex1_mingw ] ~~~~~~~~~~
  GenHdepend: %/walkdir_ex1_mingw/_obj/walkdir_ex1.c.d
- [gcc] ../walkdir_ex1.c
-gcc  -c -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG    -I../../../libsrc/include
-  -o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_ex1_mingw/_obj/wa
-lkdir_ex1.c.o" ../walkdir_ex1.c
-../walkdir_ex1.c: In function `main':
-../walkdir_ex1.c:69: warning: passing arg 2 of `walkdir_extname' from incompatible pointer type
+ [gcc] walkdir_ex1.c
+gcc  -c   -O2   -DWIN32 -D_WIN32 -D__int64="long long"   -D_MBCS -DNDEBUG   -I../../libsrc/include
+-o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_ex1_mingw/_obj/walkdir_ex1.c.
+o" walkdir_ex1.c
+walkdir_ex1.c: In function `main':
+walkdir_ex1.c:79: warning: passing arg 2 of `walkdir_extname' from incompatible pointer type
 ***** Linking(EXE): %/walkdir_ex1_mingw/walkdir_ex1.exe ...
 **extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK): (none)
-**library paths: (none)
-**libraries to link(stand-alone,gmp_bc_EXTRALIBS1): (none)
-**libraries to link(from sub-projects):
+**extra objs to link(gmu_up_list_EXTRA_OBJ_TO_LINK_2): (none)
+**library search directories(gmp_ud_list_EXTRALIB): (none)
+**libraries to link from sub-projects(gmu_Gp_list_SUBPRJ_TO_LINK):
     %/walkdir_mingw/libwalkdir.a
-**libraries to link(stand-alone,gmp_bc_EXTRALIBS2): (none)
-g++ -mconsole -o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/exe.mingw/gf/walkdir_ex1_m
-ingw/walkdir_ex1.exe"  ./gf/walkdir_ex1_mingw/_obj/walkdir_ex1.c.o ./gf/walkdir_mingw/libwalkdir.a -
-lkernel32 -luuid
+**libraries to link stand-alone(gmp_bc_EXTRALIBS): (none)
+g++ -mconsole -o "D:/GMU/GMU-examples/common/walkdir/examples/walkdir_ex1/gf/walkdir_ex1_mingw/walkd
+ir_ex1.exe"  ./gf/walkdir_ex1_mingw/_obj/walkdir_ex1.c.o -Wl,--start-group ./gf/walkdir_mingw/libwal
+kdir.a -lkernel32 -luuid -Wl,--end-group
 [DONE:] %/walkdir_ex1_mingw/walkdir_ex1.exe
 [[[END]]]                                        Projects:2,Containers:0+0
 Files compiled: C++:0 C:4 ASM:0 linked:2

@@ -13,7 +13,7 @@
 <H1 align="center">GnumakeUniproc Quick Start Guide </H1>
 
 <p>This quick start guide intends to tell you how to setup the environment to work with GnumakeUniproc. Our goal is to build our first sample program(including a LIB project and an EXE project) with GnumakeUniproc.</p>
-<p>This guide is based on GnumakeUniproc v0.97. GnumakeUniproc is often abbreviated as GMU.</p>
+<p>This guide is based on GnumakeUniproc v0.98. GnumakeUniproc is often abbreviated as GMU.</p>
 <p>GnumakeUniproc can be run on Windows or Linux, in detail:</p>
 <ul>
 				<li>On Windows 2000, Windows XP, Windows Vista SP1 or SP2(but broken on Vista without SP), Windows 7. </li>
@@ -22,7 +22,7 @@
 <h3>Installation</h3>
 <p>Basic software environment prerequisites: </p>
 <ol>
-  <li>You always need GNU make version 3.80 or above. Currently(May 2011) latest GNU make version is 3.82, which is strongly recommended over 3.80 to avoid subtle problems.<br>
+  <li>You always need GNU make version 3.80 or above. Currently(Aug 2012) latest GNU make version is 3.82, which is strongly recommended over 3.80 to avoid subtle problems.<br>
     For GMU's Windows installer, make 3.82 is already bundled for you. </li>
   <li>If you use GMU's SVN repository auto-checkout feature, you need at least Subversion 1.4.2 . </li>
 </ol>
@@ -39,10 +39,11 @@
 <p>If you have decided to deploy GnumakeUniproc for your own C/C++ projects, you may start writing your own makefiles based on some makefile templates. Those templates reside in:</p>
 <pre>$gmu_DIR_ROOT/GMU-manual/gmu-template</pre>
 <div class="hint">Throughout GnumakeUniproc's documents , <tt>$gmu_DIR_ROOT</tt> is used to represent where GMU is installed. Actually <tt>gmu_DIR_ROOT</tt> is a real environment variable(env-var for short) you can refer to after GMU installation. </div>
-<p>The walkdir LIB project is based on template in: </p>
-<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-lib</pre>
+<p>The walkdir LIB project is based on template: </p>
+<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-lib-<strong>concise</strong>/Makefile.umk</pre>
 <p>and the walkdir EXE project is based on template in: </p>
-<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-exe</pre>
+<pre>$gmu_DIR_ROOT/GMU-manual/gmu-template/use-pattern1/make-exe-<strong>concise</strong>/Makefile.umk</pre>
+<p>Note: There are template directories with &quot;verbose&quot; in their names; they are verbose makefile templates from GMU v0.97 which are not recommended -- although still usable. So, use the &quot;concise&quot; ones instead.</p>
 <p>More information can be found on GnumakeUniproc's <a href="http://gnumakeuniproc.sourceforge.net">website</a> .</p>
 <p>Good luck.</p>
 

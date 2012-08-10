@@ -77,10 +77,11 @@ cp /home/chj/GMU/GMU-main/umake_cmd/bash/umakeUD /home/chj/GMU/bin/umakeUD
 				<p>For Bash 3.0 and above, GMU root dir can be automatically deduced from <tt>gmuenv.sc</tt>'s location. </p>
 </div>
 <p>This will output something like:</p>
-<pre class="fws">Export GMU env-vars:
-    gmu_DIR_ROOT=/home/chj/GMU
-    gmu_DIR_GNUMAKEUNIPROC=/home/chj/GMU/GMU-main/GnumakeUniproc
-Success! To see all gmu-vars set into env, type command:   set | grep -e "^gm[a-z]_"
+<pre class="fws">From set-gmuenv.sc: export env-var:
+    gmu_DIR_ROOT=/home/chj/w/GMU
+    gmu_DIR_GNUMAKEUNIPROC=/home/chj/w/GMU/GMU-main/GnumakeUniproc
+GnumakeUniproc 0.97 environment variables set OK.
+To see what variables are set, type command 'lgmv' .
 </pre>
 <p>Finally, you should know that env-vars set by <tt>gmuenv.sc</tt> will vanish after you quit your current login shell, therefore, it is suggested to source it in your <tt>.bashrc</tt> , so that it can be done automatically when you login your linux box. </p>
 <p>That's all the installation process on Linux. Now, you can go on building our first example.</p>
