@@ -294,13 +294,15 @@ _SubprjMakeCmdGoals = $(if $(gmu_NO_SUBPRJ_CMDGOALS_PASSING),,$(MAKECMDGOALS))
 	#[2007-01-21] It seems today using gmu_NO_SUBPRJ_CMDGOALS_PASSING is no longer meaningful.
 
 
-_gmuf_ShowCompileeFullpath = $(if $(gmu_DO_SHOW_COMPILEE_FULLPATH),\
+_gmuf_ShowCompileeFullpath = $(if $(gmu_DO_SHOW_COMPILEE_FULLPATH)$(gmu_DO_PASS_FULLPATH_TO_COMPILER),\
 	echo " $(call gmuf_genspaces,$(call strlen,$1))=> $(call gmuf_GetAbsPathRelaToCurdir,$2)" )
 	# $1: Compiler string. cl, gcc, armcpp etc.
 	# $2: Relative path of the input file
 
 _gmuf_TransFeedSrc = $(if $(gmu_DO_FEED_FULL_PATH_SRC),$(call gmuf_GetAbsPathByRela_soc,$1),$1)
-	
+
+<cfinal_to_compiler=$(if $(gmu_DO_PASS_FULLPATH_TO_COMPILER),$(call gmuf_GetAbsPathByRela_soc,$<),$<)
+
 #------------------
 # configure actions (canned command sequence)
 #------------------
@@ -333,6 +335,7 @@ endef
 define _DO_ASM_COMPILE
 	@$(call _MkdirIfNotExist,$(@D))
 	@echo " $(if $(gmu_exe_ASM),[$(gmu_exe_ASM)],Assembling) $<"
+	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_ASM),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_ASM_CMD)
 	@$(call _AppendLogCountCompile,a)
