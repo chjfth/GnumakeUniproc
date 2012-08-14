@@ -100,7 +100,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 
   gmp_CFLAGS_MACRO_DEFS_preset += -D_LIB
 
-  gmp_Gp_list_LIB_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+  gmp_Gp_LIB_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
   define gmu_u_LINK_CMD
 	@echo "$(gmp_ALL_TO_LINK_FOR_LIB)" > $(gmu_Gd_PRJ_GMUTMP)/_ObjsForThisLib.gmp.lst
@@ -120,7 +120,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
   gmp_NOW_EXPORT = 1
 
-  gmp_Gp_list_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+  gmp_Gp_DLL_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
   gmp_LINKFLAGS_preset += -shared \
 	$(if $(gmp_GCC_LFLAGS_PIC),$(if $(call _IsStringEqual,$(gmp_GCC_LFLAGS_PIC),nopic),,$(gmp_GCC_LFLAGS_PIC)),-fpic)
@@ -130,7 +130,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 else
 ifeq (1,$(call gmuf_IsWordInSet,$(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
 
-  gmp_Gp_list_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+  gmp_Gp_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE)
 

@@ -12,15 +12,15 @@ ifneq (,$(gmi_SYDO_up_list_SYNC_HEADERS))
 endif
 
 ifneq (,$(gmi_SYDO_ud_SYNC_LIB_TO))
-  gmi_SYDO_up_list_SYNC_LIB += $(gmp_Gp_list_LIB_OUTPUT)
+  gmi_SYDO_up_list_SYNC_LIB += $(gmp_Gp_LIB_OUTPUT)
     # todo: add only if not added yet.
 endif
 ifneq (,$(gmi_SYDO_ud_SYNC_DLL_TO))
-  gmi_SYDO_up_list_SYNC_DLL += $(gmp_Gp_list_DLL_OUTPUT)
+  gmi_SYDO_up_list_SYNC_DLL += $(gmp_Gp_DLL_OUTPUT)
     # todo: add only if not added yet.
 endif
 ifneq (,$(gmi_SYDO_ud_SYNC_EXE_TO))
-  gmi_SYDO_up_list_SYNC_EXE += $(gmp_Gp_list_EXE_OUTPUT)
+  gmi_SYDO_up_list_SYNC_EXE += $(gmp_Gp_EXE_OUTPUT)
     # todo: add only if not added yet.
 endif
 # Makevars for old version compatibility  <<<<<<

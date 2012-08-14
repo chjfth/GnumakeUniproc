@@ -88,5 +88,5 @@ gmi_SYDO_up_list_SYNC_HEADERS = walkdir.h
 	# Where the headers will be sync-ed to.
 
 # gmi_SYDO_ud_SYNC_LIB_TO = # (suggested to set as env-var or by parent project)
-	# Where the static LIBs will be sync-ed to. Sync-source is $(gmp_Gp_list_LIB_OUTPUT) .
+	# Where the static LIBs will be sync-ed to. Sync-source is $(gmp_Gp_LIB_OUTPUT) .
 

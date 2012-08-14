@@ -243,5 +243,14 @@ __pattern1_first_target: \
 	@$(_Gmp1SharedFinishingCmds)
 
 
+# gmp_Gp_list_EXE_OUTPUT,gmp_Gp_list_DLL_OUTPUT,gmp_Gp_list_LIB_OUTPUT is old gmu-var from GMU 0.97 and earlier.
+# Since 0.98, they are renamed to gmp_Gp_EXE_OUTPUT,gmp_Gp_DLL_OUTPUT,gmp_Gp_LIB_OUTPUT respectively,
+# because the old naming is misnomer, -- they each contains one file, not list of files.
+# But, we still keep the three old names for backward compatibility.
+# Old gmu-vars:
+  gmp_Gp_list_EXE_OUTPUT=$(gmp_Gp_EXE_OUTPUT)
+  gmp_Gp_list_DLL_OUTPUT=$(gmp_Gp_DLL_OUTPUT)
+  gmp_Gp_list_LIB_OUTPUT=$(gmp_Gp_LIB_OUTPUT)
+
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-common-postcore.mki
 
