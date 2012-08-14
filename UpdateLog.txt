@@ -1,4 +1,27 @@
-[2011-05-xx] v0.97
+[2012-08-xx] v0.98
+1. r1106-1126
+	Suggest default GMU makefile name to be Makefile.umk. The umake command will invoke Makefile.umk as preference.
+	Update GMU makefile templates and most examples to use concise makefile. Now we will have typically one makefile per project instead of two or three.
+	Quick-start guide is updated to reflect concise makefile change.
+2. r1060,1119
+	Present more friendly error message when some .c/.cpp file is assigned in makefile but not exist. Formerly, make will say "No rule to make target foo.c needed by <path-prefix>/_obj/foo.c.o" .
+	GMU 0.97 has this feature with some bug.
+3. r1072 (Windows)
+	When gmp_msvc_WANT_RELEASE_PDB is defined, add /debug to LINK command. 
+4. r1083
+	New plugin: PI_ensure_same_cond .
+5. r1092,1094 (Windows)
+	Add gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB, gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL, gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE for more flexible usage.
+instead of a single gmp_MSVC_Gp_LINK_OUTPUT_pdb for easier usage.
+6. r1096 (Linux fix)
+	Abandon gmp_LINK_DuplicateLibList. Introduce --start-group and --end-group for gcc, mingw linker command.
+7. r1102,1105
+	Improvement: Let $(gmp_bc_EXTRALIBS) depend on $(gmu_Gp_LINK_OUTPUT), so that when some libs in gmp_bc_EXTRALIBS is updated. The output will get relinked.
+8. r1129
+	Pass gmu_DO_PASS_FULLPATH_TO_COMPILER=1 so have GMU always converts relative path to absolute path of an input file before passing the file to compiler.
+
+
+[2011-06-21] v0.97
 This is an aggressive upgrade. Many aspects have improve to ease future users.
 ===== Changes and Improvements: =====
 1. r877 (Windows)
