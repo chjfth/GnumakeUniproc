@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>FindEmptyDir example readme</title>
+
+<style type="text/css">
+.fws {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+</style>
+</head>
+
+<body>
+
+<H1 align="center">How to use EmEditor syntax file</H1>
+<h3>Introduction</h3>
+<p>I, creator of GnumakeUniproc, use EmEditor(a great shareware text editor from <a href="http://www.emeditor.com/">http://www.emeditor.com/</a>) to edit GMU makefiles daily. EmEditor has great text editing and visualizing features that ease my daily editing work drastically.</p>
+<p>With GMU-Makefile syntax highlight, you achieve these benefits:</p>
+<ul>
+  <li>GMU reserved variables are rendered in special color, so that you can easily know whether some gmu-var is spelled correctly.</li>
+  <li>Space and tab are marked with different marker, so that you can easily know whether you type them right.</li>
+  <li>Large chunks of comments are rendered in dark green, so that you can focus on true makefile statement.</li>
+</ul>
+<h3>Install</h3>
+<p>Just import <tt>GMU-Makefile.reg</tt> into your registry(double click and answer yes). Choose GMU-Makefile syntax configuration (Tools -&gt; Configuration -&gt; GMU-Makefile) or from toolbar button.</p>
+<p><img src="select-cfg.png" alt="select syntax cfg"></p>
+<p>Then you get </p>
+<p><img src="after.png" alt="effect after import"></p>
+<p>The .reg write registry keys only inside [HKEY_CURRENT_USER\Software\EmSoft\EmEditor v3\Config\GMU-Makefile], so it cannot cause harm to your system.</p>
+<p>The provided .reg has been tested with EmEditor v11. It can be used with older versions of EmEditor as early as v6, but visual effects may be degraded.</p>
+<h3>How to tweak</h3>
+<p>If you are not satisfied with my predefined color scheme, you can do some tweak. From program menu, Tools -&gt; Properties for Current Configuration, it pops up a configuration dialog that lets you adjust every aspect of &quot;GMU-Makefile&quot;, quite many things you can tweak.</p>
+<p>-- </p>
+</body>
+
+</html>

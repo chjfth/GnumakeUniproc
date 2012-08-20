@@ -19,7 +19,8 @@ instead of a single gmp_MSVC_Gp_LINK_OUTPUT_pdb for easier usage.
 	Improvement: Let $(gmp_bc_EXTRALIBS) depend on $(gmu_Gp_LINK_OUTPUT), so that when some libs in gmp_bc_EXTRALIBS is updated. The output will get relinked.
 8. r1129
 	Pass gmu_DO_PASS_FULLPATH_TO_COMPILER=1 so have GMU always converts relative path to absolute path of an input file before passing the file to compiler.
-
+9. r1134
+	EmEditor syntax file is bundled, in $gmu_DIR_ROOT/extras/EmEditor-syntax directory, with readme .
 
 [2011-06-21] v0.97
 This is an aggressive upgrade. Many aspects have improve to ease future users.
