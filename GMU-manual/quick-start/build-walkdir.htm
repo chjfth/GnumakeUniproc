@@ -19,6 +19,7 @@
         <li><a href="#HowtoClean">How to do a clean</a></li>
         <li><a href="#umake">Write GMU's running output to a log file</a></li>
         <li><a href="#diag-gmu-var">How do I know the value of a GMU variable(gmu-var)?</a></li>
+        <li><a href="#naming">Directory naming issues</a></li>
         <li><a href="#TuneGMU">Tune GMU's running behavior </a></li>
       </ul>
   </li>
@@ -241,6 +242,10 @@ gmu_uf_LINK_OUTPUT = [<b>walkdir_ex1.exe</b>]</pre>
 </ul>
 <p>to umake. The above two options are a bit different though; check <a href="../manual/gmu-vars.htm">gmu-vars.htm</a> if you'd like to know. </p>
 <p>More tips of getting gmu-var values can be found at <a href="http://p.sf.net/gnumakeuniproc/diag-gmu-var">http://p.sf.net/gnumakeuniproc/diag-gmu-var</a> . </p>
+<h4><a name="naming"></a>Directory naming issues</h4>
+<p>An important note about directory naming: The directory name of the GMU start-up makefile implies the following meaning: the directory's extension name is considered compiler-id(becomes <code>gmp_COMPILER_ID</code> in your makefile).</p>
+<p>For example: If you have a directory named <tt>exe.msvc</tt> and place <tt>Makefile.umk</tt> in it, then starting that very <tt>Makefile.umk</tt> will automatically set <tt>gmp_COMPILER_ID=msvc</tt> , overriding <tt>gmp_COMPILER_ID</tt> setting's from environment or umake command line. This is a designated behavior of GMU itself. This is the old-style(verbose style) naming from GMU 0.97 and earlier and is still supported by later GMU versions. Such naming saves the work of assigning <code>gmp_COMPILER_ID</code> as env-var before invoking make; however, if you intend your makefile to support multiple compilers, the makefiles become cumbersome to maintain --because you have to prepare one start-up makefile for each compiler-id you intended to support.</p>
+<p>So, if you're not working with the verbose-style makefile, be careful not to put <tt>Makefile.umk</tt> inside a directory with an extension name, e.g. <tt>nlssdk-v0.3</tt> (where 3 will be considered as compiler-id).</p>
 <h4><a name="TuneGMU"></a>Tune GMU's running behavior </h4>
 <p>You can tune GMU's behavior with many make variables(make-var), You can set these make-vars by defining environment variables(env-var) or assign them on make's command line. I'll call those variables used by GnumakeUniproc gmu-vars. </p>
 <p>Some often used gmu-vars: </p>
