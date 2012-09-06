@@ -229,6 +229,7 @@ Section "Developer files(docs & examples etc)" DevFiles
   !insertmacro CopyASubdir_InGMU GMU-examples
   !insertmacro CopyASubdir_InGMU demo-repositories
   !insertmacro CopyASubdir_InGMU nsis-install
+  !insertmacro CopyASubdir_InGMU extras
 
   ${If} "$isChecked_nlscanenv" == 1
     !insertmacro CopyASubdir_InGMU nlscan
