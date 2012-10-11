@@ -29,7 +29,11 @@ endif
 ############################################################################
 gmp_bc_IMAGE_TYPE = DLL
 
-#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
+#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_foo DLLEXPORT_bar
+	# This is useful if your C/C++ code finally gets its way into DLL.
+	# DLLEXPORT_foo and DLLEXPORT_bar in C/C++ code will become 
+	#	__declspec(dllexport)                             on Windows
+	#	__attribute__((visibility(\"default\")))          on Linux
 
 ############################################################################
 # Compiler specific settings below.

@@ -29,6 +29,12 @@ endif
 ############################################################################
 gmp_bc_IMAGE_TYPE = LIB
 
+#gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_foo DLLEXPORT_bar
+	# This is useful if your C/C++ code finally gets its way into DLL.
+	# DLLEXPORT_foo and DLLEXPORT_bar in C/C++ code will become 
+	#	__declspec(dllexport)                             on Windows
+	#	__attribute__((visibility(\"default\")))          on Linux
+
 ############################################################################
 # Compiler specific settings below.
 ############################################################################
@@ -40,8 +46,6 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 
   # gmp_CFLAGS_NON_CODE_GEN += /W3
   
-  # gmp_u_list_DLL_EXPORT_SYM += DLLEXPORT_xxx #(The C macros to decorate as __declspec(dllexport) etc.)
-
   # gmp_u_list_PLUGIN_TO_LOAD += PI_winres_msvc       # compile Windows resource(.rc)
   # gmp_u_list_PLUGIN_TO_LOAD += PI_use_pch_msvc      # use precompile header
     # gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = StdAfx.h
