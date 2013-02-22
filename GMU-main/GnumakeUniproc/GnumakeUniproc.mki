@@ -429,7 +429,7 @@ gmu_Gp_AllSrcListToObjList = $(call gmuf_SrcListToOutputList_addsuffix,$(gmu_up_
 
 # Now, make sure gmu_Gp_list_REQOBJS contains the same file as _list_REQ_tmp.
 # If not, it means there are some unrecognized file extensions in user's source list. 
-# We'll show these unregonized files if they exist.
+# We'll show these unrecognized files if they exist.
 _list_REQ_tmp := $(patsubst %,$(_Gd_OBJ_OUTPUT)/%,$(gmu_up_list_SRC_FROM_ROOT))
 _list_ExtUnrecognized := $(foreach file,$(_list_REQ_tmp),$(if $(findstring $(file).$(gmu_extn_OBJ),$(gmu_Gp_list_REQOBJS)),,$(file)))
 ifneq (,$(strip $(_list_ExtUnrecognized))) # there will be as many spaces in $(_list_ExtUnrecognized) as there are source files, therefore, we have to use strip.

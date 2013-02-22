@@ -34,8 +34,11 @@ _pluginId_dll_from_lib := $(gmpv_ThisPluginId)
 		# Note: LIB and DLL project must both define this to 1 to have such "auto-export"
 		# feature. If only LIB or only DLL has it set to 1, DLL will benefit nothing.
 		#
+		# Note: This auto-export feature require Python 2.6 installed on your system.
+		#
 		# [2011-02-26] Some drawback of this feature:
 		# 1. A C/C++ file is analyzed twice, first on compile, second on lib packing.
+		#
 
 #	gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT =
 		# (only for DLL project, default to null, optional)
