@@ -1,7 +1,7 @@
 #
 # Special: For convenience, I export NLSCAN related files and pack them into GMU.
 #	https://nlssvn/svnreps/makingsys
-if "$1" == "xx"; then
+if [ "$1" == "" ]; then
 	echo "You must assign a param as the SVN Url prefix for SVN repository, and optionally a second param for branch to export(default to trunk)."
 fi
 
@@ -9,7 +9,7 @@ SvnUrlPrefix=$1
 
 BranchToGet=trunk
 
-if  "$2" != ""; then BranchToGet=$2; fi
+if [ "$2" != "" ]; then BranchToGet=$2; fi
 
 OutputDirGMU=./GMU
 
