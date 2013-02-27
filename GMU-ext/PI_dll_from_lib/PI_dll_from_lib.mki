@@ -86,7 +86,8 @@ else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
   gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT = $(gmi_DFL_COPY_AUTOSTUB_TO_DLLSRCROOT)
 
 else
-  $(error !Error from$(_pluginId_dll_from_lib): Making DLL from LIB for gmp_COMPILER_ID=$(gmp_COMPILER_ID) is not supported yet)
+  $(error !Error from $(_pluginId_dll_from_lib): Making DLL from LIB for gmp_COMPILER_ID=$(gmp_COMPILER_ID) is not supported yet)
+  # [2013-02-27] Anyway, there is a concept error here. Whether we can use DLL is OS related, not compiler related.
 endif
 
 
