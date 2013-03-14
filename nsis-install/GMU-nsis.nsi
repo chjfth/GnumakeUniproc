@@ -109,7 +109,7 @@ The following env-vars are to be stored: \r\n\r\n"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define GMU_VER "0.98"
+!define GMU_VER "0.98.1"
 !define PRODUCT_VERSION "${GMU_VER}"
 !define PRODUCT_PUBLISHER "Jimm Chen (chenjun@nlscan.com)"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
