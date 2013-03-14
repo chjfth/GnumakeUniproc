@@ -1,7 +1,10 @@
 # If I'm in nlscan office, just call this bat to export ALL files necessary
 # to pack a GnumakeUniproc Linux release suitable for NLSCAN staff.
 
-rm -fr GMU # delete stale tree
+finaloutput=GMU.tar.bz2
+
+rm -fr GMU          # delete stale tree
+rm "$finaloutput"   # delete stale output file
 
 ./export-gmu.sh https://nlssvn/svnreps/makingsys/GnumakeUniproc
 if [ "$?" != 0 ]; then
@@ -17,7 +20,6 @@ fi
 
 echo All exports success.
 
-finaloutput=GMU.tar.bz2
 echo "Packing NLSCAN extras to $finaloutput ..."
 tar jcf $finaloutput GMU
 if [ "$?" == 0 ]; then 
