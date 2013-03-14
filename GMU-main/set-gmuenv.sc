@@ -64,7 +64,7 @@ if [ "$gmu_FORCE_BASH_PATH" = "" ]; then
   if [ "$toutput" != "ABC" ]; then export gmu_FORCE_BASH_PATH="/bin/bash"; fi
 fi
 
-export gmu_ver=0.98
+export gmu_ver=0.98.1
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
