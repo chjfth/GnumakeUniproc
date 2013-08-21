@@ -21,8 +21,9 @@
   </tr>
   <tr>
     <td valign="top">gmp_GCC_PREFIX</td>
-    <td><p>Tell the prefix of gcc executable. </p>
-      <p>Example: If you want to run <code>arm-linux-gcc</code> instead of <code>gcc</code>, you set <code>gmp_GCC_PREFIX=arm-linux-</code> . At the same time, <code>arm-linux-g++</code>, <code>arm-linux-ar</code> etc will be used instead of their non-prefix counterpart. </p>    </td>
+    <td><p>Tell the prefix of gcc executable. Default value is null.</p>
+      <p>Example: If you want to run <code>arm-linux-gcc</code> instead of <code>gcc</code>, you set <code>gmp_GCC_PREFIX=arm-linux-</code> . At the same time, <code>arm-linux-g++</code>, <code>arm-linux-ar</code> etc will be used instead of their non-prefix counterpart. </p>
+      <p>NOTE: If you set a value for <code>gmu_GCC_PREFIX</code>, you probably need to set <code>gmu_GCC_M_PREFIX</code> to the same value as well, so that when doing `<code>gcc -M</code>' , you use the same set of gcc(same system headers matters).</p></td>
   </tr>
   <tr>
     <td valign="top">gmp_GCC_CFLAGS_PIC</td>
