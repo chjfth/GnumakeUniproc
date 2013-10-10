@@ -1476,14 +1476,3 @@ gmu_ut_diagnose:
 .PHONY: gmu_ut_Always
 gmu_ut_Always: ;
 
-# IMNOTE1 [2006-12-05]:
-# sh.exe from www.mame.net has such a bug:
-# if you execute command 
-#	echo "" > tdir; echo 2nd
-# and if the first echo fails(maybe due to tdir is a dir), you'll find that
-# the second echo will not be executed by sh.exe. To work around, nest the
-# first echo command in a subshell, that is,
-#	(echo "" > tdir); echo 2nd
-# BTW: if the first command is not echo(actually the `echo' in that situation
-# is sh.exe's internal command), that problem does not arise.
-# [2010-01-05] win-bash does not have this problem!
