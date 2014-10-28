@@ -30,7 +30,7 @@ _gmu_rel2abs_file ()
 	# Strip preceeding ./ if any
 	while [ "${dirRel#./}" != "${dirRel}" ]; do dirRel="${dirRel#./}"; done
 
-	# Now we process possible ../.. prefix at the begining of $1
+	# Now we process possible ../.. prefix at the beginning of $1
 	while [ "${dirRel#../}" != "${dirRel}" ]; do
 		dirRel="${dirRel#../}"
 		dirGo="${dirGo%/*}"
