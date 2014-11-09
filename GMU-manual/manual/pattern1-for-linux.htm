@@ -42,6 +42,15 @@
     <td><p>This defaults to null, and when passing libraries to linker, <code>--start-group</code> and <code>--end-group</code> is used so that user can write libraries in any order. This should be the preferred linker behavior in most cases.</p>
     <p>If set to 1,  <code>--start-group</code> and <code>--end-group</code> will not be used and user have to care about the library passing order to ensure success.</p></td>
   </tr>
+  <tr>
+    <td valign="top"><p>gmp_GCC_M32</p>
+    <p>gmp_GCC_M64</p></td>
+    <td><p>If <code>gmp_GCC_M32=1</code> , <code>-m32</code> will pass passed to gcc compiler and linker, and has project suffix <code>-m32</code> .</p>
+    <p>If <code>gmp_GCC_M64=1</code> , <code>-m64</code> will pass passed to gcc compiler and linker, and has project suffix <code>-m64</code> .</p>
+    <p>Default: Neither is defined, so your build machine determines the default gcc variant to call.</p>
+    <p>If both are defined, only <code>gmp_GCC_M32</code> is effective.</p>
+    <p>Using these vars is useful when you want to build both 32-bit and 64-bit programs on the same Linux build machine, and their build output directory will be separated because project name decoration is done for you automatically.</p></td>
+  </tr>
 </table>
 <h4>Compatibility vars </h4>
 <p>In principles, if you're using latest gcc compiler, you don't have to set any of these vars. But if you're using older versions of gcc, the default pattern1 compiler option may contain some options that older gcc don't support, in this situation, you can look up the following table to see whether setting some gmp vars can make a work around. The benefit of setting these vars is you can hopefully avoid making changes to your makefiles </p>

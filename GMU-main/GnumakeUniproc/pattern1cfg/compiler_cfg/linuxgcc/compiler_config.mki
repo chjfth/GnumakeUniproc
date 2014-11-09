@@ -24,6 +24,27 @@ endif
 #^^^^^^^^ name decoration ^^^^^^^^
 
 
+# If there are explicitly gmp_GCC_M32 or gmp_GCC_M64 defined, add explicit flags to 
+# do 32-bit or 64-bit compilation.
+ifneq (,$(gmp_GCC_M32))
+
+  gmp_CFLAGS_CODE_GEN += -m32
+  gmp_LINKFLAGS += -m32
+  
+  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m32
+  
+else ifneq (,$(gmp_GCC_M64))
+
+  gmp_CFLAGS_CODE_GEN += -m64
+  gmp_LINKFLAGS += -m64
+  
+  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m64
+  	  
+else
+  # Do nothing, let system choose the default.
+endif
+
+
 ################################################################################
 
 #gmp_CFLAGS_MACRO_DEFS += $(patsubst %,-D%=__declspec\(dllexport\),$(gmp_u_list_DLL_EXPORT_SYM))

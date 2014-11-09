@@ -4,6 +4,6 @@ gmp_FLAGS_INCLUDES += $(addprefix -isystem ,$(gmp_linuxgcc_ud_list_SYSTEM_HEADER
 	# to indicate the "system"(stable) include dirs, and it is not recognized by
 	# gcc internally(i.e. unlike INCLUDE env-var for MSVC), therefore, we have to
 	# append these dirs explicitly as gcc's arguments.
-	# BTW: These -isystem options are place in the XXX.postcore.mki, so that they're
+	# BTW: These -isystem options are placed in the XXX.postcore.mki, so that they're
 	# listed after user adds something to them in u_srccfg_post.mki .
 
