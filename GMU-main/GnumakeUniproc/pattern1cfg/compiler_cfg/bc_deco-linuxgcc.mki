@@ -1,0 +1,30 @@
+ifndef __bc_deco_linuxgcc_included
+__bc_deco_linuxgcc_included := 1
+
+# This file is included by $.../pattern1cfg/compiler_cfg/linuxgcc/compiler_config.mki
+# to designate different compiler/linker options and different project name.
+#
+# It can also be included manually by user's container Makefile to decorate prjname only.
+
+# If there are explicitly gmp_GCC_M32 or gmp_GCC_M64 defined, add explicit flags to 
+# do 32-bit or 64-bit compilation.
+ifneq (,$(gmp_GCC_M32))
+
+  gmp_CFLAGS_CODE_GEN += -m32
+  gmp_LINKFLAGS += -m32
+  
+  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m32
+  
+else ifneq (,$(gmp_GCC_M64))
+
+  gmp_CFLAGS_CODE_GEN += -m64
+  gmp_LINKFLAGS += -m64
+  
+  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m64
+  	  
+else
+  # Do nothing, let system choose the default.
+endif
+
+
+endif # __bc_deco_linuxgcc_included

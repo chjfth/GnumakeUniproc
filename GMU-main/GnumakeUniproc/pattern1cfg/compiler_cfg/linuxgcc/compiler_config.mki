@@ -8,6 +8,8 @@ include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_common.mki
 
+include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-linuxgcc.mki
+
 
 ifneq (,$(gmp_GCC_PREFIX))
 ifneq (,$(gmp_DECO_PRJ_NAME))
@@ -22,27 +24,6 @@ endif
 endif
 
 #^^^^^^^^ name decoration ^^^^^^^^
-
-
-# If there are explicitly gmp_GCC_M32 or gmp_GCC_M64 defined, add explicit flags to 
-# do 32-bit or 64-bit compilation.
-ifneq (,$(gmp_GCC_M32))
-
-  gmp_CFLAGS_CODE_GEN += -m32
-  gmp_LINKFLAGS += -m32
-  
-  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m32
-  
-else ifneq (,$(gmp_GCC_M64))
-
-  gmp_CFLAGS_CODE_GEN += -m64
-  gmp_LINKFLAGS += -m64
-  
-  gmu_DECO_SUFFIX_PRJ_FORCE_ENV += -m64
-  	  
-else
-  # Do nothing, let system choose the default.
-endif
 
 
 ################################################################################
