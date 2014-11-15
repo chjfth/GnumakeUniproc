@@ -44,7 +44,7 @@ fi
 
 export gmu_ver=0.99
 
-export gmp_ud_list_CUSTOM_MKI="$gmp_ud_list_CUSTOM_MKI $gmu_DIR_ROOT/GMU-ext $gmu_DIR_ROOT/nlscan/gmu-ext"
+export gmp_ud_list_CUSTOM_MKI="$gmu_DIR_ROOT/GMU-ext $gmu_DIR_ROOT/nlscan/gmu-ext"
 export gmp_ud_list_CUSTOM_COMPILER_CFG=$gmu_DIR_ROOT/nlscan/compiler-cfgs
 
 export gmp_DECO_PRJ_NAME=1
