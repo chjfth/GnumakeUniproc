@@ -1,5 +1,5 @@
 # GnumakUniproc.mki, this single file implements the core layer of GnumakeUniproc.
-# -- Authored by Chen Jun(chjfth@gmail.com, chenjun@mail.nlscan.com) since Feb 2006.
+# -- Authored by Jimm Chen(chjfth@gmail.com) since Feb 2006.
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
 
@@ -57,7 +57,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
  Your Makefile and any source files must be placed in a path with no spaces)
   endif
 
-  ifeq (,$(gmu_ud_OUTPUT_ROOT)) # If user does not set gmu_ud_OUTPUT_ROOT explictly, we set it.
+  ifeq (,$(gmu_ud_OUTPUT_ROOT)) # If user does not set gmu_ud_OUTPUT_ROOT explicitly, we set it.
     # gmu_ud_OUTPUT_ROOT is blank now, and we assign a default value to it:
     CURDIR_TEMP := $(if $(call _IsStringEqual,$(OSTYPE),cygwin),$(subst \,/,$(shell cygpath -w $(CURDIR))),$(CURDIR))
       # The usage of `cygpath -w' is important for invoking non "cygwin-dll" compilers such as VC++.
