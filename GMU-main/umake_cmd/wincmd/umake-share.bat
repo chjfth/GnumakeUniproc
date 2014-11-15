@@ -1,15 +1,22 @@
 REM Don't call this bat directly, instead, call umake.bat, umakeD.bat etc.
 
+set tmpbatdir=%~dp0%
+set gmu_DIR_ROOT_bs=%tmpbatdir:\GMU-main\umake_cmd\wincmd\=%
+set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
+
+PATH=%tmpbatdir%;%PATH%
+
+call %gmu_DIR_ROOT_bs%\_gmuenv.bat
+
+
 IF "%gmu_MAKE_EXE%" == "" (
       set gmu_MAKE_EXE=make
     )
 
-REM Delete GnumakeUniproc start-up signiture file
+REM Delete GnumakeUniproc start-up signature file
 IF EXIST _MainPrjBuildStart.gmu.ckt DEL _MainPrjBuildStart.gmu.ckt
 IF EXIST _MainPrjBuildStart.gmu.ckt GOTO ErrorDelGmuSig
 
-REM set GMU_PATH_PRE_SAVE=%PATH%
-	rem For the old sh.exe, The PATH value will change weirdly in sh.exe
 
 IF "x%gmu_LOG_OUTPUT_FILENAME%x" == "xx" goto NoLogOutput
 
