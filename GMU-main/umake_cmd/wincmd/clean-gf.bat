@@ -10,11 +10,11 @@ call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 set gfdir=gf
 
 IF not "%~1" == "" (
-	set gfdir="%~1"
+	set gfdir=%~1
 )
 
-echo Removing directory %gfdir%
-rm -fr %gfdir%
+echo Removing directory "%gfdir%"
+rm -fr "%gfdir%"
 
 if %ERRORLEVEL% == 0 (
 	echo Done.
