@@ -12,11 +12,11 @@
 # 1. Compile and copy the gmuXXX programs to $DIR_GMU_PRG
 # 2. Compile and copy the umake* scripts to $DIR_GMU_PRG. 
 
-# _gmu_rel2abs_file (): 
+# _gmu_rel2abs_file(): 
 # Input a filepath(relative or absolute), return(echo) its absolute path.
 # This function only does string operation. 
 # This function will not change callers current working directory.
-_gmu_rel2abs_file ()
+_gmu_rel2abs_file()
 {
 	if [ "${1%%/*}" = "" ]; then 
 		# $1 starts with a / , so it is already a absolute path.
@@ -94,3 +94,7 @@ if  ! $cmd ; then
 	echo "Cannot copy make-gmu executable!"
 	exit 1
 fi
+
+echo ""
+echo "GMU installed OK!"
+echo "Remember to add '$DIR_GMU_PRG' to your PATH in order to execute umake commands."

@@ -5,7 +5,12 @@ if [ "$gmu_MAKE_EXE" = "" ]; then
 fi
 
 tmpbatdir=$(\cd `dirname ${BASH_SOURCE}` && pwd)
-export gmu_DIR_ROOT=${tmpbatdir%/GMU-main/umake_cmd/bashcmd}
+if [ "${tmpbatdir%/GMU-main/umake_cmd/bashcmd}" = "${tmpbatdir}" ]; then
+	# umake is located in [GMUROOT]/bin , e.g. ~/GMU/bin
+	export gmu_DIR_ROOT=${tmpbatdir%/bin}
+else
+	export gmu_DIR_ROOT=${tmpbatdir%/GMU-main/umake_cmd/bashcmd}
+fi
 
 PATH=$tmpbatdir:$PATH
 
