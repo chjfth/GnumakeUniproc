@@ -12,13 +12,15 @@ Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
 ~/GMU/INSTALL.linux), then do the following:
 
 $ ~/GMU/install.sh         # Prepare required executables into ~/GMU/bin
-$ source ~/GMU/gmuenv.sc   # Set required environment variables(env-var)
+$ PATH=~/GMU/bin:$PATH     # Add umake commmands to your PATH
 
-If the above two commands does not spout any "Error" message, then it succeeds.
+If the install.sh does not spout any "Error" message, then it succeeds.
 Now, you've set up the environment to use GnumakeUniproc.
 
-Note: The second command above should be executed every time you login to you shell.
-So it is suggested to run the second command in your login script(.bashrc).
+Optional: Add command 
+    source ~/GMU/gmuenv.sc
+to your login script(.bashrc) to get some convenient GMU vars/commands(gv1, 
+gv2, lgmv etc) in your shell environment.
 
 If you encounter errors or need more detail, refer to the install section for
 Linux user in quick start guide.
