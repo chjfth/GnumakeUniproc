@@ -1,0 +1,21 @@
+#!/bin/bash
+
+tmpbatdir=$(\cd `dirname ${BASH_SOURCE}` && pwd)
+export gmu_DIR_ROOT=${tmpbatdir%/GMU-main/umake_cmd/bashcmd}
+
+PATH=$tmpbatdir:$PATH
+
+source $gmu_DIR_ROOT/_gmuenv.sc
+
+gfdir=gf
+
+if [ "$1" != "" ]; then
+	gfdir="$1"
+fi
+
+echo "Removing directory \"$gfdir\""
+rm -fr "$gfdir"
+
+if [ "$?" == "0" ]; then
+	echo Done.
+fi

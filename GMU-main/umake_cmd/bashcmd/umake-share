@@ -1,7 +1,15 @@
+# This script should not be executed alone, it is source-d by umake etc.
+
 if [ "$gmu_MAKE_EXE" = "" ]; then
   gmu_MAKE_EXE=make
-	# Commet above line if you want to use your system's make.
 fi
+
+tmpbatdir=$(\cd `dirname ${BASH_SOURCE}` && pwd)
+export gmu_DIR_ROOT=${tmpbatdir%/GMU-main/umake_cmd/bashcmd}
+
+PATH=$tmpbatdir:$PATH
+
+source $gmu_DIR_ROOT/_gmuenv.sc
 
 
 rm -f _MainPrjBuildStart.gmu.ckt

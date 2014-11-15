@@ -1,11 +1,11 @@
 @REM Don't call this batch file directly; it should be called by a wrapper bat, umake-share.bat etc.
 
 @if "%gmu_DIR_ROOT%" == "" (
-	echo ERROR from %~f0: gmu_DIR_ROOT not set yet.
+	echo ERROR from _gmuenv.bat: Env-var gmu_DIR_ROOT not defined yet.
 	exit /b 1
 )
 @if "%gmu_DIR_ROOT_bs%" == "" (
-	echo ERROR from %~f0: gmu_DIR_ROOT_bs should not set yet.
+	echo ERROR from _gmuenv.bat: Env-var gmu_DIR_ROOT_bs not defined yet.
 	exit /b 1
 )
 
@@ -24,12 +24,12 @@ SET gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 SET gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
-SET NLSSVN=https://nlssvn/svnreps
-
 @REM Normally, gmu_BIN_PATH_TAIL is not defined
 @if "%gmu_BIN_PATH_TAIL%" == "" (
 	PATH=%gmu_DIR_ROOT_bs%\MinGW2\bin;%PATH%
 ) else (
 	PATH=%PATH%;%gmu_DIR_ROOT_bs%\MinGW2\bin
 )
+
+SET NLSSVN=https://nlssvn/svnreps
 

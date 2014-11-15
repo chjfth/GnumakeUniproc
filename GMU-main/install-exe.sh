@@ -79,9 +79,9 @@ for OnePrg in $GMU_PRGS; do
 	fi
 done
 
-UMAKE_CMD="umake-share umake umakeD umakeU umakeUD umaketime umakeDtime umakeUtime umakeUDtime"
+UMAKE_CMD="umake-share umake umakeD umakeU umakeUD umaketime umakeDtime umakeUtime umakeUDtime clean-gf"
 for OnePrg in $UMAKE_CMD; do
-	cmd="cp $DIR_GMU_MAIN/umake_cmd/bash/$OnePrg $DIR_GMU_PRG/$OnePrg"
+	cmd="cp $DIR_GMU_MAIN/umake_cmd/bashcmd/$OnePrg $DIR_GMU_PRG/$OnePrg"
 	echo "$cmd"
 	if ! $cmd ; then
 		exit 1

@@ -6,4 +6,4 @@ if [ "$?" != 0 ]; then exit $?; fi
 
 echo ""
 echo "GMU installed OK!"
-echo "Remember to 'source ${0%/*}/gmuenv.sc' every time you login to your shell to setup GMU env! You can do it in '.bashrc' for convenience."
+echo "Remember to add '${0%/*}/bin' to your PATH in order to execute umake commands."
