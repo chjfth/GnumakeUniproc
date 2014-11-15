@@ -12,7 +12,7 @@ ifndef gmu_PRJ_NAME
   gmu_PRJ_NAME = walkdir-all
 endif
 
-gmu_uv_list_ALL_SUBPRJ = ex1 ex2
+gmu_uv_list_ALL_SUBPRJ = ex2 ex1
 
 ex1_Makefile = ../examples/walkdir_ex1/Makefile.umk
 ex2_Makefile = ../examples/recurse_rm/Makefile.umk
