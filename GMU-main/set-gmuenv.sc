@@ -64,7 +64,7 @@ if [ "$gmu_FORCE_BASH_PATH" = "" ]; then
   if [ "$toutput" != "ABC" ]; then export gmu_FORCE_BASH_PATH="/bin/bash"; fi
 fi
 
-export gmu_ver=0.98.1
+export gmu_ver=0.99
 
 export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt #Set to null if you don't want to log make output
 
@@ -105,7 +105,7 @@ _gmu_root=
 #	gmu_MAKE_EXE=make-gmu
 #	gmu_DO_SHOW_LINK_CMD=1
 #	gmu_DIR_GNUMAKEUNIPROC=/home/chj/w/GMU/GMU-main/GnumakeUniproc
-#	gmu_ver=0.98
+#	gmu_ver=0.99
 # like a super Windows CMD 'set', so I name it "linux set".
 lset(){
 	for v in "$@"; do

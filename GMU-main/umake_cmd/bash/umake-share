@@ -10,7 +10,7 @@ if [ $? != 0 ]; then
   exit
 fi
 
-# A special processing from GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
+# A special processing since GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
 # If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
 # * If user provides -f xxx in command parameter, I'll pass those parameter to make .
 # * If user does not provide -f xxx, I'll call make with all user's parameter as well as appending -f Makefile.umk as make's extra parameters.

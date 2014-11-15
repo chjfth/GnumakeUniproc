@@ -22,7 +22,7 @@ IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% goto ErrorDelLogBak
 IF EXIST %gmu_LOG_OUTPUT_FILENAME% REN %gmu_LOG_OUTPUT_FILENAME% %gmu_LOG_OUTPUT_FILENAME_bak%
 IF NOT %ERRORLEVEL% == 0 GOTO ErrorRename
 
-REM A special processing from GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
+REM A special processing since GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
 REM If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
 REM * If user provides -f xxx in command parameter, I'll pass those parameter to make .
 REM * If user does not provide -f xxx, I'll call make with all user's parameter as well as appending -f Makefile.umk as make's extra parameters.

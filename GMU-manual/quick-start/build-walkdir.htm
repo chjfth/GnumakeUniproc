@@ -24,7 +24,7 @@
       </ul>
   </li>
 </ul>
-<p>NOTE: This article is written for GnumakeUniproc 0.96, and applicable to 0.98 as well.</p>
+<p>NOTE: This article is written for GnumakeUniproc 0.96, and applicable to later versions.</p>
 <h3><a name="Preface"></a>Preface</h3>
 <p>The example program is called <b>walkdir_ex1</b>, which is an executable file, it calls function <code>walkdir_start</code> to walk a directory tree and print all files within that directory, including all its sub-directories. The function <code>walkdir_start</code> is implemented in a static library called <b>walkdir</b>. During the build of walkdir_ex1 project, walkdir project will be built on the fly then get linked into walkdir_ex1, and later every time you want to build walkdir_ex1, walkdir lib project is checked and gets rebuilt if any of its source files have changed. That is the model we desire. </p>
 <p>The relation of the C/C++ projects here are illustrated below:</p>
