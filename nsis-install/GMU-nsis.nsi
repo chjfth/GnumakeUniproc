@@ -8,110 +8,47 @@
 !include "WriteEnvStr.nsh"
 !include "AddToPath.nsh"
 
-;!include "myconst.nsh"
 !include "gmuStoreEnvVar.nsh"
-
 
 ; My const defines for GnumakeUniproc install
 !define fname_GmuEnvIni gmu-envvar.ini
-!define fname_StoreEnvIni store-envvar.ini
-!define fname_SydoEnvIni gmi-sydo-envvar.ini
 
 !define dirname_MinGW MinGW2
 !define suffix_dir_GMUext /GMU-ext
 !define suffix_dir_ExtraCccfg /nlscan
 !define suffix_dir_GMUbin \${dirname_MinGW}\bin
 !define absdir_MinGW_bin_bkslash "$INSTDIR${suffix_dir_GMUbin}"
+!define suffix_wincmd \GMU-main\umake_cmd\wincmd
+!define absdir_wincmd "$INSTDIR${suffix_wincmd}"
 
-!define fname_GmuEnvBat _gmuenv.bat
-!define fpath_GmuEnvBat "$INSTDIR\${fname_GmuEnvBat}"
-!define absdir_GmuCore "$InstDir_fwslash/GMU-main/GnumakeUniproc"
 !define absdir_DIR_GMU_PRG "$InstDir_fwslash/${dirname_MinGW}/bin"
 
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
-!define list_GmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC gmu_ver \
-    gmp_ud_list_CUSTOM_MKI gmp_ud_list_CUSTOM_COMPILER_CFG \
-    gmp_DECO_PRJ_NAME \
-    gmu_LOG_OUTPUT_FILENAME \
-    gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
-    NLSSVN gv1 gv2 \
-	"
-
-!define TSFX "" ;"__tsfx" ; test suffix
+!define list_GmuEnvVar "gmu_DIR_ROOT gmu_ver"
 
 ; My vars for GnumakeUniproc install
 
 Var isNewInstall
-
-Var isStoreEnvVarToRegistry
-Var isStoreEnvVarToBat
 Var isAddToPathFront ; 1 means add-to-front, 0 means add-to-rear
-
 Var InstDir_fwslash ; Store forward-slash version of $INSTDIR
+Var isAddPath
 
 Var isChecked_gmu_DIR_ROOT ;No selection for isChecked_gmu_DIR_ROOT, take it always checked.
       Var str_gmu_DIR_ROOT
- !define desc_gmu_DIR_ROOT \
-         "Tells where GnumakeUniproc is installed."
-Var isChecked_gmu_DIR_GNUMAKEUNIPROC
-      Var str_gmu_DIR_GNUMAKEUNIPROC
- !define desc_gmu_DIR_GNUMAKEUNIPROC \
-         "Tells where GnumakeUniproc.mki resides."
-Var isChecked_gmp_ud_list_CUSTOM_MKI
-      Var str_gmp_ud_list_CUSTOM_MKI
- !define desc_gmp_ud_list_CUSTOM_MKI \
-         "Directories of your custom-image-mki or plugins."
-Var isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG
-      Var str_gmp_ud_list_CUSTOM_COMPILER_CFG
- !define desc_gmp_ud_list_CUSTOM_COMPILER_CFG \
-         "Directories of your extra compiler configs."
-Var isChecked_gmp_DECO_PRJ_NAME
-      Var str_gmp_DECO_PRJ_NAME
- !define desc_gmp_DECO_PRJ_NAME \
-         "Whether project-names are be decorated with compiler-id, compiler-ver etc. \
-         It should be set if you'd like to compile your C/C++ programs with more than one compiler."
-Var isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
-      Var str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING
- !define desc_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
-         "A tweak for GNU make 3.81+. If set to 1, there will be no output of verbose message \
-         $\"No such file or directory$\" when a file is not found by makefiles 'include' directive."
-Var isChecked_gmu_LOG_OUTPUT_FILENAME
-      Var str_gmu_LOG_OUTPUT_FILENAME
- !define desc_gmu_LOG_OUTPUT_FILENAME \
-         "For umake*.bat, tell where to log the make screen output."
-
 Var isChecked_gmu_ver
       Var str_gmu_ver
- !define desc_gmu_ver "This tells GnumakeUniproc version."
 
-Var isChecked_NLSSVN
-      Var str_NLSSVN
- !define desc_NLSSVN "This is the SVN repository root URL for NLSCAN."
-Var isChecked_gv1
-      Var str_gv1
- !define desc_gv1 ""
-Var isChecked_gv2
-      Var str_gv2
- !define desc_gv2 ""
-
-Var isChecked_AddPath
-      Var str_AddPath
-
-Var isChecked_nlscanenv
-
-
-!define desc_StoreEnvVar "You have two places to store the env-vars required by GnumakeUniproc(GMU):\r\n\
-* First, write to local user's registry, so that these env-vars are ready after you logon into Windows.\r\n\
-* Second, save the env-var settings to $INSTDIR\gmuenv.bat, so that you can execute \
- gmuenv.bat to set them only when required. \r\n\r\n\
-The following env-vars are to be stored: \r\n\r\n"
+Var isChecked_AddWincmdPath
+      Var str_AddWincmdPath
+Var isChecked_AddMingwPath
+      Var str_AddMingwPath
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
 !define GMU_VER "0.99"
 !define PRODUCT_VERSION "${GMU_VER}"
-!define PRODUCT_PUBLISHER "Jimm Chen (chenjun@nlscan.com)"
+!define PRODUCT_PUBLISHER "Jimm Chen (chjfth@gmail.com)"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -142,8 +79,6 @@ The following env-vars are to be stored: \r\n\r\n"
 ;!define MUI_COMPONENTSPAGE_SMALLDESC [2007-10-04]NSIS v2.24, !define this here will have no effect.
 !insertmacro MUI_PAGE_COMPONENTS
 Page custom SelectEnvVar
-#Page custom SelectGmiSydoEnvVar
-Page custom StoreEnvVar
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
@@ -170,8 +105,6 @@ ShowUnInstDetails show
 
 ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll" ; opt maybe
 ReserveFile "${fname_GmuEnvIni}" ; opt maybe
-ReserveFile "${fname_StoreEnvIni}" ; opt maybe
-ReserveFile "${fname_SydoEnvIni}" ;opt maybe
 
 !macro CopyASubdir subdir
   SetOutPath "$INSTDIR\${subdir}"
@@ -209,11 +142,10 @@ SectionEnd
 
 Section "Necessary executables for GnumakeUniproc" NeceExes
   SectionIn RO
-  SetOutPath "$INSTDIR${suffix_dir_GMUbin}"
+  SetOutPath "$INSTDIR${suffix_wincmd}"
   SetOverwrite try
   File /r "nsis-data\bin-gmu\*.*"
 
-  File "nsis-data\GMU\GMU-main\umake_cmd\wincmd\*.*"
 SectionEnd
 
 Section "Additional executables for GnumakeUniproc" AddonExes
@@ -231,9 +163,7 @@ Section "Developer files(docs & examples etc)" DevFiles
   !insertmacro CopyASubdir_InGMU nsis-install
   !insertmacro CopyASubdir_InGMU extras
 
-  ${If} "$isChecked_nlscanenv" == 1
-    !insertmacro CopyASubdir_InGMU nlscan
-  ${EndIf}
+  !insertmacro CopyASubdir_InGMU nlscan
 SectionEnd
 
 
@@ -244,18 +174,17 @@ Section -AddEnvVars
 
   ; Deal with PATH env-var
   DetailPrint "Adding PATH env-var..."
-  !insertmacro DoAddPathEnvVar AddPath
-
-  ; Add call D:\GMU\MinGW2\bin\gmu-goody.bat
-  !insertmacro AddBat_gmu_goody
-
+  ${If} "$isAddToPathFront" == 1
+    !insertmacro DoAddPathEnvVar AddMingwPath
+    !insertmacro DoAddPathEnvVar AddWincmdPath
+  ${Else}
+    !insertmacro DoAddPathEnvVar AddWincmdPath
+    !insertmacro DoAddPathEnvVar AddMingwPath
+  ${EndIf}
+  
   ; Record install target dir in registry
   WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir" "$INSTDIR"
   DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] InstallTargetDir=$InstDir_fwslash"
-
-  WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "isStoreEnvVarToRegistry" "$isStoreEnvVarToRegistry"
-  DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] isStoreEnvVarToRegistry=$isStoreEnvVarToRegistry"
-
 
   call BroadcastWinIniChange
 
@@ -321,8 +250,6 @@ NoAbort:
 
   ;Extract InstallOptions INI files
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "${fname_GmuEnvIni}"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "${fname_StoreEnvIni}"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "${fname_SydoEnvIni}"
 
   ;Check previous installation
   ReadRegStr "$R0" ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir"
@@ -353,27 +280,9 @@ FunctionEnd
 
 Section Uninstall
 
-  Delete "$INSTDIR\Quick start guide.url"
-  Delete "$INSTDIR\${PRODUCT_NAME}.url"
-  Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\*.txt"
-
-  Delete "$SMPROGRAMS\-GnumakeUniproc-\Uninstall.lnk"
-  Delete "$SMPROGRAMS\-GnumakeUniproc-\Website.lnk"
-  Delete "$SMPROGRAMS\-GnumakeUniproc-\Quick start guide.lnk"
-  RMDir "$SMPROGRAMS\-GnumakeUniproc-"
-
-  Delete "$INSTDIR\${fname_GmuEnvBat}"
-  RMDir /r "$INSTDIR\GMU-main"
-  RMDir /r "$INSTDIR\GMU-manual"
-  RMDir /r "$INSTDIR\GMU-ext"
-  RMDir /r "$INSTDIR\GMU-examples"
-  RMDir /r "$INSTDIR\demo-repositories"
-  RMDir /r "$INSTDIR\nsis-install"
-
-  RMDir /r "$INSTDIR\${dirname_MinGW}"
-
   RMDir /r "$INSTDIR" ; This clears them all!
+
+  RMDir /r "$SMPROGRAMS\-GnumakeUniproc-"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}"
@@ -390,6 +299,10 @@ Section un.RemoveEnvVars
   push "${absdir_MinGW_bin_bkslash}"
   call un.RemoveFromPath
 
+  DetailPrint "Removing $\"${absdir_wincmd}$\" from PATH env-var..."
+  push "${absdir_wincmd}"
+  call un.RemoveFromPath
+
   call un.BroadcastWinIniChange
 
 SectionEnd
@@ -399,76 +312,34 @@ SectionEnd
 Function SelectEnvVar
 
   ; Convert all backslash to forward-slash for $INSTDIR, then append /GMU-ext to it.
-  ; We make this result the default the default value for env-ver gmu_ud_list_CUSTOM_MKI.
+  ; We make this result the default value for env-ver gmu_ud_list_CUSTOM_MKI.
   Push '$INSTDIR'
   Push "\"
   Call StrSlash
   Pop $InstDir_fwslash ; StrSlash returns in $InstDir_fwslash
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 3" "State" "$InstDir_fwslash${suffix_dir_GMUext} $InstDir_fwslash${suffix_dir_ExtraCccfg}/gmu-ext"
-    ; Write suggested gmp_ud_list_CUSTOM_MKI (dynamic from $InstDir).
-  
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 23" "State" "$InstDir_fwslash${suffix_dir_ExtraCccfg}/compiler-cfgs"
-    ; Write suggested gmp_ud_list_CUSTOM_COMPILER_CFG (dynamic from $InstDir).
-  
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" "${absdir_MinGW_bin_bkslash}"
 
-  !insertmacro MUI_HEADER_TEXT "Select what environment variables(env-var) to set" \
-    "Env-var gmu_DIR_GNUMAKEUNIPROC will be set to the dir where GnumakeUniproc.mki resides. Besides, there are more you may want to set:"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" \
+    "${absdir_wincmd};${absdir_MinGW_bin_bkslash}"
+
+  !insertmacro MUI_HEADER_TEXT "Select environment variables(env-var) to modify" \
+    "GnumakeUniproc requires no modification to your system in order to run, except some directory in your PATH env-var."
+
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "${fname_GmuEnvIni}"
-  ; If some env-var is "checked"(for a checkbox), even with empty value, we must write its value to 
-  ; Windows registry, but if some env-var is "un-checked", we must remove it from Windows registry
 
-  ; Field 2, 3: checkbox, editbox for gmp_ud_list_CUSTOM_MKI
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmp_ud_list_CUSTOM_MKI ${fname_GmuEnvIni} "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $str_gmp_ud_list_CUSTOM_MKI ${fname_GmuEnvIni} "Field 3" "State"
-  ${If} "$isChecked_gmp_ud_list_CUSTOM_MKI" == 0
-    StrCpy $str_gmp_ud_list_CUSTOM_MKI ""
-  ${EndIf}
-
-  ; Field 22, 23: checkbox, editbox for gmp_ud_list_CUSTOM_COMPILER_CFG
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG ${fname_GmuEnvIni} "Field 22" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $str_gmp_ud_list_CUSTOM_COMPILER_CFG ${fname_GmuEnvIni} "Field 23" "State"
-  ${If} "$isChecked_gmp_ud_list_CUSTOM_COMPILER_CFG" == 0
-    StrCpy $str_gmp_ud_list_CUSTOM_COMPILER_CFG ""
-  ${EndIf}
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmp_DECO_PRJ_NAME ${fname_GmuEnvIni} "Field 6" "State"
-  ${If} "$isChecked_gmp_DECO_PRJ_NAME" == 1
-    StrCpy $str_gmp_DECO_PRJ_NAME 1
-  ${EndIf}
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_nlscanenv ${fname_GmuEnvIni} "Field 7" "State"
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_gmu_LOG_OUTPUT_FILENAME ${fname_GmuEnvIni} "Field 8" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $str_gmu_LOG_OUTPUT_FILENAME ${fname_GmuEnvIni} "Field 9" "State"
-  ${If} "$isChecked_gmu_LOG_OUTPUT_FILENAME" == 0
-    StrCpy $str_gmu_LOG_OUTPUT_FILENAME ""
-  ${EndIf}
-
-  ; Prepare NSIS vars for gmu_DIR_ROOT, gmu_DIR_GNUMAKEUNIPROC, gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING.
+  ; Prepare NSIS vars for gmu_DIR_ROOT
   StrCpy "$isChecked_gmu_DIR_ROOT" "1"
   StrCpy "$str_gmu_DIR_ROOT" "$InstDir_fwslash"
-  StrCpy "$isChecked_gmu_DIR_GNUMAKEUNIPROC" "1"
-  StrCpy "$str_gmu_DIR_GNUMAKEUNIPROC" "${absdir_GmuCore}"
-  StrCpy "$isChecked_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
-  StrCpy "$str_gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING" "1"
 
   StrCpy "$isChecked_gmu_ver" "1"
   StrCpy "$str_gmu_ver" "${GMU_VER}"
 
-  ${If} "$isChecked_nlscanenv" == 1
-    StrCpy "$isChecked_NLSSVN" "1"
-    StrCpy       "$str_NLSSVN" "https://nlssvn/svnreps"
-    StrCpy "$isChecked_gv1" "1"
-    StrCpy       "$str_gv1" "gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
-    StrCpy "$isChecked_gv2" "1"
-    StrCpy       "$str_gv2" "gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
+  !insertmacro MUI_INSTALLOPTIONS_READ $isAddPath ${fname_GmuEnvIni} "Field 11" "State"
+  ${If} "$isAddPath" == 1
+    StrCpy "$isChecked_AddWincmdPath" "1"
+    StrCpy        "$str_AddWincmdPath" "${absdir_wincmd}"
+    StrCpy "$isChecked_AddMingwPath"  "1"
+    StrCpy        "$str_AddMingwPath"  "${absdir_MinGW_bin_bkslash}"
   ${EndIf}
-
-  !insertmacro MUI_INSTALLOPTIONS_READ $isChecked_AddPath ${fname_GmuEnvIni} "Field 11" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $str_AddPath ${fname_GmuEnvIni} "Field 12" "State"
-  ; Do not clear $str_AddPath to null even if $isChecked_AddPath is 0, since it should
-  ; still be set in gmuenv.bat .
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isAddToPathFront ${fname_GmuEnvIni} "Field 13" "State"
 
@@ -476,39 +347,6 @@ Function SelectEnvVar
 
 FunctionEnd
 
-Function StoreEnvVar
-
-  StrCpy "$R0" "${desc_StoreEnvVar}"
-  !insertmacro AppendEnvVarDef_R0_list ${list_GmuEnvVar}
-
-  !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_StoreEnvIni}" "Field 2" "State" "$R0"
-
-  ;Check if previous installation's saved $isStoreEnvVarToRegistry, and make it the default selection.
-  ReadRegStr "$R0" ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "isStoreEnvVarToRegistry"
-  ${If} "$R0" == 0
-    !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_StoreEnvIni}" "Field 4" "State" 0
-  ${EndIf}
-
-  !insertmacro MUI_HEADER_TEXT "Where to store environment variables(env-var)?" ""
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "${fname_StoreEnvIni}"
-  ; If "Windows registry" is "checked"(for a checkbox), set $isStoreEnvVarToRegistry to 1, otherwise 0.
-  ; If "gmuenv.bat" is checked, set $isStoreEnvVarToBat to 1, otherwise 0.
-  
-  !insertmacro MUI_INSTALLOPTIONS_READ $isStoreEnvVarToRegistry ${fname_StoreEnvIni} "Field 4" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $isStoreEnvVarToBat ${fname_StoreEnvIni} "Field 5" "State"
-
-  ${If} "$MUI_TEMP1" == "back"
-  ${OrIf} "$MUI_TEMP1" == "cancel"
-  ${OrIf} "$MUI_TEMP1" == "error"
-    Return
-  ${EndIf}
-
-  ${If} "$isStoreEnvVarToBat" == 1
-    Delete ${fpath_GmuEnvBat} ; may try /REBOOTOK
-  ${EndIf}
-  ; note: $isStoreEnvVarToRegistry is processed elsewhere(in -AddEnvVars)
-
-FunctionEnd
 
 Function LaunchQuickStartGuide
   ExecShell "" "${fpath_QuickStartGuide}"

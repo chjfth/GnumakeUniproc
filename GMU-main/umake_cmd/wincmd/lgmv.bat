@@ -1,7 +1,7 @@
 @echo off
 : List GMU variables
 set gmu_
-set gmp_
+set gmp_ 2>NUL
 set gmi_ 2>NUL
 set gms_ 2>NUL
 set gv1 2>NUL

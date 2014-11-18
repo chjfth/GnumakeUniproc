@@ -53,6 +53,12 @@ export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
+
+export _gmuex1=$gmu_DIR_ROOT/GMU-examples/common/walkdir/make-all
+export gv1="gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
+export gv2="gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
+
+
 if [ "$gmu_NO_DEFAULT_gmp_COMPILER_ID" = "" ]; then
   export gmp_COMPILER_ID=linuxgcc
 	# Note: Disable this only in case you use other compiler than gcc(linux targeted).
