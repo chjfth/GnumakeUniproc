@@ -99,6 +99,8 @@ Page custom SelectEnvVar
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "setup-gmu.exe"
 InstallDir "D:\GMU" ; The default install dir
+	
+RequestExecutionLevel user ;Request application privileges for Windows Vista+
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -117,12 +119,7 @@ ReserveFile "${fname_GmuEnvIni}" ; opt maybe
 
 ; ========= sections start ===========
 
-Section "MinGW compiler(2.0) with gcc-3.2" MinGW
-  SetOverwrite try
-  !insertmacro CopyASubdir ${dirname_MinGW}
-SectionEnd
-
-Section "GnumakeUniproc" GMU ; GnumakeUniproc required files
+Section "GnumakeUniproc core scripts" GMU ; GnumakeUniproc required files
   SectionIn RO
   SetOverwrite try
 
@@ -146,6 +143,11 @@ Section "Necessary executables for GnumakeUniproc" NeceExes
   SetOverwrite try
   File /r "nsis-data\bin-gmu\*.*"
 
+SectionEnd
+
+Section "MinGW compiler(2.0) with gcc-3.2" MinGW
+  SetOverwrite try
+  !insertmacro CopyASubdir ${dirname_MinGW}
 SectionEnd
 
 Section "Additional executables for GnumakeUniproc" AddonExes
@@ -218,9 +220,9 @@ SectionEnd
 ;Descriptions
 
   ;Language strings
-  LangString DESC_MinGW ${LANG_ENGLISH} "This includes mingw-gcc 3.2. It is optional if you have your own MinGW version."
   LangString DESC_GMU ${LANG_ENGLISH} "GnumakeUniproc itself, including core make-partial files(.mki), and plugin files."
   LangString DESC_NeceExes ${LANG_ENGLISH} "Necessary Windows executables(sh.exe, mkdir.exe, etc) for running GnumakeUniproc."
+  LangString DESC_MinGW ${LANG_ENGLISH} "This includes mingw-gcc 3.2. It is optional if you have your own MinGW version."
   LangString DESC_AddonExes ${LANG_ENGLISH} "Additional Windows executables that do some assistant work."
   LangString DESC_DevFiles ${LANG_ENGLISH} "Files for GMU developers, including documents, GMU examples projects, GMU templates etc."
 
