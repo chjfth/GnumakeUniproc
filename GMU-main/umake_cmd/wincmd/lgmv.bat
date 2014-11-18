@@ -1,5 +1,13 @@
 @echo off
-: List GMU variables
+setlocal
+REM List GMU variables, were it launched from this GMU directory
+
+set tmpbatdir=%~dp0%
+set gmu_DIR_ROOT_bs=%tmpbatdir:\GMU-main\umake_cmd\wincmd\=%
+set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
+
+call %gmu_DIR_ROOT_bs%\_gmuenv.bat
+
 set gmu_
 set gmp_ 2>NUL
 set gmi_ 2>NUL

@@ -24,10 +24,6 @@ SET gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 SET gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
-set _gmuex1=%gmu_DIR_ROOT%\GMU-examples\common\walkdir\make-all
-set gv1=gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
-set gv2=gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
-
 
 @REM Normally, gmu_BIN_PATH_TAIL is not defined
 @if "%gmu_BIN_PATH_TAIL%" == "" (
@@ -35,6 +31,4 @@ set gv2=gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 ) else (
 	PATH=%PATH%;%gmu_DIR_ROOT_bs%\MinGW2\bin
 )
-
-SET NLSSVN=https://nlssvn/svnreps
 

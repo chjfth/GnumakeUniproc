@@ -25,8 +25,6 @@
 
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
-!define list_GmuEnvVar "gmu_DIR_ROOT gmu_ver"
-
 ; My vars for GnumakeUniproc install
 
 Var isNewInstall
@@ -171,9 +169,6 @@ SectionEnd
 
 Section -AddEnvVars
 
-  DetailPrint "Storing GnumakeUniproc env-vars..."
-  !insertmacro DoStoreEnvVar_list ${list_GmuEnvVar}
-
   ; Deal with PATH env-var
   DetailPrint "Adding PATH env-var..."
   ${If} "$isAddToPathFront" == 1
@@ -293,9 +288,6 @@ SectionEnd
 
 Section un.RemoveEnvVars
 
-  DetailPrint "Removing GnumakeUniproc env-vars..."
-  !insertmacro un.DelRegistryEnvVar_list ${list_GmuEnvVar}
-
   ; Deal with PATH env-var
   DetailPrint "Removing $\"${absdir_MinGW_bin_bkslash}$\" from PATH env-var..."
   push "${absdir_MinGW_bin_bkslash}"
@@ -344,8 +336,6 @@ Function SelectEnvVar
   ${EndIf}
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isAddToPathFront ${fname_GmuEnvIni} "Field 13" "State"
-
-  !insertmacro BkslashToFwslash_list ${list_GmuEnvVar}
 
 FunctionEnd
 
