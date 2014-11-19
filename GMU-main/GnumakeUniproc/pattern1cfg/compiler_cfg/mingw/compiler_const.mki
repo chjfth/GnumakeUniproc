@@ -63,6 +63,10 @@ gmu_exe_CXX = $(gmp_GCC_PREFIX)g++
 gmu_exe_LINK = $(gmp_GCC_PREFIX)g++
 gmu_exe_LIB = $(gmp_GCC_PREFIX)ar
 
+gmu_GCC_M_PREFIX = $(gmp_GCC_PREFIX)
+	# GMU 0.99: Without this, gmu_GCC_M_PREFIX would have value hdepend- on Windows(set by _gmuenv.bat),
+	# which would cause the trouble of <stdio.h> not being found.
+
 #gmp_CFLAGS_NON_CODE_GEN = 
 
 gmp_CFLAGS_MACRO_DEFS_preset += $(addprefix -D,WIN32 _WIN32) -D__int64="long long"
