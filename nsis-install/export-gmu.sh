@@ -5,6 +5,8 @@
 #		https://nlssvn/svnreps/makingsys/GnumakeUniproc
 # Tested with svn 1.4.2 (r22196)
 
+source $(dirname $0)/export-share.sc # get var finaloutput
+
 if [ "$1" == "" ]; then
 	echo "You must assign a param as the SVN Url prefix for GnumakeUniproc SVN repository, and optionally a second param for branch to export(default to trunk)."
 	exit 1
@@ -29,8 +31,8 @@ fi
 
 echo "All files of GnumakeUniproc have been retrieved."
 
-echo "Packing GMU.tar.bz2 ..."
-tar jcf GMU.tar.bz2 GMU
-if [ "$?" != 0 ]; then echo "Packing GMU.tar.bz2 failed!"; fi;
+echo "Packing $finaloutput ..."
+tar jcf "$finaloutput" GMU
+if [ "$?" != 0 ]; then echo "Packing $finaloutput failed!"; fi;
 
 echo "Done."
