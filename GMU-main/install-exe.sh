@@ -57,7 +57,8 @@ if [ "$DIR_GMU_PRG" = "" ]; then
 fi
 
 echo "Directory \"$DIR_GMU_PRG\" will be used for GMU binary files."
-ln -s "$DIR_GMU_MAIN/umake_cmd/bashcmd" "$DIR_GMU_PRG"
+ln -s -T "$DIR_GMU_MAIN/umake_cmd/bashcmd" "$DIR_GMU_PRG"
+	# -T to ensure that it only operates when $DIR_GMU_PRG is not an existing directory.
 if [ $? != 0 ]; then
 	echo "ERROR: \"$DIR_GMU_PRG\" creation fail!"
 fi

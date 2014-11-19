@@ -23,7 +23,7 @@ fi
 
 svnurl=$SvnUrlPrefix/GMU-addons/$BranchToGet/scripts
 echo "SVN exporting $svnurl ..."
-svn export --force $svnurl $OutputDirGMU/bin
+svn export --force $svnurl $OutputDirGMU/GMU-main/umake_cmd/bashcmd
 if [ "$?" != 0 ]; then
 	echo "Unexpected! SVN export($svnurl) failed."
 	exit 1
