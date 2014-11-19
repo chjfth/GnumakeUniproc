@@ -191,7 +191,7 @@ Section -AdditionalIcons
   CreateDirectory "$SMPROGRAMS\-GnumakeUniproc-"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Uninstall GMU.lnk" "$INSTDIR\uninst.exe"
   ; HM SIS Edit v2.0.3 wizard geneated <<<
 
   WriteIniStr "$INSTDIR\Quick start guide.url" "InternetShortcut" "URL" "${fpath_QuickStartGuide}"
