@@ -51,6 +51,10 @@ if exist Makefile.umk (
 goto CHECK_PARAM_AGAIN
 :CHECK_PARAM_DONE
 
+%gmu_MAKE_EXE% --version > NUL 2>&1
+if not %ERRORLEVEL% == 0 (
+	echo ERROR: GNU make executable "%gmu_MAKE_EXE%" not found on this machine!
+)
 %gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
 goto END
 
