@@ -19,8 +19,8 @@ Now, you've set up the environment to use GnumakeUniproc.
 
 Optional: Add command 
     source ~/GMU/gmuenv.sc
-to your login script(.bashrc) to get some convenient GMU vars/commands(gv1, 
-gv2, lgmv etc) in your shell environment.
+to your login script(.bashrc) to gdd the PATH and get some convenient 
+GMU vars/commands(gv1, gv2, lgmv etc) in your shell environment.
 
 If you encounter errors or need more detail, refer to the install section for
 Linux user in quick start guide.
