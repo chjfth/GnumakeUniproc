@@ -59,7 +59,7 @@ export gv1="gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD
 export gv2="gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1"
 
 
-if [ "$gmu_NO_DEFAULT_gmp_COMPILER_ID" = "" ]; then
+if [ "$gmp_COMPILER_ID" = "" ]; then
   export gmp_COMPILER_ID=linuxgcc
 	# Note: Disable this only in case you use other compiler than gcc(linux targeted).
 fi

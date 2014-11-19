@@ -43,29 +43,23 @@ _gmu_rel2abs_file()
 	fi
 }
 
-DIR_GMU=
-DIR_GMU_MAIN=
+DIR_GMU_MAIN="${0%/*}"
+	# So install-exe.sh must be placed in GMU-main directory
+
+DIR_GMU=${DIR_GMU_MAIN%/*}
+	# the parent dir
+
 DIR_GMU_PRG=$1
+	# Place of GMU binary. User can assign this explicitly(but optional)
 
 if [ "$DIR_GMU_PRG" = "" ]; then
-	if [ "${0%/*}" = "$0" ]; then # $0 does not contain any path separator(rare case by user, and seems impossible with Bash 3.x, 4,x etc), so we use current working dir.
-		DIR_GMU=.
-		DIR_GMU_MAIN=./GMU-main
-	else # $0 contains some path separator, so we use relative dir ../bin to where this script file resides.
-		PATH_THIS_FILE=$(_gmu_rel2abs_file $0)
-		DIR_GMU=${PATH_THIS_FILE%/*} ; DIR_GMU=${DIR_GMU%/*}
-		DIR_GMU_MAIN=${PATH_THIS_FILE%/*}
-	fi
-
 	DIR_GMU_PRG=$DIR_GMU/bin
-	echo "Directory \"$DIR_GMU_PRG\" will be used for GMU binary files."
-else
-	DIR_GMU_MAIN=${0%/*} # Remove the trailing "/install-exe.sh"
 fi
 
-if [ ! -d $DIR_GMU_PRG ]; then
-	if mkdir $DIR_GMU_PRG; then true
-	else echo "Cannot mkdir $DIR_GMU_PRG"; exit 1; fi
+echo "Directory \"$DIR_GMU_PRG\" will be used for GMU binary files."
+ln -s "$DIR_GMU_MAIN/umake_cmd/bashcmd" "$DIR_GMU_PRG"
+if [ $? != 0 ]; then
+	echo "ERROR: \"$DIR_GMU_PRG\" creation fail!"
 fi
 
 DIR_GMU_PRG_SRC=$DIR_GMU_MAIN/gmu_programs
@@ -79,14 +73,6 @@ for OnePrg in $GMU_PRGS; do
 	fi
 done
 
-UMAKE_CMD="umake-share umake umakeD umakeU umakeUD umaketime umakeDtime umakeUtime umakeUDtime clean-gf"
-for OnePrg in $UMAKE_CMD; do
-	cmd="cp $DIR_GMU_MAIN/umake_cmd/bashcmd/$OnePrg $DIR_GMU_PRG/$OnePrg"
-	echo "$cmd"
-	if ! $cmd ; then
-		exit 1
-	fi
-done
 
 cmd="cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_PRG"
 echo "$cmd"
