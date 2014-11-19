@@ -21,8 +21,6 @@
 !define suffix_wincmd \GMU-main\umake_cmd\wincmd
 !define absdir_wincmd "$INSTDIR${suffix_wincmd}"
 
-!define absdir_DIR_GMU_PRG "$InstDir_fwslash/${dirname_MinGW}/bin"
-
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
 ; My vars for GnumakeUniproc install
@@ -39,7 +37,7 @@ Var isChecked_gmu_ver
 
 Var isChecked_AddWincmdPath
       Var str_AddWincmdPath
-Var isChecked_AddMingwPath
+Var isChecked_AddMingwPath ; GMU 0.99: Keep it 0, so that D:\GMU\MinGW2\bin does not go into PATH
       Var str_AddMingwPath
 
 ; HM NIS Edit Wizard helper defines
@@ -149,7 +147,7 @@ Section "MinGW compiler(2.0) with gcc-3.2" MinGW
 SectionEnd
 
 Section "Additional executables for GnumakeUniproc" AddonExes
-  SetOutPath "$INSTDIR${suffix_dir_GMUbin}"
+  SetOutPath "$INSTDIR${suffix_wincmd}"
   SetOverwrite try
   File /r "nsis-data\bin-gmu-addons\*.*"
 SectionEnd
@@ -217,8 +215,8 @@ SectionEnd
   ;Language strings
   LangString DESC_GMU ${LANG_ENGLISH} "GnumakeUniproc itself, including core make-partial files(.mki), and plugin files."
   LangString DESC_NeceExes ${LANG_ENGLISH} "Necessary Windows executables(sh.exe, mkdir.exe, etc) for running GnumakeUniproc."
-  LangString DESC_MinGW ${LANG_ENGLISH} "This includes mingw-gcc 3.2. It is optional if you have your own MinGW version."
-  LangString DESC_AddonExes ${LANG_ENGLISH} "Additional Windows executables that do some assistant work."
+  LangString DESC_MinGW ${LANG_ENGLISH} "Only for GMU demonstration purpose, not a must if you have your own compilers(MSVC etc)."
+  LangString DESC_AddonExes ${LANG_ENGLISH} "Optional Windows executables that do some assistant work."
   LangString DESC_DevFiles ${LANG_ENGLISH} "Files for GMU developers, including documents, GMU examples projects, GMU templates etc."
 
   ;Assign language strings to sections
@@ -313,7 +311,7 @@ Function SelectEnvVar
   Pop $InstDir_fwslash ; StrSlash returns in $InstDir_fwslash
 
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" \
-    "${absdir_wincmd};${absdir_MinGW_bin_bkslash}"
+    "${absdir_wincmd}" ;"${absdir_wincmd};${absdir_MinGW_bin_bkslash}"
 
   !insertmacro MUI_HEADER_TEXT "Select environment variables(env-var) to modify" \
     "GnumakeUniproc requires no modification to your system in order to run, except some directory in your PATH env-var."
@@ -331,8 +329,8 @@ Function SelectEnvVar
   ${If} "$isAddPath" == 1
     StrCpy "$isChecked_AddWincmdPath" "1"
     StrCpy        "$str_AddWincmdPath" "${absdir_wincmd}"
-    StrCpy "$isChecked_AddMingwPath"  "1"
-    StrCpy        "$str_AddMingwPath"  "${absdir_MinGW_bin_bkslash}"
+;    StrCpy "$isChecked_AddMingwPath"  "1"
+;    StrCpy        "$str_AddMingwPath"  "${absdir_MinGW_bin_bkslash}"
   ${EndIf}
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isAddToPathFront ${fname_GmuEnvIni} "Field 13" "State"

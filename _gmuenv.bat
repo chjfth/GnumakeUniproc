@@ -24,11 +24,6 @@ SET gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 SET gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
-
-@REM Normally, gmu_BIN_PATH_TAIL is not defined
-@if "%gmu_BIN_PATH_TAIL%" == "" (
-	PATH=%gmu_DIR_ROOT_bs%\MinGW2\bin;%PATH%
-) else (
-	PATH=%PATH%;%gmu_DIR_ROOT_bs%\MinGW2\bin
+@if "%gmu_GCC_M_PREFIX%" == "" (
+	set gmu_GCC_M_PREFIX=hdepend-
 )
-
