@@ -108,10 +108,24 @@ WalkDir_OneLevel(int DirLevelNow,
 		pCbinfo->pszPath[pCbinfo->nDirLen] = '/';
 		strcpy(pCbinfo->pszPath + pCbinfo->nDirLen+1, pCbinfo->pszName);
 
-		if(stat(pCbinfo->pszPath, &statinfo)!=0)
+		if(lstat(pCbinfo->pszPath, &statinfo)!=0)
 		{
 			// stat failed, ignore it, may be it has just been deleted.
 			continue;
+		}
+		
+		if( S_ISLNK(statinfo.st_mode) )
+		{
+			pCbinfo->isLink = 1; // 1=yes
+			
+			// Use stat on the link, so that we can know whether it points to a directory.
+			// And if it points to a directory, we should recurse into it.
+			if(stat(pCbinfo->pszPath, &statinfo)!=0)
+				continue;
+		}
+		else
+		{
+			pCbinfo->isLink = 0; // 0=no
 		}
 
 		// Prepare the walkdir_CBINFO struct for callback

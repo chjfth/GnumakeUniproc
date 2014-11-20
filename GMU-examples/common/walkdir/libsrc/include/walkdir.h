@@ -43,6 +43,8 @@ typedef struct _walkdir_CBINFO_st
 	DIRWALK_USER_CONST char *pszName;
 	int nNameLen;
 
+	int isLink; // whether it is a symbolic link
+
 	__int64 nFileBytes;
 
 	time_t timeModified;

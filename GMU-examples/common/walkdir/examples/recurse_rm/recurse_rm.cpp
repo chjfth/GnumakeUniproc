@@ -22,6 +22,7 @@ walkdir_CBRET_et pcbWalkdir(
 {
 	int *pTotal = (int*)pCallbackExtra;
 	struct tm *ptm;
+	walkdir_CBRET_et ret = walkdir_CBRET_GoOn; 
 
 	if(pCbinfo->CallbackReason==walkdir_CBReason_DirEnterFail)
 	{
@@ -37,8 +38,18 @@ walkdir_CBRET_et pcbWalkdir(
 		printf("%s/%s (%d)\n", pCbinfo->pszDir, pCbinfo->pszName, pCbinfo->nDirLen+pCbinfo->nNameLen+1);
 		int re = remove(pCbinfo->pszPath);
 		if(re!=0)
-			printf("!!!!!! remove() fail.");
+			printf("!!!!!! remove(\"%s\") fail.", pCbinfo->pszPath);
 		printf("\n");
+	}
+	else if(pCbinfo->isLink && pCbinfo->CallbackReason==walkdir_CBReason_MeetDir)
+	{
+		printf("%s (%d)\n", pCbinfo->pszPath, pCbinfo->nPathLen+1);
+		int re = remove(pCbinfo->pszPath);
+		if(re!=0)
+			printf("!!!!!! [symlink] remove(\"%s\") fail.", pCbinfo->pszPath);
+		printf("\n");
+		
+		ret = walkdir_CBRET_BypassDir; // So we only remove symlink, NOT files inside.
 	}
 	else if(pCbinfo->CallbackReason==walkdir_CBReason_LeaveDir)
 	{
@@ -52,7 +63,7 @@ walkdir_CBRET_et pcbWalkdir(
 
 	(*pTotal)++;
 
-	return walkdir_CBRET_GoOn;
+	return ret;
 }
 
 int main(int argc, char *argv[])
@@ -63,7 +74,7 @@ int main(int argc, char *argv[])
 
 	if(argc<2)
 	{
-		printf("Please input a dir as the param.\n");
+		printf("Please input a dir as parameter.\n");
 		return 1;
 	}
 
