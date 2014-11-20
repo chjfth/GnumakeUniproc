@@ -26,7 +26,7 @@ if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
 fi
 
 # Check if make-gmu can be executed. If so, let umake use it(by overriding gmu_MAKE_EXE)
-if $gmu_DIR_ROOT/bin/make-gmu --version > /dev/null; then
+if $gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd/make-gmu --version > /dev/null; then
 	export gmu_MAKE_EXE=make-gmu
 fi
 
@@ -64,7 +64,7 @@ if [ "$gmp_COMPILER_ID" = "" ]; then
 	# Note: Disable this only in case you use other compiler than gcc(linux targeted).
 fi
 
-PATH="$gmu_DIR_ROOT/bin:$PATH"
+PATH="$gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd:$PATH"
 
 # Something extra for Nlscan and Scalacon:
 export NLSSVN=https://nlssvn/svnreps
