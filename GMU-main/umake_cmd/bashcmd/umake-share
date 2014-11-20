@@ -9,6 +9,16 @@ export gmu_DIR_ROOT=${tmpbatdir%/GMU-main/umake_cmd/bashcmd}
 
 PATH=$tmpbatdir:$PATH
 
+# If there is sign that GMU is not "installed", do the install automatically.
+if [ ! -f $tmpbatdir/gmuExtractVarDefines ]; then
+	echo "First time run umake? GMU is now installing for you... "
+	if ! $gmu_DIR_ROOT/install.sh ;then
+		echo "Sorry, GMU install fails. umake cannot run."
+		exit 1
+	fi
+fi
+
+
 source $gmu_DIR_ROOT/_gmuenv.sc
 
 

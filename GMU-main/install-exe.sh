@@ -40,3 +40,4 @@ fi
 echo ""
 echo "GMU installed OK!"
 echo "Remember to add '$DIR_GMU_BIN' to your PATH in order to execute umake commands."
+echo ""

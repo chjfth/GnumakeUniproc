@@ -1,17 +1,5 @@
 # NOTE: You MUST `source' this script(should let current env modified) instead of executing it.
 
-# _gmu_rel2abs (): 
-# Input a dir(relative or absolute), return(echo) its absolute dir.
-# If the input dir is not valid or not accessible, return null string.
-# This function will not change callers current working directory.
-_gmu_rel2abs ()
-{
-	if [ "$1" = "" ]; then return 4; fi
-
-	if cd $1 >/dev/null; then echo $(pwd)
-	else return 5; fi
-}
-
 if [ "$gmu_DIR_ROOT" = "" ]; then
 	echo "ERROR from _gmuenv.sc: Env-var gmu_DIR_ROOT not defined yet."
 	return 4
