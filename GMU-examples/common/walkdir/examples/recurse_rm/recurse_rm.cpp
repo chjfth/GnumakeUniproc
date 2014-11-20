@@ -46,7 +46,7 @@ walkdir_CBRET_et pcbWalkdir(
 		printf("[level %d] %s (%d)\n", pCbinfo->nDirLevel, pCbinfo->pszDir, pCbinfo->nDirLen);
 		int re = rmdir(pCbinfo->pszDir);
 		if(re!=0)
-			printf("!!!! rmdir() fail.");
+			printf("!!!! rmdir(\"%s\") fail.", pCbinfo->pszDir);
 		printf("\n");
 	}
 
