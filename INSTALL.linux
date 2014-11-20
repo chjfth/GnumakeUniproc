@@ -11,15 +11,17 @@ distributions since year 2005(with Bash 3.0).
 Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
 ~/GMU/INSTALL.linux), then do the following:
 
-$ ~/GMU/install.sh         # Prepare required executables into ~/GMU/bin
-$ PATH=~/GMU/bin:$PATH     # Add umake commmands to your PATH
+$ ~/GMU/install.sh                             # Prepare required executables 
+$ PATH=~/GMU/GMU-main/umake_cmd/bashcmd:$PATH  # Add umake commmands to PATH
 
 If the install.sh does not spout any "Error" message, then it succeeds.
 Now, you've set up the environment to use GnumakeUniproc.
 
 Optional: Add command 
-    source ~/GMU/gmuenv.sc
-to your login script(.bashrc) to gdd the PATH and get some convenient 
+
+    source ~/GMU/gmupath.sc
+
+to your login script(.bashrc) to add the PATH and get some convenient 
 GMU vars/commands(gv1, gv2, lgmv etc) in your shell environment.
 
 If you encounter errors or need more detail, refer to the install section for
