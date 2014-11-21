@@ -108,9 +108,33 @@ ReserveFile "${fname_GmuEnvIni}" ; opt maybe
   SetOutPath "$INSTDIR\${subdir}"
   File /r "nsis-data\${subdir}\*.*"
 !macroend
+
 !macro CopyASubdir_InGMU subdir
   SetOutPath "$INSTDIR\${subdir}"
   File /r "nsis-data\GMU\${subdir}\*.*"
+!macroend
+
+!macro ReadRegistryCfg cfgname
+  ReadRegStr "$R0" ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" ${cfgname}
+  ; [2014-11-21] Now return value in $R0. Any other way to return?
+!macroend
+
+!macro MarkSectionByRegistry SectionName_nq ; nq: no double-quotes
+  !insertmacro ReadRegistryCfg "${SectionName_nq}"
+
+    ${If} "$R0" == "0"
+      SectionSetFlags ${${SectionName_nq}} 0
+    ${EndIf}
+!macroend
+
+!macro WriteRegistryCfg cfgname cfgval
+  WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" ${cfgname} ${cfgval}
+!macroend
+
+!macro SaveRegistryBySectionMark SectionName_nq ; nq: no double-quotes
+  SectionGetFlags ${${SectionName_nq}} $0
+  IntOp $0 $0 & 1
+  !insertmacro WriteRegistryCfg "${SectionName_nq}" "$0"
 !macroend
 
 ; ========= sections start ===========
@@ -201,6 +225,11 @@ Section -AdditionalIcons
 SectionEnd
 
 Section -Post
+
+  !insertmacro SaveRegistryBySectionMark MinGW
+  !insertmacro SaveRegistryBySectionMark AddonExes
+  !insertmacro SaveRegistryBySectionMark DevFiles
+
   WriteUninstaller "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
@@ -246,10 +275,15 @@ NoAbort:
   ;Extract InstallOptions INI files
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "${fname_GmuEnvIni}"
 
-  ;Check previous installation
-  ReadRegStr "$R0" ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir"
+ ;Check previous installation
+  !insertmacro ReadRegistryCfg "InstallTargetDir"
   ${If} "$R0" != "" ; Previous install exists
     StrCpy $INSTDIR $R0
+ 
+    !insertmacro MarkSectionByRegistry MinGW
+    !insertmacro MarkSectionByRegistry AddonExes
+    !insertmacro MarkSectionByRegistry DevFiles
+    
     StrCpy $isNewInstall 0
   ${Else}
     StrCpy $isNewInstall 1
