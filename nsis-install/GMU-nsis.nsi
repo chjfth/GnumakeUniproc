@@ -93,7 +93,7 @@ Page custom SelectEnvVar
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "setup-gmu.exe"
+OutFile "setup-gmu-v${GMU_VER}.exe"
 InstallDir "D:\GMU" ; The default install dir
 	
 RequestExecutionLevel user ;Request application privileges for Windows Vista+
