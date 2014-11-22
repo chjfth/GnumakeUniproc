@@ -27,13 +27,7 @@
 
 Var isNewInstall
 Var isAddToPathFront ; 1 means add-to-front, 0 means add-to-rear
-Var InstDir_fwslash ; Store forward-slash version of $INSTDIR
 Var isAddPath
-
-Var isChecked_gmu_DIR_ROOT ;No selection for isChecked_gmu_DIR_ROOT, take it always checked.
-      Var str_gmu_DIR_ROOT
-Var isChecked_gmu_ver
-      Var str_gmu_ver
 
 Var isChecked_AddWincmdPath
       Var str_AddWincmdPath
@@ -203,7 +197,7 @@ Section -AddEnvVars
   
   ; Record install target dir in registry
   WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir" "$INSTDIR"
-  DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] InstallTargetDir=$InstDir_fwslash"
+  DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] InstallTargetDir=$INSTDIR"
 
   call BroadcastWinIniChange
 
@@ -337,13 +331,6 @@ SectionEnd
 ;;;;;;;;;;;;;;;
 Function SelectEnvVar
 
-  ; Convert all backslash to forward-slash for $INSTDIR, then append /GMU-ext to it.
-  ; We make this result the default value for env-ver gmu_ud_list_CUSTOM_MKI.
-  Push '$INSTDIR'
-  Push "\"
-  Call StrSlash
-  Pop $InstDir_fwslash ; StrSlash returns in $InstDir_fwslash
-
   !insertmacro MUI_INSTALLOPTIONS_WRITE "${fname_GmuEnvIni}" "Field 12" "State" \
     "${absdir_wincmd}" ;"${absdir_wincmd};${absdir_MinGW_bin_bkslash}"
 
@@ -351,13 +338,6 @@ Function SelectEnvVar
     "GnumakeUniproc requires no modification to your system in order to run, except some directory in your PATH env-var."
 
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "${fname_GmuEnvIni}"
-
-  ; Prepare NSIS vars for gmu_DIR_ROOT
-  StrCpy "$isChecked_gmu_DIR_ROOT" "1"
-  StrCpy "$str_gmu_DIR_ROOT" "$InstDir_fwslash"
-
-  StrCpy "$isChecked_gmu_ver" "1"
-  StrCpy "$str_gmu_ver" "${GMU_VER}"
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isAddPath ${fname_GmuEnvIni} "Field 11" "State"
   ${If} "$isAddPath" == 1
