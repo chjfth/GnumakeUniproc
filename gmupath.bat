@@ -12,4 +12,6 @@ set gv2=gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 @REM -- No need to add %tmpbatdir%\MinGW2\bin here, it will be added in _gmuenv.bat
 @PATH=%tmpdir%;%PATH%
 
+@call gmu-goody.bat
+
 @echo GMU command PATH added: %tmpdir% 
