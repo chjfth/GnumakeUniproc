@@ -25,6 +25,13 @@
 
 ; My vars for GnumakeUniproc install
 
+!define list_StaleGmuEnvVar "gmu_DIR_ROOT gmu_DIR_GNUMAKEUNIPROC gmu_ver \
+    gmp_ud_list_CUSTOM_MKI gmp_ud_list_CUSTOM_COMPILER_CFG \
+    gmp_DECO_PRJ_NAME \
+    gmu_LOG_OUTPUT_FILENAME \
+    gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING \
+    "
+
 Var isNewInstall
 Var isAddToPathFront ; 1 means add-to-front, 0 means add-to-rear
 Var isAddPath
@@ -65,7 +72,7 @@ Var isChecked_AddMingwPath ; GMU 0.99: Keep it 0, so that D:\GMU\MinGW2\bin does
 !insertmacro MUI_PAGE_WELCOME
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
-; Componet selection page
+; Component selection page
 ;!define MUI_COMPONENTSPAGE_SMALLDESC [2007-10-04]NSIS v2.24, !define this here will have no effect.
 !insertmacro MUI_PAGE_COMPONENTS
 Page custom SelectEnvVar
@@ -90,7 +97,7 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "setup-gmu-v${GMU_VER}.exe"
 InstallDir "D:\GMU" ; The default install dir
 	
-RequestExecutionLevel user ;Request application privileges for Windows Vista+
+RequestExecutionLevel user ;Request application(not Administrator) privileges for Windows Vista+
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -186,7 +193,6 @@ SectionEnd
 Section -AddEnvVars
 
   ; Deal with PATH env-var
-  DetailPrint "Adding PATH env-var..."
   ${If} "$isAddToPathFront" == 1
     !insertmacro DoAddPathEnvVar AddMingwPath
     !insertmacro DoAddPathEnvVar AddWincmdPath
@@ -199,6 +205,9 @@ Section -AddEnvVars
   WriteRegStr ${PRODUCT_INST_ROOT_KEY} "${PRODUCT_INST_KEY}" "InstallTargetDir" "$INSTDIR"
   DetailPrint "Writing registry key: [${PRODUCT_INST_ROOT_KEY}\${PRODUCT_INST_KEY}] InstallTargetDir=$INSTDIR"
 
+  ; Remove stale GMU env-vars in registry from GMU v0.98.1 and earlier 
+  !insertmacro DelRegistryEnvVar_list ${list_StaleGmuEnvVar}
+  
   call BroadcastWinIniChange
 
 SectionEnd
@@ -343,9 +352,10 @@ Function SelectEnvVar
   ${If} "$isAddPath" == 1
     StrCpy "$isChecked_AddWincmdPath" "1"
     StrCpy        "$str_AddWincmdPath" "${absdir_wincmd}"
-;    StrCpy "$isChecked_AddMingwPath"  "1"
-;    StrCpy        "$str_AddMingwPath"  "${absdir_MinGW_bin_bkslash}"
   ${EndIf}
+
+  StrCpy "$isChecked_AddMingwPath"  "0" ; "0" to remove this PATH anyway(done in DoAddPathEnvVar)
+  StrCpy        "$str_AddMingwPath"  "${absdir_MinGW_bin_bkslash}"
 
   !insertmacro MUI_INSTALLOPTIONS_READ $isAddToPathFront ${fname_GmuEnvIni} "Field 13" "State"
 
