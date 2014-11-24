@@ -10,6 +10,15 @@ Just run export-at-office.bat, then you have everything exported into a director
 
 Compile GMU-nsis.nsi with NSIS 2.46.
 
+SPECIAL NOTE: Large string(8192 bytes) version of makensis.exe(and Stubs) are suggested to build
+GMU-nsis.nsi . 
+
+The standard 1024-byte version has such a problem on Windows 7: 
+    If PATH env-var is larger than 1024 bytes, ``ReadEnvStr $1 PATH``(in AddToPath.nsh) will get 
+empty string in $1, and the result is: Running the installer exe multiple times will have 
+D:\GMU\GMU-main\umake_cmd\wincmd added to PATH multiple times as well.
+
+
 
 === The Verbose Way (for Internet users) ===
 
