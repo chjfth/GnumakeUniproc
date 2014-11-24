@@ -20,7 +20,7 @@
 !define absdir_MinGW_bin_bkslash "$INSTDIR${suffix_dir_GMUbin}"
 !define suffix_wincmd \GMU-main\umake_cmd\wincmd
 !define absdir_wincmd "$INSTDIR${suffix_wincmd}"
-
+!define uninst_exe_name "uninst-gmu.exe"
 !define fpath_QuickStartGuide "$INSTDIR\GMU-manual\quick-start\quick-start.htm"
 
 ; My vars for GnumakeUniproc install
@@ -218,7 +218,7 @@ Section -AdditionalIcons
   CreateDirectory "$SMPROGRAMS\-GnumakeUniproc-"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Uninstall GMU.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\-GnumakeUniproc-\Uninstall GMU.lnk" "$INSTDIR\${uninst_exe_name}"
   ; HM SIS Edit v2.0.3 wizard geneated <<<
 
   WriteIniStr "$INSTDIR\Quick start guide.url" "InternetShortcut" "URL" "${fpath_QuickStartGuide}"
@@ -233,9 +233,9 @@ Section -Post
   !insertmacro SaveRegistryBySectionMark AddonExes
   !insertmacro SaveRegistryBySectionMark DevFiles
 
-  WriteUninstaller "$INSTDIR\uninst.exe"
+  WriteUninstaller "$INSTDIR\${uninst_exe_name}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\${uninst_exe_name}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
