@@ -11,23 +11,23 @@ gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_msvc)
 _msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc60 := $(if $(_msvc_vc60ver),1,)
 
-_msvc_vc70ver := $(filter vc70%,$(gmp_COMPILER_VER_msvc))
-_msvc_IsUsing_vc70 := $(if $(_msvc_vc70ver),1,)
-
+# VS2003
 _msvc_vc71ver := $(filter vc71%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc71 := $(if $(_msvc_vc71ver),1,)
 
+# VS2005
 _msvc_vc80ver := $(filter vc80%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc80 := $(if $(_msvc_vc80ver),1,)
 
+# VS2008
 _msvc_vc90ver := $(filter vc90%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc90 := $(if $(_msvc_vc90ver),1,)
 
-_msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc70ver) $(_msvc_vc71ver) $(_msvc_vc80ver) $(_msvc_vc90ver))
+# VS2010
+_msvc_vc100ver := $(filter vc100%,$(gmp_COMPILER_VER_msvc))
+_msvc_IsUsing_vc100 := $(if $(_msvc_vc100ver),1,)
 
-	#(old:)
-	#_msvc_SupportedVers = vc60 vc70 vc71 vc80 vc90
-	#_msvc_CompilerVers = $(firstword $(call _FindStrings,$(_msvc_SupportedVers),$(gmp_COMPILER_VER_msvc)))
+_msvc_CompilerVers := $(strip $(_msvc_vc60ver) $(_msvc_vc71ver) $(_msvc_vc80ver) $(_msvc_vc90ver) $(_msvc_vc100ver))
 
 
 # Here, check whether gmp_COMPILER_VER_msvc results in a non-empty but unrecognized compiler-ver.
@@ -53,10 +53,10 @@ else
 endif
 
 
-_gmp_isAboveVC70 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver)$(_msvc_vc71ver)$(_msvc_vc70ver),1)
-_gmp_isAboveVC71 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver)$(_msvc_vc71ver),1)
-_gmp_isAboveVC80 = $(if $(_msvc_vc90ver)$(_msvc_vc80ver),1)
-_gmp_isAboveVC90 = $(if $(_msvc_vc90ver),1)
+_gmp_isAboveVC71 = $(if $(_msvc_vc100ver)$(_msvc_vc90ver)$(_msvc_vc80ver)$(_msvc_vc71ver),1)
+_gmp_isAboveVC80 = $(if $(_msvc_vc100ver)$(_msvc_vc90ver)$(_msvc_vc80ver),1)
+_gmp_isAboveVC90 = $(if $(_msvc_vc100ver)$(_msvc_vc90ver),1)
+_gmp_isAboveVC100 = $(if $(_msvc_vc100ver),1)
 
 
 
