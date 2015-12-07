@@ -11,6 +11,7 @@ _dirDefaultCompilerCfg = $(_dirPattern1Cfg)/compiler_cfg
 
 
 gmp_Gp_COMPILER_CFG_LOADED = $(firstword \
+	$(CURDIR)/compiler_config.mki \
 	$(foreach _Dir,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg),\
 		$(wildcard $(_Dir)/$(gmp_COMPILER_ID)/compiler_config.mki))\
 	)
