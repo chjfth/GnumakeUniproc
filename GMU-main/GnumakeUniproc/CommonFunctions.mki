@@ -694,4 +694,26 @@ gmuf_ScriptCmd = $(if $(gmuf_IsUsingWindowsCmd),cmd /C "$(subst \,\\,$1)",$1)
 	# * Replacing " to \" should not be carried out, due to the nature of``cmd /c'' !
 	
 
+_gmpfHideSpace = $(subst $(_GmuSpace),@,$(subst \,/,$(strip $1)))
+	# Example: $1=
+	#	C:\my\inc;E:\vs 2005\inc;
+	# returns
+	#	C:/my/inc;E:/vs@2005/inc;
+
+gmpf_gccM_DesectPathList = $(subst @, ,$(patsubst %,-isystem "%",$(subst $2, ,$(call _gmpfHideSpace,$1))))
+	# Example:
+	# $1=C:\my\inc;E:\vs 2005\inc;
+	# $2=;
+	# returns
+	#	-isystem "C:/my/inc" -isystem "E:/vs 2005/inc"
+	#
+	# This is used by compiler config used with VC++ command line env.
+	# MSVC is special that its paths in INCLUDE env-var normally have *spaces*,
+	# so we cannot simply append -isystem to each word of it. So this function comes to help.
+	#
+	# Usage example:
+	#	_gmu_isystem_DIRS_WRAP_QUOTES := $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
+
+
+
 endif # ifndef _CommonFunctions_included 

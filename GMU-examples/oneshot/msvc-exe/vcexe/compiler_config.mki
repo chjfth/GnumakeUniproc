@@ -1,0 +1,26 @@
+
+gmu_exe_CC = cl
+gmu_exe_CXX = cl
+	# the above two are optional
+
+INCLUDE += $(Include) $(include) # This is required because make's var is case sensitive.
+_gmu_isystem_DIRS_WRAP_QUOTES = $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
+	# This is special for MSVC. It will generate 
+	#	-isystem "C:/Program Files (x86)/Microsoft Visual Studio/VC/include" -isystem "..."
+	# and these will be passed to ``gcc -M`` telling those are VC++ system header directories.
+
+
+gmp_FLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER))
+	# Using $(gmu_ud_list_PRJ_HEADER) enables GMU's auto-hdepend facility.
+
+gmu_u_CC_CMD = cl /nologo /c /Zi $(gmp_FLAGS_INCLUDES) /Fo"$(patsubst $(CURDIR)/%,./%,$@)" $<
+gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
+
+gmp_ALL_TO_LINK = $(patsubst $(CURDIR)/%,./%,\
+  $(gmu_up_list_EXTRA_OBJ_TO_LINK) $(gmu_Gp_list_REQOBJS) \
+  $(gmu_Gp_list_SUBPRJ_TO_LINK) $(gmp_bc_EXTRALIBS) $(gmp_bc_SYSLIBS))
+  # This is an a bit simplified version of gmp_ALL_TO_LINK, see bc_common.mki for a more complete version.
+
+
+gmu_u_LINK_CMD = link /nologo /debug /out:"$@" $(gmp_ALL_TO_LINK)
+
