@@ -9,15 +9,13 @@ if not "%curdir%" == "%curdir: =!%" (
   )
 
 ::Check whether GMU env has been set-up. If not, set it up.
-set p_gmuenv_bat=%~dp0gmuenv.bat
-if "%gmu_DIR_ROOT%" == "" (
-  if exist %p_gmuenv_bat% (
-    call %p_gmuenv_bat%
-    ) else (
-    echo Unexpected: %p_gmuenv_bat% does not exist. Fail to set GMU environment.
-    exit /b 1
-    )
-  )
+set gmu_DIR_ROOT_bs=%~dp0%
+set gmu_DIR_ROOT_bs=%gmu_DIR_ROOT_bs:~0,-1%
+set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
+:	gmu_DIR_ROOT will result in something like D:/GMU
+call %gmu_DIR_ROOT_bs%\gmppath.bat
+call %gmu_DIR_ROOT_bs%\_gmuenv.bat
+
 
 set p_PerfLog=%CD%\gmuperf.log
 
@@ -28,9 +26,7 @@ set gmu_ud_OUTPUT_ROOT=%gmu_ud_OUTPUT_ROOT://=/%
 	: Otherwise, in case run from C:\ , gmu_ud_OUTPUT_ROOT will be C://gf-gmuperf
 set BYPASS_GMUTEST_AUTO_CHECKOUT=1
 
-::set dirMakeAll=%~dp0GMU-examples\common\walkdir\examples\walkdir_ex1\exe.mingw
-set dirMakeAll=%~dp0GMU-examples\make-all\all-on-windows\all.mingw
-set dirMakeAll=%dirMakeAll:\=/%
+set dirMakeAll=%gmu_DIR_ROOT%/GMU-examples/make-all/all-on-windows/all.msvc
 
 if "%1" == "" (
   set cycles=1
