@@ -52,7 +52,7 @@ gmu_ud_list_PRJ_HEADER += .
 
 
 # If you have any sub-projects to build:
-gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += # <subprj1-refname> <subprj2-refname> ...
+gmu_uv_list_SUBPRJ_TO_LINK += # <subprj1-refname> <subprj2-refname> ...
 
 <subprj1-refname>_Makefile = # where the sub-project's makefile resides
 <subprj1-refname>_MakeVarDefines = # command line options passed to sub-make
