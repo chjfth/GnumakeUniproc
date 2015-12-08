@@ -26,7 +26,7 @@ gmp_Gp_CUSTOM_IT_MKI_USED := $(firstword \
 
 ifeq (,$(strip $(gmp_Gp_CUSTOM_IT_MKI_USED)))
   $(error !GMU!Error. Your gmp_bc_IMAGE_TYPE=$(gmp_bc_IMAGE_TYPE), which is not a predefined image type\
- and the custom-image-type processor is not found in the dirs of `gmp_ud_list_CUSTOM_MKI' or `$$(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin)')
+ and the custom-image-type processor is not found in the dirs of `$(gmp_ud_list_CUSTOM_MKI)' or `$$(gmu_DIR_GNUMAKEUNIPROC)/$(_dircDefaultPlugin)')
 endif
 
 gmp_Gd_CUSTOM_IT_MKI_USED := $(patsubst %/$(gmp_bc_IMAGE_TYPE).mki,%,$(gmp_Gp_CUSTOM_IT_MKI_USED))
