@@ -11,10 +11,11 @@ _dirDefaultCompilerCfg = $(_dirPattern1Cfg)/compiler_cfg
 
 
 gmp_Gp_COMPILER_CFG_LOADED = $(firstword \
-	$(CURDIR)/compiler_config.mki \
+	$(wildcard $(CURDIR)/compiler_config.mki) \
 	$(foreach _Dir,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg),\
 		$(wildcard $(_Dir)/$(gmp_COMPILER_ID)/compiler_config.mki))\
 	)
+	# $(wildcard ) checks the existence of a filepath
 gmp_Gd_COMPILER_CONFIG_USED = $(patsubst %/compiler_config.mki,%,$(gmp_Gp_COMPILER_CFG_LOADED))
 ifeq (,$(gmp_Gp_COMPILER_CFG_LOADED))
   $(error !GMU!Error: For gmp_COMPILER_ID=$(gmp_COMPILER_ID), no compiler-config-mki can be found from $$(gmp_ud_list_CUSTOM_COMPILER_CFG) or $$(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg) )
