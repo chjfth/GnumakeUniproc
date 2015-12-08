@@ -118,7 +118,7 @@ gmu_ud_SRC_ROOT = .
 # * You can use ``subdir1/../myfunc.c'' or ``subdir1/subdir2/../myfunc.c'', which are 
 #	still in $(gmu_ud_SRC_ROOT) or $(gmu_ud_SRC_ROOT)'s subdir.
 ############################################################################
-gmu_up_list_SRC_FROM_ROOT += # none
+gmu_up_list_SRC_FROM_ROOT += stub.c
 
 # >>> optional for win32 dll (enable as you will)
 gmp_up_WINDLL_MODULE_DEF_FROM_ROOT = walkdir.def

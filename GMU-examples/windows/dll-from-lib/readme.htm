@@ -103,6 +103,7 @@ walkdir_extname
 <ol>
   <li>Load PI_windll_from_lib plugin in makefile .</li>
   <li>(optional) Assign the .def file to use in <code>gmp_up_WINDLL_MODULE_DEF_FROM_ROOT</code> . This is not absolutely must. If you don't assign a .def file, PI_windll_from_lib  will generate a temporary .def file(<tt>FinalDefForDll.def</tt>) for you.</li>
+  <li>Prepare an almost "empty" stub.c as source file; its resulting stub.obj helps link.exe use correct <code>/MACHINE:X86</code> or <code>/MACHINE:x64</code> linker option .</li>
   <li>List walkdir as  sub-project.</li>
 </ol>
 <p>Your .def need to contain only one line that reads <code>EXPORTS</code> . If you want to write other .def file statements, that's OK. But be sure to leave the <code>EXPORT</code> statement at the tail, because PI_windll_from_lib's code will append the text in <tt>ExportDefs.txt</tt>(from LIB projects) to your .def file to construct a complete .def file for the linker . </p>
