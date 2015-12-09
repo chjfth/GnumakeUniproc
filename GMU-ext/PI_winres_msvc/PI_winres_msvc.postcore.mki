@@ -20,6 +20,7 @@ ifeq (,$(_gmp_isAboveVC100))
   endif
 else
 	@echo "NOTE: MinGW gcc cannot generate .d for VS2010+ .rc files because afxres.rc etc are UTF-16 encoded."
+	@$(call _MkdirIfNotExist,$(@D))
 	@touch $(_p_ts_HDepend)
 endif
 ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
