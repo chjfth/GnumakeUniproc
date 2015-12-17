@@ -646,7 +646,13 @@
     <td>gmu_GCC_M_PREFIX</td>
     <td align="center">I</td>
     <td><p>For <code>gcc -M</code> command, what prefix to use before gcc. If you'd like to use a specific gcc version to generate C source header dependency other than the one in your PATH env-var, this can be helpful, typical on non-Unix like platforms. </p>
-      <p>This defaults to null.</p></td>
+      <p>This defaults to null. If null, <code>gmp_GCC_PREFIX</code> or <code>gmu_GCC_M_PREFIX_WEAK</code> will affect the prefix.</p></td>
+  </tr>
+  <tr>
+    <td>gmu_GCC_M_PREFIX_WEAK</td>
+    <td align="center">I</td>
+    <td><p>This will affect <code>gcc -M</code> prefix as well, but only if <code>gmu_GCC_M_PREFIX</code> and <code>gmp_GCC_PREFIX</code> are both null. So the precedence is <code>gmu_GCC_M_PREFIX</code> &gt; <code>gmp_GCC_PREFIX</code> &gt; <code>gmu_GCC_M_PREFIX_WEAK</code> .</p>
+    <p>For GMU user, defining <code>gmu_GCC_M_PREFIX_WEAK</code> is recommended over <code>gmu_GCC_M_PREFIX </code>.</p></td>
   </tr>
   <tr>
     <td>gmu_u_GCC_M_OPTIONS</td>

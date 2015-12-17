@@ -24,6 +24,6 @@ SET gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 SET gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
-@if "%gmu_GCC_M_PREFIX%" == "" (
-	set gmu_GCC_M_PREFIX=hdepend-
+@if "%gmu_GCC_M_PREFIX_WEAK%" == "" (
+	set gmu_GCC_M_PREFIX_WEAK=hdepend-
 )

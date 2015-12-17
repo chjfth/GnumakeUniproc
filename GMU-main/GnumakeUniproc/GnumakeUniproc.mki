@@ -1,5 +1,9 @@
 # GnumakUniproc.mki, this single file implements the core layer of GnumakeUniproc.
 # -- Authored by Jimm Chen(chjfth@gmail.com) since Feb 2006.
+#
+# Implementation note: This file is the GMU core, so it revolves around gmu_XXX variables.
+# I mean, it should not rely on any gmp_XXX variables, unless leaving those gmp_XXX empty
+# does not hurt the working of this core mki .
 
 include $(gmu_DIR_GNUMAKEUNIPROC)/CommonFunctions.mki
 
@@ -481,6 +485,13 @@ _GCC_GEN_HDEPEND_OPTION = -D_GMU_GCC_M_GEN_HDEPEND -M -MM -MP $(gmu_u_GCC_M_OPTI
 	# [2006-12-21]Note: We use -MM to indicate that those dirs listed with -isystem
 	# should not appear in dependency rules. This is gcc's behaviour since v3.1 .
 	
+_gmu_GCC_M_PREFIX = $(strip \
+	$(if $(strip $(gmu_GCC_M_PREFIX)),$(gmu_GCC_M_PREFIX),\
+		$(if $(strip $(gmp_GCC_PREFIX)),$(gmp_GCC_PREFIX),\
+			$(gmu_GCC_M_PREFIX_WEAK)\
+		)\
+	)\
+)# gcc -M prefix precedence: gmu_GCC_M_PREFIX > gmp_GCC_PREFIX > gmu_GCC_M_PREFIX_WEAK
 
 define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
 	@echo " GenHdepend: $(if $(_IsNotVerbose),($(notdir $(_p_ts_HDepend))),$(call _StripOutputRootPrefix,$(_p_ts_HDepend)) $(if $(gmu_ts_MORE_HDEP_TARGETS),(extra targets: $(gmu_ts_MORE_HDEP_TARGETS))) )"
@@ -489,7 +500,7 @@ define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
 @# Add user-supplied targets to target list of the hdepend rule:
 	@echo -n "" > $(_p_ts_HDepend)_ # clear the temporary .d_ file first
 	@for OneFile in "$(gmu_ts_MORE_HDEP_TARGETS)"; do echo -e "$$OneFile \\" >> $(_p_ts_HDepend)_; done;
-	$(gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< >> $(_p_ts_HDepend)_
+	$(_gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< >> $(_p_ts_HDepend)_
 	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
 endef
 	# What I do here is to generate a temporary `.d_' file first; if `gcc -M'
