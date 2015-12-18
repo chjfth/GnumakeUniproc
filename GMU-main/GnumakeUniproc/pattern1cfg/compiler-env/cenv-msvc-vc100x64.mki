@@ -1,0 +1,36 @@
+ifndef __cenv_msvc_vc100x64_env_included_
+__cenv_msvc_vc100x64_env_included_ := 1
+
+# For Visual C++ 9.0(VS2008) x64 compiler(host=x86 target=x64)
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc100x64))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc100x64 is not defined, so I cannot find Visual C++ 2010 compiler)
+endif
+
+_vc100x64_val_INCLUDE = $1/VC/atlmfc/include;$1/VC/include;$1/Include;$1/include/gl;
+_vc100x64_val_LIB = $1/VC/atlmfc/lib/amd64;$1/VC/lib/amd64;$1/Lib/x64;
+_vc100x64_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin/x86_amd64;$1/VC/bin;$1/Bin;$(subst \,/,$(PATH))
+	# Values of the above three are allowed to have spaces.
+	# $1: VS2010 install dir(root-dir)
+
+
+in_gmpf_LoadCenv_msvc_vc100x64 = \
+	gmp_COMPILER_VER_msvc=vc100x64 \
+	MSVSDir="$1" \
+	INCLUDE="$(_vc100x64_val_INCLUDE)" \
+	LIB="$(_vc100x64_val_LIB)" \
+	PATH="$(_vc100x64_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc100x64 = $(call in_gmpf_LoadCenv_msvc_vc100x64,$(gmp_CENV_ROOT_msvc_vc100x64))
+
+define def_ExportCenv_vc100x64
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc100x64)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc100x64_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc100x64_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc100x64_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc100x64 = $(eval $(call def_ExportCenv_vc100x64,$(gmp_CENV_ROOT_msvc_vc100x64)))
+
+endif
