@@ -84,7 +84,7 @@ ifeq (,$(gmu_NO_GEN_HDEPEND))
 	@echo " GenHdepend for precompiled-header from: $(_p_USER_HEADER_for_PCH) "
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	@$(call _MkdirIfNotExist,$(@D))
-	$(gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< > $(_p_ts_HDepend)_ \
+	$(_gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< > $(_p_ts_HDepend)_ \
 		# $@ is the .pch file, which must be dependent on those .h files that are included by $(_p_PhantomSrc),
 		# and what $(_p_PhantomSrc) includes are [ $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) and 
 		# all $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) includes ].
