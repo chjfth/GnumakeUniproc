@@ -45,10 +45,13 @@
   <tr>
     <td valign="top">gmp_msvc_WANT_RELEASE_PDB</td>
     <td align="center" valign="top">MSVC</td>
-    <td><ul>
+    <td>Specifiy debugging symbols(.pdb) should be generated even for "release" build.
+    <ul>
       <li>null(default): Will not append <code>/Zi</code> when <code>gmp_bc_DEBUG</code> is null.</li>
       <li>1:  Will  append <code>/Zi</code> even when <code>gmp_bc_DEBUG</code> is null, so that PDB files will be generated.</li>
-    </ul></td>
+    </ul>
+    This is an old var. Since GMU 0.99, using generic var gmp_RELEASE_WANT_DBG_SYMBOLS is suggested.
+    </td>
   </tr>
 </table>
 <p></p>

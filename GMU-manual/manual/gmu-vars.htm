@@ -854,6 +854,25 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
       <li>For MinGW or gcc, it becomes <tt>-lABC -lXYZ</tt> . </li>
     </ul></td>
   </tr>
+  <tr>
+	<td valign="top">gmp_RELEASE_WANT_DBG_SYMBOLS</td>
+	<td align="center" valign="top">I</td>
+	<td>Specifiy that debugging symbols should be generated even for "release" build. For example, it generates .pdb for MSVC, adds <code>-g</code> to gcc . (GMU 0.99) </td>
+  </tr>
+
+  <tr>
+	<td valign="top">gmp_RELEASE_DONT_OPTIMIZE</td>
+	<td align="center" valign="top">I</td>
+	<td>User set this to 1 to disable optimization options(<code>-O2</code> etc) defaultly set by compiler_config.mki, and tells GMU to add no-optimization flags(<code>-O0, /Od</code> etc). (GMU 0.99) </td>
+  </tr>
+  <tr>
+	<td valign="top">gmp_RELEASE_CUSTOM_OPTIMIZE_OPT</td>
+	<td align="center" valign="top">I</td>
+	<td>If this var is non-null, then its value becomes exact compiler optimization flags. 
+	<p>Note: different compilers may have different flag value. For example, <code>gmp_RELEASE_CUSTOM_OPTIMIZE_OPT=-O3</code> . 
+	<p>This var will suppress gmp_RELEASE_DONT_OPTIMIZE's effect. (GMU 0.99) </td>
+  </tr>
+
 </table>
 <h3><a name="gmp_XXX%20vars%20cared%20by%20pattern1%20compiler-config%20author%20or%20plugin%20author"></a>gmp_<i>XXX</i> vars cared by pattern1 compiler-config author or plugin author</h3>
 <table width="100%"  border="1">

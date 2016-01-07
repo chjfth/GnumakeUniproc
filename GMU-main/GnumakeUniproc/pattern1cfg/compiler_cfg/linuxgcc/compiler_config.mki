@@ -53,6 +53,10 @@ endif
 
 ifdef gmp_bc_DEBUG
   gmp_LINKFLAGS_preset += -g
+else
+  ifneq (,$(_gmp_RELEASE_WANT_DBG_SYMBOLS))
+    gmp_LINKFLAGS_preset += -g
+  endif
 endif
 
 ifeq (,$(gmp_GCC_OLDVER_NO_FVISIBILITY))

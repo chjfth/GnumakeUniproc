@@ -166,7 +166,7 @@ ifdef gmp_bc_DEBUG
   	# My naming rule is just adding .pdb to output DLL/EXE name, and I think it's better than 
   	# the default behavior of substituting .dll/.exe suffix with .pdb.
 else
-  ifneq (,$(strip $(gmp_msvc_WANT_RELEASE_PDB)))
+  ifneq (,$(_gmp_RELEASE_WANT_DBG_SYMBOLS))
     gmp_LINKFLAGS_preset += /debug
   endif
 endif

@@ -31,7 +31,7 @@ _d_ThisPlugin := $(dir $(_p_ThisPlugin))
 _p_sdbi_mkiToLoad := $(_d_ThisPlugin)sdbi.$(gmp_COMPILER_ID).mki
 	# TODO: To load sdbi.$(gmp_COMPILER_ID).mki from compiler-config-mki dir first
 
-ifneq (,$(gmp_bc_DEBUG)$(gmp_msvc_WANT_RELEASE_PDB))
+ifneq (,$(gmp_bc_DEBUG)$(_gmp_RELEASE_WANT_DBG_SYMBOLS))
 
   ifneq (,$(wildcard $(_p_sdbi_mkiToLoad)))
     include $(_p_sdbi_mkiToLoad)

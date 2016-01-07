@@ -18,6 +18,11 @@ unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_POST
 
 unexport gmp_NOW_EXPORT
 
+_gmp_RELEASE_WANT_DBG_SYMBOLS = $(strip $(gmp_msvc_WANT_RELEASE_PDB)$(gmp_RELEASE_WANT_DBG_SYMBOLS))
+	# Since GMU 0.99, User is recommended to assign gmp_RELEASE_WANT_DBG_SYMBOLS=1 to indicate
+	# that debugging symbols should be generated for "release" build.
+	# gmp_msvc_WANT_RELEASE_PDB is preserved for backward compatibility.
+
 gmu_FREE_STYLE_MAKEFILE += $(gmu_DELIBERATE_NO_SUBPRJ)
 gmu_DO_IGNORE_SUBPRJS += $(gmu_IGNORE_SUBPRJS)
 	# 2010-04-27 Make old name gmu_DELIBERATE_NO_SUBPRJ,gmu_IGNORE_SUBPRJS inferior, (old name not tested after deprecation).
