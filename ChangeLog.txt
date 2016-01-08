@@ -1,16 +1,27 @@
-[2014-11-21(estimated)] v0.99
+[2016-01-08] v0.99
 
-1. Overhaul of GMU installer, easier to deploy and run (Windows & Linux)
+1. r1178-1179,...
+	Overhaul of GMU installer, easier to deploy and run (Windows & Linux)
 	* No need to pre-set gmu_DIR_ROOT env-vars in order to run umake. umake works as long as its directory is listed in PATH.
 	* Excute lgmv from shell now shows exactly what will be seen when umake is run. That is, lgmv & umake share their gmu-vars definition from _gmuenv.bat / _gmuenv.sc .
+	* If you want gmu_ vars in his env explicitly, you just run gmppath.bat or source gmppath.sc .
 2. Windows installation improvement 
 	* Totally abandon storing gmu_XXX env-vars in registry, because, since 0.99, actual gmu-vars are fetched live when umake is launched -- nothing to do with what has been in the env-var table. 
 	* User no longer need to install bundled MinGW2 or have their own MinGW, -- because I have extra hdepend-gcc.exe and cpp0.exe alone with umake.bat, and these two exe is enough for ``gcc -M``(GenHdepend) action. This is quit good news, since user no longer need to worry about gcc.exe conflicts in PATH -- as long as he refuse to install MinGW2 component.
+	* The negative side is: Windows user will not be able to build examples with the bundled MinGW executables, so, having some version of Visual C++ is recommended.
 	* Installer exe no longer trigger's UAC when installing on Windows 7+ , which means it will be guaranteed to be a user-land installer.
-3. r1161,1162
-	Introduce gmp_GCC_M32 and gmp_GCC_M64 to explicitly build 32-bit or 64-bit programs on Linux and have their project name separated.
-4. r1160
+3. r1160
 	A tweak for MSVC6 : If gmu_DO_PASS_FULLPATH_TO_COMPILER=1, the .c/.cpp path passed to cl.exe will get all "/" converted to "\" , so that VC6 generated pdb will be processed by later MSVC debuggers(VS2005, VS2008 etc). Without this conversion, VC6 will store forward-slash paths inside .pdb, and such path representation cannot be recognized by VS2005, VS2008.
+4. r1161-1162
+	linuxgcc: User can pass gmp_GCC_M32=1 or gmp_GCC_M64=1 to explicitly request 32-bit-targeted or 64-bit-targeted gcc is invoked. Also, final project name is decorated accordingly.
+5. r1206-1207,1217,1220,1223
+	Visual C++ 2010 is supported as an msvc version(vc100, vc100x64).
+6. r1211-1215,1219
+	Now compiler_config.mki is searched *first* in $(CURDIR) , and the list from gmp_ud_list_CUSTOM_COMPILER_CFG is searched later. This enables in-place compiler-config scheme. That is, when you want a dedicated compiler-config for a single makefile, you can put compiler_config.mki and makefile side by side, eliminating the hassle of setting gmp_ud_list_CUSTOM_COMPILER_CFG. There is and example "$\GMU-examples\oneshot\msvc-exe\Makefile.umk" for this.
+7. r1222
+	Introduce gmu_GCC_M_PREFIX_WEAK , now ``gcc -M`` prefix will check three variables in turn to determine the prefix: gmu_GCC_M_PREFIX then gmp_GCC_PREFIX then gmu_GCC_M_PREFIX_WEAK. Now it reaches most flexibility whether you want "local gcc" or "cross gcc" to do ``gcc -M``.
+8. r1228
+	New gmp_ vars regarding generating debugging symbols for "release" builds: gmp_RELEASE_WANT_DBG_SYMBOLS(this can be used instead of gmp_msvc_WANT_RELEASE_PDB), gmp_RELEASE_DONT_OPTIMIZE, gmp_RELEASE_CUSTOM_OPTIMIZE_OPT.
 
 
 [2012-08-20] v0.98
