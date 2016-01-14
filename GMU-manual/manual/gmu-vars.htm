@@ -651,8 +651,11 @@
   <tr>
     <td>gmu_GCC_M_PREFIX_WEAK</td>
     <td align="center">I</td>
-    <td><p>This will affect <code>gcc -M</code> prefix as well, but only if <code>gmu_GCC_M_PREFIX</code> and <code>gmp_GCC_PREFIX</code> are both null. So the precedence is <code>gmu_GCC_M_PREFIX</code> &gt; <code>gmp_GCC_PREFIX</code> &gt; <code>gmu_GCC_M_PREFIX_WEAK</code> .</p>
-    <p>For GMU user, defining <code>gmu_GCC_M_PREFIX_WEAK</code> is recommended over <code>gmu_GCC_M_PREFIX </code>.</p></td>
+    <td><p>This will affect <code>gcc -M</code> prefix as well, but only if <code>gmu_GCC_M_PREFIX</code> and <code>gmp_GCC_PREFIX</code> are both null, and, $(gmu_exe_CC) is not gcc. 
+    <p> So the precedence is <code>gmu_GCC_M_PREFIX</code> &gt; <code>gmp_GCC_PREFIX</code> &gt; (null) when <code>$(gmu_exe_CC)=gcc</code> &gt; <code>gmu_GCC_M_PREFIX_WEAK</code> .</p>
+    <p>For GMU user, defining <code>gmu_GCC_M_PREFIX_WEAK</code> is recommended over <code>gmu_GCC_M_PREFIX </code>.</p>
+    <p>So we have the effect: When using a standalone MinGW version, ``gcc -M``'s prefix will be null, even if gmu_GCC_M_PREFIX_WEAK is set to <code>hdepend-</code>, which is desired.
+    </td>
   </tr>
   <tr>
     <td>gmu_u_GCC_M_OPTIONS</td>

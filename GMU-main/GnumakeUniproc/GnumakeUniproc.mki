@@ -488,10 +488,11 @@ _GCC_GEN_HDEPEND_OPTION = -D_GMU_GCC_M_GEN_HDEPEND -M -MM -MP $(gmu_u_GCC_M_OPTI
 _gmu_GCC_M_PREFIX = $(strip \
 	$(if $(strip $(gmu_GCC_M_PREFIX)),$(gmu_GCC_M_PREFIX),\
 		$(if $(strip $(gmp_GCC_PREFIX)),$(gmp_GCC_PREFIX),\
-			$(gmu_GCC_M_PREFIX_WEAK)\
+			$(if $(call _IsStringEqual,$(basename $(gmu_exe_CC)),gcc),,\
+				$(gmu_GCC_M_PREFIX_WEAK))\
 		)\
 	)\
-)# gcc -M prefix precedence: gmu_GCC_M_PREFIX > gmp_GCC_PREFIX > gmu_GCC_M_PREFIX_WEAK
+)# gcc -M prefix precedence: gmu_GCC_M_PREFIX > gmp_GCC_PREFIX > (null) when $(gmu_exe_CC)=gcc >gmu_GCC_M_PREFIX_WEAK
 
 define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
 	@echo " GenHdepend: $(if $(_IsNotVerbose),($(notdir $(_p_ts_HDepend))),$(call _StripOutputRootPrefix,$(_p_ts_HDepend)) $(if $(gmu_ts_MORE_HDEP_TARGETS),(extra targets: $(gmu_ts_MORE_HDEP_TARGETS))) )"
