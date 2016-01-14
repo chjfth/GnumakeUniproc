@@ -5,7 +5,7 @@ set gmu_DIR_ROOT_bs=%tmpbatdir:\GMU-main\umake_cmd\wincmd\=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
 
-PATH=%tmpbatdir%;%PATH%
+REM PATH=%tmpbatdir%;%PATH% // This is unnecessary, because %tmpbatdir% must have been in the PATH, otherwise umake.bat cannot be reached.
 
 call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 
