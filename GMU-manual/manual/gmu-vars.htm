@@ -958,7 +958,8 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
     <ul>
       <li>is not chained into make dependency chain, so they will be run every time even if all you outputs have been up-to-date. </li>
       <li>must be defined before gmu-core.</li>
-    </ul></td>
+      </ul>
+    <p>Of course, you can make your target explicitly chained into the dependency(let the target be a filepath and depend on another file) so the target is executed only when necessary. </p></td>
   </tr>
   <tr>
   				<td valign="top">gmp_G_CompilerVerValid</td>
