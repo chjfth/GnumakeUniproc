@@ -1039,8 +1039,8 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo "$(SubprjEvCktShortForm): \$$(if $(SubprjEvIsConfirmPostProc),gmu_ut_Always,\$$(gmu_p_BuildStartCkt))" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  Now, BuildLevel [$(MAKELEVEL)]. \$$(if $(SubprjEvIsConfirmPostProc),Processing,Making) sub-project: $(SubprjEvPrjname)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
-		$(call _DoVerbose1,echo -e "\t@echo \"  CurDir: \$$(CURDIR)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
-		$(call _DoVerbose1,echo -e "\t@echo \"  Makefile: $(SubprjEvMakefile)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose1,echo -e "\t@echo \"  ParentDir: \$$(CURDIR)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
+		$(call _DoVerbose1,echo -e "\t@echo \"  ChildMake: $(SubprjEvMakefile)\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 		echo -e "\t@(\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\tcd \$$(dir $(SubprjEvMakefile)) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!Unexpected: Cannot cd to the dir referred.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
