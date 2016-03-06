@@ -30,7 +30,7 @@ if [ "$gmu_FORCE_BASH_PATH" = "" ]; then
   if [ "$toutput" != "ABC" ]; then export gmu_FORCE_BASH_PATH="/bin/bash"; fi
 fi
 
-export gmu_ver=0.99
+export gmu_ver=0.100
 
 export gmp_ud_list_CUSTOM_MKI="$gmp_ud_list_CUSTOM_MKI $gmu_DIR_ROOT/GMU-ext $gmu_DIR_ROOT/nlscan/gmu-ext"
 export gmp_ud_list_CUSTOM_COMPILER_CFG="$gmp_ud_list_CUSTOM_COMPILER_CFG $gmu_DIR_ROOT/nlscan/compiler-cfgs"
