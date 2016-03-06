@@ -38,7 +38,7 @@ Var isAddPath
 
 Var isChecked_AddWincmdPath
       Var str_AddWincmdPath
-Var isChecked_AddMingwPath ; GMU 0.99: Keep it 0, so that D:\GMU\MinGW2\bin does not go into PATH
+Var isChecked_AddMingwPath ; Keep it null, so that D:\GMU\MinGW2\bin does not go into PATH
       Var str_AddMingwPath
 
 ; HM NIS Edit Wizard helper defines
