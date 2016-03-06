@@ -73,8 +73,8 @@ define SYDO_copy_commands
 			if [ ! -n "$${gmi_SYDO_SHOW_COPY_CMD}" ]; then echo "$(_MD) $${_sh_tmp_DestDir}"; fi; \
 			$(_MD) $${_sh_tmp_DestDir}; fi; \
 		if [ ! -d "$${_sh_tmp_DestDir}" ]; then echo "!Error from $(_pluginId_sync_devoutput): Destination dir creation fail: $${_sh_tmp_DestDir} "; exit 1; fi; \
-		$(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-)";) \
-		$(_sydo_cp_cmd_and_options) $${OneItem} $(-dirSyncTo-); \
+		$(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_sydo_cp_cmd_and_options) \"$${OneItem}\" \"$(-dirSyncTo-)\"";) \
+		$(_sydo_cp_cmd_and_options) "$${OneItem}" "$(-dirSyncTo-)"; \
 		CmdRet=$$?; if [ $$CmdRet != 0 ] ; then echo "!Error from $(_pluginId_sync_devoutput): cp command fails while copying $${OneItem} "; exit $$CmdRet; fi; \
 		done \
 	)
