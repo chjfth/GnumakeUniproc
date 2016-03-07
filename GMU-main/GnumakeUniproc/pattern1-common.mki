@@ -167,6 +167,9 @@ gmp_G_UDSuffixByBc = $(if $(gmp_bc_UNICODE),_U)$(if $(gmp_bc_DEBUG),_D)
 	#   _U_D
 gmp_G_USuffixByBc = $(if $(gmp_bc_UNICODE),_U)
 	# similar to gmp_G_UDSuffixByBc, but consider gmp_bc_UNICODE only.
+gmp_G_DSuffixByBc = $(if $(gmp_bc_DEBUG),_D)
+	# similar to gmp_G_UDSuffixByBc, but consider gmp_bc_DEBUG only.
+	# Use case: mm_snprintf 
 
 gmu_G_anyCxxSourceFiles = $(strip $(gmu_Gp_list_REQOBJS_CXX))
 
