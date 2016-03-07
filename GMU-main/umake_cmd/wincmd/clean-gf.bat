@@ -16,6 +16,6 @@ IF not "%~1" == "" (
 echo Removing directory "%gfdir%"
 rm -fr "%gfdir%"
 
-if %ERRORLEVEL% == 0 (
+if not ERRORLEVEL 1 (
 	echo Done.
 )

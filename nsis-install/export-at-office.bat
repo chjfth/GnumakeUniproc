@@ -7,13 +7,13 @@ REM I have to manually build new make 3.81 and win-bash exe into MinGW-binary fo
 del /F /S /Q nsis-data
 
 call export-gmu.bat https://nlssvn/svnreps/makingsys/GnumakeUniproc
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 call export-gmu-bin.bat  https://nlssvn/BinaryRls/MinGW-binary
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 call export-nlscan.bat https://nlssvn/svnreps/makingsys
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 @echo All exports success.
 @goto END

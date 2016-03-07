@@ -13,14 +13,14 @@ set OutputDir=nsis-data
 
 @echo on
 svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/nlscan  %OutputDir%/GMU/nlscan
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 @REM Export helper ruby programs:
 svn export --force %SvnUrlPrefix%/GmuDemoPack/%BranchToGet%  %OutputDir%/bin-gmu-addons
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 
 @echo NLSCAN related files have been retrieved.
 @goto END

@@ -13,7 +13,7 @@ set gmu_DIR_ROOT_bs=%~dp0%
 set gmu_DIR_ROOT_bs=%gmu_DIR_ROOT_bs:~0,-1%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
-call %gmu_DIR_ROOT_bs%\gmppath.bat
+call %gmu_DIR_ROOT_bs%\gmupath.bat
 call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 
 

@@ -16,11 +16,11 @@ set OutputDir=nsis-data
 
 @echo on
 svn export --force %SvnUrlPrefix%/%BranchToGet%/bin-gmu  %OutputDir%/bin-gmu
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 svn export --force %SvnUrlPrefix%/%BranchToGet%/bin-gmu-addons  %OutputDir%/bin-gmu-addons
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 svn export --force %SvnUrlPrefix%/%BranchToGet%/MinGW2   %OutputDir%/MinGW2
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 @echo off
 
 @echo The binary files for NSIS to pack have been retrieved.

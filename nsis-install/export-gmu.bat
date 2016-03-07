@@ -18,7 +18,7 @@ set OutputDir=nsis-data
 
 @echo on
 svn export --force %SvnUrlPrefix%/%BranchToGet%     %OutputDir%/GMU
-@if NOT "%ERRORLEVEL%" == "0" goto ErrSvnError
+@if ERRORLEVEL 1 goto ErrSvnError
 @echo off
 
 @echo Files for NSIS to pack have been retrieved.
