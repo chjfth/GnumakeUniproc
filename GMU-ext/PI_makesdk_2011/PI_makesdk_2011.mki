@@ -47,17 +47,17 @@ endif
 
 ifndef gmb_ignore_build_source
   gmu_uv_list_ALL_SUBPRJ += makesdk 
-  makesdk_Makefile = Makefile-mc
+  makesdk_Makefile = __Makefile-mc
 	# mc: multiple compiler build of lib source
 endif
 
 gmu_uv_list_ALL_SUBPRJ += cpuxm
-cpuxm_Makefile = Makefile-cpuxm
+cpuxm_Makefile = __Makefile-cpuxm
 	# cpuxm: copy user examples
 
 ifndef gmb_ignore_build_uxm
   gmu_uv_list_ALL_SUBPRJ += vbuxm
-  vbuxm_Makefile = Makefile-vbuxm
+  vbuxm_Makefile = __Makefile-vbuxm
 	# vbuxm: verify building user examples
 endif
 
