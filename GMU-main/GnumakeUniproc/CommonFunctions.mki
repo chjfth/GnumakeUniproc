@@ -643,7 +643,7 @@ _export_MakevarDefs = $(if $1,export $1;)
 define _AnounceExportEnvvar
   ifneq (,$(_isNowNotGmuGetPrjAttr))
   ifeq (,$(MAKE_RESTARTS)) # only when a make project is first started.
-    $$(info In make: export $1)
+    $$(info In $$(gmu_p_StartupMakefile): export $1)
   endif
   endif
   export $1
