@@ -13,7 +13,7 @@ define _gmi_prcp_GenCopyRuleL0
   $2: $$(if $(strip $(gmi_FPCP_FORCE_COPY)),gmu_ut_Always,$1)
 	@echo "PI_file_precopy for $2 ..."
 	@$(call _MkdirIfNotExist,$$(@D))
-	cp "$1" "$2"
+	$(CP_) "$1" "$2"
 endef
 
 _gmi_prcp_GenCopyRuleL1 = $(eval $(call _gmi_prcp_GenCopyRuleL0,$(word 1,$(call split,|,$1)),$(word 2,$(call split,|,$1))))

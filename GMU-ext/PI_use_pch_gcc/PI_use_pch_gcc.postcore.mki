@@ -62,7 +62,7 @@ ifeq (,$(gmu_NO_GEN_HDEPEND))
 	$(_gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< > $(_p_ts_HDepend)_ \
 		# $@ is the .gch file, which must be dependent on $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
 		# and all $(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT) includes.
-	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+	@$(MV_) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
   endef
 
 endif # ifeq (,$(gmu_NO_GEN_HDEPEND))

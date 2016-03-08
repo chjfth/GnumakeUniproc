@@ -55,7 +55,15 @@ goto CHECK_PARAM_AGAIN
 %gmu_MAKE_EXE% --version > NUL 2>&1
 if ERRORLEVEL 1 (
 	echo ERROR: GNU make executable "%gmu_MAKE_EXE%" not found on this machine!
+	goto END
 )
+
+REM Use special name for MD,MV,RM to avoid possible conflict of same-name EXE on user's existing env.
+set MD_=mkdir_ -p
+set RM_=rm_ -fr
+set MV_=mv_
+set CP_=cp_
+
 %gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
 goto END
 

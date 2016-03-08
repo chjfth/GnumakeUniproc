@@ -100,7 +100,7 @@ _StripImplibSuffix = $(if $(_isReportLibOutput),$(call _StripBasenameTail,$1,$(g
   define _RenameBackImpLib
 	@$(if $(gmu_DO_SHOW_LINK_CMD),echo "*** Renaming importlib $(call _StripOutputRootPrefix,$(_tmp_Gp_list_LIB_OUTPUT) to $(gmp_Gp_LIB_OUTPUT)) ...")
 	@if [ ! -f $(_tmp_Gp_list_LIB_OUTPUT) ]; then echo "!GMP!Error: No import lib($(gmp_Gp_LIB_OUTPUT)) generated from the linker."; exit 1; \
-	else $(_MV) $(_tmp_Gp_list_LIB_OUTPUT) $(gmp_Gp_LIB_OUTPUT) || (echo "!GMP!Error: Cannot rename temporary import-lib to its final form."; exit 1); \
+	else $(MV_) $(_tmp_Gp_list_LIB_OUTPUT) $(gmp_Gp_LIB_OUTPUT) || (echo "!GMP!Error: Cannot rename temporary import-lib to its final form."; exit 1); \
 	fi;
   endef
 

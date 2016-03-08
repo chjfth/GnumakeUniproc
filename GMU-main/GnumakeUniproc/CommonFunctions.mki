@@ -80,10 +80,20 @@ _gmu_isAboveGnumake382 := $(_gmu_isGnumake382)
 gmu_isFirstLoad = $(if $(MAKE_RESTARTS),,1)
 	# Note: This function is only available from GNUmake 3.81. Prior GNU make don't have MAKE_RESTARTS.
 
-#################### Common Shell Commands ######################
-_MD = mkdir -p 
-_RM = rm -fr #this will remove any files dirs assigned
-_MV = mv #move or rename
+#################### Common Shell Commands #######################
+# GMU/GMP developers should use these to achives best portability effect on Windows and Linux.
+ifeq (,$(strip $(MD_))) # make dir
+  MD_ = mkdir -p 
+endif
+ifeq (,$(strip $(RM_))) # remove any files and dirs 
+  RM_ = rm -fr 
+endif
+ifeq (,$(strip $(MV_))) # move or rename
+  MV_ = mv
+endif
+ifeq (,$(strip $(CP_))) # copy
+  CP_ = cp
+endif
 
 ################# Common user-defined functions for GNU make ###################
 
@@ -131,7 +141,7 @@ gmuf_ConcateWithChars = $(if $(strip $1),$(call _gmuf_addc,$1,$2))
 	#	11|22|33
 
 
-_MkdirIfNotExist = $(if $(wildcard $1),,$(_MD) $1)
+_MkdirIfNotExist = $(if $(wildcard $1),,$(MD_) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
 	# This can only be used in recipe. For mkdir in make statement, use gmuf_MkdirIfNotExist_sh.
 _ClearFile = echo -n "" > $(1)
@@ -139,13 +149,13 @@ gmuf_ClearFile = $(_ClearFile)
 
 gmuf_MkdirIfNotExist_sh = $(shell if [ ! -d "$1" ];then mkdir -p "$1"; fi )
 
-gmuf_DeleteFile_sh_wc = $(shell $(_RM) $1 1>&2 ; if [ "$$?" = 0 ];then echo 1; fi)
+gmuf_DeleteFile_sh_wc = $(shell $(RM_) $1 1>&2 ; if [ "$$?" = 0 ];then echo 1; fi)
 	# Delete a file or some files, assigned in $1.
 	# Return 1 on success; return null on failure.
 	# _wc implies you can use wildcard, so 
-	#	$(_RM) $1 
+	#	$(RM_) $1 
 	# should not be written as
-	#	$(_RM) "$1"
+	#	$(RM_) "$1"
 
 
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
@@ -195,7 +205,7 @@ gmuf_IsFileNotExist_sh = $(if $(call _IsFileExist_sh,$1),,1)
 
 gmuf_IsDirExist_sh = $(shell if [ -d "$1" ] ;then echo -n '1';fi)
 
-gmuf_Copy1File_sh = $(shell if cp --force "$1" "$2" 1>&2; then echo 1; fi)
+gmuf_Copy1File_sh = $(shell if $(CP_) --force "$1" "$2" 1>&2; then echo 1; fi)
 
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 gmuf_GetFileContent_sh = $(_GetFileContent_sh)

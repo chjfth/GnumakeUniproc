@@ -54,7 +54,7 @@ define SYDO_syncproc_vardef
 #    endif
 #  endif
 
-  _sydo_cp_cmd_and_options := cp $$(_sydo_cp_force) $$(if $$(gmi_SYDO_ONLY_COPY_NEWER),-u) $$(if $$(-isCopyDirStruct-),-r --parents)
+  _sydo_cp_cmd_and_options := $(CP_) $$(_sydo_cp_force) $$(if $$(gmi_SYDO_ONLY_COPY_NEWER),-u) $$(if $$(-isCopyDirStruct-),-r --parents)
 
 endef
 
@@ -70,12 +70,12 @@ define SYDO_copy_commands
 		$(call _DoVerbose1,echo "  > $${OneItem}";) \
 		_sh_tmp_DestDir=$(-dirSyncTo-); \
 		if [ ! -d "$${_sh_tmp_DestDir}" ]; then \
-			if [ ! -n "$${gmi_SYDO_SHOW_COPY_CMD}" ]; then echo "$(_MD) $${_sh_tmp_DestDir}"; fi; \
-			$(_MD) $${_sh_tmp_DestDir}; fi; \
+			if [ ! -n "$${gmi_SYDO_SHOW_COPY_CMD}" ]; then echo "$(MD_) $${_sh_tmp_DestDir}"; fi; \
+			$(MD_) $${_sh_tmp_DestDir}; fi; \
 		if [ ! -d "$${_sh_tmp_DestDir}" ]; then echo "!Error from $(_pluginId_sync_devoutput): Destination dir creation fail: $${_sh_tmp_DestDir} "; exit 1; fi; \
 		$(if $(gmi_SYDO_SHOW_COPY_CMD),echo "$(_sydo_cp_cmd_and_options) \"$${OneItem}\" \"$(-dirSyncTo-)\"";) \
 		$(_sydo_cp_cmd_and_options) "$${OneItem}" "$(-dirSyncTo-)"; \
-		CmdRet=$$?; if [ $$CmdRet != 0 ] ; then echo "!Error from $(_pluginId_sync_devoutput): cp command fails while copying $${OneItem} "; exit $$CmdRet; fi; \
+		CmdRet=$$?; if [ $$CmdRet != 0 ] ; then echo "!Error from $(_pluginId_sync_devoutput): $(CP_) command fails while copying $${OneItem} "; exit $$CmdRet; fi; \
 		done \
 	)
 endef # define SYDO_copy_commands

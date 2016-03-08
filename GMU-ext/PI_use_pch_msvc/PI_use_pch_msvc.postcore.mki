@@ -88,7 +88,7 @@ ifeq (,$(gmu_NO_GEN_HDEPEND))
 		# $@ is the .pch file, which must be dependent on those .h files that are included by $(_p_PhantomSrc),
 		# and what $(_p_PhantomSrc) includes are [ $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) and 
 		# all $(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) includes ].
-	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+	@$(MV_) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
   endef
 
 endif # ifneq (,$(gmu_NO_GEN_HDEPEND))

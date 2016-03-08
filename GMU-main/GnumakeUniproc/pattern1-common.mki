@@ -79,7 +79,7 @@ else # ^^^^ ifeq ($(MAKELEVEL),0) ^^^^
 endif
 
 define _Gmp1SharedFinishingCmds
-	$(_RM) $(_p_ThisPrjBuildInProgress)
+	$(RM_) $(_p_ThisPrjBuildInProgress)
 	$(gmu_u_SHOW_PROGRESS_CMD)
 	$(_GmpMakeLevel0ShowEnd)
 endef

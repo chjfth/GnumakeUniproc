@@ -72,7 +72,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
   else
     ifeq ($(_gmu_false),$(call gmuf_IsDirExist_sh,$(gmu_ud_OUTPUT_ROOT)))
       # Since not exist, now create the directory for user. If create fail, stop.
-      _tmp_ret := $(call gmuf_ExecuteSimpleShcmd,$(_MD) $(gmu_ud_OUTPUT_ROOT))
+      _tmp_ret := $(call gmuf_ExecuteSimpleShcmd,$(MD_) $(gmu_ud_OUTPUT_ROOT))
       ifneq (0,$(_tmp_ret))
         $(error !GMU!Error: From your current working directory, cannot create gmu_ud_OUTPUT_ROOT directory: $(gmu_ud_OUTPUT_ROOT))
       endif
@@ -99,7 +99,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
 	# The first thing here is to create the root-prj-start signature, so that the code
 	# in this  if/endif will only execute once during one whole build process.
-    _temp := $(shell if [ ! -d $(gmu_d_BuildStartCkt) ]; then $(_MD) -p $(gmu_d_BuildStartCkt); fi; \
+    _temp := $(shell if [ ! -d $(gmu_d_BuildStartCkt) ]; then $(MD_) -p $(gmu_d_BuildStartCkt); fi; \
     	if (echo -n "" > $(gmu_p_BuildStartCkt)) ; then true; \
     	else echo __GMU_ex_ERROR; fi; )
     ifneq (,$(_temp))
@@ -116,7 +116,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     _temp := $(shell \
     	echo "GnumakeUniproc started (GNUmake v$(MAKE_VERSION))." 1>&2 ;\
     	echo "gmu_ud_OUTPUT_ROOT(%) = $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
-    	$(_MD) $(_d_OUTPUT_ROOT_GMUTMP); \
+    	$(MD_) $(_d_OUTPUT_ROOT_GMUTMP); \
     	echo -n "" >$(gmu_Gp_COUNT_COMPILE) >$(_Gp_ScWorkInModuleOutput) >$(_Gp_CountSccmdFailure) \
     		>$(_p_BuiltListOutput) >$(_p_BuildingListOutput) \
     	)
@@ -124,7 +124,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     	# We should clear $(gmu_Gp_COUNT_COMPILE) whether or not the main-project has some C/C++ file to compile,
     	#because the sub-projects will have some to compile.
 
-	_temp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(_MD) $(gmu_Gd_PRJ_GMUTMP); fi;\
+	_temp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(MD_) $(gmu_Gd_PRJ_GMUTMP); fi;\
 		echo "$(_p_ThisMakefile)" > $(gmu_Gd_PRJ_GMUTMP)/_HisMakefile.gmu.Attr )
 
   endif # ifeq ($(_gmu_isFirstMakeRestart),1)
@@ -142,7 +142,7 @@ ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "
     _temp := $(shell \
     	for v in $(gmu_up_list_STARTUP_CLEAR_FILES); do \
     		_shFileToClear=$$v; _shDirToCreate=$${_shFileToClear%/*}; \
-    		if [ $${_shDirToCreate} != $${_shFileToClear%} ] && [ ! -d $${_shDirToCreate} ]; then $(_MD) $${_shDirToCreate}; fi; \
+    		if [ $${_shDirToCreate} != $${_shFileToClear%} ] && [ ! -d $${_shDirToCreate} ]; then $(MD_) $${_shDirToCreate}; fi; \
     		if echo -n "" > $$v; then echo -n ''; else echo $$v; exit; fi; \
     	done; )
     	# Note: ``[ $${_shDirToCreate} != $${_shFileToClear%} ]'' signifies $${_shFileToClear} does not have a dir prefix.
@@ -257,7 +257,7 @@ ifeq (,$(MAKE_RESTARTS))
   ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     # Create the "ThisPrjBuildInProgress" indication file.
     # - and "_ThisPrjAttr.gmu.txt"
-    _tmp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(_MD) $(gmu_Gd_PRJ_GMUTMP); fi; \
+    _tmp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(MD_) $(gmu_Gd_PRJ_GMUTMP); fi; \
 		echo -n "" > $(_p_ThisPrjBuildInProgress) ;\
 		echo -e "$(_gmu_strPrjAttr_LF)" > $(_p_ThisPrjAttr) \
 		)
@@ -502,7 +502,7 @@ define _GEN_HDEPEND_DOT_D # $@ is XXX.<c/c++-extn>.$(gmu_extn_OBJ)
 	@echo -n "" > $(_p_ts_HDepend)_ # clear the temporary .d_ file first
 	@for OneFile in "$(gmu_ts_MORE_HDEP_TARGETS)"; do echo -e "$$OneFile \\" >> $(_p_ts_HDepend)_; done;
 	$(_gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) -MT "$@" $< >> $(_p_ts_HDepend)_
-	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+	@$(MV_) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
 endef
 	# What I do here is to generate a temporary `.d_' file first; if `gcc -M'
 	#succeeds, then rename it to `.d'. The reason for not generating .d directly
@@ -808,7 +808,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 		echo -e "\t@echo \"  LocalDir = $(CvsmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@(\\" >> $(_p_mk_DoCheckout_shsubst) ;\
-		echo -e "\t\$$(if \$$(wildcard $(CvsmakeEvLocalDir)),,\$$(_MD) $(CvsmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t\$$(if \$$(wildcard $(CvsmakeEvLocalDir)),,\$$(MD_) $(CvsmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\tcd $(CvsmakeEvLocalDir) ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_CVS_MODULES($${OneMod}) refers to that dir, but it cannot be created or entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo -e "\techo \"\$$(call _TrShcmd4echo,$(_CvsCheckoutShcmdEvEcho2))\" ;\\" >> $(_p_mk_DoCheckout_shsubst) ; \
@@ -829,7 +829,7 @@ $(OneMod)_ScByMakefile = \$$(dir \$$($(OneMod)_SelfCoEvCheckTime))$(_f_ScByMakef
 		echo -e "\t@echo \"  From = $(SvnmakeEvSvnUrl)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@echo \"  To   = $(SvnmakeEvLocalDir)\"" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\t@(\\" >> $(_p_mk_DoCheckout_shsubst); \
-		echo -e "\t\$$(if \$$(wildcard $(SvnmakeEvLocalDir)),,\$$(_MD) $(SvnmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
+		echo -e "\t\$$(if \$$(wildcard $(SvnmakeEvLocalDir)),,\$$(MD_) $(SvnmakeEvLocalDir);)\\" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\tcd $(SvnmakeEvLocalDir) ;\\" >> $(_p_mk_DoCheckout_shsubst); \
 		echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: One of gmu_uv_list_SVN_MODULES($${OneMod}) refers to that dir, but it cannot be created or entered.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_DoCheckout_shsubst) ;\
 		echo -e "\techo \"    => \`pwd\`\" ;\\" >> $(_p_mk_DoCheckout_shsubst); \
@@ -982,7 +982,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo -e "\t@echo \"  ModuleDir = $(SubprjEvCvsModuleDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  LocalDir = $(SubprjEvCvsLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo ------------------------------------------------------------------------------" >> $(_p_mk_MakeSubPrjs_shsubst); \
-			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvCvsLocalDir)),,\$$(_MD) $(SubprjEvCvsLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvCvsLocalDir)),,\$$(MD_) $(SubprjEvCvsLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
 			echo -e "\tcd $(SubprjEvCvsLocalDir);\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
 			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvCvsLocalDir)' for doing cvs-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 			echo -e "\techo \"\$$(call _TrShcmd4echo,$(_SubprjCoShcmdEvEcho))\" ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
@@ -997,7 +997,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		echo -e "\t@echo \"  $(if $(_gmu_SC_CHECKOUT_DATETIME_),At datetime: $(_gmu_SC_CHECKOUT_DATETIME_),Using rev: $(SubprjEvSvnRev))\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  From = $(SubprjEvSvnUrl)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo \"  To   = $(SubprjEvSvnLocalDir)\"" >> $(_p_mk_MakeSubPrjs_shsubst); \
-			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(_MD) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\t@\$$(if \$$(wildcard $(SubprjEvSvnLocalDir)),,\$$(MD_) $(SubprjEvSvnLocalDir);)\\" >> $(_p_mk_MakeSubPrjs_shsubst); \
 			echo -e "\tcd $(SubprjEvSvnLocalDir) ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 			echo -e "\tCmdRet=\$$\$$?; if [ \$$\$$CmdRet != 0 ]; then echo \"!GMU!Error: Cannot create or enter \\\`$(SubprjEvSvnLocalDir)' for doing svn-checkout.\"; exit \$$\$$CmdRet; fi ;\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 			echo -e "\techo \"    => \`pwd\`\";\\" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
@@ -1201,7 +1201,7 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 			_tmp_mkf=\$$(call _GetAbsPathRelaToCurdir,$(SubprjEvMakefile)); \
 			_tmp_atf=$(SubprjEvHisMakefileAttr); \
 			if [ ! -f \$$\$$_tmp_atf ] || [ \$$\$$_tmp_atf -ot $(gmu_p_BuildStartCkt) ]; \
-				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(_MD) $(SubprjEvOutdirGMUTMP);fi; echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf; echo PrevCmdSuccess; \
+				then if [ ! -d $(SubprjEvOutdirGMUTMP) ];then \$$(MD_) $(SubprjEvOutdirGMUTMP);fi; echo \$$\$$_tmp_mkf > \$$\$$_tmp_atf; echo PrevCmdSuccess; \
 			elif [ \$$\$$_tmp_mkf = \`cat \$$\$$_tmp_atf\` ] || [ \$$\$$_tmp_mkf -ef \`cat \$$\$$_tmp_atf\` ]; \
 				then echo PrevCmdSuccess; \
 			else echo \"\`cat \$$\$$_tmp_atf\`\"; \

@@ -76,7 +76,7 @@ ifeq (,$(gmu_NO_GEN_HDEPEND))
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	@$(call _MkdirIfNotExist,$(@D))
 	$(_gmu_GCC_M_PREFIX)gcc $(_GCC_GEN_HDEPEND_OPTION) $(_res_d_CFLAGS) -MT "$@" $< > $(_p_ts_HDepend)_
-	@$(_MV) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
+	@$(MV_) $(_p_ts_HDepend)_ $(_p_ts_HDepend)
   endef
 
 endif # ifneq (,$(gmu_NO_GEN_HDEPEND))
