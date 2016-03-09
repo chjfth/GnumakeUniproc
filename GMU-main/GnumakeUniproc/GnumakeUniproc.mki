@@ -1170,7 +1170,7 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)).\$$(gmu_NO_MAKE_SUBPRJS),1.)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
-		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Query-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
+		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Queried-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
   echo "          ifeq (\$${MAKELEVEL},0)" >> $(_p_mki_SubprjAttr_shsubst) ;\
   echo "            \$$(error !!!!!!!!!!!!!!!!!!!! BAD! Got MAKELEVEL=0 HERE!!!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
   echo "          endif" >> $(_p_mki_SubprjAttr_shsubst) ;\

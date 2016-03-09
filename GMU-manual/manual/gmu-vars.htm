@@ -773,7 +773,7 @@
     gmp_u_list_PLUGIN_TO_LOAD_AUX_POST</td>
     <td align="center" valign="top">I(E)</td>
     <td><p>Similar to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, that is, there value will be merged to <code>gmp_u_list_PLUGIN_TO_LOAD</code>, one before(_PRE) and one after(_POST).</p>
-      <p>These three gmu-vars mentioned above all will not influence sub--projects. Actually, they are all <code>unexport</code>ed by GnumakeUniproc.</p>
+      <p>These three gmu-vars mentioned above all will <b>not</b> influence sub--projects. Actually, they are all <code>unexport</code>ed by GnumakeUniproc.</p>
     <p>The difference is: If you assign <code>gmp_u_list_PLUGIN_TO_LOAD=<i>xxx</i></code> as make's argument, all <code>gmp_u_list_PLUGIN_TO_LOAD</code> assignment in makefiles will be overrided. <code>gmp_u_list_PLUGIN_TO_LOAD_AUX(PRE/POST) </code>does not cause such override. </p>    </td>
   </tr>
   <tr>
@@ -782,10 +782,13 @@
     <td align="center" valign="top">I(E)</td>
     <td><p>These two vars also instruct what plugins to load. </p>
       <ul>
-        <li>They should be set as environment variables, so that they affect sub-projects and further sub-projects.</li>
+        <li>They should be set as environment variables, so that they affect sub-projects and deeper sub-projects.</li>
         <li>Plugins list in <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE</code> is guarantee to load before <code>gmp_u_list_PLUGIN_TO_LOAD</code> and those in <code>gmu_list_PLUGIN_TO_LOAD_ENV_POST </code>are guaranteed to be after <code>gmp_u_list_PLUGIN_TO_LOAD</code>. </li>
       </ul>
-    <p>A typical use: Assign <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE=PI_sync_devoutput</code> with <code>gmi_SYDO_ud_SYNC_HEADER_TO,gmi_SYDO_ud_SYNC_LIB_TO=&lt;some-dir&gt;</code> in make command line to summon a project to sync its output to somewhere.</p></td>
+    <p>A typical use: Assign <code>gmu_list_PLUGIN_TO_LOAD_ENV_PRE=PI_sync_devoutput</code> with <code>gmi_SYDO_ud_SYNC_HEADER_TO,gmi_SYDO_ud_SYNC_LIB_TO=&lt;some-dir&gt;</code> in make command line to summon a project to sync its output to somewhere.</p>
+    <p>Please be aware: When assigning more than one plugins in the following situation, </p>
+    <pre><i><code>refname</code></i><code>_MakeVarDefines = gmu_list_PLUGIN_TO_LOAD_ENV_PRE=&quot;PI_plugin1 PI_plugin2&quot;</code></pre>
+    <p>remember to enclose the in double quotes, because this string will be passed to sh.exe . </p></td>
   </tr>
   <tr>
     <td valign="top"><p>gmp_CFLAGS_CODE_GEN_ALL<br>
