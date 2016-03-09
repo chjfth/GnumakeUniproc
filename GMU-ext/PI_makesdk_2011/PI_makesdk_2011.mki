@@ -21,12 +21,13 @@ _pluginId_makesdk_2011 := $(gmpv_ThisPluginId)
 # gmb_syncto=
 
 
-#gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_makesdk_2011),postcore)
-#gmp_USER_POST_TARGETS += _gmi_MSDK1_postproc
+$(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
+$(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)
 
 ifeq (,$(gmb_syncto))
   $(error Error from $(_pluginId_makesdk_2011): gmb_syncto is not defined, so I don't know where to generate SDK output)
 endif
+gmb_syncto := $(call gmuf_GetAbsPathByRela_soc,$(gmb_syncto))
 
 ifeq (,$(gmi_MSDK1_up_BUILDSDK_INI))
   $(error Error from $(_pluginId_makesdk_2011): gmi_MSDK1_up_BUILDSDK_INI is not defined)
@@ -58,6 +59,9 @@ cpuxm_Makefile = __Makefile-cpuxm
 ifndef gmb_ignore_build_uxm
   gmu_uv_list_ALL_SUBPRJ += vbuxm
   vbuxm_Makefile = __Makefile-vbuxm
+  vbuxm_MakeVarDefines = \
+    gmu_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info" \
+    # gmi_SYDO_ud_SYNC_exe_TO=... this one is assigned in __Makefile-vbuxm for each gmp_COMPILER_ID_VER
 	# vbuxm: verify building user examples
 endif
 

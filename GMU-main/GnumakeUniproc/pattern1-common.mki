@@ -16,6 +16,9 @@ unexport gmp_u_list_PLUGIN_TO_LOAD
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE
 unexport gmp_u_list_PLUGIN_TO_LOAD_AUX_POST
 
+export gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE
+export gmp_u_list_PLUGIN_TO_LOAD_ENV_POST
+
 unexport gmp_NOW_EXPORT
 
 _gmp_RELEASE_WANT_DBG_SYMBOLS = $(strip $(gmp_msvc_WANT_RELEASE_PDB)$(gmp_RELEASE_WANT_DBG_SYMBOLS))
