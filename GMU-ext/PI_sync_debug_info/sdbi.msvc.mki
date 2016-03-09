@@ -32,6 +32,11 @@ gmi_SYDO_up_list_SYNC_DBGINFOEXE += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)
 	# MSVC compiler-config(.msvc, .wince) should have defined the following 3 output vars:
 	# gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB, gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL, gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE 
 
+# [2016-03-09] Some facility var assignment:
+# -- because if the user wants to sync PDB, he may want to sync EXE/DLL as well, along-side with the PDBs.
+gmi_SYDO_up_list_SYNC_EXE = $(gmp_Gp_EXE_OUTPUT)
+gmi_SYDO_up_list_SYNC_DLL = $(gmp_Gp_DLL_OUTPUT)
+
 
 # Historical notes:
 

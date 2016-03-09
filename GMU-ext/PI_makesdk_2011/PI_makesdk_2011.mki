@@ -60,8 +60,8 @@ ifndef gmb_ignore_build_uxm
   gmu_uv_list_ALL_SUBPRJ += vbuxm
   vbuxm_Makefile = __Makefile-vbuxm
   vbuxm_MakeVarDefines = \
-    gmu_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info" \
-    # gmi_SYDO_ud_SYNC_exe_TO=... this one is assigned in __Makefile-vbuxm for each gmp_COMPILER_ID_VER
+    #gmu_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info" \
+    # gmi_SYDO_ud_SYNC_EXE_TO=... this one is assigned in __Makefile-vbuxm for each gmp_COMPILER_ID_VER
 	# vbuxm: verify building user examples
 endif
 
