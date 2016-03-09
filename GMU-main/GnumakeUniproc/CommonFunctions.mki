@@ -157,6 +157,8 @@ gmuf_DeleteFile_sh_wc = $(shell $(RM_) $1 1>&2 ; if [ "$$?" = 0 ];then echo 1; f
 	# should not be written as
 	#	$(RM_) "$1"
 
+gmuf_dir_nts = $(patsubst %/,%,$(dir $1))
+	# similar to $(dir ), but without trailing slash.
 
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
 	# What the internal $(suffix) function returns has a leading dot, we reject the dot here.
