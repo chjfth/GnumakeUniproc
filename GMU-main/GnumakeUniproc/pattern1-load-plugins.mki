@@ -28,10 +28,9 @@ gmpv_ThisPluginId = $(basename $(notdir $(call gmuf_lastword,$(MAKEFILE_LIST))))
 gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE += $(gmp_u_list_PLUGIN_TO_LOAD_AUX)
 	# For compatibility of the old gmp_u_list_PLUGIN_TO_LOAD_AUX.
 
-# >>> Compatibility code for old var gmu_u_list_PLUGIN_TO_LOAD_ENV_PRE/POST before r651(2008-10-10)(appeared in GnumakeUniproc v0.94)
-#gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE+=$(gmu_list_PLUGIN_TO_LOAD_ENV_PRE)
-#gmp_u_list_PLUGIN_TO_LOAD_ENV_POST+=$(gmu_list_PLUGIN_TO_LOAD_ENV_POST)
-						# [2016-03-09] GMU 0.100: Now remove this to avoid gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE duplication each time entering a deeper subprj.
+# >>> Compatibility code for old var gmu_list_PLUGIN_TO_LOAD_ENV_PRE/POST before r651(2008-10-10)(appeared in GnumakeUniproc v0.94)
+gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE+=$(gmu_list_PLUGIN_TO_LOAD_ENV_PRE)
+gmp_u_list_PLUGIN_TO_LOAD_ENV_POST+=$(gmu_list_PLUGIN_TO_LOAD_ENV_POST)
 # <<< Compatibility code (END)
 
 _gmp_AllPlugins = $(call gmuf_RemoveDuplicate,\
