@@ -1,0 +1,105 @@
+ifndef __PLUGIN_MAKESDK_2016_LOADED
+__PLUGIN_MAKESDK_2016_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr))
+
+_pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: MSDK1
+
+# This plugin requires python 2.7
+
+# User input vars:
+
+# gmi_MSDK_up_BUILDSDK_INI = 
+	# (must)
+	# Set this to an INI configuration file describing how to make the SDK package.
+
+
+# (the following set in env-var)
+# gmb_compiler_ids=
+# gmb_builds=
+# gmb_builds_<compiler-id>=
+# gmb_<compiler-id>_vers=
+# gmb_thisrepo=       # directory of your SDK's source tree, must be an svn sandbox
+# gmb_dirname_sdkin = # directory name to store your code's "local SDK"
+
+
+ifeq (,$(gmb_thisrepo))
+  $(error Error from $(_pluginId_makesdk_2016): gmb_thisrepo is not defined, please set it to an svn sandbox directory)
+endif
+gmb_thisrepo := $(call gmuf_GetAbsPathByRela_soc,$(strip $(gmb_thisrepo)))
+$(call gmuf_AnounceExportEnvvar,gmb_thisrepo=$(gmb_thisrepo))
+
+
+ifeq (,$(gmb_syncto))
+  $(error Error from $(_pluginId_makesdk_2016): gmb_syncto is not defined, so I don't know where to generate SDK output)
+endif
+gmb_syncto := $(call gmuf_GetAbsPathByRela_soc,$(strip $(gmb_syncto)))
+$(call gmuf_AnounceExportEnvvar,gmb_syncto=$(gmb_syncto))
+
+gmb_dirname_sdkin := $(strip $(gmb_dirname_sdkin))
+
+$(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
+$(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)
+
+
+ifeq (,$(gmi_MSDK_up_BUILDSDK_INI))
+  $(error Error from $(_pluginId_makesdk_2016): gmi_MSDK_up_BUILDSDK_INI is not defined, I need an INI config-file to work with)
+endif
+
+_tmp := $(shell $(call gmuf_ScriptCmd,\
+	genmk-sdk.py --prjname=$(gmu_PRJ_NAME) --gmb_syncto=$(gmb_syncto) $(gmi_MSDK_up_BUILDSDK_INI) \
+	) 2>&1 )
+ifneq (,$(strip $(_tmp)))
+  $(info $(_tmp))
+  $(call gmuf_OutputInfo_shechoe,Script genmk-sdk.py execution error. Reasons may be:\n\
+    1. You do not have python 2.6 or other later 2.x installed.\n\
+    2. Your configuration file $(gmi_MSDK_up_BUILDSDK_INI) contains errors.\n\
+    3. The genmk-sdk.py python script contains bug.)
+  $(error Error occurs in $(_pluginId_makesdk_2016), see error reason above)
+endif
+
+
+# >>> Plugin PI_sc_pdb_sew_svn related instructions 
+
+gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
+  gmi_SCPSS_ud_PDB = $(gmb_syncto)
+  gmi_SCPSS_ud_source = $(gmb_thisrepo)
+  gmi_SCPSS_PRODUCT_NAME = ScalaconSDK2016
+  gmi_SCPSS_SYMSTORE_TARGET_DIR = $(gmb_thisrepo)/websymbols
+  gmi_SCPSS_SYMSTORE_CLEAN_FIRST = 1
+  gmi_SCPSS_SYMSTORE_3TIER = 1
+  gmi_SCPSS_SVNHOST_TABLE = # use default
+  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = # use default
+  #
+  gmi_SCPSS_PICK_CHERRIES = *
+  ifneq (,$(gmb_dirname_sdkin))
+    gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI = $(gmi_MSDK_up_BUILDSDK_INI)
+    gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN = $(gmb_thisrepo)/$(gmb_dirname_sdkin)
+  endif
+  gmi_SCPSS_SAVE_SSTREAMS_DIR = !..
+  gmi_SCPSS_SRC_MAPPING_FROM_INI=$(gmi_MSDK_up_BUILDSDK_INI),$(gmb_syncto),[global],examples_copyto,examples_dir
+
+gmp_USER_POST_TARGETS += gmit_SCPSS_SEW_PDB
+
+# <<< Plugin PI_sc_pdb_sew_svn related instructions 
+
+
+
+
+ifndef gmb_ignore_build_source
+  gmu_uv_list_ALL_SUBPRJ += makesdk 
+  makesdk_Makefile = __Makefile-mc
+	# mc: multiple compiler build of lib source
+endif
+
+gmu_uv_list_ALL_SUBPRJ += cpuxm
+cpuxm_Makefile = __Makefile-cpuxm
+	# cpuxm: copy user examples
+
+ifndef gmb_ignore_build_uxm
+  gmu_uv_list_ALL_SUBPRJ += vbuxm
+  vbuxm_Makefile = __Makefile-vbuxm
+endif
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr))
+endif #__PLUGIN_MAKESDK_2016_LOADED
