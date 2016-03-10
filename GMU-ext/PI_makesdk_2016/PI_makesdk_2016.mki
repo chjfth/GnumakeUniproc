@@ -19,7 +19,6 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 # gmb_builds=
 # gmb_builds_<compiler-id>=
 # gmb_<compiler-id>_vers=
-# gmb_syncto ------------------xxxxxxxxxxx
 # gmb_thisrepo=        # (must) directory of your SDK's source tree, must be an svn sandbox
 # gmb_dirname_sdkin =  # (optional) directory name to store your code's "input SDK"
 # gmb_dirname_sdkout = # (with default) directory name to store your code's "output SDK"
