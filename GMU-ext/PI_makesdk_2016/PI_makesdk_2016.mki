@@ -19,24 +19,29 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 # gmb_builds=
 # gmb_builds_<compiler-id>=
 # gmb_<compiler-id>_vers=
-# gmb_thisrepo=       # directory of your SDK's source tree, must be an svn sandbox
-# gmb_dirname_sdkin = # directory name to store your code's "local SDK"
+# gmb_syncto ------------------xxxxxxxxxxx
+# gmb_thisrepo=        # (must) directory of your SDK's source tree, must be an svn sandbox
+# gmb_dirname_sdkin =  # (optional) directory name to store your code's "input SDK"
+# gmb_dirname_sdkout = # (with default) directory name to store your code's "output SDK"
+#
+# This mki will set: gmb_syncto=$(gmb_thisrepo)/$(gmb_dirname_sdkout)
 
-
-ifeq (,$(gmb_thisrepo))
+ifeq (,$(strip $(gmb_thisrepo)))
   $(error Error from $(_pluginId_makesdk_2016): gmb_thisrepo is not defined, please set it to an svn sandbox directory)
 endif
 gmb_thisrepo := $(call gmuf_GetAbsPathByRela_soc,$(strip $(gmb_thisrepo)))
 $(call gmuf_AnounceExportEnvvar,gmb_thisrepo=$(gmb_thisrepo))
 
+$(call gmuf_AnounceExportEnvvar,gmb_dirname_sdkin=$(strip $(gmb_dirname_sdkin)))
 
-ifeq (,$(gmb_syncto))
-  $(error Error from $(_pluginId_makesdk_2016): gmb_syncto is not defined, so I don't know where to generate SDK output)
+ifeq (,$(gmb_dirname_sdkout))
+  gmb_dirname_sdkout = sdkout
 endif
-gmb_syncto := $(call gmuf_GetAbsPathByRela_soc,$(strip $(gmb_syncto)))
+$(call gmuf_AnounceExportEnvvar,gmb_dirname_sdkout=$(strip $(gmb_dirname_sdkout)))
+
+gmb_syncto := $(call gmuf_GetAbsPathByRela_soc,$(gmb_thisrepo)/$(gmb_dirname_sdkout))
 $(call gmuf_AnounceExportEnvvar,gmb_syncto=$(gmb_syncto))
 
-gmb_dirname_sdkin := $(strip $(gmb_dirname_sdkin))
 
 $(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
 $(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)
