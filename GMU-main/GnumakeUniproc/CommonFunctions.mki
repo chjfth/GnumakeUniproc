@@ -205,6 +205,8 @@ _IsFileExist_sh = $(shell if [ -f "$1" ] ;then echo -n '1';fi)
 gmuf_IsFileExist_sh = $(_IsFileExist_sh)
 gmuf_IsFileNotExist_sh = $(if $(call _IsFileExist_sh,$1),,1)
 
+gmuf_RemoveFileIfExist = $(if $(call gmuf_IsFileExist_sh,$1),$(RM_) -fr "$1")
+
 gmuf_IsDirExist_sh = $(shell if [ -d "$1" ] ;then echo -n '1';fi)
 
 gmuf_Copy1File_sh = $(shell if $(CP_) --force "$1" "$2" 1>&2; then echo 1; fi)
