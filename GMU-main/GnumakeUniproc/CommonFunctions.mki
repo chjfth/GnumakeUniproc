@@ -122,6 +122,14 @@ _FindStrings = $(strip $(foreach v,$1,$(findstring $v,$2)))
 	#   returns: b c
 gmuf_FindStrings = $(_FindStrings)
 
+gmuf_IsWordInWords = $(if $(findstring [[[$1]]],$(patsubst %,[[[[%]]],$2)),1)
+	# Example:
+	#	$(call gmuf_IsWordInWords,ab,123 abc)  # return null	
+	#	$(call gmuf_IsWordInWords,ab,123 ab)  # return 1
+	#
+	# This is not the same as $(findstring ) which does not operate on word boundary
+	#	$(findstring ab,123 abc) # returns ab
+
 gmuf_IsSubString = $(if $(call _IsStringEqual,$(subst $1,,$2),$2),,1)
 	# If $1 is a substring of $2, return 1, otherwise null.
 	# Example:

@@ -52,7 +52,9 @@ endif
 
 _tmp := $(shell $(call gmuf_ScriptCmd,\
 	genmk-sdk.py --prjname=$(gmu_PRJ_NAME) --gmb_syncto=$(gmb_syncto) $(gmi_MSDK_up_BUILDSDK_INI) \
-	) 2>&1 )
+	) 2>&1 ) 
+	# I have to use 2>&1 technique in order to know whether the $(shell cmd) executes successful.
+	# But the bad side is: all \n from $(shell ) output is replaced with spaces which cause python stack traces hard to read.
 ifneq (,$(strip $(_tmp)))
   $(info $(_tmp))
   $(call gmuf_OutputInfo_shechoe,Script genmk-sdk.py execution error. Reasons may be:\n\
