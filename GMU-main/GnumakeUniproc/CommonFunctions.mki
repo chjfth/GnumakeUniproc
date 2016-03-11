@@ -122,14 +122,6 @@ _FindStrings = $(strip $(foreach v,$1,$(findstring $v,$2)))
 	#   returns: b c
 gmuf_FindStrings = $(_FindStrings)
 
-gmuf_IsWordInWords = $(if $(findstring [[[$1]]],$(patsubst %,[[[[%]]],$2)),1)
-	# Example:
-	#	$(call gmuf_IsWordInWords,ab,123 abc)  # return null	
-	#	$(call gmuf_IsWordInWords,ab,123 ab)  # return 1
-	#
-	# This is not the same as $(findstring ) which does not operate on word boundary
-	#	$(findstring ab,123 abc) # returns ab
-
 gmuf_IsSubString = $(if $(call _IsStringEqual,$(subst $1,,$2),$2),,1)
 	# If $1 is a substring of $2, return 1, otherwise null.
 	# Example:
@@ -295,9 +287,14 @@ _gmuf_IsWordInSet_rw = $(foreach w,$2,$(if $(call _IsStringEqual,$w,$1),$1))
 gmuf_IsWordInSet_rw = $(firstword $(call _gmuf_IsWordInSet_rw,$1,$2))
 	# Check whether word $1 is word-set $2. Return $1 if yes, null if no.
 	# _rw implies: return word $1.
+	#
+	# This is not the same as $(findstring ) which does not operate on word boundary
+	#	$(findstring ab,123 abc) # returns ab
 
 gmuf_IsWordInSet = $(if $(call gmuf_IsWordInSet_rw,$1,$2),1)
 	# Check whether word $1 is word-set $2. Return 1 if yes, null if no.
+
+gmuf_IsWordInWords = $(gmuf_IsWordInSet)
 
 gmuf_IntersectWords = $(foreach w,$1,$(call gmuf_IsWordInSet_rw,$w,$2))
 	# Find intersection of words provided in $1 and $2
