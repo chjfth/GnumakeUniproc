@@ -54,7 +54,7 @@ define SYDO_syncproc_vardef
 #    endif
 #  endif
 
-  _sydo_cp_cmd_and_options := $(CP_) $$(_sydo_cp_force) $$(if $$(gmi_SYDO_ONLY_COPY_NEWER),-u) $$(if $$(-isCopyDirStruct-),-r --parents)
+  _sydo_cp_cmd_and_options := $(CP_preserve_time) $$(_sydo_cp_force) $$(if $$(gmi_SYDO_ONLY_COPY_NEWER),-u) $$(if $$(-isCopyDirStruct-),-r --parents)
 
 endef
 

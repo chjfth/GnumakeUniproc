@@ -95,6 +95,10 @@ ifeq (,$(strip $(CP_))) # copy
   CP_ = cp
 endif
 
+CP_preserve_time := $(CP_) --preserve=timestamp
+	# Note: When using $(CP_), it's suggested most of the time to use --preserve option.
+	# --preserve makes the destination file's modification time the same as source file.
+
 ################# Common user-defined functions for GNU make ###################
 
 _gmu_true = 1
@@ -209,7 +213,7 @@ gmuf_RemoveFileIfExist = $(if $(call gmuf_IsFileExist_sh,$1),$(RM_) -fr "$1")
 
 gmuf_IsDirExist_sh = $(shell if [ -d "$1" ] ;then echo -n '1';fi)
 
-gmuf_Copy1File_sh = $(shell if $(CP_) --force "$1" "$2" 1>&2; then echo 1; fi)
+gmuf_Copy1File_sh = $(shell if $(CP_) --force --preserve "$1" "$2" 1>&2; then echo 1; fi)
 
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 gmuf_GetFileContent_sh = $(_GetFileContent_sh)
