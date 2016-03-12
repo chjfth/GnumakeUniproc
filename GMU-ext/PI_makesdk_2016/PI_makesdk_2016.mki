@@ -23,6 +23,8 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 # gmb_dirname_sdkin =  # (optional) directory name to store your code's "input SDK"
 # gmb_dirname_sdkout = # (with default) directory name to store your code's "output SDK"
 #
+# gmb_run_on_compiler_id = # (optional) used in __Makefile-vbuxm
+#
 # This mki will set: gmb_syncto=$(gmb_thisrepo)/$(gmb_dirname_sdkout)
 
 ifeq (,$(strip $(gmb_thisrepo)))
