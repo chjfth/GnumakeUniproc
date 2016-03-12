@@ -1469,6 +1469,12 @@ gmu_ut_export: _in_gmu_ut_export __pattern1_inc_project_count
 	@$(_Gmp1SharedFinishingCmds)
 
 
+ifeq ($(MAKECMDGOALS),gmu_ut_diagnose)
+  ifeq (,$(gmu_u_DIAGNOSE_VARS)$(gmu_u_DIAGNOSE_VARS_LIST))
+    $(error You request gmu_ut_diagnose, but does not provide gmu_u_DIAGNOSE_VARS or gmu_u_DIAGNOSE_VARS_LIST, I don't know what variables to show)
+  endif
+endif
+
 .PHONY: gmu_ut_diagnose
 gmu_ut_diagnose:
 	@echo "******************************************************************************"

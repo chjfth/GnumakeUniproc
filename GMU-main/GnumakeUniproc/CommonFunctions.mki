@@ -117,9 +117,9 @@ _GmuSpace3 = $(_GmuNull)   $(_GmuNull)
 _GmuSpace4 = $(_GmuNull)     $(_GmuNull)
 
 
-_EchoVarValue = $(if $($1),echo $1 = $($1),echo $1 [Null])
+_EchoVarValue = $(if $($1),echo $1=$($1),echo $1 [Null])
 _EchoVarValue2 = echo $1 = "$(call _TrShcmd4echo,[$($1)])"
-_ListVarValue = $(if $($1),echo -e $1 = "$(call _TrShcmd4echo,$(foreach Ele,$($1),\n    $(Ele)))",echo $1 [NULL])
+_ListVarValue = $(if $($1),echo -e $1="$(call _TrShcmd4echo,$(foreach Ele,$($1),\n\t$(Ele)))",echo $1 [NULL])
 _FindStrings = $(strip $(foreach v,$1,$(findstring $v,$2)))
 	# Find appearances of $1 in $2, return space separated words found in $2.
 	# Example: $(call _FindStrings,a b c,b c d)
