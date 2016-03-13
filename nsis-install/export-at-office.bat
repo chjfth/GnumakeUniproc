@@ -12,9 +12,6 @@ call export-gmu.bat https://nlssvn/svnreps/makingsys/GnumakeUniproc
 call export-gmu-bin.bat  https://nlssvn/BinaryRls/MinGW-binary
 @if ERRORLEVEL 1 goto ErrSvnError
 
-call export-nlscan.bat https://nlssvn/svnreps/makingsys
-@if ERRORLEVEL 1 goto ErrSvnError
-
 @echo All exports success.
 @goto END
 

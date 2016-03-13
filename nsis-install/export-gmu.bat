@@ -19,6 +19,11 @@ set OutputDir=nsis-data
 @echo on
 svn export --force %SvnUrlPrefix%/%BranchToGet%     %OutputDir%/GMU
 @if ERRORLEVEL 1 goto ErrSvnError
+
+@REM Duplicate the scripts/*.py commands into bin-gmu-addons for NSIS packing.
+svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons
+@if ERRORLEVEL 1 goto ErrSvnError
+
 @echo off
 
 @echo Files for NSIS to pack have been retrieved.
