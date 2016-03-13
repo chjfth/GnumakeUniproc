@@ -1,0 +1,115 @@
+# Custom-image-type processor for building 850 applications for uBase.
+
+_pluginId_850APP_uBaseIII := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: UBAPP
+
+# User input vars:
+
+# gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT = 
+	# List the filepath of resource definition file(.rc) for ubase-app.
+	#
+	# Note: User mustn't list uToolsRes.cpp in gmu_ud_SRC_ROOT. Just define
+	# gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT and uToolsRes.cpp will be 
+	# generated, compiled and linked automatically.
+
+# gmi_UAPP_ud_DoSyncOutputTo = (optional)
+	# If non-null, it signifies a subdir beneath $(gmu_ud_SRC_ROOT) and the 
+	# output image(.exe or .ue) will be copied to that subdir.
+	# This can be . to indicate syncing to the same dir as $(gmu_ud_SRC_ROOT)
+
+# Make-vars provided by this plugin:
+
+# gmi_UBAPP_d_PUBLIC_LIB
+	# Tells where the public lib dir is for ubase app.
+# gmi_UBAPP_d_850_LIB 
+	# Tells where the 850 specific lib dir is.
+
+#VirtualCustomIT := $(gmp_bc_IMAGE_TYPE)
+
+gmp_up_CUSTOM_IT_POSTCORE_MKI := $(gmp_Gd_CUSTOM_IT_MKI_USED)/$(gmp_bc_IMAGE_TYPE).postcore.mki
+
+gmp_extn_EXE = bin
+
+############
+
+gmp_u_list_PLUGIN_TO_LOAD += PI_850APP_lib
+
+gmp_USER_POST_TARGETS += _gmi_UAPP_SyncOutput
+
+ifndef gmi_UAPP_TargetPt
+  gmi_UAPP_TargetPt = $(if $(call gmuf_IsStringEqual,$(gmp_COMPILER_ID),msvc),emu,arm)
+	# Check compile target:
+	# arm=ARM machine
+	# emu=Windows emulator
+  gmi_UAPP_isTargetReal = $(if $(call gmuf_IsStringEqual,$(gmi_UAPP_TargetPt),arm),1)
+endif
+
+
+ifeq (,$(gmi_UAPP_isTargetReal)) # win32-emulator
+
+  gmp_bc_IMAGE_TYPE = EXE_GUI
+
+  gmp_u_list_PLUGIN_TO_LOAD += PI_sync_debug_info
+
+else
+
+  gmp_USER_FIRST_TARGET = $(call gmuf_ChangeFilenameExt,$(gmu_Gp_LINK_OUTPUT),ue)
+  gmi_SYDO_up_list_SYNC_UserOutputAL = $(gmp_USER_FIRST_TARGET)
+
+endif
+
+
+
+gmu_up_list_SRC_FROM_ROOT += $(if $(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT),uToolsRes.cpp)
+	# $(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT) here should better be a deferred expansion,
+	# because u_srccfg_post.mki is included later than this file.
+
+
+ifeq (,$(gmi_UBAPP_d_PUBLIC_LIB)) # This may have defined in somewhere else e.g.(PI_850APP_lib.mki).
+  gmi_UBAPP_d_PUBLIC_LIB = $(UTOOLSDIR)/target/public/lib
+endif
+
+gmi_UBAPP_d_850_LIB = $(UTOOLSDIR)/target/nl850/lib
+	# These two vars may be used by user to know the application lib path
+#
+#p_PUBLIC_LIB == $(gmi_UBAPP_d_PUBLIC_LIB)# Old var, don't use.
+#p_850_LIB == $(gmi_UBAPP_d_850_LIB)
+
+ifeq (,$(gmi_UAPP_isTargetReal))
+
+  gmp_LINKFLAGS += $(addprefix -libpath:,$(gmi_UBAPP_d_NL850_LIB) $(gmi_UBAPP_d_PUBLIC_LIB))
+
+else
+  gmp_LINKFLAGS += -aif -reloc -ro-base 0 -nodebug \
+	-First "$(UTOOLSDIR)/target/nl850/lib/entry.o(LibEntry)" "$(UTOOLSDIR)/target/nl850/lib/entry.o"  \
+	-nozeropad -map -xref -info total -info unused -info inter -info size \
+	-list $(gmu_Gd_Deco_PrjOutput)/list.txt -symbols $(_Gd_Deco_PrjOutput)/symbols.txt
+
+  APCS_FP = fp
+  ifeq ($(APCS),$(APCS_FP))
+    gmp_bc_SYSLIBS += $(addprefix $(UTOOLSDIR)/lib/,armlib_c.32l armcpplib_c.32l)
+      # [2006-03-10] Strange. -apcs /fp build generates roughly the same size image as normal build. To investigate!
+  else
+    gmp_bc_SYSLIBS += $(addprefix $(UTOOLSDIR)/lib/,armlib_cn.32l armcpplib_cn.32l)
+  endif
+endif
+
+
+
+_p_ArmLinkOptList = $(gmu_Gd_Deco_PrjOutput)/armlinkoptions.lst
+
+ifeq (1,$(gmi_UAPP_isTargetReal))
+
+  define gmu_u_LINK_CMD
+	@$(bcfShowLibrariesToLink)
+	@echo -n "" > $(_p_ArmLinkOptList) # clear it first
+	@for v in $(subst /,\\,$(gmp_ALL_TO_LINK)); do echo $$v >> $(_p_ArmLinkOptList); done
+	$(gmu_exe_LINK) $(subst /,\\, -o "$@" $(gmp_LINKFLAGS) -via $(_p_ArmLinkOptList) )
+  endef
+	#	[2006-03-11 21:25] You may wonder why in link command substitue all / to \ ,
+	# that's because ARM SDT armlink's -first option may exhibit very strange and 
+	# unpredictable behavior when processing the file path following -first if you 
+	# use any / in any option or link component within the link command line.
+endif
+
+

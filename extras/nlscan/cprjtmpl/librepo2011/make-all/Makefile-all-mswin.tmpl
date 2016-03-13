@@ -1,0 +1,37 @@
+#compiler-settings
+cheetahVarStartToken = @
+#end compiler-settings
+
+ifdef gmu_DIR_ROOT
+  include $(gmu_DIR_ROOT)/nlscan/nlssvn-scalacon.mki
+else
+  $(error gmu_DIR_ROOT is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+gmu_PRJ_NAME = @(repo).all-mswin
+
+$(call gmuf_AnounceExportEnvvar,NLSSVN_ALL_SOURCE=1)
+
+gmp_MKS_PATTERN_FILENAME_SUFFIX = -mswin
+	# This will have u_subprjs-mswin.mki(instead of u_subprjs.mki) included later.
+
+
+gmu_uv_list_ALL_SUBPRJ += lib
+lib_Makefile = ../libsrc/makelib/Makefile
+lib_MakeVarDefines = 
+
+gmu_uv_list_ALL_SUBPRJ += dll
+dll_Makefile = ../libsrc/makedll/Makefile
+dll_MakeVarDefines = 
+
+
+# User-do: List subprj makefiles in subprj_makefiles, space separated.
+subprj_makefiles += \
+	../examples/Makefile-mswin-all \
+	
+
+
+$(call gmuf_AddSubprjs_Concise,$(subprj_makefiles))
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
+
+

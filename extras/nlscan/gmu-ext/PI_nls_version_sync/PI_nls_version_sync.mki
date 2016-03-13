@@ -1,0 +1,49 @@
+ifndef __PLUGIN_NLS_VERSION_SYNC_LOADED
+__PLUGIN_NLS_VERSION_SYNC_LOADED = 1
+
+_pluginId_nls_version_sync := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: NLVS
+
+###############################################################################
+## NOTE: This plugin name is now deprecated, call PI_sc_version_sync inside. ##
+## But please keep it here for backward compatibility of some old Makefiles. ##
+###############################################################################
+
+# User input vars:
+
+# gmi_NLVS_upp_list_SYNC = 
+	# (upp: User filepath pair)
+	# List filepath pairs indicating what files to tune(get version number sync-ed) before 
+	# compiling any C/C++ files, in format
+	#	<srcfile1>|<destfile1a>|<destfile1b>|... <srcfile2>|<destfile2a>|<destfile2b> ...
+	#
+	# Example:
+	#	gmi_NLVS_upp_list_SYNC = ../../libver.h|../../libverA.rc|../../libverB.rc ../../exever.h|../../exeverA.rc|../../exeverB.rc
+	#
+	#
+	# Note:
+	# * <srcfile> and <destfile>s must be files, not directory.
+	# * If <srcfile> does not exist or is a directory, makefile stops with error.
+	# * If <srcfile> is newer than any <destfile>, copy operation launches automatically.
+	#
+	# If null, nothing extra will be done.
+	#
+	# [2011-02-24]NOTE: If some <destfile> does not exist, it will not assert error,
+	# just like you have written a rule with an arbitrary target name. Such rule will not
+	# cause make's error.
+	
+# gmi_NLVS_add_current_datetime =
+	# (optional, default to null)
+	# If set to 1, current date time(YYYY-MM-DD hh:mm:ss) will be appended to version strings.
+
+gmi_SCVS_add_current_datetime = $(gmi_NLVS_add_current_datetime)
+gmi_SCVS_upp_list_SYNC = $(gmi_NLVS_upp_list_SYNC)
+	# For input-var relaying, we use gmi_SCVS_xxx=$(gmi_NLVS_xxx)
+
+gmif_NLVS_WinRcListToSyncList = $(gmif_SCVS_WinRcListToSyncList)
+	# For gmi function borrowing, use gmif_NLVS_xxx=$(gmif_SCVS_xxx)
+
+gmp_u_list_PLUGIN_TO_LOAD += PI_sc_version_sync
+
+
+endif #__PLUGIN_NLS_VERSION_SYNC_LOADED

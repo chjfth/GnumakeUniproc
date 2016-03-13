@@ -1,0 +1,217 @@
+ifndef __NLSCAN_NLSSVN_PRJS_INCLUDED_
+__NLSCAN_NLSSVN_PRJS_INCLUDED_ := 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+
+#############################
+# This mki is powerful. It lets you include NLSSVN repository into your 
+# current project easily.
+#
+# TO USE FUNCTIONS FROM THIS FILE , YOU HAVE TO 
+# >> INCLUDE this file by writing in your makefile:
+#	include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
+# >> DEFINE TWO MAKE-VARS FIRST(order of the two does not matter):
+# 1. define dirNlssvn to NLSSVN-root-dir of your sandbox
+# 2. define dirThisRepo to be the local root dir of your current repository.
+# (both can be relative directory)
+#
+### Usage example(replace <repo> with real repo name):
+### (see nlssvn-prjprops.mki for a list of all available repo names)
+###
+### Example ***1*** , using repo as a subprj and link the subprj's output:
+#
+#	$(call NlssvnLinkSubprj,<repo>,[makefile-select-string],[refname-suffix])
+#		# Very convenient if the <repo>'s makefile paths have been pre-defined in this mki.
+#		#
+#		# User-provided refname-suffix helps to avoid subprj refname conflict inside a single makefile.
+#		# This final refname is <repo>[makefile-select-string],[refname-suffix] , e.g.
+#		#	$(call NlssvnLinkSubprj,foo,-lib,bar)
+#		# results in refname
+#		#	foo-libbar
+#
+# or, more verbose, request an explicit makefile:
+#
+#	<repo>_Makefile = $(LocalDir_<repo>)/.../Makefile
+#	$(call NlssvnLinkSubprj,<repo>)
+
+###
+### Example ***2*** , using repo as a subprj but NOT link the subprj's output:
+#
+#	$(call NlssvnContainSubprj,<repo>,[makefile-select-string],[refname-suffix])
+# or
+#	$(call NlssvnReqSubprj,<repo>,[makefile-select-string],[refname-suffix])
+#	
+# -- this is often used by a container project (NlssvnContainSubprj)
+# OR, 
+#    a parent LIB project requesting other LIB as sub-projects(NlssvnReqSubprj) 
+#    and the parent project requires to use C/C++ headers from those sub-projects.
+
+###
+### Example ***3*** , using repo as a subprj, not link the subprj's output,
+### but wish my parent project to link those subprj's output:
+#
+#	$(call NlssvnLinkSubprjForParent,<repo>,[makefile-select-string],[refname-suffix])
+#	
+# -- this is often used by a LIB project who calls into other LIBs .
+
+###
+### Example ***4*** , using headers(.h) from a repo(but not take it as a subprj):
+#
+#	$(call NlssvnUseHeader,<repo>)
+
+###
+### Example ***5*** , only want to checkout <repo> for free-style use:
+#
+#	$(call NlssvnWantCheckout,<repo>)
+
+# Summuary:
+# 1. only request(will checkout) alien repo files and you(current makefile) use it freely? [NlssvnWantCheckout or NlssvnUse_NotAsSubprj]
+# 2. you request to include header files from alien repo. [NlssvnUseHeader]
+# 3. you request alien repo as subprj(build the subprj) but NOTHING to do with the subprj in any other way,
+#	not link the subprj's output, nor use subprj's headers. [NlssvnContainSubprj]
+# 4. Similar to 3. but you want to use subprj's headers. [NlssvnReqSubprj]
+# 5. Similar to 4. but you request gmu_uv_list_SUBPRJ_LINK_FOR_PARENT for that subprj. [NlssvnLinkSubprjForParent]
+# 6. you(EXE/DLL) request alien repo as subprj and you want to link its output(imply using subprj's header). [NlssvnLinkSubprj]
+
+
+_txt_dirThisRepo = It should be set to your local directory(can be relative) corresponding to current SVN checkout base.
+
+_txt_dirNlssvn = It must be set to the directory(can be relative) of your local NLSSVN sandbox.
+
+
+_f_NlssvnPrjpropsMki = nlssvn-prjprops.mki
+_svnopt_prjprops_ts = $(if $(gmu_SC_CHECKOUT_DATETIME),-r "{$(gmu_SC_CHECKOUT_DATETIME)}") 
+_svncmd_export_prjprops_mki = \
+  svn export $(_svnopt_prjprops_ts) $(call gmuf_GetVarAssertExist,NLSSVN,nlssvn-prjs.mki)/makingsys/GMU-addons/trunk/nlscan/$(_f_NlssvnPrjpropsMki) $1/$(_f_NlssvnPrjpropsMki)
+  # $1: Local dir to put nlssvn-prjprops.mki
+
+define _IncludeNlssvnPrjprops
+# Try to retrieve and include nlssvn-prjprops.mki .
+# $1: Local dir to put nlssvn-prjprops.mki
+# Where to retrieve nlssvn-prjprops.mki?
+# * If gmun_PRJPROPS_FROM_SERVER==1 , then export it from NLSSVN server,
+#   using timestamp $(gmu_SC_CHECKOUT_DATETIME).
+# * else, if nlssvn-prjprops.mki does not exist in $1 yet,
+#   copy that file from $(gmu_DIR_ROOT)/nlscan .
+#   NOTE: only check $1/nlssvn-prjprops.mki existence, not checking timestamp, reason:
+#       Sometimes we will cope with an older version of nlssvn-prjprops.mki in some 
+#       specific local sandbox, so we want to keep the old nlssvn-prjprops.mki right there.
+  ifeq (,$$(__NLSCAN_NLSSVN_PRJPROPS_INCLUDED_))
+    ifeq (1,$$(gmun_PRJPROPS_FROM_SERVER))
+      $$(info Retrieving $(_f_NlssvnPrjpropsMki) from NLSSVN server...)
+      $$(info $$(_svncmd_export_prjprops_mki))
+      _ret := $$(shell \
+        if $$(call _svncmd_export_prjprops_mki,$1) 1>&2 ; then echo SuccesS; else echo FaiL; fi;\
+        )
+      ifeq ($$(_ret),FaiL)
+        $$(error SVN export fail!)
+      endif
+    else ifneq (1,$$(call gmuf_IsFileExist_sh,$1/$(_f_NlssvnPrjpropsMki)))
+      _tmp_destfile_abspath := $$(call gmuf_GetAbsPathByRela_soc,$1/$(_f_NlssvnPrjpropsMki))
+      _ret := $$(call gmuf_Copy1File_sh,$(gmu_DIR_ROOT)/nlscan/$(_f_NlssvnPrjpropsMki),$$(_tmp_destfile_abspath))
+      $$(call gmuf_OutputInfo,Copy '$(gmu_DIR_ROOT)/nlscan/$(_f_NlssvnPrjpropsMki)' to '$$(_tmp_destfile_abspath)' ...)
+      ifneq (1,$$(_ret))
+        $$(error Copy fail!)
+      endif
+    endif
+    include $1/$(_f_NlssvnPrjpropsMki)
+  endif
+endef
+
+
+define _in_NlssvnUse
+# $1: Project name. The name should be recognizable in this file.
+# $2: Leave empty or use "_forMakefiles"
+# $3: Makefile selection(by a short string).
+# $4: refname-suffix
+#
+# ``$1$3$4'' will become subprj refname.
+#
+# This "function" outputs make-var LocalDir_$1 for its user.
+  ifeq (,$$(NlssvnPrjprosNotUseIncarnation))
+    $$(eval $$(call _IncludeNlssvnPrjprops,$$(call gmuf_GetVarAssertExist,dirThisRepo,nlssvn-prjs.mki,$$(_txt_dirThisRepo))))
+      # Use this nlssvn-prjprops.mki in current calling repo root-dir, which, is possibly
+      # a historical version. If that local nlssvn-prjprops.mki does not exist yet, GMU option 
+      # gmu_DO_CHECKOUT=1 can have it checked-out, in datetime assigned by gmu_SC_CHECKOUT_DATETIME.
+  else
+    include $(_d_ThisMki_)$(_f_NlssvnPrjpropsMki)
+      # Use nlssvn-prjpros.mki along side(in same folder of) this nlssvn-prjs.mki,
+      # which is the latest version from the SVN server.
+  endif
+  $1_gpbrname = $$(gpbr_$1)
+  $1_pirval = $$(pir_$1)
+  $$(if $$($1_pirval),,$$(error The repository named "$1" is not defined in nlssvn-prjprops.mki. Perhaps you give a wrong repo-name or your nlssvn-prjprops.mki is not up-to-date))
+  $$(call gmuf_SvnDeclareDefaultTrunk,$$($1_gpbrname))
+  $1$3$4_MakeVarDefines = gmp_COMPILER_ID=$$(gmp_COMPILER_ID)
+  $1$3$4_svnUrl$2 = $$(call gmuf_MakeSvnRepositoryPath,NLSSVN,/$$($1_pirval)/$$($$($1_gpbrname)))
+  $1$3$4_svnLocalDir$2 = $$(call gmuf_GetVarAssertExist,dirNlssvn,nlssvn-prjs.mki,$$(_txt_dirNlssvn))/$$($1_pirval)
+	# Note: We use = above to allow delayed expansion of dirNlssvn.
+  LocalDir_$1 = $$($1$3$4_svnLocalDir$2)
+  $$(if $$(umakefile_$1$3),$$(eval $1$3$4_Makefile = $$(LocalDir_$1)/$$(umakefile_$1$3)))
+endef
+
+NlssvnUseSubprjInfo = $(eval $(call _in_NlssvnUse,$1,_forMakefiles))
+
+
+define _in_NlssvnUseHeader
+  $$(eval $$(call _in_NlssvnUse,$1,$2,$3,$4))
+
+  gmu_ud_list_PRJ_HEADER +=       $$(addprefix $$(LocalDir_$1)/,$$(rirInc_$1))
+  gmu_ud_list_PRJ_HEADER += \
+	$$(call gmpf_CombinePsSubdirs,$$(addprefix $$(LocalDir_$1)/,$$(rirInc2_$1)),$$(rirInc2ps_$1))
+
+endef # define _in_NlssvnUseHeader
+
+define _NlssvnLinkSubprj # $1: Same as _in_NlssvnUse. $2: Makefile selection string. $3: refname-suffix
+  $(eval $(call _in_NlssvnUseHeader,$1,_forMakefiles,$2,$3))
+  gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL += $1$2$3	# Used by EXE or DLL project
+endef # define _NlssvnLinkSubprj
+NlssvnLinkSubprj = $(eval $(call _NlssvnLinkSubprj,$1,$2,$3)) #note: $1,$2 here can not be omitted(seems so).
+NlssvnUseSubprj = $(NlssvnLinkSubprj)# NlssvnUseSubprj is the old name, vague, better not use!!!
+
+define _NlssvnLinkSubprjForParent # $1: Same as _in_NlssvnUse. $2: Makefile selection string.
+  $(eval $(call _in_NlssvnUseHeader,$1,_forMakefiles,$2,$3))
+  gmu_uv_list_SUBPRJ_LINK_FOR_PARENT += $1$2$3	# Used by LIB project
+endef # define _NlssvnLinkSubprjForParent
+NlssvnLinkSubprjForParent = $(eval $(call _NlssvnLinkSubprjForParent,$1,$2,$3))
+
+
+define _NlssvnReqSubprj # $1: Same as _in_NlssvnUse. $2: Makefile selection string.
+  # Request to build sub-project but not link the subprj output.
+  $(eval $(call _in_NlssvnUseHeader,$1,_forMakefiles,$2,$3))
+  gmu_uv_list_ALL_SUBPRJ += $1$2$3	# Used by EXE or DLL project
+endef # define NlssvnReqSubprj
+NlssvnReqSubprj = $(eval $(call _NlssvnReqSubprj,$1,$2,$3))
+
+
+define _NlssvnContainSubprj # $1: Same as _in_NlssvnUse. $2: Makefile selection string.
+  $(eval $(call _in_NlssvnUse,$1,_forMakefiles,$2,$3))
+  gmu_uv_list_ALL_SUBPRJ += $1$2$3
+endef # define _NlssvnContainSubprj
+NlssvnContainSubprj = $(eval $(call _NlssvnContainSubprj,$1,$2,$3))
+
+
+define _NlssvnUse_NotAsSubprj # $1: Same as _in_NlssvnUse
+  $(eval $(call _in_NlssvnUse,$1,))
+  gmu_uv_list_SVN_MODULES += $1
+endef
+NlssvnWantCheckout =    $(eval $(call _NlssvnUse_NotAsSubprj,$1))
+NlssvnUse_NotAsSubprj = $(eval $(call _NlssvnUse_NotAsSubprj,$1))
+
+define _NlssvnUse # $1: Same as _in_NlssvnUse
+  $(eval $(call _in_NlssvnUseHeader,$1,))
+  gmu_uv_list_SVN_MODULES += $1
+endef # define _NlssvnUse
+NlssvnUse = $(eval $(call _NlssvnUse,$1))#NOTE: This name is too short and vague, better not use.
+	#[2009-07-09] Now, NlssvnUse is actually the SAME as NlssvnUseHeader below.
+
+define _NlssvnUseHeader # $1: Same as _in_NlssvnUse
+  $(eval $(call _in_NlssvnUseHeader,$1,))
+  gmu_uv_list_SVN_MODULES += $1
+endef # define _NlssvnUseHeader
+NlssvnUseHeader = $(eval $(call _NlssvnUseHeader,$1))# Yes, $2,$3 for _NlssvnUseHeader is null
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) 
+endif # ifndef __NLSCAN_NLSSVN_PRJS_INCLUDED_
+

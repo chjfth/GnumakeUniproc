@@ -1,0 +1,130 @@
+ifndef __PLUGIN_copy_psTCHARh_LOADED
+__PLUGIN_copy_psTCHARh_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+ifneq (,$(gmi_CTCH_dirNlssvn))
+
+# This plugin is NLSCAN specific!
+
+_pluginId_copy_psTCHARh := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: CTCH
+
+# This plugin helps you copy $(gmi_CTCH_dirNlssvn)/CommonLib/common-include/<compiler-id>/ps_TCHAR.h
+# into your project's directory($(gmi_CTCH_dirCopyTo)) before your project start compiling C/C++ files.
+# 
+# The <compiler-id> above is a placeholder. Since each compiler-id has a associated ps_TCHAR.h 
+# with different content, so the <compiler-id> differentiates them.
+#
+# If $(gmi_CTCH_dirNlssvn)/CommonLib/common-include does not exist yet, the file copy will fail.
+# However, you can assign gmu_DO_CHECKOUT=1 to check it out. This plugin provides checkout logic for you.
+#
+# This plugin will define a make-var dirNlssvn=$(gmi_CTCH_dirNlssvn)
+# Reason: dirNlssvn is recognized in nlssvn-prjs.mki . We need nlssvn-prjs.mki to accomplish
+#        auto svn checkout for common-include.
+#
+# Currently, this plugins loads PI_file_precopy(automatically) to do its work.
+
+# User input vars:
+
+# gmi_CTCH_dirNlssvn = 
+	# (optional, if null, nothing takes place for this plugin)
+	# Tell the NLSSVN local root directory. Can be a a relative dir to you startup makefile.
+	
+# gmi_CTCH_dirCopyTo =
+	# (must, if gmi_CTCH_dirNlssvn is not null)
+	# Tell the destination directory of the copied ps_TCHAR.h .
+
+# gmi_CTCH_COMPILER_PIR = 
+	# (optional)
+	# Assign the pir directory manually.
+	#
+	# Note: I do no allow gmi_CTCH_COMPILER_PIR's delayed expansion after this mki has been include.
+
+
+### [2011-10-31] Special Note regarding using different ps_TCHAR.h for the same source tree:
+# By saying "different ps_TCHAR.h", I mean there is separate ps_TCHAR.h for each compiler.
+# If you have just *one* copy of your source(e.g. Chj's mm_snprintf) locally and you want to
+# compile it with different compilers, switching $(gmi_CTCH_dirCopyTo)/ps_TCHAR.h to match the 
+# compiler you are currently using is required. Before GMU 0.98, this switching must be done
+# manually(by the conscious user), that is, user must delete $(gmi_CTCH_dirCopyTo)/ps_TCHAR.h
+# manually before switching to another compiler, otherwise, he will end up in using a mismatched 
+# ps_TCHAR.h -- miserable. 
+# Now, this switching has been made automatic by this plugin. The method here is to place a 
+# side-by-side ps_TCHAR.h.<compiler-id> file to indicate which platform of ps_TCHAR.h is there
+# in $(gmi_CTCH_dirCopyTo), so I can re-copy the matching on if it does not match.
+# Of course, if the ps_TCHAR.h has already been the matching one, the copy operation will not 
+# be performed.
+
+
+# Output vars:
+# * dirNlssvn
+# * gmi_CTCH_G_dirCommonLib
+# * gmi_CTCH_G_dirCommonInclude
+
+ifeq (,$(gmi_CTCH_dirCopyTo))
+  $(error !Error from $(_pluginId_copy_psTCHARh): You define gmi_CTCH_dirNlssvn=$(gmi_CTCH_dirNlssvn) , but you forget to define gmi_CTCH_dirCopyTo)
+endif
+
+
+#gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_copy_psTCHARh),postcore)
+	# Not needed now.
+
+
+dirNlssvn = $(gmi_CTCH_dirNlssvn)
+gmi_CTCH_G_dirCommonLib = $(dirNlssvn)/CommonLib
+gmi_CTCH_G_dirCommonInclude = $(gmi_CTCH_G_dirCommonLib)/common-include
+
+ifeq (,$(gmi_CTCH_COMPILER_PIR)) # Use $(gmp_COMPILER_ID) for the partial-dir
+
+    ifeq ($(gmp_COMPILER_ID),wince) # special for wince, who use exact the same ps_TCHAR.h as that of msvc
+      _pirTCHARH = msvc
+    else
+      _pirTCHARH = $(gmp_COMPILER_ID)
+    endif
+
+	else
+    _pirTCHARH = $(gmi_CTCH_COMPILER_PIR)
+endif
+
+_ctch_Wildcard_psTCHARh := $(gmi_CTCH_dirCopyTo)/ps_TCHAR.h.*
+_ctch_Wildcard_psTCHARh_result := $(wildcard $(_ctch_Wildcard_psTCHARh))
+_ctch_dstp_psTCHARh = $(gmi_CTCH_dirCopyTo)/ps_TCHAR.h
+_ctch_dstp_psTCHARh_sig = $(_ctch_dstp_psTCHARh).$(_pirTCHARH)
+	# the signature file telling which version of ps_TCHAR.h is there.
+
+# Load PI_file_precopy >>>
+
+gmp_u_list_PLUGIN_TO_LOAD += PI_file_precopy
+  gmi_FPCP_upp_list_COPY += $(eval $(_gmi_CTCH_pirTCHARH))\
+	$(gmi_CTCH_G_dirCommonInclude)/$(_pirTCHARH)/ps_TCHAR.h|$(_ctch_dstp_psTCHARh) \
+	$(gmi_CTCH_G_dirCommonInclude)/$(_pirTCHARH)/ps_TCHAR.h|$(_ctch_dstp_psTCHARh_sig)
+
+_ctch_isAnyExisted = $(if $(wildcard $(_ctch_Wildcard_psTCHARh)),1,)
+_ctch_isNotAnyExisted = $(if $(_ctch_isAnyExisted),,1)
+_ctch_isDstExactExist = $(if $(call gmuf_IsStringEqual,$(_ctch_Wildcard_psTCHARh_result),$(_ctch_dstp_psTCHARh_sig)),1,)
+	# meaning: 1(true) means the exactly matching ps_TCHAR.h exists in destination dir.
+	# that is, if current compiler-id(by _pirTCHARH) is msvc, then only ps_TCHAR.h.msvc is there, no ps_TCHAR.linuxgcc or ps_TCHAR.mingw there.
+
+ifneq (,$(_ctch_isNotAnyExisted)$(_ctch_isDstExactExist)) 
+  # if [no any ps_TCHAR.h.<compiler-id> existed] or [the correct ps_TCHAR.h existed]
+  # no extra action here, let PI_file_precopy do the work.
+else
+  gmi_FPCP_FORCE_COPY = 1
+  _ret := $(call gmuf_DeleteFile_sh_wc,$(_ctch_Wildcard_psTCHARh))
+  ifneq (1,$(_ret))
+    $(error Error from PI_copy_psTCHARh: Error occurred when deleting $(_ctch_Wildcard_psTCHARh) )
+  endif
+endif
+
+# Load PI_file_precopy <<<
+
+
+
+
+include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
+$(call NlssvnWantCheckout,CommonInclude)
+
+
+
+endif # ifneq (,$(gmi_CTCH_dirNlssvn))
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+endif #__PLUGIN_copy_psTCHARh_LOADED

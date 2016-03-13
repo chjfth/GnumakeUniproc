@@ -1,0 +1,29 @@
+#compiler-settings
+directiveStartToken = %
+#end compiler-settings
+#include <assert.h>
+#include <stdio.h>
+
+#include <$(repo)/$(repo).h>
+
+#ifdef WINCE // WinCE is special, whose entry point must be wmain
+
+int wmain(int argc, wchar_t *argv[])
+{
+	unsigned int v = $(repo)_get_version_v3n();
+	wprintf(L"$(repo) version: %d.%d.%d\n", v>>24, (v>>16)&0xFF, v&0xFFFF);
+	wprintf(L"argv[0]: %s\n", argv[0]);
+	return 0;
+}
+
+#else
+
+int main(int argc, char *argv[])
+{
+	unsigned int v = $(repo)_get_version_v3n();
+	printf("$(repo) version: %d.%d.%d\n", v>>24, (v>>16)&0xFF, v&0xFFFF);
+	printf("argv[0]: %s\n", argv[0]);
+	return 0;
+}
+
+#endif

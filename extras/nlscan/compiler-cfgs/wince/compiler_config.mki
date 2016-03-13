@@ -1,0 +1,349 @@
+# Currently, compile WinCE console app and GUI app.
+
+# Big category(Use . for `gmp_wince_' prefix):
+# ._u_TargetCeVer: WinCE version: 0x420, 0x501, 0x600 etc
+# ._u_MachType: Machine-type: PPC2003, SP2003, WM5, CE6 etc
+
+ifeq (,$(gmp_wince_u_TargetCeVer))
+  $(error !GMP Error(wince): You must define gmp_wince_u_TargetCeVer to one of the following: 0x420, 0x501, 0x600 )
+endif
+ifeq (,$(gmp_wince_u_MachType))
+  $(error !GMP Error(wince): You must define gmp_wince_u_MachType to one of the following: PPC2003, SP2003, WM5, CE6, NLS98X )
+endif
+
+#### Check for NLS98X >>>>
+isForNls98x = $(call gmuf_IsStringEqual,$(gmp_wince_u_MachType),NLS98X)
+#### Check for NLS98X <<<<
+
+gmp_is_ARMV4 = $(if $(findstring $(gmp_wince_u_MachType),PPC2003 SP2003),1)
+gmp_is_ARMV4I = $(if $(gmp_is_ARMV4),,1)
+
+gmp_up_COMPILER_CFG_PRECORE_TO_LOAD = $(call gmpf_GetCompilerCfgPrecorePath_std,precore)
+
+include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_common.mki
+
+#.......... name decoration, (old comment, to del: put them at the end, since they use := assignment) ........
+gmu_DECO_SUFFIX_PRJ_NAME += _$(gmp_wince_u_MachType) # Place this decoration before bc_deco-mswin.mki
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-mswin.mki
+
+
+################################################################################
+
+_MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(gmp_bc_IMAGE_TYPE),LIB),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
+	# Get the pdb name to generate:
+	# If gmp_bc_IMAGE_TYPE==LIB, 
+	# { 
+	#	It is XXX.lib.pdb
+	# }
+	# else // gmp_bc_IMAGE_TYPE==EXE/DLL etc
+	# {
+	#   If gmp_msvc_WANT_WACKY_PDBNAME is null(the default), XXX.lib/XXX.dll/XXX.exe will have name XXX.pdb .
+	#   If gmp_msvc_WANT_WACKY_PDBNAME is not null, XXX.lib/XXX.dll/XXX.exe will have .pdb appended to form the pdb name, e.g. aq_autotest.exe.pdb .
+	# }
+
+################################################################################
+
+# Abbreviation:
+# Dft: default
+
+################### WinCE common const >>> ###################
+# (used for all WinCE platforms)
+
+#                                  ........ gmp_bc_UNICODE ........
+ifneq (,$(gmp_bc_UNICODE))
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Unicode_defs)
+else # MBCS 
+  gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Mbcs_defs)
+endif
+
+
+ifneq (,$(gmp_bc_UNICODE))
+  gmp_wince_common_codegen += /Od /Zi
+else # MBCS 
+  gmp_wince_common_codegen += /O2 $(if $(_gmp_RELEASE_WANT_DBG_SYMBOLS),/Zi)
+endif
+	# Code optimization flag: /Od /O2. Gen debug info: /Zi 
+
+# Below gmp_wince_common_macrodefs will also be used for RC compiling
+gmp_wince_common_macrodefs += $(addprefix /D ,WINCE UNDER_CE ARM _ARM_)
+gmp_wince_common_macrodefs += $(if $(gmp_bc_DEBUG),/D _DEBUG /D DEBUG,/D NDEBUG)
+
+gmp_wince_common_non_codegen = /nologo
+
+################### WinCE common const <<< ###################
+
+################### WinCE 4.2 const >>> ###################
+
+#gmp_wince_DftCodeGen = /MD 
+
+################### WinCE 4.2 const <<< ###################
+
+
+gmp_CFLAGS_CODE_GEN_preset += $(gmp_wince_common_codegen)
+
+
+gmp_CFLAGS_MACRO_DEFS_preset += $(if $(_gmp_IsNowExport),\
+	$(patsubst %,/D"%=__declspec(dllexport)",$(gmp_u_list_DLL_EXPORT_SYM)))
+
+gmp_CFLAGS_MACRO_DEFS_preset += $(patsubst %,/D"%=__declspec(dllimport)",$(gmp_u_list_DLL_IMPORT_SYM))
+
+gmp_MSVC_Gp_VCx0_pdb = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+	# [2011-04-23] Now, gmp_MSVC_Gp_VCx0_pdb is synonym of gmp_MSVC_Gp_LINK_OUTPUT_pdb
+
+gmp_CFLAGS_NON_CODE_GEN_preset += $(gmp_wince_common_non_codegen) /Fd"$(gmp_MSVC_Gp_VCx0_pdb)" # /Fd may later moved to gmp_wince_common_non_codegen
+	# /Fd tells where vc60.pdb, vc71.pdb, vc80.pdb etc is generated.
+	# [2007-11-23] Today, I decided to name those VCx0.pdb specifically with prjname,
+	# -- if not, you will not be able to place pdb files from several projects into the same 
+	# directory for ease of debugging on other machines.
+	# [2007-11-25] Today, I decide to use a explicit name(VCx0_$(gmu_G_Deco_PrjName).pdb) for 
+	# the pdb file instead of VCx0.pdb, so that multiple VCx0.pdb can be placed into the
+	# same dir when distributing the debug library to the end-user.
+
+
+gmp_CFLAGS_MACRO_DEFS_preset += $(gmp_wince_common_macrodefs) 
+
+
+ifeq '$(gmp_bc_CRT)' 'CRT_MULTI_THREADED_DLL'
+  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_DEBUG),/MDd,/MD)
+  SUFFIX_CRT = CrtMD
+else
+  ifdef gmp_bc_CRT
+  ifneq '$(gmp_bc_CRT)' 'CRT_MULTI_THREADED_LIB'
+    $(error !Invalid `gmp_bc_CRT' definition.)
+  endif
+  endif
+
+  gmp_CFLAGS_CODE_GEN_preset += $(if $(gmp_bc_DEBUG),/MTd,/MT)
+  SUFFIX_CRT = #[2007-12-06] No longer set this suffix today, because /MT(d) is the default for WinCE.
+
+endif # CRT_MULTI_THREADED_DLL
+
+
+# Link flags:
+gmp_LINKFLAGS_preset += /nologo /nodefaultlib:oldnames.lib
+
+gmp_LINKFLAGS_preset += $(if $(gmp_is_ARMV4I),,/machine:ARM)
+	#[2008-10-21] Note: Although VS2005 IDE adds linker option /ARMPADCODE for PPC2003 and SP2003,
+	#I don't add it here. Let's see what could happen without /ARMPADCODE .
+
+
+ifdef gmp_bc_DEBUG
+  gmp_LINKFLAGS_preset += /debug
+else
+  ifneq (,$(_gmp_RELEASE_WANT_DBG_SYMBOLS))
+    gmp_LINKFLAGS_preset += /debug
+  endif
+endif
+
+
+# Process ==========gmp_wince_u_TargetCeVer===========
+
+ifeq ($(gmp_wince_u_TargetCeVer),0x600)
+  _WIN32_WCE_def = _WIN32_WCE=0x600
+  gmp_LINKFLAGS_preset += /subsystem:windowsce,6.00
+endif
+
+ifeq ($(gmp_wince_u_TargetCeVer),0x501)
+  _WIN32_WCE_def = _WIN32_WCE=0x501
+  gmp_LINKFLAGS_preset += /subsystem:windowsce,5.01
+endif
+
+ifeq ($(gmp_wince_u_TargetCeVer),0x420)
+  _WIN32_WCE_def = _WIN32_WCE=0x420
+  gmp_LINKFLAGS_preset += /subsystem:windowsce,4.20
+endif
+
+$(if $(_WIN32_WCE_def),,$(error !wince-compiler-cfg error: gmp_wince_u_TargetCeVer("$(gmp_wince_u_TargetCeVer)") does not result in a valid _WIN32_WCE_def))
+
+gmp_wince_common_macrodefs += /D$(_WIN32_WCE_def)
+
+
+### Special, for PI_winres_msvc >>>
+gmi_RCVC_RC_FLAGS += /D UNCER_CE /D$(_WIN32_WCE_def)
+	#[2008-10-13]Chj: Knowing PI_winres_msvc in this compiler-config-mki seems not a correct design idea.
+	#Anyhow, it is the simplest way to pass these defines to RC compiling for WinCE . 
+	#Let me think of it later.
+### Special, for PI_winres_msvc <<<
+
+
+
+###############################################################################
+# Below: deal with ....... gmp_bc_IMAGE_TYPE ........
+###############################################################################
+
+
+_p_objliblist = $(gmu_Gd_Deco_PrjOutput)/objlist.lst
+_cmd_write_objliblist = echo -e "$(subst $(_GmuSpace),\n,$1)" > $2
+	# $1: what string to write. $2: what file to write to
+
+_isReportLibOutput = $(call _IsStringEqual,$(call _GetExtName,$(gmu_uf_LINK_OUTPUT)),$(gmp_extn_LIB))
+_StripImplibSuffix = $(if $(_isReportLibOutput),$(call _StripBasenameTail,$1,$(gmp_mswin_IMPLIB_SUFFIX)),$1)
+	# Only strip implib-suffix if necessary("necessary" means $(_isReportLibOutput) is true)
+	# You should use this function anywhere where referring an output file that should not have implib suffix appended.
+
+# >>>>>>>>>>>>>> predefine some gmp_XXX commands 
+	# The gmp_LINKFLAGS_XXX here may be used by the plugin user, e.g. when writing precompiled-header generating plugin.
+
+####### DLL #######
+
+  _msvc_LINK_OUTPUT_pdb_DLL = $(call _MsvcPdbNameToGen,$(gmp_Gp_DLL_OUTPUT))
+  	  # note: Don't use $(gmu_Gp_LINK_OUTPUT) for $(gmp_Gp_DLL_OUTPUT), since the former may be XXX.lib besides XXX.dll !
+  _tmp_Gp_list_LIB_OUTPUT = $(if $(_isReportLibOutput),$(gmp_Gp_LIB_OUTPUT)_tmp)
+  gmp_LINKFLAGS_DLL = /dll $(if $(_tmp_Gp_list_LIB_OUTPUT),/implib:"$(_tmp_Gp_list_LIB_OUTPUT)") /PDB:"$(_msvc_LINK_OUTPUT_pdb_DLL)"
+
+  _p_WINDLL_MODULE_DEF_FromCurDir = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))
+
+  define _gmp_LINK_CMD_DLL
+	@$(bcfShowLibrariesToLink)
+	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK),$(_p_objliblist))
+	$(gmu_exe_LINK) $(gmp_LINKFLAGS_DLL) $(_gmp_LINKFLAGS_final)  /out:"$(gmp_Gp_DLL_OUTPUT)" \
+		$(if $(_p_WINDLL_MODULE_DEF_FromCurDir),/def:"$(_p_WINDLL_MODULE_DEF_FromCurDir)") @$(_p_objliblist)
+	$(if $(_isReportLibOutput),$(_RenameBackImpLib))
+  endef
+	#NOTE: For this _gmp_LINK_CMD_DLL to work, gmu_Gp_LINK_OUTPUT can either be XXX.obj or XXX.dll .
+
+  define _RenameBackImpLib
+	@$(if $(gmu_DO_SHOW_LINK_CMD),echo "*** Renaming importlib $(call _StripOutputRootPrefix,$(_tmp_Gp_list_LIB_OUTPUT) to $(gmp_Gp_LIB_OUTPUT)) ...")
+	@if [ ! -f $(_tmp_Gp_list_LIB_OUTPUT) ]; then echo "!GMP!Error: No import lib($(gmp_Gp_LIB_OUTPUT)) generated from the linker."; exit 1; \
+	else $(MV_) $(_tmp_Gp_list_LIB_OUTPUT) $(gmp_Gp_LIB_OUTPUT) || (echo "!GMP!Error: Cannot rename temporary import-lib to its final form."; exit 1); \
+	fi;
+  endef
+
+####### EXE_CUI #######
+#gmp_LINKFLAGS_preset += /subsystem:console
+define _gmp_LINK_CMD_EXE_CUI
+	@$(bcfShowLibrariesToLink)
+	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK),$(_p_objliblist))
+	$(gmu_exe_LINK) /entry:mainWCRTStartup /out:"$@" $(gmp_LINKFLAGS_FOR_ANY_EXE) $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
+endef
+####### EXE_GUI #######
+#gmp_LINKFLAGS_preset += /subsystem:windows
+define _gmp_LINK_CMD_EXE_GUI
+	@$(bcfShowLibrariesToLink)
+	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK),$(_p_objliblist))
+	$(gmu_exe_LINK) /out:"$@" $(gmp_LINKFLAGS_FOR_ANY_EXE) $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
+endef
+###### (EXE ALL) ######
+_msvc_LINK_OUTPUT_pdb_EXE += $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+gmp_LINKFLAGS_FOR_ANY_EXE += /PDB:"$(_msvc_LINK_OUTPUT_pdb_EXE)"
+
+# <<<<<<<<<<<<<< predefine some gmp_XXX commands 
+
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
+
+  gmu_I_AM_A_LINK_COMPONENT = 1 #[2006-11-02]
+  gmu_IS_SUBPRJ_AUTO_LINK_MERGE = 1 #[2006-12-11]
+
+  gmp_Gp_LIB_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_CFLAGS_MACRO_DEFS_preset += /D_LIB
+
+  define gmu_u_LINK_CMD
+	@echo "$(gmp_ALL_TO_LINK_FOR_LIB)" > $(gmu_Gd_PRJ_GMUTMP)/_ObjsForThisLib.gmp.lst
+	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK_FOR_LIB),$(_p_objliblist))
+	$(gmu_exe_LIB) /nologo /out:"$@" @$(_p_objliblist)
+  endef
+
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+	# Note: gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB/DLL/EXE will be used by sdbi.msvc.mki.
+else
+
+  # For all image types other than static library, add /LIBPATH:xxx link params for extra library path
+  gmp_LINKFLAGS_preset += $(addprefix /LIBPATH:,$(gmp_ud_list_EXTRALIB))
+
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
+
+  gmu_I_AM_A_LINK_COMPONENT = 1
+
+  gmp_NOW_EXPORT = 1
+
+  _p_BasenameOutput = $(basename $(gmu_Gp_LINK_OUTPUT))
+  gmp_Gp_LIB_OUTPUT = $(if $(_isReportLibOutput),$(_p_BasenameOutput).$(gmp_extn_LIB))
+  	# set it only when link output use LIB as ext-name.
+  gmp_Gp_DLL_OUTPUT = $(call _StripImplibSuffix,$(_p_BasenameOutput)).$(gmp_extn_DLL)
+
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_DLL)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
+
+else
+ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
+
+  gmp_CFLAGS_MACRO_DEFS_preset += /D _CONSOLE
+
+  gmp_Gp_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_CUI)
+
+else
+ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
+
+  gmp_CFLAGS_MACRO_DEFS_preset += /D _WINDOWS # VS2005 IDE did it. Must? and must for DLL?
+
+  ifneq (,$(findstring $(gmp_wince_u_MachType),PPC2003 WM5)) # is PPC2003, WM5 ?
+    gmp_wince_common_macrodefs += /D POCKETPC2003_UI_MODEL /D WIN32_PLATFORM_PSPC
+  else ifeq (1,$(isForNls98x))
+    gmp_wince_common_macrodefs += /D STANDARDSHELL_UI_MODEL
+		#[2008-11-27] Perhaps, STANDARDSHELL_UI_MODEL is better defined in user's makefile explicitly.
+		#That is, User should knows whether his program's GUI model is the "standard one"(e.g 240*320 screen), 
+		#if it is, he should define STANDARDSHELL_UI_MODEL explicitly. In other word, 
+		#STANDARDSHELL_UI_MODEL may not be considered a generic characteristic of a machine type.
+		#[2008-11-27] Ugly, Google STANDARDSHELL_UI_MODEL shows only 54 results today.
+  endif
+
+  gmp_Gp_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_EXE)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_GUI)
+
+endif # EXE_GUI
+endif # EXE_CUI or EXE
+endif # DLL
+endif # LIB
+
+#^^^^^^^^ gmp_bc_IMAGE_TYPE ^^^^^^^^
+
+ifeq (1,$(gmp_is_ARMV4))
+
+  gmp_wince_DefaultLibs = secchk ccrtrtti
+
+else ifneq (,$(findstring $(gmp_wince_u_MachType),NLS98X))
+
+  gmp_wince_DefaultLibs = ccrtrtti
+	# NLS-PT98X needs this. 
+	# NOTE: Windows Mobile SDK 5.0 does not have ccrtrtti.lib .
+	
+endif
+
+# ................................................
+
+gmp_FLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
+
+gmu_u_CC_CMD = $(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) /Fo"$@" $(<cfinal_to_compiler)
+gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
+
+# ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
+
+gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,$(gmp_wince_DefaultLibs)\
+	coredll corelibc ole32 oleaut32 uuid commctrl \
+	commdlg \
+	cemapi \
+	ws2 \
+	)
+
+gmp_bc_syslib_NETWORK = ws2
+gmp_bc_syslib_SecurityChk =  
+
+

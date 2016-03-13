@@ -1,0 +1,44 @@
+ifndef __NLSCAN_REQ_COMMON_INCLUDE_INCLUDED_
+__NLSCAN_REQ_COMMON_INCLUDE_INCLUDED_ := 1
+
+# [2011-04-20]NOTE: This file is out-dated and will not be updated any more!
+
+# Note:
+# Alternatively, you can use the following two make statements instead of using(including) 
+# this file. -- but don't use both.
+
+# include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
+# tmp := $(eval $(call NlssvnUse,CommonInclude))
+
+
+ifeq (,$(dirNlssvn))
+  $(error !Error from req-common-include.mki: The variable dirNlssvn is not set. \
+It must be set to the local directory corresponding to NLSSVN sandbox root)
+endif
+
+include $(_d_ThisMki)/nlssvn-ps-info.mki
+	# Introduce definition of default value(NlssvnPsIncDirDefault) for rirInc2ps_<repos>
+
+pir_CommonInclude := CommonLib/common-include
+	# pir: partial dir
+
+LocalDir_CommonInclude = $(dirNlssvn)/$(pir_CommonInclude)
+
+# Additional include directory
+
+gmu_ud_list_PRJ_HEADER += \
+	$(call gmpf_CombinePsSubdirs,$(LocalDir_CommonInclude),$(NlssvnPsIncDirDefault))
+
+
+# Additional checkout
+
+tmp := $(call gmuf_SvnDeclareDefaultTrunk,gpbr_071123_CommonInclude)
+
+CommonInclude_svnUrl = $(call gmuf_MakeSvnRepositoryPath,NLSSVN,/$(pir_CommonInclude)/$(gpbr_071123_CommonInclude))
+CommonInclude_svnLocalDir = $(dirNlssvn)/$(pir_CommonInclude)
+
+gmu_uv_list_SVN_MODULES += CommonInclude
+
+
+
+endif

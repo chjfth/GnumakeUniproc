@@ -1,0 +1,74 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "lib_$(repo_)"=.\lib_$(repo)_dsp\lib_$(repo).dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dll_$(repo_)"=.\dll_$(repo)_dsp\dll_$(repo).dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name lib_$(repo_)
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "$(exe_repo_)"=..\examples\common$(bs)$(exe_repo)$(bs)$(exe_repo).dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name lib_$(repo_)
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "$(exe_repo_usedll_)"=..\examples\common$(bs)$(exe_repo_usedll)$(bs)$(exe_repo_usedll_).dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name dll_$(repo_)
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

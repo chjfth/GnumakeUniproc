@@ -1,0 +1,79 @@
+ifeq (,$(MAKE_RESTARTS)) # only show once on first load.
+
+ifdef gmu_DIR_GNUMAKEUNIPROC
+  include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+  include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
+    NlssvnPrjprosNotUseIncarnation = 1
+  gmu_FREE_STYLE_MAKEFILE = 1 
+  gmu_DO_CHECKOUT = 1
+  gmu_PRJ_NAME = update-dev
+else
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment to use this Makefile)
+endif
+
+ifndef dirNlssvn
+  $(info You should run with option: dirNlssvn=<your-local-nlssvn-root-dir> batfile=[xxx.bat])
+  $(info Example:)
+  $(info $(_GmuSpace4)Makefile-nlsco dirNlssvn=G:/w)
+  $(info $(_GmuSpace4)Makefile-nlsco dirNlssvn=.)
+  $(info If batfile is assigned, use it, else, get(svn export) gpbrnow.bat from server.)
+
+  .PHONY: all
+  all:
+	@echo ""
+else
+
+override dirNlssvn := $(call gmuf_GetAbsPathByRela_soc,$(subst \,/,$(dirNlssvn)))
+$(info Using dirNlssvn=$(dirNlssvn))
+
+# Check out repositories according to content of gpbrnow.bat .
+
+SvnPathExport = makingsys/GMU-addons/trunk/nlscan/gpbr-co/gpbrnow.bat
+cmd_svn_export = svn export --force $(if $(gmu_SC_CHECKOUT_DATETIME),-r "{$(gmu_SC_CHECKOUT_DATETIME)}")\
+  $(call gmuf_GetVarAssertExist,NLSSVN)/$(SvnPathExport) $(batfile)
+
+ifndef batfile
+  # If batfile is null, get it from server and update local file
+  batfile := $(gmu_d_StartupMakefile)/gpbrnow.bat
+  $(info batfile is not assigned, so export gpbrnow.bat from NLSSVN server.)
+  $(info )
+  $(info $(cmd_svn_export))
+  $(info )
+  _ret := $(shell if $(cmd_svn_export) 1>&2; then echo Succ; else echo Fail; fi;)
+  ifeq ($(_ret),Fail)
+    $(error SVN export fail!)
+  endif
+endif
+override batfile := $(subst \,/,$(batfile))
+gpbr_lines := $(call gmuf_GetFileContent_sh,$(batfile))
+ifeq (,$(strip $(gpbr_lines)))
+  $(error Fail to get gpbr list from $(batfile))
+endif
+gpbr_list_keyvalue := $(subst set,,$(gpbr_lines))
+gpbr_list_keyvalue := $(filter-out rem;%,$(gpbr_list_keyvalue))
+gpbr_get_prefix = $(word 1,$(call split,_,$1))_$(word 2,$(call split,_,$1))_
+	# Input:  gpbr_071123_CommonInclude
+	# Return: gpbr_071123
+gpbr_get_repo = $(patsubst $(call gpbr_get_prefix,$1)%,%,$1)
+	# Input:  gpbr_071123_CommonInclude
+	# Return: CommonInclude
+repo_list := $(foreach p,$(gpbr_list_keyvalue),$(call gpbr_get_repo,$(firstword $(call split,=,$p))))
+	# p implies key-value pair
+
+#$(call gmuf_OutputInfo,Will checkout the following gpbr:)
+#$(foreach r,$(gpbr_list_keyvalue),$(call gmuf_OutputInfo,  $r))
+$(call gmuf_AnounceExportEnvvars,$(gpbr_list_keyvalue))
+
+
+$(foreach r,$(repo_list),$(call NlssvnWantCheckout,$r))
+
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
+
+endif # ifndef dirNlssvn
+
+
+else
+  all: ; @echo "All check-out Done."
+endif # ifeq (,$(MAKE_RESTARTS)) # only show once on first load.
+

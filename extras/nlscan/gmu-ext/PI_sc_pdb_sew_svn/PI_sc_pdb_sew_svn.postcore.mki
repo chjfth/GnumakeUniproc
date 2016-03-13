@@ -1,0 +1,94 @@
+
+# Check for mandatory params and set default params
+
+ifeq (,$(strip $(gmi_SCPSS_ud_PDB)))
+  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_ud_PDB is not assigned)
+endif
+
+ifeq (,$(strip $(gmi_SCPSS_ud_source)))
+  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_ud_source is not assigned)
+endif
+
+ifeq (,$(strip $(gmi_SCPSS_PRODUCT_NAME)))
+  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_PRODUCT_NAME is not assigned)
+endif
+
+ifeq (,$(strip $(gmi_SCPSS_SYMSTORE_TARGET_DIR)))
+  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_SYMSTORE_TARGET_DIR is not assigned)
+endif
+
+DefaultSvnhostTable := $(gmu_DIR_ROOT)/nlscan/svnhosttable.txt
+ifeq (,$(strip $(gmi_SCPSS_SVNHOST_TABLE)))
+  gmi_SCPSS_SVNHOST_TABLE = $(DefaultSvnhostTable)
+  ifeq (,$(call gmuf_IsFileExist_sh,$(gmi_SCPSS_SVNHOST_TABLE)))
+    $(error !Error from PI_sc_pdb_sew_svn: SVN host table file '$(gmi_SCPSS_SVNHOST_TABLE)' does not exist)
+  endif
+endif
+
+ifeq (,$(strip $(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL)))
+  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = https://nlssvn/svnreps/makingsys/GMU-addons/trunk/nlscan/reposie-nlssvn.txt
+endif
+
+ifeq (,$(strip $(gmu_SC_CHECKOUT_DATETIME)))
+  $(error !Error from PI_sc_pdb_sew_svn: You must assign a valid gmu_SC_CHECKOUT_DATETIME value, so that\
+ we can arrange an exact SVN export/checkout datetime for you)
+endif
+
+########
+
+
+
+cmd_collet_svn_reposie_table = \
+	$(foreach url,$(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL),svn cat $(url) > $(_gmi_SCPSS_tmpdir)/$(call gmuf_LastWordBySpc,$(url),/) &&) true
+
+pycmd_ssindex = scalacon-ssindex-svn.py\
+  --dir-pdb=$(gmi_SCPSS_ud_PDB)\
+  --dir-source=$(gmi_SCPSS_ud_source)\
+  --datetime-co="$(gmu_SC_CHECKOUT_DATETIME)"\
+  --svnhost-table=$(gmi_SCPSS_SVNHOST_TABLE)\
+  --dir-reposie-table="$(_gmi_SCPSS_tmpdir)" $(if $(gmi_SCPSS_ALLOW_LOOSY_REPOSIE),--loosy-reposie-table)\
+  --svn-use-export\
+ $(if $(gmi_SCPSS_SAVE_SSTREAMS_DIR),--save-sstreams-dir=$(gmi_SCPSS_SAVE_SSTREAMS_DIR))\
+ $(if $(gmi_SCPSS_PICK_CHERRIES),--pick-cherries=$(gmi_SCPSS_PICK_CHERRIES))\
+ $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR),--pick-sstreams-dirs=$(gmi_SCPSS_PICK_SSTREAMS_DIR))\
+ $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI),--pick-sstreams-dirs-from-ini=$(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI))\
+ $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN),--pick-sstreams-dir-sdkin=$(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN))\
+ $(if $(gmi_SCPSS_SRC_MAPPING_FROM_INI),--src-mapping-from-ini=$(gmi_SCPSS_SRC_MAPPING_FROM_INI))\
+  --logfile=$(_gmi_SCPSS_tmpdir)/scalacon-ssindex.log
+
+pycmd_symstore = scalacon-symstore.py\
+  --dir-scan=$(gmi_SCPSS_ud_PDB)\
+  --dir-store=$(gmi_SCPSS_SYMSTORE_TARGET_DIR)\
+  --product-name="$(gmi_SCPSS_PRODUCT_NAME)"\
+  --product-ver="$(if $(gmi_SCPSS_PRODUCT_VER),$(gmi_SCPSS_PRODUCT_VER),not-set)"\
+  --pattern-include="*.pdb"\
+  --pattern-exclude="*.lib.pdb/vc?0.pdb/vc??0.pdb"\
+  --tmpdir=$(_gmi_SCPSS_tmpdir) 
+
+
+.PHONY: gmit_SCPSS_SEW_PDB
+gmit_SCPSS_SEW_PDB:
+	@echo "PI_sc_pdb_sew_svn: Working start..."
+	@$(call gmuf_MkdirIfNotExist,$(_gmi_SCPSS_tmpdir))
+
+	@echo "PI_sc_pdb_sew_svn: Gathering SVN reposie table to temp dir..."
+	@$(call _DoVerbose1,echo "$(call _TrShcmd4echo,$(cmd_collet_svn_reposie_table))")
+	@$(cmd_collet_svn_reposie_table)
+	@	# This above shcmd is not a .py, so we don't use gmuf_ScriptCmd .
+	
+	@echo "PI_sc_pdb_sew_svn: Scanning and sewing svn export command to PDBs..."
+	@$(call _DoVerbose1,echo "$(call _TrShcmd4echo,$(pycmd_ssindex))")
+	@$(call gmuf_ScriptCmd,$(pycmd_ssindex))
+	@echo ""
+	
+	@echo "PI_sc_pdb_sew_svn: Storing sewed PDBs to symbol store $(call _TrShcmd4echo,$(gmi_SCPSS_SYMSTORE_TARGET_DIR)) ..."
+	@$(call _DoVerbose1,echo "$(call _TrShcmd4echo,$(pycmd_symstore))")
+	@$(call gmuf_MkdirIfNotExist,$(gmi_SCPSS_SYMSTORE_TARGET_DIR))
+	@$(if $(gmi_SCPSS_SYMSTORE_CLEAN_FIRST),rm -fr $(gmi_SCPSS_SYMSTORE_TARGET_DIR)/*)
+	@$(if $(gmi_SCPSS_SYMSTORE_3TIER),\
+		echo "" > $(gmi_SCPSS_SYMSTORE_TARGET_DIR)/index2.txt,\
+		$(call gmuf_RemoveFileIfExist,$(gmi_SCPSS_SYMSTORE_TARGET_DIR)/index2.txt))
+	@$(call gmuf_ScriptCmd,$(pycmd_symstore))
+	@echo ""
+
+	@echo "PI_sc_pdb_sew_svn: Working done."

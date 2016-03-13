@@ -1,0 +1,75 @@
+ifndef __PLUGIN_850APP_LIB_LOADED
+__PLUGIN_850APP_LIB_LOADED = 1
+
+_pluginId_850APP_LIB := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: UAPP
+
+# Make-vars provided by this plugin:
+
+# gmi_UBAPP_d_INCLUDE
+	# Tells where the include dir is for ubase app.
+# gmi_UBAPP_d_PUBLIC_LIB
+	# Tells where the public lib dir is for ubase app.
+
+#gmi_CTCH_COMPILER_PIR = msvc+armcpp [2011-10-31] This is a historical bad idea, only used with GnumakeUniproc 0.97 and 0.97.1
+
+ifeq (,$(_isNowGmuGetPrjAttr))
+  gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_850APP_LIB),postcore)
+endif
+
+ifdef NLSSVN_ALL_SOURCE # [2008-12-10]
+  gmu_DECO_SUFFIX_PRJ_NAME += _nlsas
+	# nlsas: nls all source
+endif
+
+
+ifndef gmi_UAPP_TargetPt # IT_850APP_uBaseIII may have already defined this
+  gmi_UAPP_TargetPt = $(if $(call gmuf_IsStringEqual,$(gmp_COMPILER_ID),msvc),emu,arm)
+	# Check compile target:
+	# arm=ARM machine
+	# emu=Windows emulator
+  gmi_UAPP_isTargetReal = $(if $(call gmuf_IsStringEqual,$(gmi_UAPP_TargetPt),arm),1)
+endif
+
+# [2007-01-31] Yes: To use this plugins, you must have uTools2 installed.
+
+ifeq (,$(UTOOLSDIR))
+  $(error !Error from $(_pluginId_850APP_LIB): Env-var `UTOOLSDIR' not defined)
+endif
+
+UTOOLSDIR := $(subst \,/,$(UTOOLSDIR))
+
+ifeq (,$(wildcard $(UTOOLSDIR)))
+  $(error !Error from $(_pluginId_850APP_LIB): UTOOLSDIR=$(UTOOLSDIR), but that directory does not exist)
+	#[2007-01-22]Special NOTE: To guarantee success, the last dir component of $(UTOOLSDIR)
+	#should exactly match what is stored on Windows file system. Example:
+	# Your filesystem has:
+	#	C:\nlscan\uTools2
+	# You should set UTOOLSDIR to:
+	#	C:\nlscan\uTools2
+	# or
+	#	c:\NLSCAN\uTools2
+	# or
+	#	C:/nlscan/uTools2
+	# But not:
+	#	C:\nlscan\UTOOLS2
+endif
+
+gmi_UBAPP_d_INCLUDE = $(UTOOLSDIR)/target/public/include
+gmi_UBAPP_d_NL850_LIB = $(UTOOLSDIR)/target/nl850/lib
+gmi_UBAPP_d_PUBLIC_LIB = $(UTOOLSDIR)/target/public/lib
+	#	[2007-03-28] Although, [ when building a LIB, no need to link other libs, hence no need 
+	# for this path ], yet this info should better be presented to user. For example, 850GrandTest's
+	# lib projects want to sync there output(libs) to $(gmi_UBAPP_d_PUBLIC_LIB), so this var is 
+	# desired.
+
+gmp_CFLAGS_MACRO_DEFS += -D___NLS850___
+	# This define(___NLS850___) makes it specific to 850 app.
+
+ifeq (,$(gmi_UAPP_isTargetReal))
+  gmp_CFLAGS_CODE_GEN += $(addprefix -D,_WINDOWS _AFXDLL)
+endif
+
+#/nologo /MD /W3 /GR /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /D "___NLS850___" /Fp"Release/test_850RW.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+
+endif # ifndef __PLUGIN_850APP_LIB_LOADED

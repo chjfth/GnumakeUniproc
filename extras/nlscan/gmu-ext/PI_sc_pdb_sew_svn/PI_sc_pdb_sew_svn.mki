@@ -1,0 +1,125 @@
+ifndef __PLUGIN_SC_PDB_SEW_SVN_LOADED
+__PLUGIN_SC_PDB_SEW_SVN_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+_pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: SCPSS
+	# _SC_ means scalacon.
+
+# This plugin calls my scalacon-ssindex-svn.py and scalacon-symstore.py to do:
+# * Scan PDBs in an input directory(gmi_SCPSS_ud_PDB), and find their associating
+#   source files(.c .cpp etc).
+# * For those source files, find out those beneath gmi_SCPSS_ud_source.
+# * Deduce the exact svn command to export/checkout any specific source file.
+# * Sew the svn commands into PDBs. (PDBs get modified)
+# * Push the modified PDBs into a symbol store location(by gmi_SCPSS_SYMSTORE_TARGET_DIR).
+
+
+# How to make this plugin work?
+# [step1] Load this plugin with 
+#
+#	gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
+#
+# [step2] Define mandatory and optional input variables(listed later).
+#
+# [step3] Put target 'gmit_SCPSS_SEW_PDB' into make dependency chain. e.g. 
+#
+#	gmp_USER_POST_TARGETS += gmit_SCPSS_SEW_PDB
+#
+#### Practical suggestion:
+# For test builds, you may not want to do symstore. You may apply 
+# gmit_SCPSS_SEW_PDB conditionally, for example:
+#
+#	gmp_USER_POST_TARGETS += $(if $(gmi_SCPSS_ENABLE_SEW_PDB),gmit_SCPSS_SEW_PDB)
+#
+# Then, only by defining gmi_SCPSS_ENABLE_SEW_PDB=1 in your env will 
+# PI_sc_pdb_sew_svn come into action.
+#
+# Another question: how can I carry out PI_sc_pdb_sew_svn action solely
+# without building the actual project?
+# OK. by passing gmu_NO_MAKE_SUBPRJS=1 as well as gmi_SCPSS_ENABLE_SEW_PDB=1 
+# to umake to accomplish that.
+#
+# Note: gmi_SCPSS_ENABLE_SEW_PDB is a suggested make-var, not a mandatory 
+# input variable defined by this plugin.
+
+
+# User input vars:
+
+# gmi_SCPSS_ud_PDB = 
+	# (must)
+	# The directory to scan PDBs.
+
+# gmi_SCPSS_ud_source = 
+	# (must)
+	# Tells a local source directory.
+	# For those source files recorded in PDB('srctool -r xxx.pdb' knows it), I will only 
+	# sew those within $(gmi_SCPSS_ud_source). Therefore, those source files from Microsoft,
+	# like
+	#	f:\sp\vctools\crt_bld\self_x86\crt\src\wchtodig.c
+	#	f:\sp\vctools\crt_bld\self_x86\crt\src\atox.c
+	# will not be considered.
+	#
+	# In practice, we'll use sandbox root corresponding to https://nlssvn/svnreps .
+	
+# gmi_SCPSS_PRODUCT_NAME = 
+	# (must)
+	# The product name (a free string).
+
+# gmi_SCPSS_PRODUCT_VER = 
+	# (optional)
+	# The product version string.
+
+# gmi_SCPSS_SYMSTORE_TARGET_DIR = 
+	# (must)
+	# symstore target dir( -s option for symstore.exe ).
+	# This can be a UNC path.
+	#
+	# Example:
+	#	D:\devshare\tmpSymbols
+	#	\\winshad0\devshare\tmpSymbols
+
+# gmi_SCPSS_SYMSTORE_CLEAN_FIRST =
+	# (optional)
+	# If non-null, gmi_SCPSS_SYMSTORE_TARGET_DIR will be cleaned first.
+
+# gmi_SCPSS_SYMSTORE_3TIER =
+	# (optional)
+	# If non-null, $(gmi_SCPSS_SYMSTORE_TARGET_DIR)/index2.txt will be created,
+	# so that it becomes a 3-tier symbol-store.
+
+# gmi_SCPSS_SVNHOST_TABLE =
+	# (optional)
+	# If null, I'll use $(gmu_DIR_ROOT)/nlscan/svnhosttable.txt
+	# If set, this may be an SVN URL and scalacon-ssindex-svn.py with cope with that SVN URL. 
+
+# gmi_SCPSS_list_REPOSIE_TABLE_SVNURL =
+	# (optional)
+	# This tells one or more SVN URLS that describe "reposie table" for sewing.
+	# These URLs will be svn cat to the plugin dir.
+	# If null, we'll just use 
+	#	https://nlssvn/svnreps/makingsys/GMU-addons/nlscan/reposie-nlssvn.txt
+
+# gmi_SCPSS_SAVE_SSTREAMS_DIR = <ssdir>
+# gmi_SCPSS_PICK_CHERRIES = <cherry1>,<cherry2>,...
+# gmi_SCPSS_PICK_SSTREAMS_DIR = <pickdir1>,<pickdir2>,...
+# gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI = <inifilepath>
+# gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN = <dirsdkin>
+# gmi_SCPSS_SRC_MAPPING_FROM_INI = <inifilepath>,<[global]>,<examples_dir>,<examples_copyto>
+	# (optional)
+	# This value is passed to scalacon-ssindex-svn.py via options:
+	# Check scalacon-ssindex-svn.py's comment to get the usage.
+
+# gmi_SCPSS_ALLOW_LOOSY_REPOSIE =
+	# (optional)
+	# If non-null, pass --loosy-reposie-table to scalacon-ssindex-svn.py .
+
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,PI_sc_pdb_sew_svn,postcore)
+
+_gmi_SCPSS_tmpdir = $(gmu_Gd_PRJ_GMUTMP)/PI_sc_pdb_sew_svn
+
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+endif #__PLUGIN_SC_PDB_SEW_SVN_LOADED

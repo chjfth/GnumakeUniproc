@@ -1,0 +1,232 @@
+ifndef __NLSCAN_NLSSVN_PRJPROPS_INCLUDED_
+__NLSCAN_NLSSVN_PRJPROPS_INCLUDED_ := 1
+
+##############################################################################
+# This file is to be included by nlssvn-prjs.mki .
+# Check nlssvn-prjs.mki for some more detail.
+##############################################################################
+
+### Properties each repository(abbr. repo) has to announce:
+### For every <repo>:
+# gpbr_<repo>: Name(env-var name) indicating the branch to use for that repo.
+# pir_<repo>: Partial dir of the repo, i.e. the dir components starting from $NLSSVN
+#			to the repo real location.
+# rirInc_<repo>: Include directories for its user(Relative to dirNlssvn).
+#			These dirs will be added to gmu_ud_list_PRJ_HEADER for the calling makefile.
+# rirInc2_<repo>, rirInc2ps_<repo>: 
+#			Combinations of rirInc2_<repo>/rirInc2ps<repo> will be added to gmu_ud_list_PRJ_HEADER.
+# umakefile_<repo>sel :
+#			This tells where the makefile is for a repository.
+#			If there are multiple makefiles provided by a repository serving multiple purposes,
+#			(e.g. a Makefile for making LIB, another Makefile for making DLL)
+#			the *sel* suffix is used to distinguish which makefile to use.
+#			Benefit: End-makefile-users are now relieve from writing complete(often very long)
+#			makefile path, instead, users can now use a short *sel* string telling which makefile
+#			they want to use. Also, when the xxx makefile changes its makefile path, we
+#			ONLY need to change this file to make all dependent project to work again.
+
+
+define _ScalaconDefaultIncMake
+  rirInc_$1 := libsrc/include
+  umakefile_$1-lib := libsrc/makelib/Makefile
+  umakefile_$1-dll := libsrc/makedll/Makefile
+  umakefile_$1-sdkmsvc := make-sdk/sdk-msvc-all/Makefile
+  umakefile_$1-sdklinuxgcc := make-sdk/sdk-linuxgcc-all/Makefile
+endef
+ScalaconDefaultIncMake = $(eval $(call _ScalaconDefaultIncMake,$1))
+
+# (Please sort following repo by gpbr timeline, e.g. gpbr_080722_1snc in front of gpbr_080727_IThreadSync)
+
+##############################################################################
+#### repo: uBaseIII
+##############################################################################
+gpbr_uBaseIII := gpbr_071119_uBaseIII
+ pir_uBaseIII := uBase-III
+ rirInc_uBaseIII := Common/include
+umakefile_uBaseIII-850krnl :=   bsp/Target850s/make/850Krnl/make.armcpp/Makefile
+umakefile_uBaseIII-850applib := bsp/Target850s/make/AppLib/make.armcpp/Makefile
+umakefile_uBaseIII-all := make-all/85x-krnl-all/Makefile
+
+
+##############################################################################
+#### repo: 850Shell (a container)
+##############################################################################
+#$(call gmuf_SvnDeclareDefaultTrunk,gpbr_071119_850Shell) // seem not a must, just $(call NlssvnUse,<it>) will accomplish that
+gpbr_850Shell := gpbr_071119_850Shell
+ pir_850Shell := 800Demos/850Shell
+umakefile_850Shell := make-all/all.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: UFC
+##############################################################################
+gpbr_UFC := gpbr_071119_UFC
+ pir_UFC := uBaseLibs/UFC
+ rirInc_UFC := include
+umakefile_UFC-middle := build/middle/middle.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: uTools
+##############################################################################
+gpbr_uTools := gpbr_071120_uTools
+ pir_uTools := DesktopApps/uTools
+umakefile_uTools := make-all/Makefile
+
+
+##############################################################################
+#### repo: CommonInclude
+##############################################################################
+gpbr_CommonInclude := gpbr_071123_CommonInclude
+ pir_CommonInclude := CommonLib/common-include
+  rirInc2_CommonInclude := .
+umakefile_CommonInclude-copy-to-sdk := copy-to-sdk/Makefile
+
+##############################################################################
+#### repo: jthread
+##############################################################################
+gpbr_jthread := gpbr_071123_jthread
+ pir_jthread := Isyslib/Jthread
+  rirInc2_jthread := include
+umakefile_jthread-lib = make/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_jthread-lib-mswin = make/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_jthread-lib-ubase = make/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+umakefile_jthread-lib-ubaseWinEmu = make/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: IUartBasic
+##############################################################################
+gpbr_IUartBasic := gpbr_071126_IUartBasic
+ pir_IUartBasic := Isyslib/IUartBasic
+$(call ScalaconDefaultIncMake,IUartBasic)
+#umakefile_IUartBasic-lib-ubase := make/lib-ubase.$(gmp_COMPILER_ID)/Makefile # obsolete since GMU 0.97
+
+##############################################################################
+#### repo: IFileBasic
+##############################################################################
+gpbr_IFileBasic := gpbr_071126_IFileBasic
+ pir_IFileBasic := Isyslib/IFileBasic
+  rirInc_IFileBasic := include
+umakefile_IFileBasic-lib := make/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_IFileBasic-lib-ubase := make/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+#umakefile_IFileBasic-dll = make/dll-from-lib.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: uEasyCom
+##############################################################################
+gpbr_uEasyCom := gpbr_071128_uEasyCom
+ pir_uEasyCom := CommuLib/uEasyCom
+  rirInc2_uEasyCom := include
+umakefile_uEasyCom-lib = make/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_uEasyCom-lib-ubase = make/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: IEasyPipe
+##############################################################################
+gpbr_IEasyPipe := gpbr_071128_IEasyPipe
+ pir_IEasyPipe := Isyslib/IEasyPipe
+  rirInc2_IEasyPipe := include
+umakefile_IEasyPipe-libUartPipe = make/lib-UartPipe/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_IEasyPipe-libUartPipe-ubase = make/lib-UartPipe/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+umakefile_IEasyPipe-libUSBPipe-mswin = make/lib-USBPipe-mswin/lib.$(gmp_COMPILER_ID)/Makefile
+umakefile_IEasyPipe-libUSBPipe-ubase = make/lib-UsbPipe-ubase/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+umakefile_IEasyPipe-libUSBPipe-linux = make/lib-UsbPipe-linux/Makefile.umk
+umakefile_IEasyPipe-dllUartPipe = make/dll-UartPipe/dll.$(gmp_COMPILER_ID)/Makefile
+umakefile_IEasyPipe-dllUSBPipe = make/dll-UsbPipe/dll.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: WebComm
+##############################################################################
+gpbr_WebComm := gpbr_071209_WebComm
+ pir_WebComm := CommuLib/WebComm
+rirInc_WebComm := include
+umakefile_WebComm-ubase := make/webcomm/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: mm_snprintf
+##############################################################################
+gpbr_mmsnprintf := gpbr_071211_mmsnprintf
+ pir_mmsnprintf := CommonLib/mm_snprintf
+$(call ScalaconDefaultIncMake,mm_snprintf)
+
+##############################################################################
+#### repo: udp_op
+##############################################################################
+gpbr_udp_op := gpbr_080428_udp_op
+ pir_udp_op := CommuLib/udp_op
+umakefile_udp_op-dll := udp_op_lib/make/dll.msvc/Makefile
+
+
+##############################################################################
+#### repo: 1snc
+##############################################################################
+gpbr_1snc := gpbr_080722_1snc
+ pir_1snc := CommuLib/1snc
+rirInc_1snc := libsrc/include
+umakefile_1snc-lib-tcp = libsrc/makelib-tcp/Makefile
+umakefile_1snc-dll-tcp = libsrc/makedll-tcp/Makefile
+umakefile_1snc-sdkmsvc = make-sdk/sdk-msvc-all/Makefile
+umakefile_1snc-sdklinuxgcc = make-sdk/sdk-linuxgcc-all/Makefile
+
+##############################################################################
+#### repo: IThreadSync
+##############################################################################
+gpbr_IThreadSync := gpbr_080727_IThreadSync
+ pir_IThreadSync := Isyslib/IThreadSync
+$(call ScalaconDefaultIncMake,IThreadSync)
+umakefile_IThreadSync_ubase = libsrc/makelib/Makefile
+	#[2008-10-17] Later, please use _IThreadSync-linux instead of _IThreadSync_linux
+
+
+##############################################################################
+#### repo: gadgetlib
+##############################################################################
+gpbr_gadgetlib := gpbr_080812_gadgetlib
+ pir_gadgetlib := CommonLib/gadgetlib
+$(call ScalaconDefaultIncMake,gadgetlib)
+umakefile_gadgetlib-ubase := libsrc/makelib/lib-ubase.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: IPeekFifoQueue
+##############################################################################
+gpbr_IPeekFifoQueue := gpbr_080812_IPeekFifoQueue
+ pir_IPeekFifoQueue := CommonLib/IPeekFifoQueue
+$(call ScalaconDefaultIncMake,IPeekFifoQueue)
+
+##############################################################################
+#### repo: AnsiC_Tfuncs
+##############################################################################
+gpbr_AnsiC_Tfuncs := gpbr_080902_AnsiC_Tfuncs
+ pir_AnsiC_Tfuncs := CommonLib/AnsiC_Tfuncs
+rirInc_AnsiC_Tfuncs := libsrc/include
+umakefile_AnsiC_Tfuncs-lib := libsrc/makelib/Makefile
+umakefile_AnsiC_Tfuncs-dll := libsrc/makedll/Makefile
+
+
+##############################################################################
+#### repo: lib_paramconf (This lib only valid on 850UFC)
+##############################################################################
+gpbr_lib_paramconf := gpbr_081204_lib_paramconf
+ pir_lib_paramconf := 800Demos/lib_paramconf
+rirInc_lib_paramconf := .
+umakefile_lib_paramconf := make/ubase.$(gmp_COMPILER_ID)/Makefile
+
+##############################################################################
+#### repo: walkdir
+##############################################################################
+gpbr_walkdir := gpbr_100415_walkdir
+ pir_walkdir := CommonLib/walkdir
+$(call ScalaconDefaultIncMake,walkdir)
+
+##############################################################################
+#### repo: expat
+##############################################################################
+gpbr_expat := gpbr_110516_expat
+ pir_expat := alien/expat
+ rirInc_expat := libsrc/official/lib
+umakefile_expat-lib := libsrc/makelib/Makefile
+umakefile_expat-dll := libsrc/makedll/Makefile
+umakefile_expat-sdkmsvc = make-sdk/sdk-msvc-all/Makefile
+umakefile_expat-sdklinuxgcc = make-sdk/sdk-linuxgcc-all/Makefile
+
+
+
+endif # __NLSCAN_NLSSVN_PRJPROPS_INCLUDED_

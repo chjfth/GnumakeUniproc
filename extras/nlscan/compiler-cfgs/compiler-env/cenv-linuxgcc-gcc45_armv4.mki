@@ -1,0 +1,26 @@
+ifndef __cenv_linuxgcc_gcc45_armv4_env_included_
+__cenv_linuxgcc_gcc45_armv4_env_included_ := 1
+
+
+# For linuxgcc(gcc 4.5) compiling Linux programs
+
+ifeq (,$(gmp_CENV_ROOT_linuxgcc_gcc45_armv4))
+  $(error !GMP!Error: gmp_CENV_ROOT_linuxgcc_gcc45_armv4 is not defined, so I cannot find linuxgcc,gcc45_armv4 compiler)
+endif
+
+
+in_gmpf_LoadCenv_linuxgcc_gcc45_armv4 = \
+	PATH=$1/bin:$(PATH) \
+	gmp_GCC_PREFIX=arm-none-linux-gnueabi-
+
+gmpf_LoadCenv_linuxgcc_gcc45_armv4 = $(call in_gmpf_LoadCenv_linuxgcc_gcc45_armv4,$(gmp_CENV_ROOT_linuxgcc_gcc45_armv4))
+
+define def_ExportCenv_linuxgcc_gcc45_armv4
+  $(call gmuf_AnounceExportEnvvars,$(call in_gmpf_LoadCenv_linuxgcc_gcc45_armv4,$(gmp_CENV_ROOT_linuxgcc_gcc45_armv4)))
+endef
+
+gmpf_ExportCenv_linuxgcc_gcc45_armv4 = $(eval $(gmpf_LoadCenv_linuxgcc_gcc45_armv4))
+
+
+
+endif

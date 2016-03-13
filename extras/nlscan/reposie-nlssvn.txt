@@ -1,0 +1,12 @@
+CommonLib/common-include	gpbr_071123_CommonInclude
+CommonLib/mm_snprintf	gpbr_071211_mmsnprintf
+CommonLib/gadgetlib	gpbr_080812_gadgetlib
+CommonLib/AnsiC_Tfuncs	gpbr_080902_AnsiC_Tfuncs
+CommonLib/IPeekFifoQueue gpbr_080812_IPeekFifoQueue
+
+Isyslib/IUartBasic	gpbr_071126_IUartBasic
+Isyslib/IThreadSync	gpbr_080727_IThreadSync
+
+CommuLib/1snc	gpbr_080722_1snc
+
+alien/expat gpbr_110516_expat

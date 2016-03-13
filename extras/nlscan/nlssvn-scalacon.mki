@@ -1,0 +1,59 @@
+ifndef __nlssvn-scalacon-mki-included__
+__nlssvn-scalacon-mki-included__ := 1
+
+ifndef gmu_DIR_GNUMAKEUNIPROC
+  $(error gmu_DIR_GNUMAKEUNIPROC is not defined, You have to set up GnumakeUniproc environment first)
+endif
+
+include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
+
+include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
+
+
+
+############################################################################
+# Global compiler-specific settings below.
+# If Scalacon later adds support for more compilers, this should be updated.
+############################################################################
+
+### >>> something for all compilers now
+
+  NLSSDK_the_prefix = $(if $(NLSSDK_fs),$(NLSSDK_fs),NLSSDK_fs__not_defined)
+  SDKLIB_CV = $(gmp_COMPILER_ID_VER)/lib
+  	  # CV: Compiler with Version
+
+  NlssdkIncludeDirs = $(NLSSDK_the_prefix)/include
+
+  NlssdkLibSearchDirs = $(NLSSDK_the_prefix)/$(SDKLIB_CV)
+
+### <<< something for all compilers now
+
+ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+  # Microsoft msvc, wince compiler 
+
+  UserDllNameForLink = $(call gmpf_MakeDllNameForLink,$1$(gmp_G_USuffixByBc)--imp)
+	# For $1=@(repo) :
+	# @(repo)--imp.lib or @(repo)_U--imp.lib (on Windows)
+  NlssdkDllSearchDirs = $(NlssdkLibSearchDirs)
+  UserLibNameForLink = $(call gmpf_MakeLibName,$1$(gmp_G_UDSuffixByBc))
+	# For $1=@(repo) :
+	# @(repo).lib , @(repo)_D.lib , @(repo)_U.lib or @(repo)_U_D.lib
+
+else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
+  # GCC compiling linux program
+
+  UserDllNameForLink = $(call gmpf_MakeUpSysLibsToLink,$1$(gmp_G_USuffixByBc))
+	# For $1=@(repo) :
+	# -l@(repo) or -l@(repo)_U.so  (on Linux)
+  NlssdkDllSearchDirs = $(NLSSDK_fs)/$(gmp_COMPILER_ID_VER)/$(if $(gmp_bc_DEBUG),bin-debug,bin-release)
+  UserLibNameForLink = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_UDSuffixByBc))
+	# For $1=@(repo) :
+	# -l@(repo)_s , -l@(repo)_s_D , -l@(repo)_s_U or -l@(repo)_s_U_D
+
+else # ... some other gmp_COMPILER_ID processing ...
+
+endif # ifeq, $(gmp_COMPILER_ID)=xxx
+
+
+
+endif # ifndef __nlssvn-scalacon-mki-included__

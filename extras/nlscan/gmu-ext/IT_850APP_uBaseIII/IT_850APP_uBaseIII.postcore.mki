@@ -1,0 +1,118 @@
+
+gmif_UBAPP_AddWin32Lib = $(if $(gmp_bc_DEBUG),$(addsuffix $1.lib,$2),$(addsuffix .lib,$2))
+	# $2: lib list( no d or _d suffix ). $1: suffix to add
+
+ifeq (,$(gmi_UAPP_isTargetReal)) # win32-emulator
+  gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,ws2_32)
+  gmp_bc_SYSLIBS += $(call gmif_UBAPP_AddWin32Lib,d, UFC850 libemu850 EMUDLL850) \
+	$(call gmif_UBAPP_AddWin32Lib,_D, WebCommLib tinyxml ubcppadd)
+# lib_paramconfD.lib ubcppaddD.lib libemu850.lib UFC850.lib EMUDLL850.lib NLDECOMPLIB_r.lib WebCommLib_r.lib WSock32.lib 
+else # // armcpp
+  gmp_bc_SYSLIBS += $(addprefix $(gmi_UBAPP_d_850_LIB)/,UFC850.alf Applib.alf)
+  gmp_bc_SYSLIBS += $(addprefix $(gmi_UBAPP_d_PUBLIC_LIB)/,\
+	zlib.alf sharelib.alf scannerlib.alf WebCommLib.alf tinyxml.alf ubcppadd.alf Unichar.alf \
+	jthread.alf IThreadSync.alf \
+	IFileBasic.alf IUartBasic.alf EasyUartPipe.alf EasyUSBPipe.alf uEasyCom.alf uEasyFile_Server.alf)
+endif
+
+# For user adding LIB/ALF convenience:
+gmif_UBAPP_req_public_lib = $(if $(gmi_UAPP_isTargetReal),\
+	$(patsubst %,$(gmi_UBAPP_d_PUBLIC_LIB)/%.$(gmp_extn_LIB),$1), \
+	$(call gmif_UBAPP_AddWin32Lib,_D,$1))
+	# $1: Lib name, without ext-name.
+gmif_UBAPP_req_850_lib = $(if $(gmi_UAPP_isTargetReal),\
+	$(patsubst %,$(gmi_UBAPP_d_850_LIB)/%.$(gmp_extn_LIB),$1), \
+	$(call gmif_UBAPP_AddWin32Lib,_D,$1))
+	# $1: Lib name, without ext-name.
+  #The return value of the above gmif_UBAPP_req_XXX_lib can be assigned to gmp_bc_EXTRALIBS or gmp_bc_SYSLIBS.
+
+
+# Check some necessary programs :
+
+_p_GenUToolsRes = $(dir $(SHELL))GenUToolsRes.exe
+ifeq '' '$(wildcard $(_p_GenUToolsRes))'
+  $(warning ! $(_p_GenUToolsRes) not exist, resource cannot be compiled into uTools programs)
+endif
+
+
+############################################
+
+ifneq (,$(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT))
+  _p_uToolsRes_rc = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT))
+  _p_uToolsRes_cpp = $(dir $(_p_uToolsRes_rc))uToolsRes.cpp
+endif
+
+define _GenUeFromBin
+	$(UTOOLSDIR)/uWarp $(gmu_Gp_LINK_OUTPUT) -o $(gmp_USER_FIRST_TARGET) $(if $(UTOOLSVER),-utoolsverstr "$(UTOOLSVER)")
+endef
+# 		UTOOLSVER env-var is introduced in 2.03.015. 
+
+############################################
+
+########## >>> Dependency rule: The emu-exe requires Emu850.cpp to be compiled and linked.
+ifeq (msvc,$(gmp_COMPILER_ID))
+
+Compile_emu850_cpp = $(gmu_u_CXX_CMD) #$(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) /Fo"$@" $<
+
+p_Emu850obj = $(gmu_Gd_OBJ_OUTPUT)/Emu850.obj
+
+gmu_up_list_EXTRA_OBJ_TO_LINK += $(p_Emu850obj)
+
+$(gmu_Gp_LINK_OUTPUT): $(p_Emu850obj)
+
+$(p_Emu850obj): $(UTOOLSDIR)/target/nl850/Emu850/Emu850.cpp
+ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
+	$(Compile_emu850_cpp)
+else
+	@$(Compile_emu850_cpp)
+endif
+
+endif
+########## <<<
+
+########## >>> Dependency rule: All objs depend on uToolsRes.cpp . And .ue generation 
+ifneq (msvc,$(gmp_COMPILER_ID))
+ifneq (,$(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT))
+
+$(gmu_Gp_AllSrcListToObjList): $(_p_uToolsRes_cpp)
+
+#	[2007-03-27] Well, if $(_p_uToolsRes_cpp) is null, leaving only a colon on a line,
+# it's no problem on GNUmake 3.80 or 3.81, which is just ignored by GNUmake.
+$(_p_uToolsRes_cpp): $(_p_uToolsRes_rc)
+	@(\
+	echo "  In dir $(@D) , generating uToolsRes.cpp from $(<F)"; \
+	if cd $(@D); then true; else echo "Cannot cd to $(@D)"; exit 1; fi; \
+	GenUToolsRes .\\ $(notdir $(_p_uToolsRes_rc)) \
+	)
+
+endif # ifneq (,$(gmi_UBAPP_up_UTOOLS_RESOURCE_RC_FROM_ROOT))
+
+$(gmp_USER_FIRST_TARGET): $(gmu_Gp_LINK_OUTPUT_ckt)
+ifeq (,$(gmu_DO_SHOW_LINK_CMD))
+	@$(_GenUeFromBin)
+else
+	$(_GenUeFromBin)
+endif
+	@echo -e "\n***** uBase app image(.ue) generated: $(patsubst $(CURDIR)/%,./%,$@) *****"
+
+endif
+########## <<<
+
+
+########## >>> Syncing project output 
+
+_d_SyncOutputTo = $(gmu_ud_SRC_ROOT)/$(gmi_UAPP_ud_DoSyncOutputTo)
+
+.PHONY: _gmi_UAPP_SyncOutput
+_gmi_UAPP_SyncOutput: 
+ifneq (,$(gmi_UAPP_ud_DoSyncOutputTo))
+	@$(call _MkdirIfNotExist,$(_d_SyncOutputTo))
+  ifeq (,$(gmi_UAPP_isTargetReal)) # win32-emulator
+	cp -u $(gmu_Gp_LINK_OUTPUT) $(_d_SyncOutputTo)
+	$(if $(strip $(gmi_SDBI_Gps_DBG_FILE)),cp -u $(gmi_SDBI_Gps_DBG_FILE) $(_d_SyncOutputTo))
+  else # uBase .ue
+	cp -u $(gmp_USER_FIRST_TARGET) $(_d_SyncOutputTo)
+  endif
+endif
+
+########## <<< Syncing project output 

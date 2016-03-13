@@ -1,0 +1,38 @@
+#compiler-settings
+cheetahVarStartToken = @
+directiveStartToken = %
+#end compiler-settings
+#ifndef __@(repo_)_h_@(timeYYYYMMDD)_
+#define __@(repo_)_h_@(timeYYYYMMDD)_
+
+// Place your library interface function/type/const declarations here.
+
+#ifdef __cplusplus
+extern"C"{
+#endif
+
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <time.h>
+
+%if @dirNlssvn
+#include <ps_TCHAR.h>
+%end if
+
+#ifndef DLLEXPORT_@(repo_)
+# define DLLEXPORT_@(repo_)
+#endif
+
+
+
+DLLEXPORT_@(repo_)
+unsigned int @(repo_)_get_version_v3n(void);
+
+
+
+#ifdef __cplusplus
+} //extern"C"{
+#endif
+
+#endif
+

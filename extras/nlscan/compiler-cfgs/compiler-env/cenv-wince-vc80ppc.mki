@@ -1,0 +1,68 @@
+ifndef __cenv_wince_vc80ppc_env_included_
+__cenv_wince_vc80ppc_env_included_ := 1
+
+
+# For Visual C++ 8.0 ARM 
+
+ifeq (,$(gmp_CENV_ROOT_wince_vc80ppc))
+  $(error !GMP!Error: gmp_CENV_ROOT_wince_vc80ppc is not defined, so I cannot find Visual C++ 8 compiler)
+endif
+
+_vc80ppc_VSInstallDir := $(gmp_CENV_ROOT_wince_vc80ppc)
+_vc80ppc_VCInstallDir := $(_vc80ppc_VSInstallDir)/VC
+_vc80ppc_VCCeDir := $(_vc80ppc_VCInstallDir)/ce
+
+#ifeq (,$(gmp_CENV_PSDK_ROOT_msvc_vc80))
+#  $(info !GMP!info: gmp_CENV_PSDK_ROOT_msvc_vc80 is not defined, so you are not using a PlatformSDK)
+#endif
+
+
+#_vc80ppc_val_INCLUDE = $(if $2,$2/Include;)$1/VC/include;$1/VC/PlatformSDK/Include;$1/VC/atlmfc/include;
+#_vc80ppc_val_LIB = $(if $2,$2/Lib;)$1/VC/lib;$1/VC/PlatformSDK/Lib;$1/VC/atlmfc/lib;$1/SDK/v2.0/lib;
+#_vc80ppc_val_PATH = $(if $2,$2/Bin;)$1/Common7/IDE;$1/VC/BIN;$1/Common7/Tools;$1/Common7/Tools/bin;$1/VC/PlatformSDK/bin;$(subst \,/,$(PATH))
+	# Values of the above three is allowed to have spaces.
+	# $1: VS2005 install root dir
+	# $2: PSDK root dir(preferred WinSDK Feb 2007).
+
+# !!! NOTE: NO SPACES is allowed in env-var values that are set into _vc80ppc_extra_envvars,
+# also, NEVER put a space around the equal sign!
+# Otherwise, gmuf_AnounceExportEnvvars function will not get env-var boundaries correctly.
+_vc80ppc_extra_envvars = \
+	gmp_wince_u_TargetCeVer=0x420 gmp_wince_u_MachType=PPC2003 \
+	gmu_u_GCC_M_OPTIONS=-D_M_ARM \
+	VSInstallDir=$(_vc80ppc_VSInstallDir) VCInstallDir=$(_vc80ppc_VCInstallDir) \
+	VCCeDir=$(_vc80ppc_VCCeDir)
+
+_vc80ppc_val_INCLUDE = $1/SmartDevices/SDK/PocketPC2003/include;$1/VC/ce/include;$1/VC/ce/altmfc/include;
+_vc80ppc_val_LIB = $1/SmartDevices/SDK/PocketPC2003/lib/ARMV4;$1/VC/ce/atlmfc/lib/ARMV4;$1/VC/ce/lib/ARMV4;
+_vc80ppc_val_PATH = $1/VC/ce/bin/x86_arm;$1/Common7/IDE;$1/VC/BIN;$(subst \,/,$(PATH))
+	# $1: VS2005 install root dir
+	#
+	# [2011-03-14] Be aware, we should use a specific varname like _vc80ppc_val_INCLUDE instead of the
+	# more general _vc80_val_INCLUDE, because a parent project may introduce two subprjs building 
+	# vc80 PC program and vc80 WinCE program, so may cause the function name conflict here.
+
+
+in_gmpf_LoadCenv_wince_vc80ppc = \
+	$(_vc80ppc_extra_envvars) \
+	gmp_COMPILER_VER_wince=vc80ppc \
+	MSVSDir="$1" MSSdk="$2" \
+	INCLUDE="$(_vc80ppc_val_INCLUDE)" \
+	LIB="$(_vc80ppc_val_LIB)" \
+	PATH="$(_vc80ppc_val_PATH)"
+
+gmpf_LoadCenv_wince_vc80ppc = $(call in_gmpf_LoadCenv_wince_vc80ppc,$(gmp_CENV_ROOT_wince_vc80ppc),$(gmp_CENV_PSDK_ROOT_msvc_vc80))
+
+define def_ExportCenv_wince_vc80ppc
+  $(call gmuf_AnounceExportEnvvars,$(_vc80ppc_extra_envvars))
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_wince := $(gmp_COMPILER_VER_wince) vc80ppc)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc80ppc_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc80ppc_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc80ppc_val_PATH))
+endef
+
+gmpf_ExportCenv_wince_vc80ppc = $(eval $(call def_ExportCenv_wince_vc80ppc,$(gmp_CENV_ROOT_wince_vc80ppc),$(gmp_CENV_PSDK_ROOT_msvc_vc80)))
+
+endif
