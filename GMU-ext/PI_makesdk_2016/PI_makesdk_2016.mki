@@ -67,8 +67,8 @@ ifneq (,$(strip $(_tmp)))
 endif
 
 
-# >>> Plugin PI_sc_pdb_sew_svn related instructions 
-
+# >>> Plugin PI_sc_pdb_sew_svn related instructions (only for VC++ compiler)
+ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
 gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
   gmi_SCPSS_ud_PDB = $(gmb_syncto)
   gmi_SCPSS_ud_source = $(gmb_thisrepo)
@@ -88,7 +88,7 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
   gmi_SCPSS_SRC_MAPPING_FROM_INI=$(gmi_MSDK_up_BUILDSDK_INI),$(gmb_syncto),[global],examples_copyto,examples_dir
 
 gmp_USER_POST_TARGETS += gmit_SCPSS_SEW_PDB
-
+endif
 # <<< Plugin PI_sc_pdb_sew_svn related instructions 
 
 
