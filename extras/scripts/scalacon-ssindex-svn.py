@@ -765,13 +765,15 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 		dirs = get_pick_sstreams_dirs()
 		for i,dir in enumerate(dirs):
 			if dir[0]=='!': # starting with !, then it's a dir relative to pdbpath
-				dirs[i] = os.path.split(pdbpath)[0] + '/' + dir[1:]
+				dirs[i] = os.path.join(os.path.split(pdbpath)[0], dir[1:])
 			dirs[i] = os.path.abspath(dirs[i])
 		# Now dirs[] are all abspath.
 		
 		if g_pick_cherries=='*':
 			# draw in all .sstream.txt found. 
 			for dir in dirs:
+				if not os.path.isdir(dir):
+					continue # ignore non-existing dir
 				filenames = os.listdir(dir)
 				for filename in filenames:
 					if filename.endswith('.sstream.txt'):
@@ -785,6 +787,8 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 			for cherry in cherries:
 				sstracks = ''
 				for dir in dirs:
+					if not os.path.isdir(dir):
+						continue # ignore non-existing dir
 					sstream_filepath = dir+'/'+ "%s.sstream.txt"%(cherry)
 					if os.path.isfile(sstream_filepath):
 						print '  > picking from %s'%(sstream_filepath)
@@ -1056,8 +1060,12 @@ def main():
 		section = _section_.strip('[]') # turns '[global]' into 'global'
 		iniobj = ConfigParser.ConfigParser()
 		iniobj.read(inipath)
-		g_srcmapping_pdb = dir_sdkout +'/'+ iniobj.get(section, key_src_mapping_pdb)
-		g_srcmapping_svn = os.path.join(os.path.split(inipath)[0], iniobj.get(section, key_src_mapping_svn))
+		try:
+			g_srcmapping_pdb = dir_sdkout +'/'+ iniobj.get(section, key_src_mapping_pdb)
+			g_srcmapping_svn = os.path.join(os.path.split(inipath)[0], iniobj.get(section, key_src_mapping_svn))
+		except ConfigParser.NoOptionError as e:
+			Logp( 'Scalacon info: Your --src-mapping-from-ini= option is ignored, because the INI does not have "[%s] %s=..." assignment.'%(e.section, e.option) )
+			pass
 	else:
 		if '--src-mapping-pdb' in opts:
 			g_srcmapping_pdb = opts['--src-mapping-pdb'].replace('/', '\\')
