@@ -26,7 +26,7 @@ ifeq (,$(strip $(gmi_SCPSS_SVNHOST_TABLE)))
 endif
 
 ifeq (,$(strip $(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL)))
-  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = https://nlssvn/svnreps/makingsys/GMU-addons/trunk/nlscan/reposie-nlssvn.txt
+  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = https://nlssvn/svnreps/makingsys/GnumakeUniproc/trunk/nlscan/reposie-nlssvn.txt
 endif
 
 ifeq (,$(strip $(gmu_SC_CHECKOUT_DATETIME)))

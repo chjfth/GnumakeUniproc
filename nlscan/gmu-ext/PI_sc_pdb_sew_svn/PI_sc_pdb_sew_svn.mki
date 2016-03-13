@@ -98,7 +98,7 @@ _pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
 	# This tells one or more SVN URLS that describe "reposie table" for sewing.
 	# These URLs will be svn cat to the plugin dir.
 	# If null, we'll just use 
-	#	https://nlssvn/svnreps/makingsys/GMU-addons/nlscan/reposie-nlssvn.txt
+	#	https://nlssvn/svnreps/makingsys/GnumakeUniproc/trunk/nlscan/reposie-nlssvn.txt
 
 # gmi_SCPSS_SAVE_SSTREAMS_DIR = <ssdir>
 # gmi_SCPSS_PICK_CHERRIES = <cherry1>,<cherry2>,...
