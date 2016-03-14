@@ -219,6 +219,11 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	[可选]
 	将处理过程写入日志文件 <logfile>，追加写入。
 
+--allow-empty-scan
+	[可选]
+	指定此参数时，允许 --dir-pdb 指定的目录不存在，或其中没有发现 PDB 文件。
+	默认不启用此参数，未扫描到 PDB 文件会报错，退出码非零。
+
 """
 
 import sys
@@ -1000,7 +1005,7 @@ def main():
 		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
-		'version'] # optional arguments
+		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
 
@@ -1079,6 +1084,8 @@ def main():
 	if g_srcmapping_pdb and g_srcmapping_svn:
 		print 'Assign srcmapping:\n  prefix-in-pdb: %s\n  prefix-in-svn: %s\n'%(g_srcmapping_pdb, g_srcmapping_svn)
 	
+	is_allow_empty_scan = True if '--allow-empty-scan' in opts else False
+	
 	if '--logfile' in opts:
 		fnlog = opts['--logfile']
 		try:
@@ -1111,7 +1118,7 @@ def main():
 	svnhosttable_buf = ''
 	fnSvnhostTable = opts['--svnhost-table']
 		# Two cases: 1. it's a local file, 2. it's an SVN url.
-	if ':' in fnSvnhostTable[2:]: # Skip first two chars which may be 'C:','D:' etc
+	if ':' in fnSvnhostTable[2:]: # so it may be http://... https://... instead of C:\... ,D:\... etc
 		# Process as an SVN url. svn cat that file to current dir.
 		flocal = fnSvnhostTable.split('/')[-1]
 		try:
@@ -1162,16 +1169,18 @@ def main():
 				)
 			return 0 # Success
 		else:
+			prompt = "Scalacon info: " if is_allow_empty_scan else "Scalacon Error: "
+			
 			if g_nPdbsFound==0:
-				Logp( "Error: No matching PDBs found in input directory '%s' ."%(g_dp))
+				Logp( prompt+"No matching PDBs found in input directory '%s' ."%(g_dp))
 			elif g_nSourceFilesFound==0:
-				Logp( "Error: For all scanned PDBs, no associating source files is found in '%s' ."%(g_ds))
+				Logp( prompt+"For all scanned PDBs, no associating source files is found in '%s' ."%(g_ds))
 			else:
-				Logp( "Error: No valid tracks are sewed into any found PDB. "
+				Logp( prompt+"No valid tracks are sewed into any found PDB. "
 					"Probably, no source files associated with your PDBs are in any svn sandbox, "
 					"so I cannot deduce their SVN URL to form a track."
 					)
-			return ErrNoFileProcessed
+			return 0 if is_allow_empty_scan else ErrNoFileProcessed
 	else:
 		return 4
 

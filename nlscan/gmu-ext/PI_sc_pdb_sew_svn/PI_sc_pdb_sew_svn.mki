@@ -52,7 +52,7 @@ _pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
 
 # gmi_SCPSS_ud_source = 
 	# (must)
-	# Tells a local source directory.
+	# Tells a local source directory to scan. 
 	# For those source files recorded in PDB('srctool -r xxx.pdb' knows it), I will only 
 	# sew those within $(gmi_SCPSS_ud_source). Therefore, those source files from Microsoft,
 	# like
@@ -113,6 +113,11 @@ _pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
 # gmi_SCPSS_ALLOW_LOOSY_REPOSIE =
 	# (optional)
 	# If non-null, pass --loosy-reposie-table to scalacon-ssindex-svn.py .
+
+# gmi_SCPSS_ALLOW_EMPTY_SCAN =
+	# (optional, default null)
+	# If set, it will not report error if directory of gmi_SCPSS_ud_source does not exist
+	# or there is no PDB inside. By default, error will be asserted if no PDB is found.
 
 
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,PI_sc_pdb_sew_svn,postcore)

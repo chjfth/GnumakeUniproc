@@ -54,7 +54,8 @@ pycmd_ssindex = scalacon-ssindex-svn.py\
  $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI),--pick-sstreams-dirs-from-ini=$(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI))\
  $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN),--pick-sstreams-dir-sdkin=$(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN))\
  $(if $(gmi_SCPSS_SRC_MAPPING_FROM_INI),--src-mapping-from-ini=$(gmi_SCPSS_SRC_MAPPING_FROM_INI))\
-  --logfile=$(_gmi_SCPSS_tmpdir)/scalacon-ssindex.log
+  --logfile=$(_gmi_SCPSS_tmpdir)/scalacon-ssindex.log \
+ $(if $(gmi_SCPSS_ALLOW_EMPTY_SCAN),--allow-empty-scan)
 
 pycmd_symstore = scalacon-symstore.py\
   --dir-scan=$(gmi_SCPSS_ud_PDB)\
@@ -63,7 +64,8 @@ pycmd_symstore = scalacon-symstore.py\
   --product-ver="$(if $(gmi_SCPSS_PRODUCT_VER),$(gmi_SCPSS_PRODUCT_VER),not-set)"\
   --pattern-include="*.pdb"\
   --pattern-exclude="*.lib.pdb/vc?0.pdb/vc??0.pdb"\
-  --tmpdir=$(_gmi_SCPSS_tmpdir) 
+  --tmpdir=$(_gmi_SCPSS_tmpdir)\
+  $(if $(gmi_SCPSS_ALLOW_EMPTY_SCAN),--allow-empty-scan)
 
 
 .PHONY: gmit_SCPSS_SEW_PDB

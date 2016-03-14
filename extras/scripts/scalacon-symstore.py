@@ -89,6 +89,10 @@ SYMSTORE: Number of files ignored = 0
     另，本程序会分析 symstore /o 的输出，自动找出哪些文件已经存储成功，因此，
 	重试时只会让 symstore 处理未成功的那些文件。
 
+--allow-empty-scan
+	[可选]
+	无文件被操作时仍旧返回成功（退出码 0）。
+
 【限制】
 1. dscan 目录不允许有空格。
 
@@ -109,7 +113,7 @@ import tempfile
 import fnmatch
 #import ConfigParser
 
-version = "1.0"
+version = "1.2"
 
 opts = {}
 
@@ -125,6 +129,8 @@ gar_ptinc = ['*.pdb']
 	# gar means global array.
 gar_ptexc = ['vc?0.pdb', 'vc??0.pdb'] 
 	# Exclude those vc60.pdb, vc80.pdb, vc100.pdb .
+
+g_allow_empty_scan = False
 
 ErrNoFileProcessed = 9
 
@@ -284,9 +290,9 @@ def DoStart():
 
 	npickout = len(pickouts)
 	if npickout==0 :
-		print
-		print "Error: No matching files found. No files are pushed to symbol store."
-		return ErrNoFileProcessed
+		prompt = "Info: " if g_allow_empty_scan else "Error: "
+		print prompt+"No matching files found. No files are pushed to symbol store."
+		return 0 if g_allow_empty_scan else ErrNoFileProcessed
 
 	ss_id_start, remain = CallSymstore_with_filelist(pickouts)
 	ss_id_end = ss_id_start
@@ -322,9 +328,11 @@ def SetWildcardList(param):
 def main():
 	global opts, g_dscan, g_dstore, g_prodn, g_prodv, gar_ptinc, gar_ptexc
 	global g_tmpdir, g_maxretry
+	global g_allow_empty_scan
 
 	reqopts = ['dir-scan=', 'dir-store=', 'product-name=', 'product-ver=']
-	optopts = ['pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 'version'] # optional arguments
+	optopts = ['pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
+		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
 
@@ -351,7 +359,8 @@ def main():
 	if '--pattern-exclude' in opts:
 		gar_ptexc = SetWildcardList(opts['--pattern-exclude'])
 
-	#
+	if '--allow-empty-scan' in opts:
+		g_allow_empty_scan = True
 
 	# Assert valid directories
 	for d in [g_dscan]:
