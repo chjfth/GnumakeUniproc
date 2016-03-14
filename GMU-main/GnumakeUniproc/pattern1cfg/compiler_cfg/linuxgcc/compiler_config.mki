@@ -12,15 +12,10 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-linuxgcc.mki
 
 
 ifneq (,$(gmp_GCC_PREFIX))
-ifneq (,$(gmp_DECO_PRJ_NAME))
+ifneq (,$(gmp_DECO_GCC_PREFIX))
   gmu_DECO_PREFIX_PRJ_NAME += $(gmp_GCC_PREFIX)
-    # 	NOTE: If a gcc user would like to build his app/lib crossly as well as 
-    # natively in the same gmu_ud_OUTPUT_ROOT, he should ensure gmp_DECO_PRJ_NAME 
-    # is defined, otherwise, the different builds(e.g. output from i386-linux-gcc 
-    # and arm-linux-gcc) will mix into the same project output dir.
+	# I'll not prepend $(gmp_GCC_PREFIX) to output *image name* , which is always weird.
 endif
-	#[2006-07-10] I'll not however prepend $(gmp_GCC_PREFIX) to output image name,
-	#which is always weird.
 endif
 
 #^^^^^^^^ name decoration ^^^^^^^^
