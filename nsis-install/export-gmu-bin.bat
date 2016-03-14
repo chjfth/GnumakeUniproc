@@ -1,4 +1,5 @@
 @echo off
+setlocal
 REM This .bat file exports binary files for GnumakeUniproc NSIS packing.
 REM These files(tens of mega-bytes) are not stored on sf.net, but on my nlssvn SVN server.
 rem		https://nlssvn/BinaryRls/MinGW-binary

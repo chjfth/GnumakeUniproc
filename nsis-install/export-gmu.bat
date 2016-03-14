@@ -21,7 +21,10 @@ svn export --force %SvnUrlPrefix%/%BranchToGet%     %OutputDir%/GMU
 @if ERRORLEVEL 1 goto ErrSvnError
 
 @REM Duplicate the scripts/*.py commands into bin-gmu-addons for NSIS packing.
-svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons
+rem to-del svn export --force %SvnUrlPrefix%/GMU-addons/%BranchToGet%/scripts  %OutputDir%/bin-gmu-addons
+set dirGmuAddons=%OutputDir%\bin-gmu-addons
+@if not exist %dirGmuAddons% mkdir %dirGmuAddons%
+move %OutputDir%\GMU\extras\scripts\*.* %dirGmuAddons%
 @if ERRORLEVEL 1 goto ErrSvnError
 
 @echo off
