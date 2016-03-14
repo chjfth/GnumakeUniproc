@@ -35,9 +35,20 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
 	# For $1=@(repo) :
 	# @(repo)--imp.lib or @(repo)_U--imp.lib (on Windows)
   NlssdkDllSearchDirs = $(NlssdkLibSearchDirs)
-  UserLibNameForLink = $(call gmpf_MakeLibName,$1$(gmp_G_UDSuffixByBc))
+  UserLibNameForLink_UD = $(call gmpf_MakeLibName,$1$(gmp_G_UDSuffixByBc))
 	# For $1=@(repo) :
 	# @(repo).lib , @(repo)_D.lib , @(repo)_U.lib or @(repo)_U_D.lib
+
+  UserLibNameForLink_D = $(call gmpf_MakeLibName,$1$(gmp_G_DSuffixByBc))
+	# For $1=@(repo) :
+	# @(repo).lib or @(repo)_D.lib 
+
+  UserLibNameForLink_U = $(call gmpf_MakeLibName,$1$(gmp_G_USuffixByBc))
+	# For $1=@(repo) :
+	# @(repo).lib or @(repo)_U.lib 
+
+  UserLibNameForLink = $(UserLibNameForLink_UD)
+
 
 else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
   # GCC compiling linux program
@@ -46,9 +57,19 @@ else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
 	# For $1=@(repo) :
 	# -l@(repo) or -l@(repo)_U.so  (on Linux)
   NlssdkDllSearchDirs = $(NLSSDK_fs)/$(gmp_COMPILER_ID_VER)/$(if $(gmp_bc_DEBUG),bin-debug,bin-release)
-  UserLibNameForLink = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_UDSuffixByBc))
+  UserLibNameForLink_UD = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_UDSuffixByBc))
 	# For $1=@(repo) :
 	# -l@(repo)_s , -l@(repo)_s_D , -l@(repo)_s_U or -l@(repo)_s_U_D
+
+  UserLibNameForLink_D = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_DSuffixByBc))
+	# For $1=@(repo) :
+	# -l@(repo)_s or -l@(repo)_s_D
+
+  UserLibNameForLink_U = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_USuffixByBc))
+	# For $1=@(repo) :
+	# -l@(repo)_s or -l@(repo)_s_U
+
+  UserLibNameForLink = $(UserLibNameForLink_UD)
 
 else # ... some other gmp_COMPILER_ID processing ...
 
