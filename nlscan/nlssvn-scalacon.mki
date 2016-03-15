@@ -28,7 +28,7 @@ include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 
 ### <<< something for all compilers now
 
-ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
+ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
   # Microsoft msvc, wince compiler 
 
   UserDllNameForLink = $(call gmpf_MakeDllNameForLink,$1$(gmp_G_USuffixByBc)--imp)
@@ -50,7 +50,7 @@ ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince),1)
   UserLibNameForLink = $(UserLibNameForLink_UD)
 
 
-else ifeq ($(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc),1)
+else ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc))
   # GCC compiling linux program
 
   UserDllNameForLink = $(call gmpf_MakeUpSysLibsToLink,$1$(gmp_G_USuffixByBc))
