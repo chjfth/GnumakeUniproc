@@ -8,7 +8,7 @@ export gv1='gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD
 export gv2='gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1'
 
 # Will set tmpdirgmu to bashcmd
-tmpdirgmu=$tmpdirgmu/GMU-main/umake_cmd/bashcmd
+tmpdirgmu=$tmpdirgmu/extras/scripts:$tmpdirgmu/GMU-main/umake_cmd/bashcmd
 
 PATH=$tmpdirgmu:$PATH
 
