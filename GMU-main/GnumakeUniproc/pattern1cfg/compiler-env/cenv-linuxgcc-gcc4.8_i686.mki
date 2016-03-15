@@ -4,9 +4,26 @@ __cenv_linuxgcc_gcc4.8_i686_env_included_ := 1
 # For i686-linux targeted gcc 4.8 compiler 
 
 # Naming requirement:
-# gmpf_LoadCenv_msvc_vc100...
+# GMU compiler-id  <cid> = linuxgcc
+# GMU compiler-ver <cver>= gcc4.8_i686
+# 
+# This file takes one input from env-var:
+#
+#	gmp_CENV_ROOT_linuxgcc_gcc4_8_i686    # which is gmp_CENV_ROOT_<cid>_<cver>
+#
+# This file's outputs things:
+#
+# First, a make-var, used on making subprj, refname_MakeVarDefines= 
+#	gmpf_LoadCenv_linuxgcc_gcc4.8_i686    # which is gmpf_LoadCenv_<cid>_<cver>
+#
+#	gmpf_ExportCenv_linuxgcc_gcc4_8_i686  # which is gmpf_ExportCenv_<cid>_<cver>
+#
+# And, for the env-var name cases, "dot" is replaced with "underscore", 4.8 becomes 4_8
+# because dot is invalid in env-var name.
+#
+# Note: the naming of the above two is a misnomer, it better says gmp_ instead of gmpf_ ,
+# because gmpf_ implies a make-function.
 
-#$(info @@@@@@@@@@@@@@$(gmp_CENV_ROOT_linuxgcc_gcc4_8_i686))
 ifeq (,$(gmp_CENV_ROOT_linuxgcc_gcc4_8_i686))
   $(error !GMP!Error: gmp_CENV_ROOT_linuxgcc_gcc4_8_i686 is not defined, so I cannot find gcc4.8_i686 compiler)
 endif
@@ -27,7 +44,7 @@ define def_ExportCenv_linuxgcc_gcc4.8_i686
   $(call gmuf_AnounceExportEnvvar,PATH := $(_linuxgcc_gcc4_8_i686_val_PATH))
 endef
 
-gmpf_ExportCenv_msvc_vc100 = $(eval $(call def_ExportCenv_linuxgcc_gcc4.8_i686,$(gmp_CENV_ROOT_linuxgcc_gcc4_8_i686)))
+gmpf_ExportCenv_linuxgcc_gcc4_8_i686 = $(eval $(call def_ExportCenv_linuxgcc_gcc4.8_i686,$(gmp_CENV_ROOT_linuxgcc_gcc4_8_i686)))
 
 
 endif
