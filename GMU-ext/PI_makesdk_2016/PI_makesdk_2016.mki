@@ -3,7 +3,7 @@ __PLUGIN_MAKESDK_2016_LOADED = 1
 ifeq (,$(_isNowGmuGetPrjAttr))
 
 _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
-	# Plugin ID abbreviation: MSDK1
+	# Plugin ID abbreviation: MSDK
 
 # This plugin requires python 2.7
 
@@ -13,8 +13,8 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 	# (must)
 	# Set this to an INI configuration file describing how to make the SDK package.
 
-
-# (the following set in env-var)
+# The plugin takes following env-vars as input:
+# gmb_buildsdk_ini=
 # gmb_compiler_ids=
 # gmb_builds=
 # gmb_builds_<compiler-id>=
@@ -26,6 +26,11 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 # gmb_run_on_compiler_id = # (optional) used in __Makefile-vbuxm
 #
 # This mki will set: gmb_syncto=$(gmb_thisrepo)/$(gmb_dirname_sdkout)
+
+ifeq (,$(strip $(gmb_buildsdk_ini)))
+  $(error Error from $(_pluginId_makesdk_2016): gmb_buildsdk_ini is not defined. I need an INI config-file to work with)
+endif
+gmi_MSDK_up_BUILDSDK_INI = $(gmb_buildsdk_ini)
 
 ifeq (,$(strip $(gmb_thisrepo)))
   $(error Error from $(_pluginId_makesdk_2016): gmb_thisrepo is not defined, please set it to an svn sandbox directory)
@@ -48,9 +53,6 @@ $(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
 $(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)
 
 
-ifeq (,$(gmi_MSDK_up_BUILDSDK_INI))
-  $(error Error from $(_pluginId_makesdk_2016): gmi_MSDK_up_BUILDSDK_INI is not defined, I need an INI config-file to work with)
-endif
 
 _tmp := $(shell $(call gmuf_ScriptCmd,\
 	genmk-sdk.py --prjname=$(gmu_PRJ_NAME) --gmb_syncto=$(gmb_syncto) $(gmi_MSDK_up_BUILDSDK_INI) \

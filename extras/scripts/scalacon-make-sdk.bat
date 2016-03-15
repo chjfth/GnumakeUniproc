@@ -1,18 +1,17 @@
 @echo off
 setlocal
-call %DIR_NLS_BUILD_ENV%\gmp-cenv-all.bat
 
-set CURDIR=%CD%
-set CURDIR_fs=%CURDIR:\=/%
+if "%DIR_NLS_BUILD_ENV%" == "" (
+  echo Env-var DIR_NLS_BUILD_ENV not set, so I cannot find the compiler sets to use.
+  exit /b 1
+) else (
+  call %DIR_NLS_BUILD_ENV%\gmp-cenv-all.bat
+)
 
-:set gmi_SYDO_SHOW_COPY_CMD=1
+rem set CURDIR=%CD%
+rem set CURDIR_fs=%CURDIR:\=/%
+	rem Not used now.
 
-REM Set default sdkout directory (gmb_syncto):
-REM We must use / (instead of \) even on Windows, otherwise it fails PI_sync_devoutput.
-IF "%gmb_syncto%" == "" (
-	echo SET gmb_syncto=%CURDIR_fs%/sdkout
-         SET gmb_syncto=%CURDIR_fs%/sdkout
-  )
 
 REM Set releasing-datetime for this SDK (gmu_SC_CHECKOUT_DATETIME):
 REM If gmu_SC_CHECKOUT_DATETIME have value, use it, otherwise, I think the best bet is
@@ -41,4 +40,5 @@ if not "%CMD_GETSDKIN%" == "" (
 
 @echo on
 umaketime %*
-@REM ENV may have: gmb_compiler_ids="..." gmb_msvc_vers="..." gmb_wince_vers="..." 
+
+@copy %gmu_LOG_OUTPUT_FILENAME% %gmb_syncto%\%gmb_dirname_sdkout%
