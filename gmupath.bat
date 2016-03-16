@@ -1,7 +1,7 @@
 @set tmpbatdir=%~dp0
 @set tmpbatdir=%tmpbatdir:~0,-1%
 
-@SET NLSSVN=https://nlssvn/svnreps
+@SET NLSSVN=https://nlssvn.dev.nls/svnreps
 
 set gv1=gmu_DO_SHOW_VERBOSE=1 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 set gv2=gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
@@ -18,6 +18,8 @@ set gv2=gmu_DO_SHOW_VERBOSE=2 gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1
 @endlocal & PATH=%__tmpPATH%
 
 doskey gmuex1=cd %tmpbatdir%\GMU-examples\common\walkdir\examples\walkdir_ex1
+
+set gmu_INTERACTIVE_ERROR_RETRY=1
 
 @call gmu-goody.bat
 
