@@ -1055,7 +1055,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		$(call _DoVerbose2,echo -e "\t@echo \">>>>> Intermediate-make to build [ $(SubprjEvPrjname) ] starting... ( from autogen-ed makefile: $(call _StripOutputRootPrefix,$(_p_mk_MakeSubPrjs)) ) \"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 \
 		$(if $(gmu_INTERACTIVE_ERROR_RETRY),\
-			echo -e "\t@( while true; do \$$($(SubprjEvMakeCmdAndOptsVar)); if [ \$$\$$? = 0 ]; then break; else echo -e \"[[Oops! Got error in a subprj. Do you need a retry(Y/n)?]]\"; read yn; [ \"\$$\$$yn\" = \"n\" ] || [ \"\$$\$$yn\" = \"N\" ] && exit 33; fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			echo -e "\t@( while true; do \$$($(SubprjEvMakeCmdAndOptsVar)); if [ \$$\$$? = 0 ]; then break; else echo -e \"\\\\n[[Oops! Got error in a subprj. Do you need a retry(Y/n)?]]\"; read yn; [ \"\$$\$$yn\" = \"n\" ] || [ \"\$$\$$yn\" = \"N\" ] && exit 33; fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		,\
 			echo -e "\t@\$$($(SubprjEvMakeCmdAndOptsVar))" >> $(_p_mk_MakeSubPrjs_shsubst);)\
 \
