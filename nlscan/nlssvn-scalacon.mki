@@ -31,10 +31,14 @@ include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
   # Microsoft msvc, wince compiler 
 
-  UserDllNameForLink = $(call gmpf_MakeDllNameForLink,$1$(gmp_G_USuffixByBc)--imp)
+  UserDllNameForLink_U = $(call gmpf_MakeDllNameForLink,$1$(gmp_G_USuffixByBc)--imp)
 	# For $1=@(repo) :
 	# @(repo)--imp.lib or @(repo)_U--imp.lib (on Windows)
-  NlssdkDllSearchDirs = $(NlssdkLibSearchDirs)
+  UserDllNameForLink_  = $(call gmpf_MakeDllNameForLink,$1--imp)
+  UserDllNameForLink = $(UserDllNameForLink_U)
+
+  #NlssdkDllSearchDirs = $(NlssdkLibSearchDirs) # deprecated on 2016-03-16
+
   UserLibNameForLink_UD = $(call gmpf_MakeLibName,$1$(gmp_G_UDSuffixByBc))
 	# For $1=@(repo) :
 	# @(repo).lib , @(repo)_D.lib , @(repo)_U.lib or @(repo)_U_D.lib
@@ -47,16 +51,22 @@ ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
 	# For $1=@(repo) :
 	# @(repo).lib or @(repo)_U.lib 
 
+  UserLibNameForLink_  = $(call gmpf_MakeLibName,$1)
+
   UserLibNameForLink = $(UserLibNameForLink_UD)
 
 
 else ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc))
   # GCC compiling linux program
 
-  UserDllNameForLink = $(call gmpf_MakeUpSysLibsToLink,$1$(gmp_G_USuffixByBc))
+  UserDllNameForLink_U = $(call gmpf_MakeUpSysLibsToLink,$1$(gmp_G_USuffixByBc))
 	# For $1=@(repo) :
 	# -l@(repo) or -l@(repo)_U.so  (on Linux)
-  NlssdkDllSearchDirs = $(NLSSDK_fs)/$(gmp_COMPILER_ID_VER)/$(if $(gmp_bc_DEBUG),bin-debug,bin-release)
+  UserDllNameForLink_  = $(call gmpf_MakeUpSysLibsToLink,$1)
+  UserDllNameForLink   = $(UserDllNameForLink_U)
+
+  #NlssdkDllSearchDirs = $(NLSSDK_fs)/$(gmp_COMPILER_ID_VER)/$(if $(gmp_bc_DEBUG),bin-debug,bin-release) # deprecated on 2016-03-16
+
   UserLibNameForLink_UD = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_UDSuffixByBc))
 	# For $1=@(repo) :
 	# -l@(repo)_s , -l@(repo)_s_D , -l@(repo)_s_U or -l@(repo)_s_U_D
@@ -68,6 +78,8 @@ else ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc))
   UserLibNameForLink_U = $(call gmpf_MakeUpSysLibsToLink,$1_s$(gmp_G_USuffixByBc))
 	# For $1=@(repo) :
 	# -l@(repo)_s or -l@(repo)_s_U
+
+  UserLibNameForLink_U = $(call gmpf_MakeUpSysLibsToLink,$1_s)
 
   UserLibNameForLink = $(UserLibNameForLink_UD)
 

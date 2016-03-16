@@ -110,8 +110,19 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
 
 else
 
+  _gccAutoDllSearchPathAdd = $(foreach d,$1,$(if $(call gmuf_IsSuffixWith,$d,$(gmp_COMPILER_ID_VER)/lib),$(patsubst %/lib,%/$(if $(gmp_bc_DEBUG),bin-debug,bin-release) $d,$d),$d))
+	# Example: 
+	#	$1 = ../gcc4.8_x64/sdkout/lib foo/bar ../gcc4.8_x64/sdkin/lib 
+	# Returns(sample):
+	#	../sdkout/gcc4.8_x64/bin-release ../sdkout/gcc4.8_x64/lib foo/bar ../sdkin/gcc4.8_x64/bin-release ../sdkin/gcc4.8_x64/lib 
+	#
+	# The purpose is: When you want to search for .a as well as .so , you ONLY need to assign .a's directory in gmp_ud_list_EXTRALIB,
+	# very convenient and resulting in a multi-compiler friendly makefile.
+	# Note: This is introduced for Scalacon 2016, $(gmp_COMPILER_ID_VER) takes an important role in the match, 
+	# so the "foo/bar" does not get affected.
+
   # For all image types other than static library, add -L xxx link params for extra library path
-  gmp_LINKFLAGS_preset += $(addprefix -L ,$(gmp_ud_list_EXTRALIB))
+  gmp_LINKFLAGS_preset += $(addprefix -L ,$(call _gccAutoDllSearchPathAdd,$(gmp_ud_list_EXTRALIB)))
 	#[2007-02-08] I use a space after -L, so that if gmp_ud_list_EXTRALIB contains a dir
 	#starting with ~ , the ~ will be expanded to be user's home-dir by shell.
 
