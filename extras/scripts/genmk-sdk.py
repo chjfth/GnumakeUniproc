@@ -69,24 +69,27 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     else
       include $(tmp_cenvmki)
     endif
-    uxm_%(idx_show)d_%(vidx_show)d_subprj_cver := $(tmp_subprj_cver)
-    	# Define a unique make-var so that it's value can be retreived when %(refname)s_MakeVarDefines is delay-expanded. ( $(tmp_subprj_cver) itself will be overwritten across multiple uxm makefile chunks)
+    
+    %(uxm_cidver_var)s := $(tmp_subprj_cver)
+    	# Define a unique make-var so that it's value can be retreived when %(refname)s_MakeVarDefines is delay-expanded. 
+    	# ( $(tmp_subprj_cver) itself will be overwritten across multiple uxm makefile chunks)
+    	# So, $(%(uxm_cidver_var)s) will be sth like "vc80" , "vc100x64" etc
     gmu_uv_list_ALL_SUBPRJ += %(refname)s
     %(refname)s_Makefile = %(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s
     %(refname)s_MakeVarDefines = \
-      gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver) \
+      gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=$(%(uxm_cidver_var)s) \
       %(ud_makevars)s \
       gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info"\
-      gmi_SYDO_ud_SYNC_EXE_TO=$(absdir_example_bins)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
-      gmi_SYDO_ud_SYNC_DBGINFO_TO=$(absdir_example_bins)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
-      $(gmpf_LoadCenv_%(compiler_id)s_$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver))
+      gmi_SYDO_ud_SYNC_EXE_TO=$(absdir_example_bins)/$(%(uxm_cidver_var)s)\
+      gmi_SYDO_ud_SYNC_DBGINFO_TO=$(absdir_example_bins)/$(%(uxm_cidver_var)s)\
+      $(gmpf_LoadCenv_%(compiler_id)s_$(%(uxm_cidver_var)s))
 
-    %(uxm_dirbin_var)s := $(absdir_example_bins)/$(tmp_subprj_cver)
+    %(uxm_dirbin_var)s := $(absdir_example_bins)/$(%(uxm_cidver_var)s)
     
     ifneq (,$(strip %(copydlls)s))
       gmp_USER_POST_TARGETS += COPYDLLS_%(refname)s
     endif
-    ifeq (1,$(call gmuf_IsWordInSet,$(tmp_subprj_cver),$(gmb_run_example_on_compiler_vers)))
+    ifeq (1,$(call gmuf_IsWordInSet,$(%(uxm_cidver_var)s),$(gmb_run_example_on_compiler_vers)))
     ifeq (run1,run$(strip %(isrunverify)s))
       gmp_USER_POST_TARGETS += RUN_%(refname)s
       cmd_%(refname)s := %(runcmd)s
@@ -98,7 +101,7 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
 #
 .PHONY: COPYDLLS_%(refname)s
 COPYDLLS_%(refname)s:
-	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs from $(gmb_syncto)/$(tmp_subprj_cver)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(tmp_subprj_cver)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
+	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs from $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
 #
 .PHONY: RUN_%(refname)s
 RUN_%(refname)s:
@@ -148,6 +151,8 @@ RUN_%(refname)s:
 		idx_show = idx+1
 		vidx_show = vidx+1
 		uxm_dirbin_var = "uxm_%d_%d_dirbin"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_dirbin
+		uxm_cidver_var = "uxm_%d_%d_cidver"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_cidver
+		
 		uxm_is_copy_selfdll = '1' if 'self' in copydlls.split() else ''
 		uxm_copy_binvariant = 'bin-release' # because example-bin does not fork into bin-debug//bin-release, so I just use bin-release.
 		# // uxm_copy_binvariant = 'bin-debug' if ('d' in ud) else 'bin-release'
