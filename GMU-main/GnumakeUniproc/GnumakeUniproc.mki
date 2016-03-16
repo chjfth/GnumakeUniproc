@@ -927,6 +927,8 @@ SubprjEvMakeVarDefines = \$$($${SubPrj}_MakeVarDefines)
 SubprjEvIsForcePostProc = \$$($${SubPrj}_IsForcePostProc)
 SubprjEvIsConfirmPostProc = \$$($${SubPrj}_IsConfirmPostProc)
 SubprjEvAttr = \$$($${SubPrj}_PrjAttr)
+SubprjEvMakeCmdAndOptsVar = $${SubPrj}_MakeCmdAndOpts
+SubprjEvMakeCmdAndOptsVal = \$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} \$$(_SubprjMakeCmdGoals) -C \$$(dir $(SubprjEvMakefile)) \$$(if $(SubprjEvIsConfirmPostProc),_gmu_cmdopt_NowPostProc=1) -f \$$(notdir $(SubprjEvMakefile))
 
 SubprjEvCvsRoot = \$$($${SubPrj}_cvsRoot_forMakefiles)
 SubprjEvCvsModuleDir = \$$($${SubPrj}_cvsModuleDir_forMakefiles)
@@ -965,7 +967,7 @@ include $(_p_SubprjsMade)
 $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 	@$(call _MkdirIfNotExist,$(dir $(_p_mk_MakeSubPrjs)))
 	@$(call _ClearFile,$(_p_mk_MakeSubPrjs))
-	@echo -e "_SubprjMakeCmdGoals = $(_SubprjMakeCmdGoals)\n" >> $(_p_mk_MakeSubPrjs_shsubst)
+	@echo -e "_SubprjMakeCmdGoals := $(_SubprjMakeCmdGoals)\n" >> $(_p_mk_MakeSubPrjs_shsubst)
 	@echo -e "include $(_p_mki_SubprjAttr)\n" >> $(_p_mk_MakeSubPrjs_shsubst)
 	@for SubPrj in $(gmu_uv_list_ALL_SUBPRJ); do \
 		echo "#######################################################################" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
@@ -1035,6 +1037,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 \
 	echo  -e "\nelse # ifdef _isInCheckoutPhase {$${SubPrj}} /else\n" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 \
+		echo  -e "$(SubprjEvMakeCmdAndOptsVar) := $(SubprjEvMakeCmdAndOptsVal)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo "$${SubPrj}_IsConfirmPostProc = \$$(if \$$(call _IsOlderThanBuildStart,$(SubprjEvCktShortForm))\$$(call gmuf_Not,$(SubprjEvIsForcePostProc)),,1)" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo "$(SubprjEvCktShortForm): \$$(if $(SubprjEvIsConfirmPostProc),gmu_ut_Always,\$$(gmu_p_BuildStartCkt))" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
@@ -1050,8 +1053,12 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		$(call _DoVerbose1,echo -e "\t@echo \"  MakeVarDefs: \$$(call _TrShcmd4echo,$(SubprjEvMakeVarDefines))\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		$(call _DoVerbose2,echo -e "\t@echo \">>>>> Intermediate-make to build [ $(SubprjEvPrjname) ] starting... ( from autogen-ed makefile: $(call _StripOutputRootPrefix,$(_p_mk_MakeSubPrjs)) ) \"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
-		echo -e "\t@ \$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} \$$(_SubprjMakeCmdGoals) -C \$$(dir $(SubprjEvMakefile)) \$$(if $(SubprjEvIsConfirmPostProc),_gmu_cmdopt_NowPostProc=1) -f \$$(notdir $(SubprjEvMakefile))" \
-			>> $(_p_mk_MakeSubPrjs_shsubst); \
+\
+		$(if $(gmu_INTERACTIVE_ERROR_RETRY),\
+			echo -e "\t@( while true; do \$$($(SubprjEvMakeCmdAndOptsVar)); if [ \$$\$$? = 0 ]; then break; else echo -e \"[[Oops! Got error in a subprj. Do you need a retry(Y/n)?]]\"; read yn; [ \"\$$\$$yn\" = \"n\" ] || [ \"\$$\$$yn\" = \"N\" ] && exit 33; fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
+		,\
+			echo -e "\t@\$$($(SubprjEvMakeCmdAndOptsVar))" >> $(_p_mk_MakeSubPrjs_shsubst);)\
+\
 		$(call _DoVerbose2,echo -e "\t@echo \"<<<<< Intermediate-make for sub-project [ $(SubprjEvPrjname) ] returned.\"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 		$(call _DoVerbose2,echo -e "\t@echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 		$(call _DoVerbose1,echo -e "\t@echo ^^^^^^^^^^BuildLevel[$(MAKELEVEL)] Done Sub-project[ $(SubprjEvPrjname) ]^^^^^^^^^^" >> $(_p_mk_MakeSubPrjs_shsubst);) \
