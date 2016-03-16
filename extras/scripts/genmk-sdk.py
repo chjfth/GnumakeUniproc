@@ -48,7 +48,9 @@ def makefile_1c_getname(compiler_id):
 
 def GenOneUxm_in_vbuxm(idx, section_name, dsection):
 	chunk_uxm = r"""
-# User example [%(idx_show)d-%(vidx_show)d] umkvariant=%(umkvariant)s
+##################################################################################################
+# User example [%(idx_show)d-%(vidx_show)d] umkvariant=%(umkvariant)s : %(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s
+##################################################################################################
   tmp_subprj_cver := %(compiler_ver)s
   tmp_isCidverMatch := $(call gmuf_IsWordInSet,%(compiler_id)s$(_GmuComma)$(tmp_subprj_cver),$(_list_cidcver_used))
   tmp_CidMatchAnyCver := $(if $(tmp_subprj_cver),,$(call gmuf_pick_one_cver_by_cid,%(compiler_id)s,$(_list_cidcver_used)))
@@ -75,10 +77,15 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
       gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver) \
       %(ud_makevars)s \
       gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info"\
-      gmi_SYDO_ud_SYNC_EXE_TO=$(gmb_syncto)/$(if $(gmb_example_bin_dirname),$(gmb_example_bin_dirname),example-bin)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
-      gmi_SYDO_ud_SYNC_DBGINFO_TO=$(gmb_syncto)/$(if $(gmb_example_bin_dirname),$(gmb_example_bin_dirname),example-bin)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
+      gmi_SYDO_ud_SYNC_EXE_TO=$(absdir_example_bins)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
+      gmi_SYDO_ud_SYNC_DBGINFO_TO=$(absdir_example_bins)/$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver)\
       $(gmpf_LoadCenv_%(compiler_id)s_$(uxm_%(idx_show)d_%(vidx_show)d_subprj_cver))
 
+    %(uxm_dirbin_var)s := $(absdir_example_bins)/$(tmp_subprj_cver)
+    
+    ifneq (,$(strip %(copydlls)s))
+      gmp_USER_POST_TARGETS += COPYDLLS_%(refname)s
+    endif
     ifeq (1,$(call gmuf_IsWordInSet,$(tmp_subprj_cver),$(gmb_run_example_on_compiler_vers)))
     ifeq (run1,run$(strip %(isrunverify)s))
       gmp_USER_POST_TARGETS += RUN_%(refname)s
@@ -89,11 +96,21 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     $(info Scalacon info: Example-makefile "%(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s" is skipped for umkvariant(%(umkvariant)s) because you did not tell GMU to build its libraries.)
   endif # Check $(_list_cidcver_used) to filter out "not-used [cid,cver]"
 #
+.PHONY: COPYDLLS_%(refname)s
+COPYDLLS_%(refname)s:
+	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs from $(gmb_syncto)/$(tmp_subprj_cver)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(tmp_subprj_cver)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
+#
 .PHONY: RUN_%(refname)s
 RUN_%(refname)s:
-	@echo "Verify-run example in [%(section_name)s](umkvariant=%(umkvariant)s) with shell cmd:"
-	@echo "> $(call _TrShcmd4echo,$(subst %%{exe},$(call gmuf_GetSubprjOutputPathByRefname,%(refname)s),$(cmd_%(refname)s)))"
-	@$(call _TrShcmd4echo,$(subst %%{exe},$(call gmuf_GetSubprjOutputPathByRefname,%(refname)s),$(cmd_%(refname)s)))
+	@echo "Verify-run example for [%(section_name)s](umkvariant=%(umkvariant)s):"
+	@echo ">Working-directory:"
+	@echo ">   $(%(uxm_dirbin_var)s)"
+	@echo ">Shell command-line:"
+	@echo ">   $(call _TrShcmd4echo,$(subst %%{exename},$(call gmuf_GetSubprjOutputNameByRefname,%(refname)s),$(cmd_%(refname)s)))"
+	@(\
+		cd "$(%(uxm_dirbin_var)s)";\
+		$(subst %%{exename},$(call gmuf_GetSubprjOutputNameByRefname,%(refname)s),$(cmd_%(refname)s))\
+	)
 	@echo "Verify-run exit-code is 0, success."
 
 """
@@ -120,19 +137,28 @@ RUN_%(refname)s:
 		ud_makevars = ''
 		ud_makevars += 'gmp_bc_UNICODE=%s '%('1' if ('u' in ud) else '')
 		ud_makevars += 'gmp_bc_DEBUG=%s '%('1' if ('d' in ud) else '')
-#		fname_cenv_mki = get_fname_cenv_mki(compiler_id, compiler_ver)
 
-		isrunverify = dsection['isrunverify'] if 'isrunverify' in dsection else ''
+		copydlls = dsection['copydlls'].strip() if 'copydlls' in dsection else ''
+			# a space separated string, like "self sdkin1 sdkin2" .
+			# "self" is reserved word meaning all things in $/sdkout (i.e. self)
+			# (not implemented yet): sdkin1, sdkin2 are placeholders for other dll's name, no need to add _U or .dll suffix here.
+		isrunverify = dsection['isrunverify'].strip() if 'isrunverify' in dsection else ''
 		runcmd = dsection['runcmd'] if 'runcmd' in dsection else ''
 
 		idx_show = idx+1
 		vidx_show = vidx+1
+		uxm_dirbin_var = "uxm_%d_%d_dirbin"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_dirbin
+		uxm_is_copy_selfdll = '1' if 'self' in copydlls.split() else ''
+		uxm_copy_binvariant = 'bin-release' # because example-bin does not fork into bin-debug//bin-release, so I just use bin-release.
+		# // uxm_copy_binvariant = 'bin-debug' if ('d' in ud) else 'bin-release'
+		
 		refname = 'uxmRefname_%s_%s_'%(idx_show,vidx_show) + umkvariant.replace(',','_')
 			# use idx and vidx in GMU subprj refname to avoid refname conflict
 
 		retstr += chunk_uxm % locals()
 	
 	return retstr
+
 
 def GenMakefile_vbuxm(prjname):
 	makefile_content = """
@@ -142,6 +168,11 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-concise-header.mki
 gmu_PRJ_NAME=%(prjname)s-vbuxm
 gmu_ALLOW_ZERO_SUBPRJ=1
 	# If user builds the SDK with partial compilers, subprjs may be empty, so define this to suppress no-subprj error.
+
+ifeq (,$(strip $(gmb_example_bin_dirname)))
+  gmb_example_bin_dirname := example-bin
+endif
+absdir_example_bins := $(gmb_syncto)/$(gmb_example_bin_dirname)
 
 ifeq ($(_isNowNotGmuGetPrjAttr),1) # No need to include the big chunks below when doing _gmu_ut_GetPrjAttr
 _list_cidcver_used := $(shell cat _cidcver_used.gmu.txt)
