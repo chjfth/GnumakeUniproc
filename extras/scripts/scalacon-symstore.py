@@ -51,17 +51,22 @@ SYMSTORE: Number of files ignored = 0
 	[必须]
 	指出 symbol store 目录（写入目录），对应 symstore /s 。
 
+--3tier-symstore
+	[可选]
+	如果指定，当 <dstore> 目录原先不存在、或是空目录时，本程序会先在 <dstore> 中创建 index2.txt 
+	以便 symstore.exe 能生成“三层”symbol store 的目录结构
+
 --product-name=<prodn>
-	[必须]
+	[可选]
 	指出“产品名称”，对应 symstore /t
 
 --product-ver=<prodv>
-	[必须]
+	[可选]
 	指出“产品版本”，对应 symstore /v
 
 --pattern-include=<ptinc>
 	[可选]
-	告知要扫描哪些类型的文件。若不指定，相当于指定了 *.pdb 。
+	告知要扫描哪些类型的文件。若不指定，相当于指定了 *.pdb/*.exe/*.dll/*.sys 。
 	文件类型基于“通配符”，内部用 fnmatch 实现。比如 * 表示匹配0个或多个任意字符，? 表示匹配单个字符。
 	通配符描述的是文件名，而非带目录前缀的文件路径。比如，不能用 vc80/*.pdb 来指定仅查找处于 vc80 子目录中的 *.pdb。
 	若要指定多组通配符，则用 / 分隔开。如，扫描所有 dll 和 pdb，则指定 --pattern-include=*.dll/*.pdb
@@ -119,15 +124,16 @@ opts = {}
 
 g_dscan = ''
 g_dstore = ''
-g_prodn = ''
-g_prodv = ''
+
+g_prodn = 'Unknown-prodname'
+g_prodv = 'Unknown-prodver'
 
 g_tmpdir = '.'
 g_maxretry = 3
 
-gar_ptinc = ['*.pdb']
+gar_ptinc = ['*.pdb', '*.exe', '*.dll', '*.sys']
 	# gar means global array.
-gar_ptexc = ['vc?0.pdb', 'vc??0.pdb'] 
+gar_ptexc = ['vc?0.pdb', 'vc??0.pdb', '*.lib.pdb*'] 
 	# Exclude those vc60.pdb, vc80.pdb, vc100.pdb .
 
 g_allow_empty_scan = False
@@ -274,9 +280,11 @@ def DoStart():
 	pickouts = [] # pick-out file list, including dir-scan prefix
 	for root, folders, files in os.walk(g_dscan):
 		# Filter through each pattern in gar_ptinc[]
+		files_qualify = []
 		for pt in gar_ptinc:
-			files = fnmatch.filter(files, pt)
+			files_qualify.extend(fnmatch.filter(files, pt))
 		# Filter-out through each pattern in gar_ptexc[]
+		files = files_qualify
 		for pt in gar_ptexc:
 			files = [f for f in files if not fnmatch.fnmatch(f, pt)]
 		pickouts += [os.path.abspath(os.path.join(root, f)) for f in files]
@@ -330,8 +338,8 @@ def main():
 	global g_tmpdir, g_maxretry
 	global g_allow_empty_scan
 
-	reqopts = ['dir-scan=', 'dir-store=', 'product-name=', 'product-ver=']
-	optopts = ['pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
+	reqopts = ['dir-scan=', 'dir-store=']
+	optopts = ['3tier-symstore', 'pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
 		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
@@ -345,8 +353,11 @@ def main():
 
 	g_dscan = opts['--dir-scan']
 	g_dstore = opts['--dir-store']
-	g_prodn = opts['--product-name']
-	g_prodv = opts['--product-ver']
+	
+	if '--product-name' in opts:
+		g_prodn = opts['--product-name']
+	if '--product-ver' in opts:
+		g_prodv = opts['--product-ver']
 
 	if '--tmpdir' in opts:
 		g_tmpdir = opts['--tmpdir']
@@ -361,6 +372,8 @@ def main():
 
 	if '--allow-empty-scan' in opts:
 		g_allow_empty_scan = True
+
+	is_3tier = True if '--3tier-symstore' in opts else False
 
 	# Assert valid directories
 	for d in [g_dscan]:
@@ -379,6 +392,14 @@ def main():
 			except:
 				print "Error: Cannot create symbol store directory '%s' (abspath: %s)!"%(d, os.path.abspath(d))
 				return 2
+	
+	if os.listdir(g_dstore)==[] and is_3tier:
+		p_index2txt = g_dstore+'/'+'index2.txt'
+		try:
+			open(p_index2txt, 'w').close()
+		except IOError:
+			print 'Error: Cannot create file "%s" for 3-tier symbol store.'%(p_index2txt)
+			return 3
 
 	err = DoStart()
 
