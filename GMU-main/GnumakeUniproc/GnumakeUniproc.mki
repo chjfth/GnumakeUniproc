@@ -16,6 +16,12 @@ ifeq (,$(gmu_PRJ_NAME_s))
   $(error !GMU!Error: Make-var: `gmu_PRJ_NAME' not defined or it is empty)
 endif
 
+### >>> make stripped internal vars, 
+# so that user is freed from the burden of ensuring no trailing spaces on these make-vars.
+_gmu_ud_SRC_ROOT = $(strip $(gmu_ud_SRC_ROOT))
+### <<<
+
+
 _StartupSignatureFile = _MainPrjBuildStart.gmu.ckt
 
 unexport gmu_DECO_PREFIX_PRJ_NAME gmu_DECO_SUFFIX_PRJ_NAME gmu_DECO_PREFIX_LINK_OUTPUT gmu_DECO_SUFFIX_LINK_OUTPUT
@@ -387,7 +393,7 @@ gmuf_SrcListToHdepList_FreeStyleExtn = $(call gmuf_SrcListToOutputList_addsuffix
 
 
 # Check whether gmu_ud_SRC_ROOT and gmu_up_list_SRC_FROM_ROOT has backslash, if so spout error
-ifeq (1,$(call gmuf_IsSubString,\,$(gmu_ud_SRC_ROOT)))
+ifeq (1,$(call gmuf_IsSubString,\,$(_gmu_ud_SRC_ROOT)))
   $(error !GMU!Error: gmu_ud_SRC_ROOT contains back-slash(\), please use forward-slash(/) instead)
 endif
 
@@ -421,7 +427,7 @@ gmu_Gp_list_REQOBJS_CXX = $(_REQOBJS_CXX)
 gmu_Gp_list_REQOBJS_C_CXX = $(_REQOBJS_C) $(_REQOBJS_CXX)
 gmu_Gp_list_REQOBJS_CXX_C = $(_REQOBJS_CXX) $(_REQOBJS_C)
 
-gmu_Gp_list_AllSource = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmu_up_list_SRC_FROM_ROOT))
+gmu_Gp_list_AllSource = $(addprefix $(_gmu_ud_SRC_ROOT)/,$(gmu_up_list_SRC_FROM_ROOT))
 	#[2007-03-28] Path of all source files, starting with $(gmu_ud_SRC_ROOT). If the user wants
 	#all his source files to depend on something, he can use this.
 
@@ -518,7 +524,7 @@ endif # ifneq (,$(gmu_NO_GEN_HDEPEND))
 
 $(gmu_Gp_list_REQOBJS): _p_ts_HDepend = $(@:.$(gmu_extn_OBJ)=.d)# `ts' means target specific variable
 
-$(_REQOBJS_C): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+$(_REQOBJS_C): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 	$(_GEN_HDEPEND_DOT_D)
 else
@@ -531,7 +537,7 @@ else
 	@$(_DO_C_COMPILE)
 endif
 
-$(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+$(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 	$(_GEN_HDEPEND_DOT_D)
 else
@@ -544,7 +550,7 @@ else
 	@$(_DO_CXX_COMPILE)
 endif
 
-$(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(gmu_ud_SRC_ROOT)/%
+$(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 	$(call _gmuf_ExecuteShcmdList,$(gmu_uc_elst_ASM_PRIOR_PROCESS))
 ifdef gmu_DO_SHOW_COMPILE_CMD
 	$(_DO_ASM_COMPILE)
@@ -556,7 +562,7 @@ endif
 # so I can give a more friendly error message instead of the default
 #	*** No rule to make target `xxx.c', needed by `.../_obj/xxx.c.o'
 _gmu_all_src_extn = $(gmu_u_list_CXX_EXTN) $(gmu_u_list_C_EXTN) $(gmu_u_list_ASM_EXTN)
-$(foreach extn,$(_gmu_all_src_extn),$(gmu_ud_SRC_ROOT)/%.$(extn)):
+$(foreach extn,$(_gmu_all_src_extn),$(_gmu_ud_SRC_ROOT)/%.$(extn)):
 	@echo -e "!GMU!Error: Your source file $@\n  => $(call gmuf_GetAbsPathByRela_soc,$@)\ndoes not exist yet." 
 	@[ 1 = 0 ]
 %.d::
