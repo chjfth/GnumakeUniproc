@@ -1062,8 +1062,11 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 			if [ \$$\$$? = 0 ]; then break;\
 			else\
 				if [ ! -f \$$(_p_ErrorAndDie) ] || [ \$$(_p_ErrorAndDie) -ot \$$(gmu_p_BuildStartCkt) ]; then\
-					echo -e \"\\\\n[[Oops! Got error in a subprj. Do you need a retry(Y/n)?]]\"; read yn;\
-					[ \"\$$\$$yn\" = \"n\" ] || [ \"\$$\$$yn\" = \"N\" ] && echo -n \"\" > \$$(_p_ErrorAndDie) && exit 33;\
+					echo -e \"\\\\n[[ Oops! Got error in a subprj. Do you need a retry? (Y=retry, N=quit, 0=ignore) ]]\"; read yn;\
+					if [ \"\$$\$$yn\" = n ] || [ \"\$$\$$yn\" = N ]; then\
+						echo -n \"\" > \$$(_p_ErrorAndDie) ; exit 33;\
+					elif [ \"\$$\$$yn\" = 0 ]; then exit 0;\
+					fi;\
 				else exit 33;\
 				fi;\
 			fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
