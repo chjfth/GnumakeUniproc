@@ -340,7 +340,8 @@ def main():
 	global g_allow_empty_scan
 
 	reqopts = ['dir-scan=', 'dir-store=']
-	optopts = ['3tier-symstore', 'pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
+	optopts = ['3tier-symstore', 'product-name=', 'product-ver=',
+		'pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
 		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
