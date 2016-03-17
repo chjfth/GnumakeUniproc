@@ -142,13 +142,14 @@ ErrNoFileProcessed = 9
 
 f_ssinput = 'ssinput.txt'
 
-def AssertMissingOpt(reqopts):
+def AssertMissingOpt(reqopts, is_print_errmsg=True):
 	global opts
 	# reqopts can be '--xxx=' or '--xxx'
 	reqoptschk = [ '--'+(opt[:-1] if opt[-1]=='=' else opt) for opt in reqopts]
 	for opt in reqoptschk:
 		if not opt in opts:
-			print 'Error: No %s option assigned.'%(opt)
+			if is_print_errmsg:
+				print 'Error: No %s option assigned.'%(opt)
 			return False
 	return True
 
@@ -348,7 +349,10 @@ def main():
 		print '%s v%s'%(os.path.basename(__file__), version)
 		return 0
 
-	if not AssertMissingOpt(reqopts):
+	if not AssertMissingOpt(reqopts, False):
+		print "Options required:"
+		print "    %s --dir-scan=<dirscan> --dir-store=<dirstore> [--3tier-symstore]"%(
+			os.path.basename(__file__))
 		return 1
 
 	g_dscan = opts['--dir-scan']
