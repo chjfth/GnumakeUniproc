@@ -80,7 +80,7 @@ ifeq ($(findstring %(refname)s,$(gmb_planets)),%(refname)s) #if $(gmb_planets) c
 gmu_uv_list_ALL_SUBPRJ+=%(refname)s
 %(refname)s_Makefile:=%(subprjmkf)s
 %(refname)s_MakeVarDefines:=gmp_bc_DEBUG=%(bDebug)s gmp_bc_UNICODE=%(bUnicode)s \\
-  gmp_u_list_PLUGIN_TO_LOAD_AUX_PRE="PI_sync_devoutput PI_sync_debug_info"\\
+  gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info"\\
   gmi_SYDO_SHOW_COPY_CMD=1 gmp_msvc_WANT_RELEASE_PDB=1 \\
   gmi_SYDO_ud_SYNC_HEADER_TO=$(gmb_syncto)/include \\
   gmi_SYDO_ud_SYNC_LIB_TO=$(gmb_syncto)/$(gmb_bintray)/lib \\
