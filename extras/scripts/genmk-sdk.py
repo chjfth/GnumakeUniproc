@@ -110,10 +110,8 @@ RUN_%(refname)s:
 	@echo ">   $(%(uxm_dirbin_var)s)"
 	@echo ">Shell command-line:"
 	@echo ">   $(call _TrShcmd4echo,$(subst %%{exename},$(call gmuf_GetSubprjOutputNameByRefname,%(refname)s),$(cmd_%(refname)s)))"
-	@(\
-		cd "$(%(uxm_dirbin_var)s)";\
-		$(subst %%{exename},$(call gmuf_GetSubprjOutputNameByRefname,%(refname)s),$(cmd_%(refname)s))\
-	)
+	@cd "$(%(uxm_dirbin_var)s)";\
+		$(subst %%{exename},$(call gmuf_GetSubprjOutputNameByRefname,%(refname)s),$(cmd_%(refname)s))
 	@echo "Verify-run exit-code is 0, success."
 
 """

@@ -1068,7 +1068,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 		$(call _DoVerbose2,echo -e "\t@echo \">>>>> Intermediate-make to build [ $(SubprjEvPrjname) ] starting... ( from autogen-ed makefile: $(call _StripOutputRootPrefix,$(_p_mk_MakeSubPrjs)) ) \"" >> $(_p_mk_MakeSubPrjs_shsubst);) \
 \
 		$(if $(gmu_INTERACTIVE_ERROR_RETRY),\
-			echo -e "\t@(\
+			echo -e "\t@\
 			while true; do \$$($(SubprjEvMakeCmdAndOptsVar));\
 			if [ \$$\$$? = 0 ]; then break;\
 			else\
@@ -1084,7 +1084,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 				echo \"Now retrying sub-make:\";\
 				echo \">> \$$(call gmuf_GetAbsPathByRela_soc,$(SubprjEvMakefile))\";\
 				echo \"\";\
-			fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
+			fi; done;" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		,\
 			echo -e "\t@\$$($(SubprjEvMakeCmdAndOptsVar))" >> $(_p_mk_MakeSubPrjs_shsubst);)\
 \
