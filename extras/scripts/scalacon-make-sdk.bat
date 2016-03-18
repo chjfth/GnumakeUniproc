@@ -39,6 +39,10 @@ if not "%CMD_GETSDKIN%" == "" (
 ) 
 
 @echo on
-umaketime %*
+call umaketime %*
 
-@copy %gmu_LOG_OUTPUT_FILENAME% %gmb_syncto%\%gmb_dirname_sdkout%
+if ERRORLEVEL 1 exit /b 1
+
+@cp_ _gmulog.txt %gmb_thisrepo%/%gmb_dirname_sdkout%
+@cp_ gf/building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
+REM -- In theory the filenames may not be _gmulog.txt or building_list.gmu.txt, but for simplicity, I just use the default.
