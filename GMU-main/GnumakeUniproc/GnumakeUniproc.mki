@@ -1045,7 +1045,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 \
 	echo  -e "\nelse # ifdef _isInCheckoutPhase {$${SubPrj}} /else\n" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 \
-		echo  -e "$(SubprjEvMakeCmdAndOptsVar) := $(SubprjEvMakeCmdAndOptsVal)" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
+		echo  -e "$(SubprjEvMakeCmdAndOptsVar) := \$$(strip $(SubprjEvMakeCmdAndOptsVal))" >> $(_p_mk_MakeSubPrjs_shsubst) ;\
 		echo "$${SubPrj}_IsConfirmPostProc = \$$(if \$$(call _IsOlderThanBuildStart,$(SubprjEvCktShortForm))\$$(call gmuf_Not,$(SubprjEvIsForcePostProc)),,1)" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo "$(SubprjEvCktShortForm): \$$(if $(SubprjEvIsConfirmPostProc),gmu_ut_Always,\$$(gmu_p_BuildStartCkt))" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		echo -e "\t@echo ==============================================================================" >> $(_p_mk_MakeSubPrjs_shsubst); \
@@ -1075,6 +1075,9 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 					fi;\
 				else exit 33;\
 				fi;\
+				echo \"Now retrying sub-make:\";\
+				echo \">> \$$(call gmuf_GetAbsPathByRela_soc,$(SubprjEvMakefile))\";\
+				echo \"\";\
 			fi; done; )" >> $(_p_mk_MakeSubPrjs_shsubst); \
 		,\
 			echo -e "\t@\$$($(SubprjEvMakeCmdAndOptsVar))" >> $(_p_mk_MakeSubPrjs_shsubst);)\

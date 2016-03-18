@@ -116,6 +116,7 @@ _GmuSpace2 = $(_GmuNull)  $(_GmuNull)
 _GmuSpace3 = $(_GmuNull)   $(_GmuNull)
 _GmuSpace4 = $(_GmuNull)     $(_GmuNull)
 
+_gmu_bs2fs = $(subst \,/,$1)
 
 _EchoVarValue = $(if $($1),echo $1=$($1),echo $1 [Null])
 _EchoVarValue2 = echo $1 = "$(call _TrShcmd4echo,[$($1)])"
@@ -644,7 +645,7 @@ define _gmuf_Add1Subprj_Concise
   $$(call _AutoRefnameFromMkfpath,$1)_Makefile = $1
   $$(call _AutoRefnameFromMkfpath,$1)_MakeVarDefines = $2
 endef
-gmuf_AddSubprjs_Concise = $(foreach makefile,$1,$(eval $(call _gmuf_Add1Subprj_Concise,$(makefile),$2)))
+gmuf_AddSubprjs_Concise = $(foreach makefile,$(call _gmu_bs2fs,$1),$(eval $(call _gmuf_Add1Subprj_Concise,$(makefile),$2)))
 
 
 # Functions for source control branch management, 
