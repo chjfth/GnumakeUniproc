@@ -99,6 +99,8 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
   	# Important! For GNU make 3.80, user should first delete it before invoking the makefile of the main-project!
   	#Otherwise, the build can be incomplete. GNU make 3.81 don't have this problem.
 
+  export _p_BuildSucessCkt := $(gmu_d_BuildStartCkt)/_MainPrjBuildSuccess.gmu.ckt
+
   export _p_ErrorAndDie := $(gmu_ud_OUTPUT_ROOT)/_ErrorAndDie.gmu.ckt
 
 #  export gmu_ud_OUTPUT_ROOT_AbsPath := $(gmu_ud_OUTPUT_ROOT)

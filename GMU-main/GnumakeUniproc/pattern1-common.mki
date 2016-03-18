@@ -85,6 +85,7 @@ define _Gmp1SharedFinishingCmds
 	$(RM_) $(_p_ThisPrjBuildInProgress)
 	$(gmu_u_SHOW_PROGRESS_CMD)
 	$(_GmpMakeLevel0ShowEnd)
+	echo -n "" > $(_p_BuildSucessCkt) # touch this file so that the success state can be known by comparing its time-stamp to _MainPrjBuildStart.gmu.ckt
 endef
 
 # Still referring to the old 'gmp_USER_FIRST_TARGET' for backward compatibility.

@@ -84,3 +84,21 @@ echo Error from %0: Cannot Rename %gmu_LOG_OUTPUT_FILENAME% to %gmu_LOG_OUTPUT_F
 goto END
 
 :END
+
+REM Determine success/fail by comparing time stamp
+REM Thanks to: http://stackoverflow.com/questions/1687014/how-do-i-compare-timestamps-of-files-in-a-dos-batch-script
+SET FileStart=_MainPrjBuildStart.gmu.ckt
+SET FileSuccess=_MainPrjBuildSuccess.gmu.ckt
+
+FOR %%i IN (%FileStart%) DO SET TimeStart=%%~ti
+FOR %%i IN (%FileSuccess%) DO SET TimeSuccess=%%~ti
+IF "%TimeStart%"=="%TimeSuccess%" exit /b 0
+
+FOR /F %%i IN ('dir /b /o:d %FileStart% %FileSuccess\%') DO SET Newest=%%i
+if %Newest% == %FileSuccess% (
+	exit /b 0
+) else (
+	exit /b 4
+)
+
+
