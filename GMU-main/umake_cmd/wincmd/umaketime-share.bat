@@ -4,6 +4,12 @@ set "startTime=%time%"
 
 call %~dp0umake-share.bat %*
 
+if ERRORLEVEL 1 (
+	set errmake=4
+) else (
+	set errmake=0
+)
+
 set "stopTime=%time%"
 call :timeDiff diff startTime stopTime
 set /A _sec_=%diff% / 1000
@@ -57,4 +63,6 @@ FOR /F "tokens=1,2,3,4 delims=:,.^ " %%a IN ("!%~2!") DO (
 ( ENDLOCAL & REM RETURN VALUES
     IF "%~2" NEQ "" SET /a %~2=%len%
 )
-EXIT /b
+
+
+EXIT /b %errmake%
