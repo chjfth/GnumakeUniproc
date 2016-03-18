@@ -103,6 +103,9 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
   export _p_ErrorAndDie := $(gmu_ud_OUTPUT_ROOT)/_ErrorAndDie.gmu.ckt
 
+  export gmu_p_RootMakefile := $(gmu_p_StartupMakefile)
+  export gmu_d_RootMakefile := $(call gmuf_GetDir,$(gmu_p_RootMakefile))
+
 #  export gmu_ud_OUTPUT_ROOT_AbsPath := $(gmu_ud_OUTPUT_ROOT)
 
   ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "first restart" state.
@@ -1069,6 +1072,7 @@ $(_p_SubprjsMade):: $(gmu_p_BuildStartCkt)
 			while true; do \$$($(SubprjEvMakeCmdAndOptsVar));\
 			if [ \$$\$$? = 0 ]; then break;\
 			else\
+				\$$(call _gmu_SHCMD_ALERT_ERROR,\$$(gmu_p_RootMakefile),\$$(call gmuf_GetAbsPathByRela_soc,$(SubprjEvMakefile)));\
 				if [ ! -f \$$(_p_ErrorAndDie) ] || [ \$$(_p_ErrorAndDie) -ot \$$(gmu_p_BuildStartCkt) ]; then\
 					echo -e \"\\\\n[[ Oops! Got error in a subprj. Do you need a retry? (Y=retry, N=quit, 0=ignore) ]]\"; read yn;\
 					if [ \"\$$\$$yn\" = n ] || [ \"\$$\$$yn\" = N ]; then\
