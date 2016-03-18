@@ -91,6 +91,11 @@ rem I assume that umake's execution time is at least one second, and do not use 
 SET FileStart=_MainPrjBuildStart.gmu.ckt
 SET FileSuccess=_MainPrjBuildSuccess.gmu.ckt
 
+if not exist %FileStart% if not exist %FileSuccess% (
+	exit /b 0
+REM Sigh, if the makefile does not use GMU, I don't know how to reliably check success state. 
+)
+
 FOR /F %%i IN ('dir /b /o:d %FileStart% %FileSuccess%') DO SET Newest=%%i
 if %Newest% == %FileSuccess% (
 	exit /b 0
