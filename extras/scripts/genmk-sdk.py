@@ -99,9 +99,15 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     $(info Scalacon info: Example-makefile "%(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s" is skipped for umkvariant(%(umkvariant)s) because you did not tell GMU to build its libraries.)
   endif # Check $(_list_cidcver_used) to filter out "not-used [cid,cver]"
 #
+define copy1sdkin_dll_%(refname)s
+	echo "Copying DLLs(sdkin[$1]) from $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"
+	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s)
+endef
+#
 .PHONY: COPYDLLS_%(refname)s
 COPYDLLS_%(refname)s:
-	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs from $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
+	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs(self) from $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
+	@$(foreach v,%(uxm_sdkin_dlls)s,$(call copy1sdkin_dll_%(refname)s,$v))
 #
 .PHONY: RUN_%(refname)s
 RUN_%(refname)s:
@@ -152,6 +158,7 @@ RUN_%(refname)s:
 		uxm_cidver_var = "uxm_%d_%d_cidver"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_cidver
 		
 		uxm_is_copy_selfdll = '1' if 'self' in copydlls.split() else ''
+		uxm_sdkin_dlls = ' '.join([dllname for dllname in copydlls.split() if dllname!='self'])
 		uxm_copy_binvariant = 'bin-release' # because example-bin does not fork into bin-debug//bin-release, so I just use bin-release.
 		# // uxm_copy_binvariant = 'bin-debug' if ('d' in ud) else 'bin-release'
 		
