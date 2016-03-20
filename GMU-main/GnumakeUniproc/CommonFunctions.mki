@@ -436,6 +436,8 @@ gmuf_RemoveDuplicate = $(if $(strip $1),$(call gmuf_RemoveDuplicate,$(call gmuf_
 	# Remove duplicate words in $1, but not sorting.
 	# Thanks to the GMSL library for this function
 
+gmuf_CountNonDupWords = $(words $(sort $1))
+
 # CVS/SVN path construction functions
 _MakeCvsRepsPath_Svr = $(subst --user--,$(if $($1_USER),$($1_USER),anonymous),$($1))$2
 _MakeCvsRepsPath_SvrRps = $(subst --user--,$($1_USER$(subst /,_,$2)),$($1))$2
@@ -758,5 +760,8 @@ gmuf_pick_one_cver_by_cid = $(patsubst $1$(_GmuComma)%,%,$(firstword $(filter $1
 
 _gmu_SHCMD_ALERT_ERROR = $(if $(strip $(gmu_SHCMD_ALERT_ERROR)),$(gmu_SHCMD_ALERT_ERROR),true)
 	# Used when gmu_INTERACTIVE_ERROR_RETRY=1
+
+_gmufe_ShowSubprj_refname_prjname = $$(info $$(_GmuSpace2)[$1] $$($1_Upjname) , $$($1_Prjname))
+
 
 endif # ifndef _CommonFunctions_included 
