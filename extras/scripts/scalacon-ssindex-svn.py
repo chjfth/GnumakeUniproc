@@ -706,7 +706,8 @@ def Sew1Cookie(cookie):
 	s += '*'+TimeStampForVar8(g_dtco) # %var8%
 	return s
 
-def get_sstracks_from_streamstxt(sstreamtxt):
+def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
+	# This function modifiies ssdict(a python dict) object.
 	with open( sstreamtxt, "rb" ) as f:
 		sstream = f.read()
 #		print '{{{%s}}}'%(sstream_text_pick) #debug
@@ -719,7 +720,10 @@ def get_sstracks_from_streamstxt(sstreamtxt):
 		
 		sstracks = r.group(1)
 #		print "[[[cherry-pick(%d)=%s]]]"%(g_nCherryPicks, pick_text) #debug
-		return sstracks
+		for track in sstracks.splitlines():
+			if not track in ssdict:
+				ssdict[track] = 1
+		
 
 def get_pick_sstreams_dirs():
 	if g_pick_sstreams_dirs:
@@ -764,7 +768,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 	
 	global g_nCherryPicks 
 	print '  Sstream cherry picking for %s ...'%(pdbpath)
-	sstracks_all = ''
+	sstracks_all_dict = {} # use python dict as a easy duplication eliminator
 	
 	try:
 		dirs = get_pick_sstreams_dirs()
@@ -784,7 +788,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 					if filename.endswith('.sstream.txt'):
 						sstream_filepath = dir+'/'+filename
 						print '  > picking from %s'%(sstream_filepath)
-						sstracks_all += get_sstracks_from_streamstxt(sstream_filepath)
+						append_sstracks_from_streamstxt(sstracks_all_dict, sstream_filepath)
 						g_nCherryPicks += 1
 		else:
 			# looks for specific <cherry>.sstream.txt files
@@ -797,8 +801,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 					sstream_filepath = dir+'/'+ "%s.sstream.txt"%(cherry)
 					if os.path.isfile(sstream_filepath):
 						print '  > picking from %s'%(sstream_filepath)
-						sstracks = get_sstracks_from_streamstxt(sstream_filepath)
-						sstracks_all += sstracks
+						append_sstracks_from_streamstxt(sstracks_all_dict, sstream_filepath)
 						g_nCherryPicks += 1
 						# break // just go on and pick from all dirs
 				
@@ -811,7 +814,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 		Logp( "Error: IOError on %s."%(sstream_filepath) )
 		exit(10)
 
-	return sstracks_all
+	return '\n'.join(sstracks_all_dict.keys())
 
 def Sew1Pdb(pdbpath):
 	pdbpath = os.path.abspath(pdbpath) # pdb filepath
@@ -869,8 +872,7 @@ def Sew1Pdb(pdbpath):
 	if g_pick_cherries:
 		tracks_pick = cherry_pick_srcsrv_tracks(pdbpath)
 	
-	tracks_all = tracks_self + tracks_pick
-	#tracks_all = re.sub('[\r\n]+', '\r\n', tracks_all) #eliminate verbose \r\n
+	tracks_all = tracks_self + '\n' + tracks_pick
 	
 	srcsrv_stream_text = SRCSRV_stream_template.format(
 		datetime=g_dtco,
