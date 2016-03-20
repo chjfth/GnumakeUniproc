@@ -9,6 +9,8 @@ _pluginId_nls_version_sync := $(gmpv_ThisPluginId)
 ## But please keep it here for backward compatibility of some old Makefiles. ##
 ###############################################################################
 
+$(info !!!$(_pluginId_nls_version_sync) is a deprecated plugin. You should use PI_sc_version_sync instead!)
+
 # User input vars:
 
 # gmi_NLVS_upp_list_SYNC = 

@@ -101,7 +101,7 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
 #
 define copy1sdkin_dll_%(refname)s
 	echo "Copying DLLs(sdkin[$1]) from $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"
-	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s)
+	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s) # "$1*" results in .pdb be copied as well, just what we want.
 endef
 #
 .PHONY: COPYDLLS_%(refname)s
