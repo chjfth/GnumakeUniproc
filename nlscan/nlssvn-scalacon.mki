@@ -26,6 +26,10 @@ include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 
   NlssdkLibSearchDirs = $(NLSSDK_the_prefix)/$(SDKLIB_CV)
 
+  UserDllNameForLink   = $(UserDllNameForLink_U)
+  UserDllNameForLink_UD= $(UserDllNameForLink_U)
+	# These two names do not reflect the "essence", but for brain friendly.
+
 ### <<< something for all compilers now
 
 ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
@@ -35,7 +39,6 @@ ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
 	# For $1=@(repo) :
 	# @(repo)--imp.lib or @(repo)_U--imp.lib (on Windows)
   UserDllNameForLink_  = $(call gmpf_MakeDllNameForLink,$1--imp)
-  UserDllNameForLink = $(UserDllNameForLink_U)
 
   #NlssdkDllSearchDirs = $(NlssdkLibSearchDirs) # deprecated on 2016-03-16
 
@@ -63,7 +66,6 @@ else ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc))
 	# For $1=@(repo) :
 	# -l@(repo) or -l@(repo)_U.so  (on Linux)
   UserDllNameForLink_  = $(call gmpf_MakeUpSysLibsToLink,$1)
-  UserDllNameForLink   = $(UserDllNameForLink_U)
 
   #NlssdkDllSearchDirs = $(NLSSDK_fs)/$(gmp_COMPILER_ID_VER)/$(if $(gmp_bc_DEBUG),bin-debug,bin-release) # deprecated on 2016-03-16
 
