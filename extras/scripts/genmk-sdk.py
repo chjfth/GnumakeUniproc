@@ -245,11 +245,11 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
 	fh.close()
 
 
-def GenOneSubprj_in_mc(idx, compiler_id, cidver, bintray, planets_cid, planets_cidver=''):
+def GenOneSubprj_in_mc(idx, compiler_id, cidver, planets_cid, planets_cidver=''):
 	refname = 'subprjRefname_' + compiler_id + '_' + cidver
 	Makefile_1c = makefile_1c_getname(compiler_id)
 	fname_cenv_mki = get_fname_cenv_mki(compiler_id, cidver)
-	chunk_subprj = """
+	chunk_subprj = r"""
   # [%(idx)d] %(compiler_id)s, %(cidver)s
   ifeq (1,$(call gmuf_IsWordInWords,%(compiler_id)s,$(gmb_compiler_ids)))
   ifeq (1,$(call gmuf_IsWordInWords,%(cidver)s,$(gmb_%(compiler_id)s_vers)))
@@ -264,9 +264,9 @@ def GenOneSubprj_in_mc(idx, compiler_id, cidver, bintray, planets_cid, planets_c
     endif
     gmu_uv_list_ALL_SUBPRJ += %(refname)s
     %(refname)s_Makefile := %(Makefile_1c)s
-    %(refname)s_MakeVarDefines := gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=%(cidver)s \\
-      gmb_planets=$(call _get_specific_gmb_planets,%(compiler_id)s,%(cidver)s,%(planets_cid)s,%(planets_cidver)s) \\
-      gmb_bintray=%(bintray)s $(gmpf_LoadCenv_%(compiler_id)s_%(cidver)s)
+    %(refname)s_MakeVarDefines := gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=%(cidver)s \
+      gmb_planets=$(call _get_specific_gmb_planets,%(compiler_id)s,%(cidver)s,%(planets_cid)s,%(planets_cidver)s) \
+      gmb_cidver=%(cidver)s $(gmpf_LoadCenv_%(compiler_id)s_%(cidver)s)
     $(shell echo "%(compiler_id)s,%(cidver)s" >> _cidcver_used.gmu.txt)
   endif
   endif
@@ -333,14 +333,11 @@ endif
 		# Generate per-subprj chunk for __Makefile-mc (chunks_subprjinfo)
 		cidvers = cid_info['cidvers']
 		for cidver in cidvers.split():
-			# cidver may be 'vc60', 'vc80x64' etc
-			bintray = cid_info['bintray'].replace('%{cidver}', cidver)
-
 			# Process planets.<cidver> for this cid
 			planets_cidver = cid_info['planets.'+cidver] if ('planets.'+cidver in cid_info) else ''
 
 			idx += 1
-			sret = GenOneSubprj_in_mc(idx, cid, cidver, bintray, cid_info['planets'], planets_cidver)
+			sret = GenOneSubprj_in_mc(idx, cid, cidver, cid_info['planets'], planets_cidver)
 			chunks_subprjinfo += sret
 
 		# Generate __Makefile-<cid>-1c files, using another .py
@@ -420,7 +417,6 @@ def ExtractIniInfo(iniobj):
 			exit(4)
 
 		IniSetKeyDefault(cid, 'planets', 'all')
-		IniSetKeyDefault(cid, 'bintray', '%{cidver}')
 	
 	if not g_compiler_ids:
 		print 'Scalacon Error: Your INI file does not have any [compiler-id.xxx] section.'

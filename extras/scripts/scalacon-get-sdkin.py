@@ -42,7 +42,9 @@ svndatetime= 2016-03-05 23:00
 svnurl=      %(NLSSVN)s/CommonLib/common-include/trunk
 localdir=    %(gmb_dirname_sdkin)s/include
 want-cidver-mapping=1
-; localdir is relative to this INI file.
+; -- localdir is relative to this INI file.
+implicit-cidver-mapping=
+explicit-cidver-mapping=
 
 [sdkin.mm_snprintf]
 svndatetime= 2016-03-06 13:39:43
@@ -102,9 +104,12 @@ $/sdkin 中最终呈现的 cidver ，以及 cidver 中的内容由四层信息�
 	覆盖掉 (2),(3) 的映射方法，直接建立跟 (1) 的映射关系。若 (1) 中没有期望的 cidver 目标，
 	宣告失败。
 
-implicit-cidver-mapping= 和 explicit-cidver-mapping= 的取值格式：
+im/explicit-cidver-mapping= 的取值格式：
 
 implicit-cidver-mapping = vc100(=vc80) vc100x64(=vc80x64)
+
+当 want-cid-mapping=1 时，implicit-cidver-mapping= 和 explicit-cidver-mapping= 可以为空，表示
+仅仅遵循第 (2) 层的 mapping 。
 
 """
 
@@ -117,6 +122,7 @@ import shlex
 import shutil
 import stat
 import ConfigParser # INI op
+import re
 
 version = "1.2"
 optdict = {}
@@ -129,7 +135,7 @@ g_self_dir_param = ''
 
 g_is_simulate = False
 
-DIRNAME_CACHE = 'sdkin-cidver-cache'
+DIRNAME_CACHE = 'sdkin-cache'
 
 def os_sep(hint=""):
 	# A more friendly os.sep .
@@ -161,6 +167,24 @@ def force_rmtree(dir):
 	if os.path.isdir(dir):
 		shutil.rmtree(dir)
 	
+def copytree_overwrite(src, dest, ignore=None):
+	# Thanks to: http://stackoverflow.com/a/15824216/151453
+	if os.path.isdir(src):
+		if not os.path.isdir(dest):
+			os.makedirs(dest)
+		files = os.listdir(src)
+		if ignore is not None:
+			ignored = ignore(src, files)
+		else:
+			ignored = set()
+		for f in files:
+			if f not in ignored:
+				copytree_overwrite(os.path.join(src, f), 
+									os.path.join(dest, f), 
+									ignore)
+	else:
+		shutil.copyfile(src, dest)
+
 
 def pick_sections(iniobj, g_ini_dir):
 	sdknames = iniobj.sections()
@@ -187,10 +211,48 @@ def pick_sections(iniobj, g_ini_dir):
 		yield section, dsection, localdir_final # dsection's d implies dict
 
 
-def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir):
-	# section is section name
+def merge_sdk_self_mapping(mapping, inifile):
+	# [in/out] mapping
+	# Grab a cidver-mapping.ini from your harddisk to know the format of this inifile.
+	"""Sample: 
+[mapping]
+vc90=vc80
+vc90x64=vc80x64
+...
+"""
+	#
+	iniobj = ConfigParser.ConfigParser()
+	iniobj.read(inifile)
+	kvpairs = iniobj.items('mapping')
+	for virtual, real in kvpairs:
+		mapping.setdefault(virtual, [])
+		mapping[virtual].insert(0, real)
+	
+
+def make_cidver_mapping_dict(mapping_spec):
+	d = {}
+	mapping_entries = mapping_spec.split()
+	for entry in mapping_entries:
+		# one entry is like: "vc100(=vc80)"
+		r = re.match(r'(.+)\(=(.+)\)' , entry)
+		if not r or not len(r.groups())==2:
+			print 'Scalacon Error: %s contains invalid cidver mapping spec: "%s"'%(g_ini_filepath, entry)
+			exit(24)
+		virtual_cidver = r.group(1)
+		real_cidver = r.group(2)
+		d[virtual_cidver] = real_cidver
+		
+	return d
+
+def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir, 
+	implicit_mapping_spec, explicit_mapping_spec):
+	# section is section name,
+	# all other params are items from this section.
+	# im/explicit_mapping_spec sample: "vc100(=vc80) vc100x64(=vc80x64)"
 	# [PENDING] g_isforce processing ........
-	cachedir = os.path.join(g_ini_dir, DIRNAME_CACHE. section
+	
+	sdk_refname = re.sub(r'^sdkin\.', '', section)
+	cachedir = os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname)
 	svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, svndatetime, cachedir)
 	print "Running cmd: \n  " + svncmd
 	
@@ -199,8 +261,77 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir):
 	
 	ret = subprocess.check_call(shlex.split(svncmd))
 	
-	# Apply four layer cid-mapping
-	# zzz
+	### Apply four-layer cid-mapping
+
+	cidvers_dir = os.path.join(cachedir, 'cidvers')
+		# cidvers_dir is expected to contain sub-dirs like vc60, vc80, vc100x64 etc
+	mapping = {} # mapping[virtual]=real
+		# Example: 
+		#	mapping['vc100']=['vc90', 'vc80']
+		# means:
+		# SDK-user's vc100 will be mapped to vc90; some previous layer has mapped it to 'vc80' but has been overridden.
+		# I record the overridden info just for debugging purpose.
+	
+	# layer 1: real <cidver> folder, vc60, vc80 etc 
+	list_cidvers = os.listdir(cidvers_dir)
+	assert list_cidvers
+	for cidver in list_cidvers:
+		mapping[cidver] = [cidver]
+	
+	# layer 2: cidver-mapping.ini
+	self_mapping_ini = os.path.join(cachedir,'cidver-mapping.ini')
+	if os.path.isfile(self_mapping_ini):
+		merge_sdk_self_mapping(mapping, self_mapping_ini)
+	
+	# layer 3: SDK-user implicit mapping
+	if implicit_mapping_spec:
+		implicit_mapping_dict = make_cidver_mapping_dict(implicit_mapping_spec)
+		for virtual_cidver in implicit_mapping_dict.keys():
+			if not virtual_cidver in mapping:
+				# add this mapping only in case of not exist
+				mapping[virtual_cidver] = implicit_mapping_dict[virtual_cidver]
+	
+	# layer 4: SDK-user explicit mapping
+	if explicit_mapping_spec:
+		explicit_mapping_dict = make_cidver_mapping_dict(explicit_mapping_spec)
+		for virtual_cidver in explicit_mapping_dict.keys():
+			# use this mapping
+			mapping.setdefault(virtual_cidver, [])
+			mapping[virtual_cidver].insert(0, explicit_mapping_dict[virtual_cidver])
+	
+	copytree_overwrite(cachedir, localdir)
+
+	# Now, generate virtual cidver dirs(directly in localdir) by copying from their real bodies
+	for virtual_cidver in mapping:
+		real_cidver = mapping[virtual_cidver][0]
+		dir_src = os.path.join(cachedir, 'cidvers', real_cidver)
+		dir_dst = os.path.join(localdir, 'cidvers', virtual_cidver)
+		
+		if not os.path.isdir(dir_src):
+			print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist, '\
+				'which means that input SDK(INI section [%s]) does not provide that cidver.'%(
+				virtual_cidver, real_cidver, dir_src, section)
+			exit(25)
+		
+		copytree_overwrite(dir_src, dir_dst)
+		
+		# create an empty file telling user the cidver's real body
+		open(dir_dst+'/_CopiedFrom.cidver.'+real_cidver, "wb").close()
+
+
+def getsdk_direct(section, svnurl, svndatetime, localdir):
+	if (not g_isforce) and os.path.exists(localdir):
+		print 'Existed localdir "%s", skipped.'%(localdir)
+		return
+	
+	svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, svndatetime, localdir)
+	print "Running cmd: \n  " + svncmd
+	
+	if g_is_simulate:
+		return
+	
+	ret = subprocess.check_call(shlex.split(svncmd))
+
 
 def do_getsdks():
 	iniobj = ConfigParser.ConfigParser()
@@ -249,30 +380,20 @@ def do_getsdks():
 		
 		try:
 			want_cidver_mapping = dsection['want-cidver-mapping']
+			implicit_mapping_spec = dsection.setdefault('implicit-cidver-mapping', '')
+			explicit_mapping_spec = dsection.setdefault('explicit-cidver-mapping', '')
 		except:
 			want_cidver_mapping = False
 		
-		if want_cidver_mapping:
-			getsdk_with_cidver_mapping(section, svnrul, svndatetime)
-		else:
-			getsdk_direct(section, svnrul, svndatetime)
-		
-###
 		print "SDK[%s] from %s"%(section, svnurl)
-		
-		if (not g_isforce) and os.path.exists(localdir):
-			print 'Existed localdir "%s", skipped.'%(localdir)
-			continue
-		
-		svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, svndatetime, localdir)
-		print "Running cmd: \n  " + svncmd
-		
-		if g_is_simulate:
-			continue
-		
-		ret = subprocess.check_call(shlex.split(svncmd))
 
-		# Make the exported files read-only.
+		if want_cidver_mapping:
+			getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir, implicit_mapping_spec, explicit_mapping_spec)
+		else:
+			getsdk_direct(section, svnrul, svndatetime, localdir)
+		
+		# Make the exported files read-only. 
+		# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
 		for root, dirs, files in os.walk(localdir):
 			for file in files:
 #				print 'Make read-only:', root+os.sep+file #debug

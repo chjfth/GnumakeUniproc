@@ -38,17 +38,16 @@ gmb_syncto=<root-dir>
 Example:
 	gmb_syncto=D:/SDKOutput
 	
-	Copy the generated headers,libs,dlls to D:/SDKOutput directory.
-
-gmb_bintray=<dirname>
+	Copy the generated headers,libs,dlls to D:/SDKOutput with scalacon layout .
 
 Example:
-	bintray=vc8
+	when current cidver=vc8
 	
-	LIBs will be copied to D:/SDKOutput/vc8/lib
-	DLLs will be copied to D:/SDKOutput/vc8/bin-debug or D:/SDKOutput/vc8/bin-debug .
+	.h will be copied to D:/SDKOutput/include
+	LIBs will be copied to D:/SDKOutput/cidvers/vc8/lib
+	DLLs will be copied to D:/SDKOutput/cidvers/vc8/bin-debug and D:/SDKOutput/cidvers/vc8/bin-release .
 
-	See NlsWiki pageId=47907618 for directory layout spec for the bintray thing.
+	NlsWiki pageId=47907618 has some historic information about such directory layout structure.
 
 
 gmb_ : GnuMake Script assistant.
@@ -83,9 +82,9 @@ gmu_uv_list_ALL_SUBPRJ+=%(refname)s
   gmp_u_list_PLUGIN_TO_LOAD_ENV_PRE="PI_sync_devoutput PI_sync_debug_info"\\
   gmi_SYDO_SHOW_COPY_CMD=1 gmp_msvc_WANT_RELEASE_PDB=1 \\
   gmi_SYDO_ud_SYNC_HEADER_TO=$(gmb_syncto)/include \\
-  gmi_SYDO_ud_SYNC_LIB_TO=$(gmb_syncto)/$(gmb_bintray)/lib \\
-  gmi_SYDO_ud_SYNC_DLL_TO=$(gmb_syncto)/$(gmb_bintray)/bin-%(sDorR)s \\
-  gmi_SYDO_ud_SYNC_DBGINFO_TO=$(gmb_syncto)/$(gmb_bintray)/%(sdDbgInfo)s
+  gmi_SYDO_ud_SYNC_LIB_TO=$(gmb_syncto)/cidvers/$(gmb_cidver)/lib \\
+  gmi_SYDO_ud_SYNC_DLL_TO=$(gmb_syncto)/cidvers/$(gmb_cidver)/bin-%(sDorR)s \\
+  gmi_SYDO_ud_SYNC_DBGINFO_TO=$(gmb_syncto)/cidvers/$(gmb_cidver)/%(sdDbgInfo)s
 %(refname)s_IsForcePostProc:=1
 endif
 """	
@@ -116,13 +115,13 @@ ifeq (1,$(_isNowNotGmuGetPrjAttr))
 #### >>>>
 
 ifndef gmb_planets
-  $(error gmb_planets is not defined)
+  $(error gmb_planets is not passed in from parent)
+endif
+ifndef gmb_cidver
+  $(error gmb_cidver is not passed in from parent)
 endif
 ifndef gmb_syncto
-  $(error gmb_syncto is not defined)
-endif
-ifndef gmb_bintray
-  $(error gmb_bintray is not defined)
+  $(error gmb_syncto is not passed in from parent)
 endif
 ifeq ($(strip $(gmb_planets)),all)
   override gmb_planets=RML RMD RUL RUD DML DMD DUL DUD
