@@ -92,6 +92,7 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
 gmp_USER_POST_TARGETS += gmit_SCPSS_SEW_PDB
 # <<< Plugin PI_sc_pdb_sew_svn related instructions 
 
+gmp_USER_POST_TARGETS += Copy-cidver-mapping-ini
 
 
 
@@ -109,6 +110,15 @@ ifndef gmb_ignore_uxm
   gmu_uv_list_ALL_SUBPRJ += vbuxm
   vbuxm_Makefile = __Makefile-vbuxm
 endif
+
+
+
+.PHONY: Copy-cidver-mapping-ini
+Copy-cidver-mapping-ini: 
+	$(CP_) $(gmb_thisrepo)/cidver-mapping.ini $(gmb_syncto)
+
+
+
 
 endif # ifeq (,$(_isNowGmuGetPrjAttr))
 endif #__PLUGIN_MAKESDK_2016_LOADED
