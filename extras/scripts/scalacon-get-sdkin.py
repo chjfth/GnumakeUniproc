@@ -308,10 +308,14 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 		dir_dst = os.path.join(localdir, 'cidvers', virtual_cidver)
 		
 		if not os.path.isdir(dir_src):
-			print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist, '\
-				'which means that input SDK(INI section [%s]) does not provide that cidver.'%(
-				virtual_cidver, real_cidver, dir_src, section)
-			exit(25)
+			# try link layer(3-4) to layer 2 (just a recursive mapping operation)
+			real_cidver = mapping[real_cidver][0]
+			dir_src = os.path.join(cachedir, 'cidvers', real_cidver)
+			if not os.path.isdir(dir_src):
+				print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist, '\
+					'which means that input SDK(INI section [%s]) does not provide that cidver.'%(
+					virtual_cidver, real_cidver, dir_src, section)
+				exit(25)
 		
 		copytree_overwrite(dir_src, dir_dst)
 		
