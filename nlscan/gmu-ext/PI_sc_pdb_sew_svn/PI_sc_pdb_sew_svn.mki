@@ -106,6 +106,8 @@ _pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
 # gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI = <inifilepath>
 # gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN = <dirsdkin>
 # gmi_SCPSS_SRC_MAPPING_FROM_INI = <inifilepath>,<[global]>,<examples_dir>,<examples_copyto>
+# gmi_SCPSS_SDKOUT_DOTH_LOCALROOT=
+# gmi_SCPSS_SDKIN_DOTH_LOCALROOT=
 	# (optional)
 	# This value is passed to scalacon-ssindex-svn.py via options:
 	# Check scalacon-ssindex-svn.py's comment to get the usage.

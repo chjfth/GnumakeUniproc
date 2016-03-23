@@ -9,11 +9,17 @@ _pluginId_makesdk_2016 := $(gmpv_ThisPluginId)
 
 # User input vars:
 
-# gmi_MSDK_up_BUILDSDK_INI = 
-	# (must)
-	# Set this to an INI configuration file describing how to make the SDK package.
+# gmi_MSDK_ud_SELF_DOTH_FROM_REPO= (optional)
+#	Directory of offering interface headers(.h), relative to this-repo-root.
+#	This option is required for the magical .h PDB-sewing to work for your SDK users.
+#	User normally set this in their make-sdk Makefile, like gmi_MSDK_ud_SELF_DOTH_FROM_REPO=libsrc/include .
 
-# The plugin takes following env-vars as input:
+# gmi_MSDK_ud_USING_DOTH_FROM_SDKIN= (optional, has default, normally user should not override it)
+#	Directory of SDKIN's interface headers(.h), relative to SDKIN's directory.
+#	This option is required for the magical .h PDB-sewing to work when using other's SDK(sdkin).
+
+
+# Further, this plugin takes following env-vars as input:
 # gmb_buildsdk_ini=
 # gmb_compiler_ids=
 # gmb_builds=
@@ -82,12 +88,23 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
   gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = # use default
   #
   gmi_SCPSS_PICK_CHERRIES = *
-  ifneq (,$(gmb_dirname_sdkin))
+  ifneq (,$(strip $(gmb_dirname_sdkin)))
     gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI = $(gmi_MSDK_up_BUILDSDK_INI)
     gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN = $(gmb_thisrepo)/$(gmb_dirname_sdkin)
   endif
   gmi_SCPSS_SAVE_SSTREAMS_DIR = !..
   gmi_SCPSS_SRC_MAPPING_FROM_INI=$(gmi_MSDK_up_BUILDSDK_INI),$(gmb_syncto),[global],examples_copyto,examples_dir
+
+  ifneq (,$(strip $(gmi_MSDK_ud_SELF_DOTH_FROM_REPO)))
+    gmi_SCPSS_SDKOUT_DOTH_LOCALROOT=$(if $(call gmuf_IsStringEqual,$(strip $(gmi_MSDK_ud_SELF_DOTH_FROM_REPO)),.),$(gmb_thisrepo),$(gmb_thisrepo)/$(gmi_MSDK_ud_SELF_DOTH_FROM_REPO))
+  endif
+
+  ifeq (,$(strip $(gmi_MSDK_ud_USING_DOTH_FROM_SDKIN)))
+    gmi_MSDK_ud_USING_DOTH_FROM_SDKIN = include
+      # set this as default because we always grab SDKIN binary packages to $(gmb_thisrepo)/$(gmb_dirname_sdkin)
+      # which definitely has an "include" folder in it.
+  endif
+  gmi_SCPSS_SDKIN_DOTH_LOCALROOT=$(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(strip $(gmi_MSDK_ud_USING_DOTH_FROM_SDKIN))
 
 gmp_USER_POST_TARGETS += gmit_SCPSS_SEW_PDB
 # <<< Plugin PI_sc_pdb_sew_svn related instructions 
@@ -112,10 +129,11 @@ ifndef gmb_ignore_uxm
 endif
 
 
+_p_cidver_mapping_ini := $(gmb_thisrepo)/cidver-mapping.ini
 
 .PHONY: Copy-cidver-mapping-ini
 Copy-cidver-mapping-ini: 
-	$(CP_) $(gmb_thisrepo)/cidver-mapping.ini $(gmb_syncto)
+	$(if wildcard $(_p_cidver_mapping_ini),$(CP_) $(_p_cidver_mapping_ini) $(gmb_syncto))
 
 
 

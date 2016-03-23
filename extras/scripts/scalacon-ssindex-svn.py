@@ -196,7 +196,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	编译得到的 EXE 进行 PDB-sewing 时，d:\verify\examples\foobar.c 并不会被 sewing ，原因是 
 	``svn info d:\verify\examples\foobar.c`` 不会返回一个 SVN URL 。没有这个 SVN URL 信息，
 	本程序是无法知道如何对 d:\verify\examples\foobar.c 进行 sewing 的。
-	解决方法是，在 CalTrack(cookie) 中，将 cookie 由 d:\verify\examples\foobar.c 替换为
+	解决方法是，在 CalTrack_by_svninfo(cookie) 中，将 cookie 由 d:\verify\examples\foobar.c 替换为
 	d:\mywork\examples\foobar.c ，``svn info d:\work\examples\foobar.c`` 是可以返回 SVN URL 的。
 	有了 SVN URL, 此 cookie 的 sewing 八要素就能够生成了，让这八要素跟原始 cookie ，即
 	d:\verify\examples\foobar.c， 发生关联，此 cookie 的 sewing 动作完成。
@@ -214,6 +214,15 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	.
 	增加此参数的缘由：在 Scalacon 2016 的设计中，dirpfxpdb 和 dirpfxsvn 的值需要分析 INI 内容
 	才能得到，而这个对于 makefile 是个难事，因此，干脆将这个动作交给 py 去处理好了。
+
+--sdkout-doth-localroot=<sdkout-hdir>
+--sdkin-doth-localroot=<sdkin-hdir>
+	[皆可选]
+	此两参数的作用是为了让 SDK 提供者针对 .h （强调是 .h 不是 .c/.cpp）的 PDB-sewing 动作
+	能够在 SDK 用户端发生。运行机理有些复杂，见我的 Evernote 笔记
+	http://www.evernote.com/l/ABX8Qv7Jw_hJWLh8VONL4PlSynpG-eK56gA/
+	如果不提供，则略过相关动作。
+
 
 --logfile=<logfile>
 	[可选]
@@ -293,6 +302,11 @@ g_nCherryPicks = 0
 
 g_srcmapping_pdb = ''
 g_srcmapping_svn = ''
+
+g_sdkout_hdir = ''
+g_sdkin_hdir = ''
+
+g_dict_doth_mapping = {}
 
 ErrNoFileProcessed = 9
 
@@ -575,7 +589,7 @@ def DissectSvnRemain(svnhostid, urm):
 		exit(3)
 
 
-def CalTrack(cookie):
+def CalTrack_by_svninfo(cookie):
 	"""
 	Return the track info(in Track object) corresponding to the input cookie.
 	Return None if no track info is available(when the cookie has no svn info).
@@ -684,30 +698,46 @@ def Sew1Cookie(cookie):
 		t = g_tracks[cookie]
 		Log( "'%s' already in cache%s."%(cookie, '' if t else '(None)') )
 	else:
-		t = CalTrack(cookie)
+		t = CalTrack_by_svninfo(cookie)
 		g_tracks[cookie] = t
-			# Add the new cookie to cache(even if None). Yes, use filepath as g_tracks' index
+			# Add the new cookie to cache(even if None). Yes, use filepath as g_tracks' key
 		if t:
 			g_nValidTracks += 1
 
-	if not t:
+	if t:
+		g_nTracksSewed += 1
+
+		# concatenate track properties into a track line
+		s = cookie # %var1%
+		s += '*'+t.SvnHostId # %var2%
+		s += '*'+t.SvnRootUrl # %var3%
+		s += '*'+t.Reposie # %var4%
+		s += '*'+t.Branchie # %var5%
+		s += '*'+t.Innard # %var6%
+		s += '*'+g_dtco      # %var7%
+		s += '*'+TimeStampForVar8(g_dtco) # %var8%
+		return s
+	
+	elif g_dict_doth_mapping:
+		assert g_sdkin_hdir
+		g_sdkin_hdir_bsl = g_sdkin_hdir.replace('/', '\\').lower()
+		# magical .h PDB-sewing processing
+#		print "g_sdkin_hdir_bsl=%s"%(g_sdkin_hdir_bsl) #debug
+		cookie_l = cookie.lower()
+		if cookie_l.startswith(g_sdkin_hdir_bsl):
+			cookie_tail = cookie_l[len(g_sdkin_hdir_bsl):]
+			if cookie_tail in g_dict_doth_mapping:
+				s = cookie + '*' + g_dict_doth_mapping[cookie_tail]
+#				print '>>>[debug]>>> h-PDB-sewing=%s'%(s) #debug
+				return s
+		return ''
+	
+	else:
 		return ''
 
-	g_nTracksSewed += 1
-
-	# concatenate track properties into a track line
-	s = cookie # %var1%
-	s += '*'+t.SvnHostId # %var2%
-	s += '*'+t.SvnRootUrl # %var3%
-	s += '*'+t.Reposie # %var4%
-	s += '*'+t.Branchie # %var5%
-	s += '*'+t.Innard # %var6%
-	s += '*'+g_dtco      # %var7%
-	s += '*'+TimeStampForVar8(g_dtco) # %var8%
-	return s
 
 def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
-	# This function modifiies ssdict(a python dict) object.
+	# This function modifies ssdict(a python dict) object.
 	with open( sstreamtxt, "rb" ) as f:
 		sstream = f.read()
 #		print '{{{%s}}}'%(sstream_text_pick) #debug
@@ -719,10 +749,45 @@ def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
 			exit(12)
 		
 		sstracks = r.group(1)
+
+		# Check for possible [scalacon]sdkout-doth-localroot=<dir> (would appear at end of the .sstream.txt) 
+		# for magical .h PDB-sewing.
+		r = re.search(r'\n\[scalacon\]sdkout-doth-localroot=(.+)', sstream)
+#		print '@@@@@@@@@@@@@[%s] r=%s'%(sstreamtxt, r) #debug-zzz
+		picked_hdir = r.group(1) if r else ''
+			# Sample: picked_hdir=d:\w\CommonLib\common-include
+#		print '>>>[debug]>>> picked_hdir=%s'%(picked_hdir) #debug
+
 #		print "[[[cherry-pick(%d)=%s]]]"%(g_nCherryPicks, pick_text) #debug
 		for track in sstracks.splitlines():
-			if not track in ssdict:
+			if not track in ssdict: # this track is "new", do only new
+				if track=='':
+					continue
+				
 				ssdict[track] = 1
+				
+				if not g_sdkin_hdir:
+					continue
+				
+				if not picked_hdir:
+					continue
+				
+#				print '@@@@@@@22222:[[%s]][[%d]]'%(track, len(track)) #debug
+				cookie, cookie_args = track.split('*', 1)
+					# Sample:
+					# cookie = r'd:\w\CommonLib\common-include\include\DlOpe.h'
+					# cookie_args = '*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/DlOpe.h*2016-03-22 19:32:56*20160322.193256'
+				
+				cookie_l = cookie.lower()
+				picked_hdir_l = picked_hdir.lower()
+				if cookie_l.startswith(picked_hdir_l):
+					cookie_tail = cookie[len(picked_hdir_l):] # strip picked_hdir_l prefix
+						# Sample: tail=r'\DlOpe.h'
+#					print '$$$matched cookie=%s [tail=%s]'%(cookie_l, cookie_tail) # debug
+					if cookie_tail in g_dict_doth_mapping:
+						assert g_dict_doth_mapping[cookie_tail] == cookie_args
+					else:
+						g_dict_doth_mapping[cookie_tail] = cookie_args
 		
 
 def get_pick_sstreams_dirs():
@@ -762,7 +827,8 @@ cidvers=vc80ppc
 		allvers.extend(cidvers.split())
 	
 	assert g_pick_sstreams_dir_sdkin
-	return [ g_pick_sstreams_dir_sdkin+'/'+v for v in allvers ]
+	return [ os.path.join(g_pick_sstreams_dir_sdkin, 'cidvers', v) for v in allvers ]
+
 
 def cherry_pick_srcsrv_tracks(pdbpath):
 	
@@ -816,6 +882,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 
 	return '\n'.join(sstracks_all_dict.keys())
 
+
 def Sew1Pdb(pdbpath):
 	pdbpath = os.path.abspath(pdbpath) # pdb filepath
 	
@@ -860,6 +927,12 @@ def Sew1Pdb(pdbpath):
 	tracks_all = ''  # store tracks text 
 	ntrack = 0
 
+	if g_pick_cherries:
+		tracks_pick = cherry_pick_srcsrv_tracks(pdbpath)
+
+	# Note: We should do cherry_pick_srcsrv_tracks() before Sew1Cookie cycle,
+	# because cherry_pick_srcsrv_tracks() will collect info in g_dict_doth_mapping for Sew1Cookie's use.
+
 	for cookie in srclist_want:
 		t = Sew1Cookie(cookie)
 		if t:
@@ -869,9 +942,6 @@ def Sew1Pdb(pdbpath):
 	if ntrack==0 and not g_pick_cherries:
 		return True # Do nothing more and return
 
-	if g_pick_cherries:
-		tracks_pick = cherry_pick_srcsrv_tracks(pdbpath)
-	
 	tracks_all = tracks_self + '\n' + tracks_pick
 	
 	srcsrv_stream_text = SRCSRV_stream_template.format(
@@ -943,7 +1013,13 @@ def Sew1Pdb(pdbpath):
 	"""
 	
 	if g_save_sstreams_dir:
-		save_sstream_as_file(srcsrv_stream_text, pdbpath)
+		if g_sdkout_hdir:
+			sdkout_hdir_text = '\n[scalacon]sdkout-doth-localroot='+ g_sdkout_hdir.replace('/', '\\') + '\n'
+				# Sample: [scalacon]sdkout-doth-localroot=d:\w\CommonLib\common-include
+		else:
+			sdkout_hdir_text = ''
+		sstream_txt_all = srcsrv_stream_text + sdkout_hdir_text
+		save_sstream_as_file(sstream_txt_all, pdbpath)
 
 	try:
 		os.remove(fnstream)
@@ -999,6 +1075,7 @@ def main():
 	global g_save_sstreams_dir, g_pick_cherries, g_pick_sstreams_dirs
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
 	global g_srcmapping_pdb, g_srcmapping_svn
+	global g_sdkout_hdir, g_sdkin_hdir
 
 	reqopts = ['dir-pdb=', 'dir-source=', 'datetime-co=', 'svnhost-table=' ]
 	optopts = [
@@ -1007,6 +1084,7 @@ def main():
 		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
+		'sdkout-doth-localroot=', 'sdkin-doth-localroot=',
 		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
@@ -1082,9 +1160,14 @@ def main():
 	g_srcmapping_pdb = os.path.abspath(g_srcmapping_pdb) if g_srcmapping_pdb else ''
 	g_srcmapping_svn = os.path.abspath(g_srcmapping_svn) if g_srcmapping_svn else ''
 		# Note: os.path.abspath("") will return abspath of current working directory.
-#@#
+
 	if g_srcmapping_pdb and g_srcmapping_svn:
 		print 'Assign srcmapping:\n  prefix-in-pdb: %s\n  prefix-in-svn: %s\n'%(g_srcmapping_pdb, g_srcmapping_svn)
+	
+	if '--sdkout-doth-localroot' in opts:
+		g_sdkout_hdir = opts['--sdkout-doth-localroot']
+	if '--sdkin-doth-localroot' in opts:
+		g_sdkin_hdir  = opts['--sdkin-doth-localroot']
 	
 	is_allow_empty_scan = True if '--allow-empty-scan' in opts else False
 	

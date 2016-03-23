@@ -54,6 +54,8 @@ pycmd_ssindex = scalacon-ssindex-svn.py\
  $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI),--pick-sstreams-dirs-from-ini=$(gmi_SCPSS_PICK_SSTREAMS_DIR_FROM_INI))\
  $(if $(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN),--pick-sstreams-dir-sdkin=$(gmi_SCPSS_PICK_SSTREAMS_DIR_SDKIN))\
  $(if $(gmi_SCPSS_SRC_MAPPING_FROM_INI),--src-mapping-from-ini=$(gmi_SCPSS_SRC_MAPPING_FROM_INI))\
+ $(if $(gmi_SCPSS_SDKOUT_DOTH_LOCALROOT),--sdkout-doth-localroot=$(gmi_SCPSS_SDKOUT_DOTH_LOCALROOT))\
+ $(if $(gmi_SCPSS_SDKIN_DOTH_LOCALROOT),--sdkin-doth-localroot=$(gmi_SCPSS_SDKIN_DOTH_LOCALROOT))\
   --logfile=$(_gmi_SCPSS_tmpdir)/scalacon-ssindex.log \
  $(if $(gmi_SCPSS_ALLOW_EMPTY_SCAN),--allow-empty-scan)
 
