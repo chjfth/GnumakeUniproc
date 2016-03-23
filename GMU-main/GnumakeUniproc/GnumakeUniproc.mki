@@ -48,8 +48,8 @@ gmu_Gd_PRJ_GMUTMP = $(call gmuf_GetPrjTmpDir,$(gmu_G_Deco_PrjName))
 _d_OUTPUT_ROOT_GMUTMP = $(gmu_ud_OUTPUT_ROOT)/_gmu_tmp
 
 # Some files to clear on start-up, -- should be in front of ``ifeq ($(MAKELEVEL),0)'' check.
-_p_BuiltListOutput = $(gmu_ud_OUTPUT_ROOT)/built_list.gmu.txt
-_p_BuildingListOutput = $(gmu_ud_OUTPUT_ROOT)/building_list.gmu.txt
+_p_BuiltListOutput = $(gmu_ud_OUTPUT_ROOT)/_built_list.gmu.txt
+_p_BuildingListOutput = $(gmu_ud_OUTPUT_ROOT)/_building_list.gmu.txt
 
 _gmu_isFirstMakeRestart = $(if $(_gmu_isAboveGnumake381),$(if $(MAKE_RESTARTS),,1),$(if $(wildcard $(gmu_p_BuildStartCkt)),,1))
 
