@@ -401,7 +401,7 @@ def do_getsdks():
 		if want_cidver_mapping:
 			getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir, implicit_mapping_spec, explicit_mapping_spec)
 		else:
-			getsdk_direct(section, svnrul, svndatetime, localdir)
+			getsdk_direct(section, svnurl, svndatetime, localdir)
 		
 		# Make the exported files read-only. 
 		# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
