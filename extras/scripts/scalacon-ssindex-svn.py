@@ -727,7 +727,11 @@ def Sew1Cookie(cookie):
 		if cookie_l.startswith(g_sdkin_hdir_bsl):
 			cookie_tail = cookie_l[len(g_sdkin_hdir_bsl):]
 			if cookie_tail in g_dict_doth_mapping:
-				s = cookie + '*' + g_dict_doth_mapping[cookie_tail]
+				
+#				if len(g_dict_doth_mapping[cookie_tail])>1: #debug
+#					print "###CONFLICT on cookie(%s), ['%s']=%s"%(cookie, cookie_tail, g_dict_doth_mapping[cookie_tail])
+				assert len(g_dict_doth_mapping[cookie_tail])==1
+				s = cookie + '*' + g_dict_doth_mapping[cookie_tail][0]
 #				print '>>>[debug]>>> h-PDB-sewing=%s'%(s) #debug
 				return s
 		return ''
@@ -785,9 +789,18 @@ def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
 						# Sample: tail=r'\DlOpe.h'
 #					print '$$$matched cookie=%s [tail=%s]'%(cookie_l, cookie_tail) # debug
 					if cookie_tail in g_dict_doth_mapping:
-						assert g_dict_doth_mapping[cookie_tail] == cookie_args
+						# This may occur, but does not harm. See my comment http://www.evernote.com/l/ABX8Qv7Jw_hJWLh8VONL4PlSynpG-eK56gA/
+#						print "###Conflicting cookie_tail:", cookie_tail
+#						print "###OLD: ", g_dict_doth_mapping[cookie_tail]
+#						print "###NEW: ", cookie_args
+						try:
+							g_dict_doth_mapping[cookie_tail].index(cookie_args)
+						except: 
+							# cookie_args not in the array yet, so append it to array
+							g_dict_doth_mapping[cookie_tail].append(cookie_args)
 					else:
-						g_dict_doth_mapping[cookie_tail] = cookie_args
+						g_dict_doth_mapping[cookie_tail] = [ cookie_args ] 
+							# store as an array for possible furture investigation.
 		
 
 def get_pick_sstreams_dirs():
