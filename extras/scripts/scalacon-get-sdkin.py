@@ -137,6 +137,8 @@ g_is_simulate = False
 
 DIRNAME_CACHE = 'sdkin-cache'
 
+g_required_subdir_in_sdkin = ['include', 'cidvers' ]
+
 def os_sep(hint=""):
 	# A more friendly os.sep .
 	fs_pos = hint.find('/')
@@ -299,7 +301,10 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 			mapping.setdefault(virtual_cidver, [])
 			mapping[virtual_cidver].insert(0, explicit_mapping_dict[virtual_cidver])
 	
-	copytree_overwrite(cachedir, localdir)
+	for subdir in g_required_subdir_in_sdkin:
+		copytree_overwrite(
+			os.path.join(cachedir, subdir),
+			os.path.join(localdir, subdir))
 
 	# Now, generate virtual cidver dirs(directly in localdir) by copying from their real bodies
 	for virtual_cidver in mapping:
@@ -320,7 +325,9 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 		copytree_overwrite(dir_src, dir_dst)
 		
 		# create an empty file telling user the cidver's real body
-		open(dir_dst+'/_CopiedFrom.cidver.'+real_cidver, "wb").close()
+		if virtual_cidver != real_cidver:
+			filename_cidver_source_hint = "_[%s]CopiedFromCidver.%s.txt"%(section, real_cidver)
+			open(dir_dst+'/'+filename_cidver_source_hint, "wb").close()
 
 
 def getsdk_direct(section, svnurl, svndatetime, localdir):

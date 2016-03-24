@@ -19,12 +19,12 @@ include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 ### >>> something for all compilers now
 
   NLSSDK_the_prefix = $(if $(NLSSDK_fs),$(NLSSDK_fs),NLSSDK_fs__not_defined)
-  SDKLIB_CV = $(gmp_COMPILER_ID_VER)/lib
+  SDKLIB_CIDVER = cidvers/$(gmp_COMPILER_ID_VER)/lib
   	  # CV: Compiler with Version
 
   NlssdkIncludeDirs = $(NLSSDK_the_prefix)/include
 
-  NlssdkLibSearchDirs = $(NLSSDK_the_prefix)/$(SDKLIB_CV)
+  NlssdkLibSearchDirs = $(NLSSDK_the_prefix)/$(SDKLIB_CIDVER)
 
   UserDllNameForLink   = $(UserDllNameForLink_U)
   UserDllNameForLink_UD= $(UserDllNameForLink_U)
