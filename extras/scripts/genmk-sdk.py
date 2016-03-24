@@ -100,13 +100,13 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
   endif # Check $(_list_cidcver_used) to filter out "not-used [cid,cver]"
 #
 define copy1sdkin_dll_%(refname)s
-	echo "Copying DLLs(sdkin[$1]) from $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"
-	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s) # "$1*" results in .pdb be copied as well, just what we want.
+	echo "Copying DLLs(sdkin[$1]) from $(gmb_thisrepo)/$(gmb_dirname_sdkin)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"
+	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s) # "$1*" results in .pdb be copied as well, just what we want.
 endef
 #
 .PHONY: COPYDLLS_%(refname)s
 COPYDLLS_%(refname)s:
-	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs(self) from $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
+	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs(self) from $(gmb_syncto)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
 	@$(foreach v,%(uxm_sdkin_dlls)s,$(call copy1sdkin_dll_%(refname)s,$v))
 #
 .PHONY: RUN_%(refname)s

@@ -133,7 +133,7 @@ _p_cidver_mapping_ini := $(gmb_thisrepo)/cidver-mapping.ini
 
 .PHONY: Copy-cidver-mapping-ini
 Copy-cidver-mapping-ini: 
-	$(if wildcard $(_p_cidver_mapping_ini),$(CP_) $(_p_cidver_mapping_ini) $(gmb_syncto))
+	$(if $(wildcard $(_p_cidver_mapping_ini)),$(CP_) $(_p_cidver_mapping_ini) $(gmb_syncto))
 
 
 
