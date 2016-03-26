@@ -76,6 +76,12 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     export gmu_ud_OUTPUT_ROOT := $(CURDIR_TEMP)/gf
     gmu_d_BuildStartCkt := $(CURDIR)
   else
+
+    # Ensure $(gmu_ud_OUTPUT_ROOT) is an absolute dir
+    ifeq (,$(call gmuf_IsAbsDir,$(gmu_ud_OUTPUT_ROOT)))
+      gmu_ud_OUTPUT_ROOT := $(call gmuf_GetAbsPathByRela_soc,$(gmu_ud_OUTPUT_ROOT))# Turn relative-dir to absolute-dir.
+      $(info Set absdir: gmu_ud_OUTPUT_ROOT=$(gmu_ud_OUTPUT_ROOT))
+    endif
     ifeq ($(_gmu_false),$(call gmuf_IsDirExist_sh,$(gmu_ud_OUTPUT_ROOT)))
       # Since not exist, now create the directory for user. If create fail, stop.
       _tmp_ret := $(call gmuf_ExecuteSimpleShcmd,$(MD_) $(gmu_ud_OUTPUT_ROOT))
@@ -88,11 +94,8 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     ifeq (__GMU_cd_ERROR,$(_tmp_dir))
       $(error !GMU!Error: You assigned a bad dir(not exist or not accessible) for gmu_ud_OUTPUT_ROOT: $(_tmp) )
     endif
-    # Finally, ensure $(gmu_ud_OUTPUT_ROOT) is an absolute dir
-    ifeq (,$(call gmuf_IsAbsDir,$(gmu_ud_OUTPUT_ROOT)))
-      $(error You assigned gmu_ud_OUTPUT_ROOT=$(gmu_ud_OUTPUT_ROOT) , which is not an absolute dir)
-    endif
     gmu_d_BuildStartCkt := $(gmu_ud_OUTPUT_ROOT)
+  
   endif
 
   export gmu_p_BuildStartCkt := $(gmu_d_BuildStartCkt)/$(_StartupSignatureFile)
@@ -128,7 +131,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
     _temp := $(shell \
     	echo "GnumakeUniproc started (GNUmake v$(MAKE_VERSION))." 1>&2 ;\
-    	echo "gmu_ud_OUTPUT_ROOT(%) = $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
+    	echo "gmu_ud_OUTPUT_ROOT(%) is $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
     	$(MD_) $(_d_OUTPUT_ROOT_GMUTMP); \
     	echo -n "" >$(gmu_Gp_COUNT_COMPILE) >$(_Gp_ScWorkInModuleOutput) >$(_Gp_CountSccmdFailure) \
     		>$(_p_BuiltListOutput) >$(_p_BuildingListOutput) \
