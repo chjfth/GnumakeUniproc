@@ -257,7 +257,7 @@ g_ds = ''
 g_dtco = ''
 g_drt = ''
 g_dftbr = 'trunk'
-g_lrt = False
+g_allow_loosy_reposie = False
 g_svn_use_export = False
 
 g_logfile = None
@@ -542,7 +542,7 @@ def DissectSvnRemain(svnhostid, urm):
 		"""
 
 	# reposie definition not found in reposie table
-	if g_lrt:
+	if g_allow_loosy_reposie:
 		# Now we carry out the loosy search method
 		""" sample:
 		For:
@@ -577,7 +577,7 @@ def DissectSvnRemain(svnhostid, urm):
 					)
 				exit(3)
 	else:
-		# Since not g_lrt, we have to assert error.
+		# Since not g_allow_loosy_reposie, we have to assert error.
 		Logp(
 			"Error: No reposie definition can be found in file %s ,\n"
 			"- for SVN root URL: %s\n"
@@ -1083,7 +1083,7 @@ def save_sstream_as_file(sstream_text, pdbpath):
 
 
 def main():
-	global opts, g_dp, g_ds, g_dtco, g_drt, g_dftbr, g_lrt
+	global opts, g_dp, g_ds, g_dtco, g_drt, g_dftbr, g_allow_loosy_reposie
 	global g_logfile, g_svn_use_export
 	global g_save_sstreams_dir, g_pick_cherries, g_pick_sstreams_dirs
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
@@ -1116,7 +1116,7 @@ def main():
 		g_drt = opts['--dir-reposie-table']
 
 	if '--loosy-reposie-table' in opts:
-		g_lrt = True
+		g_allow_loosy_reposie = True
 	else:
 		if not g_drt:
 			print "Error: You must provide --dir-reposie-table=<drt> option unless you specify --loosy-reposie-table."

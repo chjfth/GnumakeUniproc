@@ -86,6 +86,7 @@ gmp_u_list_PLUGIN_TO_LOAD += PI_sc_pdb_sew_svn
   gmi_SCPSS_SYMSTORE_3TIER = 1
   gmi_SCPSS_SVNHOST_TABLE = # use default
   gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = # use default
+  gmi_SCPSS_ALLOW_LOOSY_REPOSIE = 1
   #
   gmi_SCPSS_PICK_CHERRIES = *
   ifneq (,$(strip $(gmb_dirname_sdkin)))

@@ -26,7 +26,7 @@ ifeq (,$(strip $(gmi_SCPSS_SVNHOST_TABLE)))
 endif
 
 ifeq (,$(strip $(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL)))
-  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = https://nlssvn/svnreps/makingsys/GnumakeUniproc/trunk/nlscan/reposie-nlssvn.txt
+  gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = $(if $(NLSSVN),$(NLSSVN),https://nlssvn.dev.nls/svnreps)/makingsys/GnumakeUniproc/trunk/nlscan/reposie-nlssvn.txt
 endif
 
 ifeq (,$(strip $(gmu_SC_CHECKOUT_DATETIME)))
@@ -35,11 +35,6 @@ ifeq (,$(strip $(gmu_SC_CHECKOUT_DATETIME)))
 endif
 
 ########
-
-
-
-cmd_collet_svn_reposie_table = \
-	$(foreach url,$(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL),svn cat $(url) > $(_gmi_SCPSS_tmpdir)/$(call gmuf_LastWordBySpc,$(url),/) &&) true
 
 pycmd_ssindex = scalacon-ssindex-svn.py\
   --dir-pdb=$(gmi_SCPSS_ud_PDB)\
@@ -70,15 +65,31 @@ pycmd_symstore = scalacon-symstore.py\
   $(if $(gmi_SCPSS_ALLOW_EMPTY_SCAN),--allow-empty-scan)
 
 
+####
+
+shcmd_svn_get_reposie_table = svn cat $1 > "$(_gmi_SCPSS_tmpdir)/$(call gmuf_LastWordBySpc,$(url),/)"
+	# $1: The SVN URL to get a reposie-xxx.txt file.
+
+define svn_get_one_reposie_table # shell commands
+	echo "$(call _TrShcmd4echo,$(call shcmd_svn_get_reposie_table,$1))"
+	$(call shcmd_svn_get_reposie_table,$1) || \
+		$(if $(gmi_SCPSS_ALLOW_LOOSY_REPOSIE),\
+			echo "Scalacon info: Ignoring svn reposie-table fetching error$(_GmuComma) because gmi_SCPSS_ALLOW_LOOSY_REPOSIE=1." && true,\
+			false)
+	@	# This above shcmd is not a .py, so we don't use gmuf_ScriptCmd .
+endef
+
+cmd_collet_svn_reposie_table = \
+	$(foreach url,$(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL),svn cat $(url) > $(_gmi_SCPSS_tmpdir)/$(call gmuf_LastWordBySpc,$(url),/) &&) true
+
+
 .PHONY: gmit_SCPSS_SEW_PDB
 gmit_SCPSS_SEW_PDB:
 	@echo "PI_sc_pdb_sew_svn: Working start..."
 	@$(call gmuf_MkdirIfNotExist,$(_gmi_SCPSS_tmpdir))
 
-	@echo "PI_sc_pdb_sew_svn: Gathering SVN reposie table to temp dir..."
-	@$(call _DoVerbose1,echo "$(call _TrShcmd4echo,$(cmd_collet_svn_reposie_table))")
-	@$(cmd_collet_svn_reposie_table)
-	@	# This above shcmd is not a .py, so we don't use gmuf_ScriptCmd .
+	@echo "PI_sc_pdb_sew_svn: Gathering SVN reposie tables to temp dir..."
+	@$(foreach url,$(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL),$(call svn_get_one_reposie_table,$(url)))
 	
 	@echo "PI_sc_pdb_sew_svn: Scanning and sewing svn export command to PDBs..."
 	@$(call _DoVerbose1,echo "$(call _TrShcmd4echo,$(pycmd_ssindex))")
