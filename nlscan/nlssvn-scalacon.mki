@@ -18,7 +18,7 @@ include $(gmu_DIR_ROOT)/nlscan/nlssvn-prjs.mki
 
 ### >>> something for all compilers now
 
-  NLSSDK_the_prefix = $(if $(NLSSDK_fs),$(NLSSDK_fs),$(if $(NLSSDK),$(subst \,/,$(NLSSDK)),NLSSDK_fs__not_defined))
+  NLSSDK_the_prefix = $(if $(NLSSDK_fs),$(NLSSDK_fs),$(if $(NLSSDK),$(subst \,/,$(NLSSDK)),NLSSDK_not_defined))
   SDKLIB_CIDVER = cidvers/$(gmp_COMPILER_ID_VER)/lib
   	  # CV: Compiler with Version
 
