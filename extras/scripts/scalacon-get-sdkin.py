@@ -137,7 +137,18 @@ g_is_simulate = False
 
 DIRNAME_CACHE = 'sdkin-cache'
 
+FN_SVNDATETIME_CKT = 'svndatetime.ckt.txt'
+FN_PATTERN_REFNAME_DONE = 'refname.%s.done.txt'
+
+IK_svndatetime = 'svndatetime'
+
 g_required_subdir_in_sdkin = ['include', 'cidvers' ]
+
+def cachedirs(sdk_refname):
+	dir_sdkcache = os.path.join(g_ini_dir, DIRNAME_CACHE)
+	refname_cache = os.path.join(dir_sdkcache, sdk_refname)
+#	svndt_filepath = os.path.join(refname_cache, FN_SVNDATETIME_CKT)
+	return dir_sdkcache, refname_cache, refname_cache+'.tmp'
 
 def os_sep(hint=""):
 	# A more friendly os.sep .
@@ -158,6 +169,14 @@ def os_sep_unify(path):
 	else:
 		return path.replace('/', '\\')
 
+def os_remove_easy(filepath):
+	try:
+		os.remove(filepath)
+	except OSError:
+		if os.path.exist(filepath):
+			raise
+		else:
+			pass
 
 def force_rmtree(dir):
 	# Remove read-only attribute for files inside.
@@ -196,7 +215,12 @@ def pick_sections(iniobj, g_ini_dir):
 		if (not section.startswith('self.')) and g_is_only_self:
 			continue
 		
-		if not section.startswith('sdkin.'):
+		if section.startswith('sdkin.'):
+			sdk_refname = re.sub(r'^sdkin\.', '', section)
+		elif section.startswith('self.'):
+			sdk_refname = re.sub(r'^self\.', '', section)
+		else:
+			print "Scalacon info: Ignoring unrecognized section name [%s]."%(section)
 			continue # unrecognized section name
 		
 		kvlist = iniobj.items(section)
@@ -210,7 +234,7 @@ def pick_sections(iniobj, g_ini_dir):
 			localdir = dsection['localdir']
 		
 		localdir_final = os.path.abspath( os.path.join(g_ini_dir, localdir) )
-		yield section, dsection, localdir_final # dsection's d implies dict
+		yield section, dsection, sdk_refname, localdir_final # dsection's d implies dict
 
 
 def merge_sdk_self_mapping(mapping, inifile):
@@ -246,26 +270,20 @@ def make_cidver_mapping_dict(mapping_spec):
 		
 	return d
 
-def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir, 
-	implicit_mapping_spec, explicit_mapping_spec):
-	# section is section name,
+def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
+	# section is INI section name,
 	# all other params are items from this section.
 	# im/explicit_mapping_spec sample: "vc100(=vc80) vc100x64(=vc80x64)"
 	# [PENDING] g_isforce processing ........
+
+	implicit_mapping_spec = dsection.setdefault('implicit-cidver-mapping', '')
+	explicit_mapping_spec = dsection.setdefault('explicit-cidver-mapping', '')
 	
-	sdk_refname = re.sub(r'^sdkin\.', '', section)
-	cachedir = os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname)
-	svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, svndatetime, cachedir)
-	print "Running cmd: \n  " + svncmd
-	
-	if g_is_simulate:
-		return 
-	
-	ret = subprocess.check_call(shlex.split(svncmd))
+	dir_sdkcache, dir_refname = cachedirs(sdk_refname)[:2]
 	
 	### Apply four-layer cid-mapping
 
-	cidvers_dir = os.path.join(cachedir, 'cidvers')
+	cidvers_dir = os.path.join(dir_refname, 'cidvers')
 		# cidvers_dir is expected to contain sub-dirs like vc60, vc80, vc100x64 etc
 	mapping = {} # mapping[virtual]=real
 		# Example: 
@@ -281,7 +299,7 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 		mapping[cidver] = [cidver]
 	
 	# layer 2: cidver-mapping.ini
-	self_mapping_ini = os.path.join(cachedir,'cidver-mapping.ini')
+	self_mapping_ini = os.path.join(dir_refname, 'cidver-mapping.ini')
 	if os.path.isfile(self_mapping_ini):
 		merge_sdk_self_mapping(mapping, self_mapping_ini)
 	
@@ -303,19 +321,19 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 	
 	for subdir in g_required_subdir_in_sdkin:
 		copytree_overwrite(
-			os.path.join(cachedir, subdir),
+			os.path.join(dir_refname, subdir),
 			os.path.join(localdir, subdir))
 
 	# Now, generate virtual cidver dirs(directly in localdir) by copying from their real bodies
 	for virtual_cidver in mapping:
 		real_cidver = mapping[virtual_cidver][0]
-		dir_src = os.path.join(cachedir, 'cidvers', real_cidver)
+		dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
 		dir_dst = os.path.join(localdir, 'cidvers', virtual_cidver)
 		
 		if not os.path.isdir(dir_src):
 			# try link layer(3-4) to layer 2 (just a recursive mapping operation)
 			real_cidver = mapping[real_cidver][0]
-			dir_src = os.path.join(cachedir, 'cidvers', real_cidver)
+			dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
 			if not os.path.isdir(dir_src):
 				print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist, '\
 					'which means that input SDK(INI section [%s]) does not provide that cidver.'%(
@@ -328,6 +346,9 @@ def getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir,
 		if virtual_cidver != real_cidver:
 			filename_cidver_source_hint = "_[%s]CopiedFromCidver.%s.txt"%(section, real_cidver)
 			open(dir_dst+'/'+filename_cidver_source_hint, "wb").close()
+	
+	fp_refname_done = os.path.join(localdir, FN_PATTERN_REFNAME_DONE%(sdk_refname))
+	open(fp_refname_done, 'wb') # create an empty file
 
 
 def getsdk_direct(section, svnurl, svndatetime, localdir):
@@ -342,6 +363,56 @@ def getsdk_direct(section, svnurl, svndatetime, localdir):
 		return
 	
 	ret = subprocess.check_call(shlex.split(svncmd))
+
+
+def get_sdkcache_1refname(section, dsection, sdk_refname, localdir):
+	svnurl = dsection['svnurl']
+	ini_svndatetime = dsection['svndatetime']
+	
+	dir_sdkcache, dir_refname, dir_refname_tmp = cachedirs(sdk_refname)
+		# Sample: dir_sdkcache=$/sdkin-cache , dir_refname=$/sdkin-cache/gadgetlib
+
+	# 此函数的工作是：
+	# 1. 先将 svn 抓取的内容存放在 $/sdkin-cache/gadgetlib.tmp 目录中，
+	#    抓取成功后在其中创建 svndatetime.ckt.txt 记录同步时间戳。
+	# 2. 根据原 $/sdkin-cache/gadgetlib 中的文件 对应着 删除 $/sdkin 中的同名文件（用于消除已废弃的文件）。
+	# 3. 删掉 $/sdkin-cache/gadgetlib 目录树。
+	# 4. $/sdkin-cache/gadgetlib.tmp 改名为 $/sdkin-cache/gadgetlib 。
+
+	# 先判断 $/sdkin-cache/gadgetlib.tmp 中的同步时间戳是否匹配 INI 的，是的话说明上回已抓取成功过，
+	# 此目录中的内容是有效的，此回不用再去 svn 抓取了。
+
+	fp_svndatetime_tmp = os.path.join(dir_refname_tmp, FN_SVNDATETIME_CKT)
+	fp_svndatetime = os.path.join(dir_refname, FN_SVNDATETIME_CKT)
+	try:
+		tmp_svndatetime = open(fp_svndatetime_tmp, 'rb').read()
+	except IOError:
+		tmp_svndatetime = 'none'
+
+	# 1.
+	if tmp_svndatetime != ini_svndatetime:
+		# Grab svn server content into .tmp folder first.
+		svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, ini_svndatetime, dir_refname_tmp)
+		print "Running cmd: \n  " + svncmd
+		ret = subprocess.check_call(shlex.split(svncmd))
+		open(fp_svndatetime_tmp, 'wb').write(ini_svndatetime)
+
+	# 2.
+	dir_refname = os.path.normpath(dir_refname)
+	for dirpath, dirs, files in os.walk(dir_refname):
+		for file in files:
+			midpart = dirpath[len(dir_refname):]
+			fp_dest = os.path.join(localdir, midpart, file)
+			if g_isforce:
+				os_remove_easy(fp_dest)
+			else:
+				os_remove_easy # TODO: compare time-stamp and prompt, process cidver-mapping.
+	
+	# 3.
+	shutil.rmtree(dir_refname)
+	
+	# 4.
+	os.rename(dir_refname_tmp, dir_refname)
 
 
 def do_getsdks():
@@ -370,42 +441,48 @@ def do_getsdks():
 		print 'Scalacon Error: The INI file "%s" does not exist or cannot be opened.'%(g_ini_filepath)
 		return 1
 	
-	if g_isforce:
-		# 删除目录动作要专门自己一个循环（而非在 fetch server content 循环中），
-		# 是考虑到各个 SDK 指定的 localdir 可能有重叠或父子关系，那将导致后一次循环的
-		# rmtree 将前一次循环取出的东西给删了。
-		for s,ds, localdir_final in pick_sections(iniobj, g_ini_dir):
-			print 'Removing old directory: %s'%(localdir_final)
-			if g_is_simulate:
-				continue
-			force_rmtree(localdir_final)
+	
+	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, g_ini_dir):
 		
-		# 删除 cidver cache 目录
-		force_rmtree( os.path.join(g_ini_dir, DIRNAME_CACHE) )
-
-	# For each SDK, fetch server content.
-	for section, dsection, localdir in pick_sections(iniobj, g_ini_dir):
-
-		svnurl = dsection['svnurl']
-		svndatetime = dsection['svndatetime']
+		# check required INI key:
+		if not IK_svndatetime in dsection:
+			print 'Scalacon Error: INI section [%s] missing %s= .'%(section, IK_svndatetime)
+			exit(30)
 		
+		# check whether INI-and-cache svndatetime match.
+		dir_sdkcache, dircache_this_refname, _ = cachedirs(sdk_refname)
+		fp_svndatetime_cache = os.path.join(dircache_this_refname, FN_SVNDATETIME_CKT)
 		try:
-			want_cidver_mapping = dsection['want-cidver-mapping']
-			implicit_mapping_spec = dsection.setdefault('implicit-cidver-mapping', '')
-			explicit_mapping_spec = dsection.setdefault('explicit-cidver-mapping', '')
-		except:
-			want_cidver_mapping = False
+			cached_svndatetime = open(fp_svndatetime_cache, 'rb').read()
+		except IOError:
+			cached_svndatetime = 'none' # arbitrary string
 		
-		print "SDK[%s] from %s"%(section, svnurl)
-
-		if want_cidver_mapping:
-			getsdk_with_cidver_mapping(section, svnurl, svndatetime, localdir, implicit_mapping_spec, explicit_mapping_spec)
+		if dsection[IK_svndatetime] == cached_svndatetime:
+			new_cache = False
 		else:
-			getsdk_direct(section, svnurl, svndatetime, localdir)
+			if os.path.exists(dircache_this_refname):
+				print "SDK[%s] creating cache in %s ."%(section, dircache_this_refname)
+				print "SDK[%s] refreshing cache in %s due to svndatetime change."%(section, dircache_this_refname)
+			get_sdkcache_1refname(section, dsection, sdk_refname, localdir)
+			new_cache = True
 		
-		# Make the exported files read-only. 
+		# verify the cache is refreshed, otherwise assert fail.
+		try:
+			cached_svndatetime = open(fp_svndatetime_cache, 'rb').read()
+		except IOError:
+			cached_svndatetime = 'none' # arbitrary string
+		assert dsection[IK_svndatetime] == cached_svndatetime
+		
+		# Determine whether to sync cache to $/sdkin
+		fn_sdkin_done_chk = FN_PATTERN_REFNAME_DONE%(sdk_refname)
+		fp_sdkin_done_chk = os.path.join(localdir, fn_sdkin_done_chk)
+		
+		if new_cache or not os.path.exist(fp_sdkin_done_chk):
+			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir)
+	
+		# Make the exported "include"(.h) files read-only. 
 		# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
-		for root, dirs, files in os.walk(localdir):
+		for root, dirs, files in os.walk( os.path.join(localdir, "include") ):
 			for file in files:
 #				print 'Make read-only:', root+os.sep+file #debug
 				os.chmod(root+ '/' +file, stat.S_IREAD)
