@@ -588,7 +588,7 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 		elif cached_svndt=='not_exist':
 			str_cache_status = 'not exist'
 		else:
-			str_cache_status = 'need update(was %s)'%(cached_svndt)
+			str_cache_status = 'not match(was %s)'%(cached_svndt)
 		
 		old_local_exist = check_mlocal_exist_1refname(localdir, sdk_refname)
 		
