@@ -652,6 +652,7 @@ def do_getsdks():
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir)
+			print
 	
 		# Make the exported "include"(.h) files read-only. 
 		# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
@@ -659,7 +660,6 @@ def do_getsdks():
 			for file in files:
 #				print 'Make read-only:', root+os.sep+file #debug
 				os.chmod(root+ '/' +file, stat.S_IREAD)
-		print
 	
 	return 0
 
@@ -702,7 +702,6 @@ def main():
 	ret = do_getsdks()
 	
 	if ret==0:
-		print
 		print "Success."
 	
 	return ret
