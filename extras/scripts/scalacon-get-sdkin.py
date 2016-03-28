@@ -636,7 +636,7 @@ def do_getsdks():
 		dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
 	
 		if daction[sdk_refname].upcache:
-			print "[%s]Creating cache in %s ..."%(section, dircache_this_refname)
+			print '[%s]Creating cache in %s ...'%(section, dircache_this_refname)
 			go_on_sync = fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir)
 			if not go_on_sync:
 				print
@@ -651,6 +651,7 @@ def do_getsdks():
 		
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
+			print '[%s] Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir)
 			print
 	
