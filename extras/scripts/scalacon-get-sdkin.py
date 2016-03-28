@@ -176,10 +176,12 @@ def os_sep_unify(path):
 		return path.replace('/', '\\')
 
 def os_remove_easy(filepath):
+	if os.path.exists(filepath):
+		os.chmod(filepath, stat.S_IWRITE)
 	try:
 		os.remove(filepath)
 	except OSError:
-		if os.path.exist(filepath):
+		if os.path.exists(filepath):
 			raise
 		else:
 			pass
@@ -412,6 +414,46 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	open(fp_refname_done, 'wb') # create an empty file
 
 
+def cache_to_local_enum_pair(dir_refname, localdir, dsection): # this is a generator
+	
+	if not os.path.exists(dir_refname):
+		return
+	
+	inipath_cidver_mapping = os.path.join(dir_refname, FN_CIDVER_MAPPING)
+	cidvers_dir = os.path.join(dir_refname, 'cidvers')
+	rmapping = get_cidvers_reverse_mapping(cidvers_dir, inipath_cidver_mapping, dsection) # TODO: dsection should be a inipath to analyze user cidver-mapping override.
+	# print "### rmapping:", rmapping #debug
+		# Sample return( rmapping[real]=virtual ):
+		# rmapping['vc100'] = ['vc100', 'vc120', 'vc140'] # the list will include 'vc100' itself
+		# -- which means: virtual cidver(vcidver) vc120 and vc140 are both mapped to real cidver vc100
+	
+	for dirpath, dirs, files in os.walk(dir_refname):
+		for file in files:
+			midpart_real = dirpath[len(dir_refname)+1:] # +1 is for the '\' after dir_refname
+				# Sample:
+				# localdir:      $\sdkin
+				# midpart_real:  cidvers\vc100\lib
+				# file:          sgetopt.lib 
+				# or
+				# midpart_real:  cidvers\include\getopt
+				# file:          sgetopt.h
+			
+			# Generate midparts_dst(multiple midpart) according to cidver-mapping .
+			# So, one source file in dir_refname may correspond to multiple files in localdir.
+			r = re.match(r'cidvers\\([^\\]+)(.*)', midpart_real)
+			if r:
+				real_cidver = r.group(1)
+				midparts_dst = [r'cidvers\%s%s'%(vcidver, r.group(2)) for vcidver in rmapping[real_cidver]]
+			else:
+				midparts_dst = [ midpart_real ]
+			
+			fp_src = os.path.join(dir_refname, midpart_real, file) 
+			
+			for midpart_dst in midparts_dst:
+				fp_dst = os.path.join(localdir, midpart_dst, file)
+				yield fp_src, fp_dst
+
+
 def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 	svnurl = dsection['svnurl']
 	ini_svndatetime = dsection['svndatetime']
@@ -446,60 +488,37 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 		open(fp_svndatetime_tmp, 'wb').write(ini_svndatetime)
 
 	# 2.
-	inipath_cidver_mapping = os.path.join(dir_refname, FN_CIDVER_MAPPING)
-	cidvers_dir = os.path.join(dir_refname_tmp, 'cidvers')
-	rmapping = get_cidvers_reverse_mapping(cidvers_dir, inipath_cidver_mapping, dsection)
-	# print "### rmapping:", rmapping #debug
-		# Sample return( rmapping[real]=virtual ):
-		# rmapping['vc100'] = ['vc100', 'vc120', 'vc140'] # the list will include 'vc100' itself
-		# -- which means: virtual cidver(vcidver) vc120 and vc140 are both mapped to real cidver vc100
+	print '[%s]Removing old files in localdir ...'%(section)
 	
 	dir_refname = os.path.normpath(dir_refname)
-		# Note: os.walk() a non-exsiting dir is a blank operation, no exception raised.
-	for dirpath, dirs, files in os.walk(dir_refname):
-		for file in files:
-			midpart_real = dirpath[len(dir_refname):]
-				# Sample:
-				# localdir:      $/sdkin/getopt 
-				# midpart_real:  cidvers/vc100/lib
-				# file:          sgetopt.lib 
-				# or
-				# midpart_real:  cidvers/include/getopt
-				# file:          sgetopt.h
-			
-			# generate midparts(multiple midpart) accoding to cidver-mapping 
-			r = re.match(r'\\cidvers\\([^\\]+)(.*)', midpart_real)
-			if r:
-				real_cidver = r.group(1)
-				midparts = [r'cidvers\%s%s'%(vcidver, r.group(2)) for vcidver in rmapping[real_cidver]]
-			else:
-				midparts = [midpart_real]
-			
-			for midpart_dest in midparts:
-				fp_dst = os.path.join(localdir, midpart_dest, file)
-				if not os.path.exists(fp_dst):
-					continue
-				
-				if g_isforce:
-					# print ">>>removing %s"%(fp_dst) #debug
-					os_remove_easy(fp_dst)
-				else:
-					is_overwrite = False
-					# compare time-stamps and prompt for difference
-					fp_src = os.path.join(dir_refname, midpart_real, file)
-					srctime = os.path.getmtime(fp_src)
-					dsttime = os.path.getmtime(fp_dst)
-					# todo: time changed to localtime
-					if srctime!=dsttime:
-						print "The file to overwrite/remove is differnt from cache:"
-						print "Cached file: %s [%s]"%(fp_src, time.strftime('%Y-%m-%d %H:%M:%S', srctime))
-						print "Target file: %s [%s]"%(fp_dst, time.strftime('%Y-%m-%d %H:%M:%S', dsttime))
-						a = raw_input("Shall I overwrite/remove the target file according to new cache?[Y/n] ")
-						if a in ['', 'Y', 'y']:
-							is_overwrite = True
-					
-					if is_overwrite:
-						os_remove_easy(fp_dst)
+		# Note: os.walk()ing a non-exsiting dir is a blank operation, no exception raised.
+	
+	if not g_isforce: # force means direct-overwrite target, "not force" means ask bfr overwrite
+		# Check for file modification in localdir(e.g. user dropped in a trial-built binary).
+		# If any modification is found, let user determine whether to overwrite them.
+		count = 0
+		for fp_src, fp_dst in cache_to_local_enum_pair(dir_refname, localdir, dsection):
+			if not os.path.exists(fp_dst):
+				continue
+			srctime = int( os.path.getmtime(fp_src) )
+			dsttime = int( os.path.getmtime(fp_dst) )
+			if srctime != dsttime:
+				count += 1
+				print "Found %d target file with local modification:"%(count)
+				print "  Cached (%s): %s"%( 
+					time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(srctime)), fp_src)
+				print "  Target (%s): %s"%(
+					time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(dsttime)), fp_dst)
+		
+		if count>0:
+			a = raw_input("[%s]Shall I overwrite/remove those target files?[Y/n] "%(section))
+			if not (a in ['Y', 'y']):
+				print 'You answered "No", so skip this SDK refname.'
+				return False # False: cache->localdir sync should be skipped.
+		
+	for fp_src, fp_dst in cache_to_local_enum_pair(dir_refname, localdir, dsection):
+		os_remove_easy(fp_dst)
+		# Note: actual cache->localdir copy will be done later in sync_sdkcache_to_sdklocal()
 	
 	# 3.
 	if os.path.exists(dir_refname):
@@ -508,6 +527,7 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 	# 4.
 	os.rename(dir_refname_tmp, dir_refname)
 
+	return True # True: cache->localdir sync should be done.
 
 def check_cached_svndatetime_1refname(dsection, sdk_refname):
 	dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
@@ -603,20 +623,24 @@ def do_getsdks():
 		
 	except(MissingSectionHeaderError):
 		print 'Scalacon Error: "%s" does not look like a valid INI file.'%(g_ini_filepath)
-		return 1
+		exit(1)
 
 	if not readret:
 		print 'Scalacon Error: The INI file "%s" does not exist or cannot be opened.'%(g_ini_filepath)
-		return 1
+		exit(1)
 	
 	daction = sdkbin_check_all_local_status(iniobj, g_ini_dir)
+	print
 
 	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, g_ini_dir):
 		dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
 	
 		if daction[sdk_refname].upcache:
 			print "[%s]Creating cache in %s ..."%(section, dircache_this_refname)
-			fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir)
+			go_on_sync = fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir)
+			if not go_on_sync:
+				print
+				continue
 		
 		# verify the cache is refreshed, otherwise assert fail.
 		try:
@@ -635,6 +659,8 @@ def do_getsdks():
 			for file in files:
 #				print 'Make read-only:', root+os.sep+file #debug
 				os.chmod(root+ '/' +file, stat.S_IREAD)
+		print
+	
 	return 0
 
 def main():
