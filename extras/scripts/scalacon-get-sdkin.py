@@ -651,7 +651,7 @@ def do_getsdks():
 
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
-			print '[%s] Syncing cache to localdir ...'%(section)
+			print '[%s]Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir)
 			print
 	
