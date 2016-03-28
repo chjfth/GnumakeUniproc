@@ -648,19 +648,19 @@ def do_getsdks():
 		except IOError:
 			cached_svndatetime = 'none' # arbitrary string
 		assert dsection[IK_svndatetime] == cached_svndatetime
-		
+
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
 			print '[%s] Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir)
 			print
 	
-		# Make the exported "include"(.h) files read-only. 
-		# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
-		for root, dirs, files in os.walk( os.path.join(localdir, "include") ):
-			for file in files:
-#				print 'Make read-only:', root+os.sep+file #debug
-				os.chmod(root+ '/' +file, stat.S_IREAD)
+			# Make the exported "include"(.h) files read-only. 
+			# (TO IMPROVE: If more than one sdkin share the same localdir, there will be duplicate make-read-only actions.)
+			for root, dirs, files in os.walk( os.path.join(localdir, "include") ):
+				for file in files:
+#					print 'Make read-only:', root+os.sep+file #debug
+					os.chmod(root+ '/' +file, stat.S_IREAD)
 	
 	return 0
 
