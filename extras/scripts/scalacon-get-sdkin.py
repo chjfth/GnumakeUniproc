@@ -422,7 +422,6 @@ def get_cidvers_reverse_mapping(cidvers_dir, self_mapping_ini, user_override_ini
 	rmapping = get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection)
 	return rmapping
 
-
 def get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection):
 	mapping = get_cidvers_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection)
 
@@ -439,6 +438,17 @@ def get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection):
 	
 	return rmapping
 	
+
+def check_cidver_case_correct(dir, cidver):
+	# Assert that cidver has the matching upper/lower case as that in dir(file system directory).
+	entries = os.listdir(dir)
+	is_ok = True if cidver in entries else False
+	correct_case = None
+	for entry in entries:
+		if entry.lower()==cidver.lower():
+			correct_case = entry
+			break
+	return is_ok, correct_case
 
 def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	# section is INI section name,
@@ -468,14 +478,22 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 		dir_dst = os.path.join(localdir, 'cidvers', virtual_cidver)
 		
 		if not os.path.isdir(dir_src):
-			# try link layer(3-4) to layer 2 (just a recursive mapping operation)
-			real_cidver = mapping[real_cidver][0]
-			dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
-			if not os.path.isdir(dir_src):
-				print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist, '\
+			# try link layer(3-4) to layer 2 (just one more level of mapping)
+			if not real_cidver in mapping:
+				print 'Scalacon Error: You request mapping "%s" to real cidver "%s" but the directory "%s" does not exist(cidver upper/lower case matter), '\
 					'which means that input SDK(INI section [%s]) does not provide that cidver.'%(
 					virtual_cidver, real_cidver, dir_src, section)
 				exit(25)
+			real_cidver = mapping[real_cidver][0]
+			dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
+			assert os.path.isdir(dir_src)
+		
+		is_ok, correct_case = check_cidver_case_correct( *os.path.split(dir_src) )
+		if not is_ok:
+			assert correct_case
+			print 'Scalacon Error: You assign real cidver "%s" in INI section [%s], but the upper/lower case is not correct. ' \
+				'The correct case is %s .'%(real_cidver, section, correct_case)
+			exit(26)
 		
 		copytree_overwrite(dir_src, dir_dst)
 		
