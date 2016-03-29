@@ -137,7 +137,7 @@ g_self_dir_param = ''
 
 g_is_simulate = False
 
-DIRNAME_CACHE = 'sdkin-cache'
+DIRNAME_CACHE = 'sdkbin-cache'
 
 FN_CIDVER_MAPPING = 'cidver-mapping.ini'
 
