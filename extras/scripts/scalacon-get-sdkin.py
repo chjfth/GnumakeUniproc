@@ -41,7 +41,6 @@ gmb_dirname_sdkout=sdkout
 svndatetime= 2016-03-05 23:00
 svnurl=      %(NLSSVN)s/CommonLib/common-include/trunk
 localdir=    %(gmb_dirname_sdkin)s/include
-want-cidver-mapping=1
 ; -- localdir is relative to this INI file.
 implicit-cidver-mapping=
 explicit-cidver-mapping=
@@ -50,14 +49,11 @@ explicit-cidver-mapping=
 svndatetime= 2016-03-06 13:39:43
 svnurl=      %(NLSSVN)s/scalacon/sdkbin/mmsnprintf/4.2.0
 localdir=    %(gmb_dirname_sdkin)s
-want-cidver-mapping=1
 
-[self.0]
+[self.IUartBasic]
 svndatetime= 2016-03-11 11:44:00
 svnurl=      %(NLSSVN)s/scalacon/sdkbin/IUartBasic/2.1.6
 localdir=    %(gmb_dirname_sdkout)s
-want-cidver-mapping=1
-
 
 === <<< INI 格式范例
 
@@ -576,7 +572,7 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, ini_dir):
 		daction[sdk_refname] = action()
 		
-		print "[%s] refname=%s"%(section, sdk_refname)
+		print '[%s] refname="%s"'%(section, sdk_refname)
 		print "  svndatetime: %s"%(dsection[IK_svndatetime])
 		print "  svnurl     : %s"%(dsection[IK_svnurl])
 		print "  localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
