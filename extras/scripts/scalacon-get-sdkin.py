@@ -202,10 +202,9 @@ def rmdir_if_empty(dir):
 		else:
 			return False
 	
-	print "@@@ Check removing dir %s"%(dir) , #debug
 	entries = os.listdir(dir)
-	if dir.find('VC80__'): #debug
-		print "  ---%s"%(entries)
+#	print "@@@ Check removing dir %s"%(dir) , #debug
+#	if dir.find('VC80__'): print "  ---%s"%(entries) #debug
 	
 	keep = False
 	for entry in entries:
@@ -213,7 +212,7 @@ def rmdir_if_empty(dir):
 			keep = True
 			break
 		
-	print "[keep]" if keep else '[REMOVE]' #debug
+#	print "[keep]" if keep else '[REMOVE]' #debug
 	if not keep:
 		force_rmtree(dir)
 
@@ -508,36 +507,54 @@ def cache_to_local_enum_pair(section, dsection, dir_refname, localdir): # this i
 		# rmapping['vc100'] = ['vc100', 'vc120', 'vc140'] # the list will include 'vc100' itself
 		# -- which means: virtual cidver(vcidver) vc120 and vc140 are both mapped to real cidver vc100
 	
-	for dirpath, dirs, files in os.walk(dir_refname, topdown=False):
-		# Note: use topdown=False so that "empty-directory removing" works in clean_old_local_by_old_refname()
-		for file in files+dirs:
-			midpart_real = dirpath[len(dir_refname)+1:] # +1 is for the '\' after dir_refname
-				# Sample:
-				# localdir:      $\sdkin
-				# midpart_real:  cidvers\vc100\lib
-				# file:          sgetopt.lib 
-				# or
-				# midpart_real:  cidvers\include\getopt
-				# file:          sgetopt.h
-			
-			# Generate midparts_dst(multiple midpart) according to cidver-mapping .
-			# So, one source file in dir_refname may correspond to multiple files in localdir.
-			r = re.match(r'cidvers\\([^\\]+)(.*)', midpart_real)
-			if r:
-				real_cidver = r.group(1)
-				midparts_dst = [r'cidvers\%s%s'%(vcidver, r.group(2)) for vcidver in rmapping[real_cidver]]
-			else:
-				midparts_dst = [ midpart_real ]
-			
-			fp_src = os.path.join(dir_refname, midpart_real, file) 
-			
-			for midpart_dst in midparts_dst:
-				fp_dst = os.path.join(localdir, midpart_dst, file)
-				yield fp_src, fp_dst
-	
-	yield dir_refname, localdir
-		# This is for clean_old_local_by_old_refname to remove empty localdir.
+	# We walk the dir in two passes, first excluding the cidvers dir, second for the cidvers dir,
+	# because cidvers dir is special(need cidver-mapping process).
+	#
+	# Memo: contents in dir_refname corresponds to contents in localdir.
+	# Memo: use topdown=False in os.walk below, so that "empty-directory removing" works 
+	# in clean_old_local_by_old_refname().
 
+	# pass1:
+	pass1_roots = filter(lambda x:x!='cidvers', g_required_subdir_in_sdkin)
+	for rootname in pass1_roots: # root implies walk-root
+		proot = os.path.join(dir_refname, rootname) # p:path
+			# Example: proot=r'D:\myproj\.sdkbin-cache\mm_snprintf\include'
+		for dirpath, dirnames, files in os.walk(proot, topdown=False):
+			for entry in files+dirnames:
+				psrc = os.path.join(dirpath, entry)
+				pdst = os.path.join(localdir, psrc[len(dir_refname):], entry)
+				yield psrc, pdst
+		yield proot, os.path.join(localdir, rootname)
+			
+	# pass2:
+	srcdir_cidvers = os.path.join(dir_refname, 'cidvers')
+	pass2_roots = filter( lambda x:os.path.isdir(os.path.join(srcdir_cidvers,x)), os.listdir(srcdir_cidvers) )
+	for real_cidver in pass2_roots: # root implies walk-root, real_cidver is like vc60, vc80, vc100 etc
+		proot = os.path.join(srcdir_cidvers, real_cidver)
+			# Example: proot = D:\myproj\.sdkbin-cache\mm_snprintf\cidvers\vc100
+		for dirpath, dirnames, files in os.walk(proot, topdown=False): 
+			for entry in files+dirnames:
+				psrc = os.path.join(dirpath, entry)
+				midpart = os.path.split(psrc[len(proot)+1:])[0] # +1 is for the '\' after proot
+					# Example: If current 
+					# psrc is 
+					#	D:\myproj\.sdkbin-cache\mm_snprintf\cidvers\vc100\bin-debug\foo.dll
+					# Localdir is 
+					#	D:\myproj\sdkbin
+					# then the corresponding virtual entry may be:
+					#	D:\myproj\sdkbin\cidvers\vc120\bin-debug\foo.dll
+					# or
+					#	D:\myproj\sdkbin\cidvers\vc140\bin-debug\foo.dll
+					# so the midpart is:
+					#	bin-debug
+					#
+					# -- Note: midpart may be empty, which is OK.
+				for vcidver in rmapping[real_cidver]:
+					pdst = os.path.join(localdir, 'cidvers', vcidver, midpart, entry)
+					yield psrc, pdst
+		for vcidver in rmapping[real_cidver]:
+			yield proot, os.path.join(localdir, 'cidvers', vcidver)
+	
 
 def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 	svnurl = dsection['svnurl']
@@ -582,8 +599,6 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 	
 	# step 3.
 	os.rename(dir_refname_new, dir_refname)
-
-	return True # True: cache->localdir sync should be done.
 
 def check_cached_svndatetime_1refname(dsection, sdk_refname):
 	dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
@@ -654,7 +669,7 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 				return False # False: cache->localdir sync should be skipped.
 		
 	for fp_src, fp_dst in cache_to_local_enum_pair(section, dsection, dir_refname_old, localdir):
-		print ">>> fp_src=%s"%(fp_src); print "### fp_dst=%s"%(fp_dst); print #debug
+#		print ">>> fp_src=%s"%(fp_src); print "### fp_dst=%s"%(fp_dst); print #debug
 		if not os.path.exists(fp_dst):
 			continue
 		elif os.path.isfile(fp_dst):
@@ -669,7 +684,7 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 	if is_remove_old:
 		force_rmtree(dir_refname_old)
 	
-	return True
+	return True # True: cache->localdir sync should be carried out.
 
 class Action:
 	def __init__(self):
@@ -760,10 +775,7 @@ def do_getsdks():
 	
 		if daction[sdk_refname].upcache:
 			print '[%s]Creating cache in %s ...'%(section, dircache_this_refname)
-			go_on_sync = fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir) #!!!
-			if not go_on_sync:
-				print
-				continue
+			fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir) #!!!
 		
 		# verify the cache is refreshed, otherwise assert fail.
 		try:
@@ -772,18 +784,24 @@ def do_getsdks():
 			cached_svndatetime = 'none' # arbitrary string
 		assert dsection[IK_svndatetime] == cached_svndatetime
 
-		# Now we clean up the old files in $/sdkin according to refname.old's content
+		go_on_sync = True
+		
+		# Now we are going to clean up the old files in $/sdkin according to refname.old's content
 		if daction[sdk_refname].upcache:
 			# This copes with new content grabbed from svn server.
 			assert daction[sdk_refname].uplocal==True
-			clean_old_local_by_old_refname(section, dsection, 
+			go_on_sync = clean_old_local_by_old_refname(section, dsection, 
 				os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname+SUFFIX_OLD), # diff1 (+SUFFIX_OLD)
 				localdir, True) #!!! diff2
 		elif daction[sdk_refname].uplocal:
 			# This copes with get-sdkin.ini change that would cause cidver-mapping change.
-			clean_old_local_by_old_refname(section, dsection, 
+			go_on_sync = clean_old_local_by_old_refname(section, dsection, 
 				os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname), # diff1
 				localdir, False) #!!! diff2
+
+		if not go_on_sync:
+			print
+			continue
 
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
