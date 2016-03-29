@@ -656,7 +656,7 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 			dsttime = int( os.path.getmtime(fp_dst) )
 			if srctime != dsttime:
 				count += 1
-				print "Found %d target file with local modification:"%(count)
+				print "Found %d target file with local modification(different timestamp):"%(count)
 				print "  Cached (%s): %s"%( 
 					time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(srctime)), fp_src)
 				print "  Target (%s): %s"%(
@@ -802,6 +802,9 @@ def do_getsdks():
 		if not go_on_sync:
 			print
 			continue
+				# This leave FN_PATTERN_REFNAME_DONE sigfile not updated, so run this py again
+				# will cause this refname's cache->localdir sync to launch again, so you user will 
+				# again be asked whether to overwrite/remove those files. This is desired behavior.
 
 		# Determine whether to sync cache to $/sdkin (mlocal)
 		if daction[sdk_refname].uplocal:
