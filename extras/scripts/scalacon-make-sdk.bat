@@ -42,7 +42,7 @@ if "%gmu_SC_CHECKOUT_DATETIME%" == "" (
 
 REM CMD_GETSDKIN is optional, but most SDK should have it.
 if not "%CMD_GETSDKIN%" == "" (
-	%CMD_GETSDKIN% 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+	%CMD_GETSDKIN% 2>&1 | mtee "%gmu_LOG_OUTPUT_FILENAME%"
 	if ERRORLEVEL 1 (
 		echo Error executing CMD_GETSDKIN.
 		exit /b 1
@@ -75,3 +75,4 @@ goto END
 :ErrorRename
 echo Error from %0: Cannot Rename %gmu_LOG_OUTPUT_FILENAME% to %gmu_LOG_OUTPUT_FILENAME_bak% .
 goto END
+:END

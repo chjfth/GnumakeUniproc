@@ -70,9 +70,9 @@ set MV_=mv_
 set CP_=cp_
 
 if "%gmu_LOG_APPEND%" == "1" (
-	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee -a "%gmu_LOG_OUTPUT_FILENAME%"
+	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | mtee /+ "%gmu_LOG_OUTPUT_FILENAME%"
 ) else (
-	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | mtee "%gmu_LOG_OUTPUT_FILENAME%"
 )
 
 goto END
