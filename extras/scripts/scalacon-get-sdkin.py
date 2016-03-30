@@ -37,6 +37,8 @@ NLSSVN=https://nlssvn/svnreps
 gmb_dirname_sdkin=sdkin
 gmb_dirname_sdkout=sdkout
 
+cidvers_restrict=
+
 [sdkin.common-include]
 svndatetime= 2016-03-05 23:00
 svnurl=      %(NLSSVN)s/CommonLib/common-include/trunk
@@ -60,6 +62,19 @@ localdir=    %(gmb_dirname_sdkout)s
 [DEFAULT] 小节用来定义一些全局变量的默认值，以便稍后多次引用。
 
 [DEFAULT] 中定义的条目会被同名环境变量覆盖，这个覆盖动作是在本 .py 代码中实现的。
+
+	cidvers_restrict=<cidvers list>    (可选)
+	
+	例：
+	cidvers_restrict=vc100 vc100x64 
+		只在 $/sdkin, $/sdkout 中生成 vc100 的二进制。
+		换言之， $/sdkbin-cache 中还是会取到 svn 上的全部 cidvers ，但只将 vc100 和 vc100x64 
+		的二进制拷贝到 $/sdkin, $/sdkout 中。
+	
+	环境变量中设置 cidvers_restrict=0 ，用于覆盖 INI 中的 cidvers_restrict 设定，
+	相当于临时解除了 cidvers 限制。
+	设计 =0 的原因：由于无法创建一个“空值”的环境变量，因此，想把 INI 中的 cidvers_restrict
+	覆盖成空值，只能作个特殊规定。
 
 [self.xxx] 小节，指示自己这个 SDK 的最新发布包，该内容默认将被取出到 sdkout 子目录中。
 [self.xxx] 小节的内容仅仅在传递了 --self 时才会去获取。注意，进行 make-sdk-all 构建后，
@@ -132,7 +147,9 @@ g_is_do_self = False
 g_is_only_self = False
 g_self_dir_param = ''
 
-g_is_simulate = False
+g_cidvers_restrict = []
+
+#g_is_simulate = False
 
 DIRNAME_CACHE = '.sdkbin-cache'
 
@@ -452,7 +469,6 @@ def check_cidver_case_correct(dir, cidver):
 
 def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	# section is INI section name,
-	# all other params are items from this section.
 	# im/explicit_mapping_spec sample: "vc100(=vc80) vc100x64(=vc80x64)"
 
 	dir_sdkcache, dir_refname = cachedirs(sdk_refname)[:2]
@@ -467,12 +483,21 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	# Do our sync(copy) work according to mapping:
 	
 	for subdir in g_required_subdir_in_sdkin:
+		if subdir=='cidvers':
+			continue # cidvers\vc60, cidvers\vc80 etc will be copied later with special action
 		copytree_overwrite(
 			os.path.join(dir_refname, subdir),
 			os.path.join(localdir, subdir))
 
 	# Now, generate virtual cidver dirs(directly in localdir) by copying from their real bodies
+	skips = []
+	count = 0
 	for virtual_cidver in mapping:
+		
+		if g_cidvers_restrict and (not virtual_cidver in g_cidvers_restrict):
+			skips.append(virtual_cidver)
+			continue
+		
 		real_cidver = mapping[virtual_cidver][0]
 		dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
 		dir_dst = os.path.join(localdir, 'cidvers', virtual_cidver)
@@ -495,12 +520,22 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 				'The correct case is %s .'%(real_cidver, section, correct_case)
 			exit(26)
 		
+		count += 1
+		count_show = ('(%d)'%(count)).ljust(4)
+		if virtual_cidver == real_cidver:
+			print '  %s Storing <%s>'%(count_show, virtual_cidver)
+		else:
+			print '  %s Storing <%s> from %s'%(count_show, virtual_cidver, real_cidver)
+		
 		copytree_overwrite(dir_src, dir_dst)
 		
 		# create an empty file telling user the cidver's real body
 		if virtual_cidver != real_cidver:
 			filename_cidver_source_hint = "_[%s]CopiedFromCidver.%s.txt"%(section, real_cidver)
 			open(dir_dst+'/'+filename_cidver_source_hint, "wb").close()
+	
+	if skips:
+		print '  Skipped cidvers: %s'%(', '.join(skips))
 	
 	# Create FN_PATTERN_REFNAME_DONE signature file in localdir.
 	fp_refname_done = os.path.join(localdir, FN_PATTERN_REFNAME_DONE%(sdk_refname))
@@ -761,21 +796,28 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 
 def do_getsdks():
 	iniobj = ConfigParser.ConfigParser()
+	global g_cidvers_restrict
 	
 	try:
 		readret = iniobj.read(g_ini_filepath)
 		
 		# Override the values in [DEFAULT] section according to env-vars
 		kvpairs = iniobj.items('DEFAULT')
+		dpairs = dict(kvpairs)
 		for key,value in kvpairs:
 			# Check all upper-case then lower-case key in env, for OS like Linux.
+			# This does not cope with mixed-case env-var names for simplicity, 
+			# so user should obey this when setting env-var.
 			if key.upper() in os.environ:
 				value = os.environ[key.upper()]
 			elif key.lower() in os.environ:
 				value = os.environ[key.lower()]
 			else:
 				continue
-			iniobj.set('DEFAULT', key, value)
+			dpairs[key] = value
+		
+		if ('cidvers_restrict' in dpairs) and (dpairs['cidvers_restrict']!='0'):
+			g_cidvers_restrict = dpairs['cidvers_restrict'].split()
 		
 	except(MissingSectionHeaderError):
 		print 'Scalacon Error: "%s" does not look like a valid INI file.'%(g_ini_filepath)
@@ -842,7 +884,7 @@ def do_getsdks():
 def main():
 	global optdict, g_ini_filepath, g_ini_dir, g_isforce
 	global g_is_do_self, g_is_only_self, g_self_dir_param
-	global g_is_simulate
+#	global g_is_simulate
 
 	optlist,arglist = getopt.getopt(sys.argv[1:], 's', 
 		['force', 'ini=', 'self=', 'get-all', 'simulate', 'version']
@@ -873,8 +915,8 @@ def main():
 		g_is_do_self = True
 		g_is_only_self = False
 
-	if ('--simulate' in optdict) or ('-s' in optdict):
-		g_is_simulate = True
+#	if ('--simulate' in optdict) or ('-s' in optdict):
+#		g_is_simulate = True
 
 	ret = do_getsdks()
 	
