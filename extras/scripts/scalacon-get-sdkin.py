@@ -492,7 +492,8 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	# Now, generate virtual cidver dirs(directly in localdir) by copying from their real bodies
 	skips = []
 	count = 0
-	for virtual_cidver in mapping:
+	ordered_vcidvers = sorted(mapping.keys())
+	for virtual_cidver in ordered_vcidvers:
 		
 		if g_cidvers_restrict and (not virtual_cidver in g_cidvers_restrict):
 			skips.append(virtual_cidver)
