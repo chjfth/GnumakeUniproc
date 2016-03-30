@@ -829,11 +829,18 @@ def do_getsdks():
 	
 	daction = sdkbin_check_all_local_status(iniobj, g_ini_dir)
 	print
+	if (not g_isforce) and sum([daction[r].uplocal for r in daction]):
+		a = raw_input('Your SDK binary needs update. Do it now?[Y/n]')
+		if not a in ['Y', 'y']:
+			print 'You answered No. Now quit.'
+			exit(0)
 
 	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, g_ini_dir):
 		dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
 	
-		if daction[sdk_refname].upcache:
+		action = daction[sdk_refname] # info collected by sdkbin_check_all_local_status
+	
+		if action.upcache:
 			print '[%s]Creating cache in %s ...'%(section, dircache_this_refname)
 			fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir) #!!!
 		
@@ -847,13 +854,13 @@ def do_getsdks():
 		go_on_sync = True
 		
 		# Now we are going to clean up the old files in $/sdkin according to refname.old's content
-		if daction[sdk_refname].upcache:
+		if action.upcache:
 			# This copes with new content grabbed from svn server.
-			assert daction[sdk_refname].uplocal==True
+			assert action.uplocal==True
 			go_on_sync = clean_old_local_by_old_refname(section, dsection, 
 				os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname+SUFFIX_OLD), # diff1 (+SUFFIX_OLD)
 				localdir, True) #!!! diff2
-		elif daction[sdk_refname].uplocal:
+		elif action.uplocal:
 			# This copes with get-sdkin.ini change that would cause cidver-mapping change.
 			go_on_sync = clean_old_local_by_old_refname(section, dsection, 
 				os.path.join(g_ini_dir, DIRNAME_CACHE, sdk_refname), # diff1
@@ -867,7 +874,7 @@ def do_getsdks():
 				# again be asked whether to overwrite/remove those files. This is desired behavior.
 
 		# Determine whether to sync cache to $/sdkin (mlocal)
-		if daction[sdk_refname].uplocal:
+		if action.uplocal:
 			print '[%s]Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir) #!!!
 			print
