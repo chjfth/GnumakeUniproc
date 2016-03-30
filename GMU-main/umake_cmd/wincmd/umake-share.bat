@@ -22,6 +22,9 @@ IF EXIST _MainPrjBuildStart.gmu.ckt GOTO ErrorDelGmuSig
 
 IF "x%gmu_LOG_OUTPUT_FILENAME%x" == "xx" goto NoLogOutput
 
+if "%gmu_LOG_APPEND%" == "1" goto LOG_READY
+REM	-- we should not clear existing log when gmu_LOG_APPEND=1
+
 REM Backup old log file by renaming
 SET gmu_LOG_OUTPUT_FILENAME_bak=%gmu_LOG_OUTPUT_FILENAME%.bak
 
@@ -30,6 +33,8 @@ IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% goto ErrorDelLogBak
 
 IF EXIST %gmu_LOG_OUTPUT_FILENAME% REN %gmu_LOG_OUTPUT_FILENAME% %gmu_LOG_OUTPUT_FILENAME_bak%
 IF ERRORLEVEL 1 GOTO ErrorRename
+
+:LOG_READY
 
 REM A special processing since GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
 REM If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
@@ -64,7 +69,12 @@ set RM_=rm_ -fr
 set MV_=mv_
 set CP_=cp_
 
-%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+if "%gmu_LOG_APPEND%" == "1" (
+	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee -a "%gmu_LOG_OUTPUT_FILENAME%"
+) else (
+	%gmu_MAKE_EXE% %_F_MAKEFILE% %* 2>&1 | tee "%gmu_LOG_OUTPUT_FILENAME%"
+)
+
 goto END
 
 :NoLogOutput
@@ -87,7 +97,7 @@ goto END
 
 REM Determine success/fail by comparing time stamp
 REM Thanks to: http://stackoverflow.com/questions/1687014/how-do-i-compare-timestamps-of-files-in-a-dos-batch-script
-rem I assume that umake's execution time is at least one second, and do not use the ~t compare skill, which report only "minute" time accurary.
+REM I assume that umake's execution time is at least one second, and do not use the ~t compare skill, which report only "minute" time accurary.
 SET FileStart=_MainPrjBuildStart.gmu.ckt
 SET FileSuccess=_MainPrjBuildSuccess.gmu.ckt
 

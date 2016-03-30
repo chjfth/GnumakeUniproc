@@ -37,7 +37,7 @@ export gmp_ud_list_CUSTOM_COMPILER_CFG="$gmp_ud_list_CUSTOM_COMPILER_CFG $gmu_DI
 
 export gmp_DECO_PRJ_NAME=1
 
-export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
+[ "$gmu_LOG_OUTPUT_FILENAME" = "" ] && export gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 
 export gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
 
