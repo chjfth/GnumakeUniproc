@@ -690,7 +690,7 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 								#	absdir_refname = os.path.join(g_ini_dir, DIRNAME_CACHE, dir_refname_old)  # zzz wrong!
 	
 	if not os.path.exists( dir_refname_old ):
-		return
+		return True # go on sync
 	
 	print '[%s]Removing old files in localdir ...'%(section)
 	
@@ -829,7 +829,7 @@ def do_getsdks():
 	
 	daction = sdkbin_check_all_local_status(iniobj, g_ini_dir)
 	print
-	if (not g_isforce) and sum([daction[r].uplocal for r in daction]):
+	if (not g_isforce) and sum([daction[r].uplocal for r in daction])>0:
 		a = raw_input('Your SDK binary needs update. Do it now?[Y/n]')
 		if not a in ['Y', 'y']:
 			print 'You answered No. Now quit.'
@@ -852,6 +852,7 @@ def do_getsdks():
 		assert dsection[IK_svndatetime] == cached_svndatetime
 
 		go_on_sync = True
+			# I will be false if user cancels it inside clean_old_local_by_old_refname().
 		
 		# Now we are going to clean up the old files in $/sdkin according to refname.old's content
 		if action.upcache:
