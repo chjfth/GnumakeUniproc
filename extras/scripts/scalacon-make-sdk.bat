@@ -72,10 +72,7 @@ if not "%CMD_GETSDKIN%" == "" (
 	)
 ) 
 
-pause
 @echo on
-@set gmu_LOG_OUTPUT_FILENAME=0
-@REM -- Request that umaketime do not use tee, because we're using tee in outtest wrapper.
 call umaketime %*
 
 if ERRORLEVEL 1 exit /b 1
@@ -89,6 +86,6 @@ if "%gmu_ud_OUTPUT_ROOT%" == "" (
 	set GF_DIR=%gmu_ud_OUTPUT_ROOT%
 )
 cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
-REM -- In theory the filenames may not be _gmulog.txt or building_list.gmu.txt, but for simplicity, I just use the default.
+REM -- In theory the filenames may not be building_list.gmu.txt, but for simplicity, I just use the default.
 
 
