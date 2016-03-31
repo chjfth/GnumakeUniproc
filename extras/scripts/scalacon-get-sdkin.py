@@ -797,7 +797,7 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 			str_cache_status,
 			'yes' if action.uplocal else 'no' 
 			)
-	#	sys.stdout.flush(); sys.stderr.flush()
+		print '.'
 
 	return daction
 
