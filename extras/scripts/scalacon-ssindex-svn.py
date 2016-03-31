@@ -728,12 +728,12 @@ def Sew1Cookie(cookie):
 	
 	elif g_dict_doth_mapping:
 		assert g_sdkin_hdir
-		g_sdkin_hdir_bsl = g_sdkin_hdir.replace('/', '\\').lower()
+		sdkin_hdir_bsl = g_sdkin_hdir.replace('/', '\\').lower() # bsl: back-slash
 		# magical .h PDB-sewing processing
-#		print "g_sdkin_hdir_bsl=%s"%(g_sdkin_hdir_bsl) #debug
+#		print "sdkin_hdir_bsl=%s"%(sdkin_hdir_bsl) #debug
 		cookie_l = cookie.lower()
-		if cookie_l.startswith(g_sdkin_hdir_bsl):
-			cookie_tail = cookie_l[len(g_sdkin_hdir_bsl):]
+		if cookie_l.startswith(sdkin_hdir_bsl):
+			cookie_tail = cookie_l[len(sdkin_hdir_bsl):]
 			if cookie_tail in g_dict_doth_mapping:
 				
 #				if len(g_dict_doth_mapping[cookie_tail])>1: #debug
