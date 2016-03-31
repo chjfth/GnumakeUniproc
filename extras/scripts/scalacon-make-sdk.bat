@@ -4,7 +4,7 @@ setlocal
 set SCALACON_LOGFILE=_scalacon.gmulog.txt
 set SCALACON_LOGFILE_bak=%SCALACON_LOGFILE%.bak
 
-REM ¦¬y elegant teebat solution, auto-log whole .bat output to tee(mtee) when this .bat is the root bat. 
+REM My elegant teebat solution, auto-log whole .bat output to tee(mtee) when this .bat is the root bat. 
 REM So,
 REM * If you are the end-user calling this .bat, SCALACON_LOGFILE will be generated with the 
 REM   same content on screen.
