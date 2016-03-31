@@ -65,7 +65,7 @@ if "%gmu_SC_CHECKOUT_DATETIME%" == "" (
 
 REM CMD_GETSDKIN is optional, but most SDK should have it.
 if not "%CMD_GETSDKIN%" == "" (
-	%CMD_GETSDKIN% 2>&1
+	%CMD_GETSDKIN%
 	if ERRORLEVEL 1 (
 		echo Error executing CMD_GETSDKIN.
 		exit /b 1
