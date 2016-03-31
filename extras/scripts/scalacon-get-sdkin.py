@@ -533,7 +533,7 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 		# create an empty file telling user the cidver's real body
 		if virtual_cidver != real_cidver:
 			filename_cidver_source_hint = "_[%s]CopiedFromCidver.%s.txt"%(section, real_cidver)
-			open(dir_dst+'/'+filename_cidver_source_hint, "wb").close()
+			open(os.path.join(dir_dst, filename_cidver_source_hint), "wb").close()
 	
 	if skips:
 		print '  Skipped cidvers: %s'%(', '.join(skips))
