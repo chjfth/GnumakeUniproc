@@ -1,6 +1,40 @@
 @echo off
 setlocal
 
+set SCALACON_LOGFILE=_scalacon.gmulog.txt
+set SCALACON_LOGFILE_bak=%SCALACON_LOGFILE%.bak
+
+REM ¦¬y elegant teebat solution, auto-log whole .bat output to tee(mtee) when this .bat is the root bat. 
+REM So,
+REM * If you are the end-user calling this .bat, SCALACON_LOGFILE will be generated with the 
+REM   same content on screen.
+REM * If you are using another wrapper bat to run this bat, you should set SCALACON_WRAPPER_EXISTED=1
+REM   so that this .bat does not use tee. In other word, your wrapper bat use tee.
+
+if "%SCALACON_WRAPPER_EXISTED%" == "" (
+
+	if exist %SCALACON_LOGFILE_bak% del %SCALACON_LOGFILE_bak%
+	if exist %SCALACON_LOGFILE_bak% (
+		echo Cannot delete old logfile: %SCALACON_LOGFILE_bak% 
+		exit /b 1
+	)
+
+	if exist %SCALACON_LOGFILE% ren %SCALACON_LOGFILE% %SCALACON_LOGFILE_bak%
+	if ERRORLEVEL 1 (
+		echo Cannot rename old %SCALACON_LOGFILE% to %SCALACON_LOGFILE_bak%
+		exit /b 1
+	)
+
+	set SCALACON_WRAPPER_EXISTED=1
+
+	call %0 %* 2>&1 | tee %SCALACON_LOGFILE%
+	REM By using pipe on the above CMD line, we cannot be sure of %0's exit code,
+	REM because ERRORLEVEL may indicate %0's exit code or tee's exit code. So we just exit with 0.
+	exit /b 0 
+)
+
+
+
 if "%DIR_NLS_BUILD_ENV%" == "" (
   echo Env-var DIR_NLS_BUILD_ENV not set, so I cannot find the compiler sets to use.
   exit /b 1
@@ -8,17 +42,6 @@ if "%DIR_NLS_BUILD_ENV%" == "" (
   call %DIR_NLS_BUILD_ENV%\gmp-cenv-all.bat
 )
 
-set gmu_LOG_APPEND=1
-set gmu_LOG_OUTPUT_FILENAME=_scalacon.gmulog.txt
-
-REM Backup old log file by renaming
-SET gmu_LOG_OUTPUT_FILENAME_bak=%gmu_LOG_OUTPUT_FILENAME%.bak
-
-IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% DEL %gmu_LOG_OUTPUT_FILENAME_bak%
-IF EXIST %gmu_LOG_OUTPUT_FILENAME_bak% goto ErrorDelLogBak
-
-IF EXIST %gmu_LOG_OUTPUT_FILENAME% REN %gmu_LOG_OUTPUT_FILENAME% %gmu_LOG_OUTPUT_FILENAME_bak%
-IF ERRORLEVEL 1 GOTO ErrorRename
 
 rem set CURDIR=%CD%
 rem set CURDIR_fs=%CURDIR:\=/%
@@ -42,21 +65,23 @@ if "%gmu_SC_CHECKOUT_DATETIME%" == "" (
 
 REM CMD_GETSDKIN is optional, but most SDK should have it.
 if not "%CMD_GETSDKIN%" == "" (
-	%CMD_GETSDKIN% 2>&1 | mtee "%gmu_LOG_OUTPUT_FILENAME%"
+	%CMD_GETSDKIN% 2>&1
 	if ERRORLEVEL 1 (
 		echo Error executing CMD_GETSDKIN.
 		exit /b 1
 	)
 ) 
 
-
+pause
 @echo on
+@set gmu_LOG_OUTPUT_FILENAME=0
+@REM -- Request that umaketime do not use tee, because we're using tee in outtest wrapper.
 call umaketime %*
 
 if ERRORLEVEL 1 exit /b 1
 
 @echo off
-cp_ %gmu_LOG_OUTPUT_FILENAME% %gmb_thisrepo%/%gmb_dirname_sdkout%
+cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
 
 if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
 	set GF_DIR=gf
@@ -67,12 +92,3 @@ cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
 REM -- In theory the filenames may not be _gmulog.txt or building_list.gmu.txt, but for simplicity, I just use the default.
 
 
-REM ==========================================================================
-goto END
-:ErrorDelLogBak
-echo Error from %0: Cannot delete backup log-file(%gmu_LOG_OUTPUT_FILENAME_bak%) .
-goto END
-:ErrorRename
-echo Error from %0: Cannot Rename %gmu_LOG_OUTPUT_FILENAME% to %gmu_LOG_OUTPUT_FILENAME_bak% .
-goto END
-:END
