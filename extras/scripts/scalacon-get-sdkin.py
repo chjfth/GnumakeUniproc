@@ -640,6 +640,12 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 		# Grab svn server content into .new folder first.
 		svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, ini_svndatetime, dir_refname_new)
 		print "Running cmd: \n  " + svncmd
+		
+		sys.stdout.flush(); 
+			# [2016-03-31] Special Note: I have to flush stdout before calling svn.exe child process.
+			# Without this flush, when piping the screen output to tee, I see "svn export"'s output 
+			# come out BEFORE the print content above.
+	
 		ret = subprocess.check_call(shlex.split(svncmd))
 		open(fp_svndatetime_tmp, 'wb').write(ini_svndatetime)
 
@@ -791,7 +797,8 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 			str_cache_status,
 			'yes' if action.uplocal else 'no' 
 			)
-	
+	#	sys.stdout.flush(); sys.stderr.flush()
+
 	return daction
 
 
