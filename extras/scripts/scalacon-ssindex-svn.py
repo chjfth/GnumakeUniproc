@@ -730,8 +730,8 @@ def Sew1Cookie(cookie):
 		assert g_sdkin_hdir
 		sdkin_hdir_bsl = g_sdkin_hdir.replace('/', '\\').lower() # bsl: back-slash
 		# magical .h PDB-sewing processing
-#		print "sdkin_hdir_bsl=%s"%(sdkin_hdir_bsl) #debug
 		cookie_l = cookie.lower()
+#		print ">>> sdkin_hdir_bsl=%s // cookie_l=%s"%(sdkin_hdir_bsl, cookie_l) #debug
 		if cookie_l.startswith(sdkin_hdir_bsl):
 			cookie_tail = cookie_l[len(sdkin_hdir_bsl):]
 			if cookie_tail in g_dict_doth_mapping:
@@ -1186,9 +1186,9 @@ def main():
 		print 'Assign srcmapping:\n  prefix-in-pdb: %s\n  prefix-in-svn: %s\n'%(g_srcmapping_pdb, g_srcmapping_svn)
 	
 	if '--sdkout-doth-localroot' in opts:
-		g_sdkout_hdir = opts['--sdkout-doth-localroot']
+		g_sdkout_hdir = os.path.abspath(opts['--sdkout-doth-localroot'])
 	if '--sdkin-doth-localroot' in opts:
-		g_sdkin_hdir  = opts['--sdkin-doth-localroot']
+		g_sdkin_hdir  = os.path.abspath(opts['--sdkin-doth-localroot'])
 	
 	is_allow_empty_scan = True if '--allow-empty-scan' in opts else False
 	
