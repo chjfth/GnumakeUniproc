@@ -29,6 +29,9 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 
 输入参数：
 
+--version
+	显示版本号。
+
 --dir-pdb=<dp>
 	[必须]
 	指出在哪个目录中搜索 pdb 。
@@ -104,7 +107,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
     若启用此开关，则在 srcsrv 流中嵌入 svn export 命令而非 svn co 。
 
 --svnhost-table=<svnhosttable>
-	[必须]
+	[可选] （默认为仅用一个 host 条目 "nlssvn  https://nlssvn/svnreps"）
 	此值是一个本地文件名（可带路径）或一个文件的 SVN 地址。
 	该值指示的文件是一个表格，每行有两个字段，用于将源码 SVN URL 的前缀关联到一个“主机名”。
 	比如：svnhosttable 内容如下：
@@ -132,6 +135,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 		在给 'srctool -r self.pdb' 缝合 S 流时，额外去 D:\mydir1 , D:\mydir2 中搜索
 	mmsnprintf.sstream.txt, ithreadsync.sstream.txt ，如果它们存在，将它们的内容加入
 	self.pdb 的 S 流（当然，只取 "SRCSRV: source files" 小节的内容）。
+	注：会递归搜索子目录。
 	
 	pickdir 的特殊形式： 如果 pickdir 以 ! 打头，表示本目录是相对于当前 pdb 的。比如，
 	指定了 --pick-sstreams-dirs=!.. ，那么，处理 D:/sdkin/vc100/bin-debug/foo.pdb 时，
@@ -180,8 +184,12 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 
 --pick-sstreams-dirs-from-ini=<inipath>
 --pick-sstreams-dir-sdkin=<dirsdkin>
-	[可选] since v1.2.
-	类似于 --pick-sstreams-dirs (但优先于它)，指定从 inipath 中搜索出 pickdirs 。 
+	[可选] since v1.2. 此两选项需一起使用方有效。
+	类似于 --pick-sstreams-dirs (但优先于它)，分析 inipath 指示的文件内容，从 INI 内容中弹查出
+	应该将 <dirsdkin> 底下的哪些子目录纳入 pickdirs 。 主要由 Scalacon 2016 的 SDK 工程使用。
+	.
+	不过，由于使用 --pick-sstreams-dirs 已可以递归搜索子目录（虽然可能比较耗时），这两选项
+	显得不那么必要。
 
 --src-mapping-pdb=<dirpfxpdb>
 --src-mapping-svn=<dirpfxsvn>
@@ -862,13 +870,13 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 			for dir in dirs:
 				if not os.path.isdir(dir):
 					continue # ignore non-existing dir
-				filenames = os.listdir(dir)
-				for filename in filenames:
-					if filename.endswith('.sstream.txt'):
-						sstream_filepath = dir+'/'+filename
-						print '  > picking from %s'%(sstream_filepath)
-						append_sstracks_from_streamstxt(sstracks_all_dict, sstream_filepath)
-						g_nCherryPicks += 1
+				for dirpath, dirnames, filenames in os.walk(dir):
+					for filename in filenames:
+						if filename.endswith('.sstream.txt'):
+							sstream_filepath = os.path.join(dirpath, filename)
+							print '  > picking from %s'%(sstream_filepath)
+							append_sstracks_from_streamstxt(sstracks_all_dict, sstream_filepath)
+							g_nCherryPicks += 1
 		else:
 			# looks for specific <cherry>.sstream.txt files
 			cherries = g_pick_cherries.split(',')
@@ -1090,10 +1098,10 @@ def main():
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
 
-	reqopts = ['dir-pdb=', 'dir-source=', 'datetime-co=', 'svnhost-table=' ]
+	reqopts = ['dir-pdb=', 'dir-source=', 'datetime-co=' ]
 	optopts = [
 		'svn-use-export', 'logfile=', 'default-branchie=',
-		'dir-reposie-table=', 'loosy-reposie-table', 
+		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
 		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
@@ -1214,29 +1222,32 @@ def main():
 
 	# Fetch SVN host table from file.
 	svnhosttable_buf = ''
-	fnSvnhostTable = opts['--svnhost-table']
-		# Two cases: 1. it's a local file, 2. it's an SVN url.
-	if ':' in fnSvnhostTable[2:]: # so it may be http://... https://... instead of C:\... ,D:\... etc
-		# Process as an SVN url. svn cat that file to current dir.
-		flocal = fnSvnhostTable.split('/')[-1]
-		try:
-			svn_cat_cmd = "svn cat %s"%(fnSvnhostTable)
-			svnhosttable_buf = subprocess.check_output(svn_cat_cmd)
-		except WindowsError:
-			Logp( "Error: '%s' execution fail! Probably you don't have svn.exe in your PATH."%(svn_cat_cmd) )
-			exit(1)
-		except subprocess.CalledProcessError as cpe:
-			Logp( "Error: '%s' execution fail, exit code is %d. Output is:\n%s"%(
-				svn_cat_cmd, cpe.returncode , cpe.output) )
+	if '--svnhost-table' in opts:
+		fnSvnhostTable = opts['--svnhost-table']
+			# Two cases: 1. it's a local file, 2. it's an SVN url.
+		if ':' in fnSvnhostTable[2:]: # so it may be http://... https://... instead of C:\... ,D:\... etc
+			# Process as an SVN url. svn cat that file to current dir.
+			flocal = fnSvnhostTable.split('/')[-1]
+			try:
+				svn_cat_cmd = "svn cat %s"%(fnSvnhostTable)
+				svnhosttable_buf = subprocess.check_output(svn_cat_cmd)
+			except WindowsError:
+				Logp( "Error: '%s' execution fail! Probably you don't have svn.exe in your PATH."%(svn_cat_cmd) )
+				exit(1)
+			except subprocess.CalledProcessError as cpe:
+				Logp( "Error: '%s' execution fail, exit code is %d. Output is:\n%s"%(
+					svn_cat_cmd, cpe.returncode , cpe.output) )
+		else:
+			# Process fnSvnhostTable as local file.
+			try:
+				ftable = open(fnSvnhostTable, 'r')
+				svnhosttable_buf = ftable.read()
+				ftable.close()
+			except:
+				Logp( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
+				exit(1)
 	else:
-		# Process fnSvnhostTable as local file.
-		try:
-			ftable = open(fnSvnhostTable, 'r')
-			svnhosttable_buf = ftable.read()
-			ftable.close()
-		except:
-			Logp( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
-			exit(1)
+		svnhosttable_buf = 'nlssvn https://nlssvn/svnreps'
 
 	Log( "SVN host table has content:\n%s\n"%(svnhosttable_buf) )
 
