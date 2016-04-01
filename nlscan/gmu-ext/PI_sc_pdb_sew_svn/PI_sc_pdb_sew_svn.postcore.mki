@@ -5,8 +5,11 @@ ifeq (,$(strip $(gmi_SCPSS_ud_PDB)))
   $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_ud_PDB is not assigned)
 endif
 
-ifeq (,$(strip $(gmi_SCPSS_ud_source)))
-  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_ud_source is not assigned)
+gmi_SCPSS_ud_list_source += $(gmi_SCPSS_ud_source)
+	# gmi_SCPSS_ud_source is old var
+
+ifeq (,$(strip $(gmi_SCPSS_ud_list_source)))
+  $(error !Error from PI_sc_pdb_sew_svn: gmi_SCPSS_ud_list_source is not assigned)
 endif
 
 ifeq (,$(strip $(gmi_SCPSS_PRODUCT_NAME)))
@@ -38,7 +41,7 @@ endif
 
 pycmd_ssindex = scalacon-ssindex-svn.py\
   --dir-pdb=$(gmi_SCPSS_ud_PDB)\
-  --dir-source=$(gmi_SCPSS_ud_source)\
+  --dirs-source=$(subst $(_GmuSpace),$(_GmuComma),$(gmi_SCPSS_ud_list_source))\
   --datetime-co="$(gmu_SC_CHECKOUT_DATETIME)"\
   --svnhost-table=$(gmi_SCPSS_SVNHOST_TABLE)\
   --dir-reposie-table="$(_gmi_SCPSS_tmpdir)" $(if $(gmi_SCPSS_ALLOW_LOOSY_REPOSIE),--loosy-reposie-table)\

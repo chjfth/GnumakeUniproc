@@ -50,17 +50,19 @@ _pluginId_SC_PDB_SEW_SVN := $(gmpv_ThisPluginId)
 	# (must)
 	# The directory to scan PDBs.
 
-# gmi_SCPSS_ud_source = 
+# gmi_SCPSS_ud_list_source =       
 	# (must)
-	# Tells a local source directory to scan. 
+	# Tells a local source directory list to scan. 
 	# For those source files recorded in PDB('srctool -r xxx.pdb' knows it), I will only 
-	# sew those within $(gmi_SCPSS_ud_source). Therefore, those source files from Microsoft,
+	# sew those within $(gmi_SCPSS_ud_list_source). Therefore, those source files from Microsoft,
 	# like
 	#	f:\sp\vctools\crt_bld\self_x86\crt\src\wchtodig.c
 	#	f:\sp\vctools\crt_bld\self_x86\crt\src\atox.c
 	# will not be considered.
 	#
 	# In practice, we'll use sandbox root corresponding to https://nlssvn/svnreps .
+	#
+	# old name: gmi_SCPSS_ud_source (will append to gmi_SCPSS_ud_list_source) 
 	
 # gmi_SCPSS_PRODUCT_NAME = 
 	# (must)

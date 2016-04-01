@@ -36,18 +36,20 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	[必须]
 	指出在哪个目录中搜索 pdb 。
 
---dir-source=<ds>
+--dirs-source=<ds>,<ds>
 	[必须]
 	指出仅考虑对那个目录中的源文件作 sew 动作。
 	背景：用 srctool -r xxx.pdb，会列出很多源文件，其中很多是微软构建机上的源文件，比如
 		f:\sp\vctools\crt_bld\self_x86\crt\src\wchtodig.c
 		f:\sp\vctools\crt_bld\self_x86\crt\src\atox.c
-	我们不需对那些微软的 .c 作 sew 动作。我们很容易区分那些源文件和我们自己的源文件，
+	我们不需对那些微软的 .c 作 sew 动作。我们很容易区分哪那些源文件和我们自己的源文件，
 	因为我们自己的源文件会放在(比如) P:\nlsbuild 目录下，而非 f:\sp 下。
+	.
+	用逗号分隔多个目录。
 
 --datetime-co=<dtco>
 	[必须]
-	告知一个时间戳，格式如 "2011-08-29 08:30:00" ，指出用户要缝合的 svn checkout 命令应该
+	告知一个时间戳，格式如 "2011-08-29 08:30:00 +0800" ，指出用户要缝合的 svn checkout 命令应该
 	用哪个时间戳。是的，在我的设计中，不是用 SVN 版本号来标识一个具体的版本，而是用时间戳。
 	scalacon-ssindex-svn.py 自身无法得知这个时间戳，构建源码的人才知道，因此要由外部传入。
 	.
@@ -143,6 +145,8 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	
 	--pick-cherries 的特殊形式： 如果 --pick-cherries=* ，那么所有 pickdir 中的 
 	所有 .sstream.txt 都会被加入。多个 pickdir 若中有同名的文件，它们的内容都将加入。
+	.
+	当 --pick-sstreams-dirs= 非空且 --pick-cherries= 未指定时，默认设 --pick-cherries=* 。
 
 	层级关系： --pick-cherries 作为外层循环， --pick-sstreams-dir 作为内层循环；
 	在某个搜索目录中遇到匹配的 <cherry>.sstream.txt 之后，仍会继续搜索其他目录并将所有 S 流加入。
@@ -260,8 +264,8 @@ version = "1.2"
 
 opts = {}
 
-g_dp = ''
-g_ds = ''
+g_dirpdb = ''
+g_ds_list = []
 g_dtco = ''
 g_drt = ''
 g_dftbr = 'trunk'
@@ -276,7 +280,7 @@ g_tracks = {}
 	# to avoid checking that cookie with 'svn info' again and again.
 g_nSourceFilesFound = 0
 	# For those files reported by 'srctool -r', how many of them are actually found
-	# from g_ds directory.
+	# from g_ds_list directories.
 g_nValidTracks = 0
 	# Total source files listed from 'srctool -r' that results in a track.
 	# Note: A source file can result in a valid track when he has correct 'svn info' and the
@@ -932,9 +936,12 @@ def Sew1Pdb(pdbpath):
 	"""
 
 	# filter the source files we want(those inside --dir-source)
-	srclist_want = filter( lambda s : ComparePathStr(g_ds, s[0:len(g_ds)]) , srclist)
+	srclist_want = []
+	for dirsource in g_ds_list:
+		wants = filter( lambda s : ComparePathStr(dirsource, s[0:len(dirsource)]) , srclist)
+		srclist_want.extend(wants)
 
-	""" srclist_want sample, when g_ds="g:\w" :
+	""" srclist_want sample, when dirsource="g:\w" :
     g:\w\isyslib\iuartbasic\libsrc\mswin\uartbasic_win.cpp
 	g:\w\commonlib\common-include\mswin\mswinclarify.h
 	g:\w\isyslib\iuartbasic\libsrc\iuartbasic_common.cpp
@@ -1056,12 +1063,10 @@ def Sew1Pdb(pdbpath):
 
 def ScanAndSew():
 	"""
-	g_dp, g_ds, g_drt, g_dtco as input params
-	
 	[2016-03-06] For .lib.pdb, 'srctool -r' shows nothing(Microsoft did it deliberately), 
 	so we don't have to bother with *.lib.pdb .
 	"""
-	for root, folders, files in os.walk(g_dp):
+	for root, folders, files in os.walk(g_dirpdb):
 		# In files, search for *.pdb but not *.lib.pdb
 		for file in files:
 			if fnmatch.fnmatch(file, '*.pdb') and not fnmatch.fnmatch(file, '*.lib.pdb'):
@@ -1091,14 +1096,14 @@ def save_sstream_as_file(sstream_text, pdbpath):
 
 
 def main():
-	global opts, g_dp, g_ds, g_dtco, g_drt, g_dftbr, g_allow_loosy_reposie
+	global opts, g_dirpdb, g_ds_list, g_dtco, g_drt, g_dftbr, g_allow_loosy_reposie
 	global g_logfile, g_svn_use_export
 	global g_save_sstreams_dir, g_pick_cherries, g_pick_sstreams_dirs
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
 
-	reqopts = ['dir-pdb=', 'dir-source=', 'datetime-co=' ]
+	reqopts = ['dir-pdb=', 'dirs-source=', 'datetime-co=' ]
 	optopts = [
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
@@ -1117,8 +1122,9 @@ def main():
 	if not AssertMissingOpt(reqopts):
 		return 1
 
-	g_dp = opts['--dir-pdb']
-	g_ds = opts['--dir-source']
+	g_dirpdb = opts['--dir-pdb']
+	g_ds_list = opts['--dirs-source'].split(',')
+	g_ds_list = [d for d in g_ds_list if d] # remove empty ones
 
 	if '--dir-reposie-table' in opts:
 		g_drt = opts['--dir-reposie-table']
@@ -1145,6 +1151,8 @@ def main():
 
 	if '--pick-cherries' in opts:
 		g_pick_cherries = opts['--pick-cherries']
+	elif '--pick-sstreams-dirs' in opts:
+		g_pick_cherries = '*'
 
 	if '--pick-sstreams-dirs-from-ini' in opts:
 		g_pick_sstreams_dirs_from_ini = opts['--pick-sstreams-dirs-from-ini']
@@ -1212,12 +1220,12 @@ def main():
 			Log( "\t%s"%(sys.argv[i]) )
 
 	# Assert valid directories
-	for d in [g_dp, g_ds] + ([g_drt] if g_drt else []):
+	for d in [g_dirpdb] + g_ds_list + ([g_drt] if g_drt else []):
 		if not os.path.isdir(d):
 			print "Error: Your input directory '%s' (abspath: %s) does not exist!"%(d, os.path.abspath(d))
 			return 2
 
-	g_ds = os.path.abspath(g_ds)
+	g_ds_list = map(lambda ds:os.path.abspath(ds), g_ds_list)
 		# No need to translate other paths to abs.
 
 	# Fetch SVN host table from file.
@@ -1281,7 +1289,7 @@ def main():
 			prompt = "Scalacon info: " if is_allow_empty_scan else "Scalacon Error: "
 			
 			if g_nPdbsFound==0:
-				Logp( prompt+"No matching PDBs found in input directory '%s' ."%(g_dp))
+				Logp( prompt+"No matching PDBs found in input directory '%s' ."%(g_dirpdb))
 			elif g_nSourceFilesFound==0:
 				Logp( prompt+"For all scanned PDBs, no associating source files is found in '%s' ."%(g_ds))
 			else:
