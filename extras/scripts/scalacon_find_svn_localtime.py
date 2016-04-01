@@ -196,7 +196,6 @@ If difference found, output is like:
 </paths>
 </diff>
 """
-	print xml
 	changed_files = []
 	for r in re.finditer(r'<path\s+(?:.+?)>(.+?)</path>', xml, re.DOTALL):
 		changed_files.append(r.group(1))
