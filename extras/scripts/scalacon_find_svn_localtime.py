@@ -243,7 +243,7 @@ def scalacon_find_svn_localtime(dirs_source):
 		if changed_files:
 			errmsg = 'The latest files in your sandboxes has (local) timestamp %s, '\
 			'but local content does not exactly match server content.\n'\
-				'Different files are:\n  %s'%(timestrlocal, '  '.join(changed_files))
+				'Different files are:\n  %s'%(timestrlocal, '\n  '.join(changed_files))
 			exit(errmsg)
 	
 	ret = timestrlocal +' '+ svn_timezone_string()
