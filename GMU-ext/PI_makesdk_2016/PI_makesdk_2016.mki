@@ -60,7 +60,7 @@ $(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
 $(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)
 
 ### Show some extra important gmu vars:
-$(call gmuf_AnounceExportEnvvar,gmu_SC_CHECKOUT_DATETIME=$(gmu_SC_CHECKOUT_DATETIME))
+# (none yet)
 
 
 _tmp := $(shell $(call gmuf_ScriptCmd,\
