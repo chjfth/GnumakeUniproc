@@ -114,7 +114,7 @@ def svn_find_latest_timestamp(rootdir, dentry):
 			r'<commit\s+revision="([0-9]+)">(?:.+?)<date>(.+?)</date>(?:.+?)</commit>', 
 			entry_content, re.DOTALL)
 		if r:
-			entry_revision = r.group(1)
+			entry_revision = int(r.group(1))
 			date = r.group(2)
 #			print "### %s (r=%s) date=%s"%(entry_path, entry_revision, date) #debug
 			if entry_revision>max_revision:
@@ -125,7 +125,7 @@ def svn_find_latest_timestamp(rootdir, dentry):
 			dentry[entry_path] = SvnEntry()
 			dentry[entry_path].rev = entry_revision
 			
-#	print "# %s entries collected in %s"%(len(dentry.keys()), rootdir) #debug
+#	print "# %s entries collected in %s, max_date=%s"%(len(dentry.keys()), rootdir, max_date) #debug
 	
 	epsec = svn_epsec_from_iso8601(max_date)
 #	print "# %d"%(epsec)
