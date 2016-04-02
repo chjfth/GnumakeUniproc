@@ -40,6 +40,7 @@ if "%DIR_NLS_BUILD_ENV%" == "" (
   exit /b 1
 ) else (
   call %DIR_NLS_BUILD_ENV%\gmp-cenv-all.bat
+  if errorlevel 1 exit /b 1
 )
 
 

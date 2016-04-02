@@ -274,7 +274,11 @@ def copytree_overwrite(src, dest, ignore=None):
 	# Thanks to: http://stackoverflow.com/a/15824216/151453
 	if os.path.isdir(src):
 		if not os.path.isdir(dest):
-			os.makedirs(dest)
+			try:
+				os.makedirs(dest)
+			except OSError:
+				if not os.path.isdir(dest):
+					raise
 		files = os.listdir(src)
 		if ignore is not None:
 			ignored = ignore(src, files)
@@ -430,17 +434,19 @@ def get_cidvers_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection_user_overri
 	return mapping
 
 def get_cidvers_reverse_mapping(cidvers_dir, self_mapping_ini, user_override_ini, user_section):
+	dsection_user_override = {}
 	iniobj = ConfigParser.ConfigParser()
 	okini = iniobj.read(user_override_ini)
-	assert okini # ensure the ini file exists
+	
+	if okini:
+		kvlist = iniobj.items(user_section)
+		dsection_user_override = dict(kvlist)
 
-	kvlist = iniobj.items(user_section)
-	dsection = dict(kvlist)
-	rmapping = get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection)
+	rmapping = get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection_user_override)
 	return rmapping
 
-def get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection):
-	mapping = get_cidvers_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection)
+def get_cidvers_reverse_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection_user_override):
+	mapping = get_cidvers_mapping_dsuo(cidvers_dir, self_mapping_ini, dsection_user_override)
 
 	rmapping = {}
 		# Result: 
@@ -547,7 +553,13 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	shutil.copyfile(g_ini_filepath, inipath_copy)
 	
 
-def cache_to_local_enum_pair(section, dsection, dir_refname, localdir): # this is a generator
+def cache_to_local_enum_pair(section, dsection, dir_refname, localdir):
+	"""
+	This is a generator. It outputs pairs (psrc, pdst):
+	psrc is a filepath or dirpath inside $/.sdkin-cache 
+	pdst is a filepath or dirpath inside $/.sdkin 
+	The pdst are actually a copy from psrc; the copy was done in previous scalacon-get-sdkin.py run.
+	"""
 	
 	if not os.path.exists(dir_refname):
 		return

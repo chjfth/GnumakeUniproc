@@ -48,14 +48,15 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	用逗号分隔多个目录。
 
 --datetime-co=<dtco>
-	[必须]
+	[可选]
 	告知一个时间戳，格式如 "2011-08-29 08:30:00 +0800" ，指出用户要缝合的 svn checkout 命令应该
 	用哪个时间戳。是的，在我的设计中，不是用 SVN 版本号来标识一个具体的版本，而是用时间戳。
 	scalacon-ssindex-svn.py 自身无法得知这个时间戳，构建源码的人才知道，因此要由外部传入。
 	.
-	<dtco> 填为 now ，则自动取当前时间。
-	.
-	我不让此参数可选，因为时间太重要了，它决定你是否将 checkout/export 正确的版本。
+	如果不提供此参数，则会花费一些时间进行自动选择。方法是：扫描所有 dirs-source 目录，
+	找出具有最大时间戳的那个文件、取其时间戳（往上取整秒）为 dtco ，同时还会自动检查
+	服务器的此时间点内容跟本地内容是否完全一致，若不一致则宣告失败。
+	这种自动选择机制应该是很可靠的，因此建议自动选择而非手动指定，手动指定仅用于开发试验。
 
 --dir-reposie-table=<drt>
 	[必须] 但指定了 --loosy-reposie-table 的情况下可选。
@@ -259,6 +260,8 @@ import tempfile
 import ConfigParser
 from datetime import datetime
 import fnmatch
+
+import scalacon_svn_op
 
 version = "1.2"
 
@@ -1103,8 +1106,8 @@ def main():
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
 
-	reqopts = ['dir-pdb=', 'dirs-source=', 'datetime-co=' ]
-	optopts = [
+	reqopts = ['dir-pdb=', 'dirs-source=' ]
+	optopts = [ 'datetime-co=', 
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
 		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
@@ -1124,7 +1127,7 @@ def main():
 
 	g_dirpdb = opts['--dir-pdb']
 	g_ds_list = opts['--dirs-source'].split(',')
-	g_ds_list = [d for d in g_ds_list if d] # remove empty ones
+	g_ds_list = [os.path.abspath(d) for d in g_ds_list if d] # remove empty ones
 
 	if '--dir-reposie-table' in opts:
 		g_drt = opts['--dir-reposie-table']
@@ -1135,10 +1138,15 @@ def main():
 		if not g_drt:
 			print "Error: You must provide --dir-reposie-table=<drt> option unless you specify --loosy-reposie-table."
 			return 1
-
-	g_dtco = opts['--datetime-co']
-	if g_dtco=='now':
-		g_dtco = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	
+	if '--datetime-co' in opts:
+		g_dtco = opts['--datetime-co']
+	else:
+		try:
+			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_time(g_ds_list)
+		except scalacon_svn_op.SvnopErr as e:
+			Logp('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
+			exit(1)
 
 	if '--svn-use-export' in opts:
 		g_svn_use_export = True
