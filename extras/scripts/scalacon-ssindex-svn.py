@@ -1144,7 +1144,7 @@ def main():
 		print 'Scalacon info: User assigned PDB-sewing datetime is: "%s"'%(g_dtco)
 	else:
 		try:
-			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_time(g_ds_list)
+			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list)
 		except scalacon_svn_op.SvnopErr as e:
 			Logp('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)
