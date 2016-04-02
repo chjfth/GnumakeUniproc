@@ -62,6 +62,7 @@ call umaketime %*
 
 @if ERRORLEVEL 1 exit /b 1
 
+@echo on
 cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
 
 @if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
