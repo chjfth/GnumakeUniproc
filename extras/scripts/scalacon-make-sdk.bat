@@ -58,6 +58,7 @@ if not "%CMD_GETSDKIN%" == "" (
 ) 
 
 @echo on
+set gmu_WRAPPER_EXISTED=1
 call umaketime %*
 
 @if ERRORLEVEL 1 exit /b 1
