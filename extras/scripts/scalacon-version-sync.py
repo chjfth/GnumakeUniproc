@@ -52,7 +52,7 @@ vmajor = 0
 vminor = 0
 vbuild = 0
 vextra = 0
-vlinear = 0 # todo: renamed to vlinear
+vlinear = 0
 sig_vlinear = ''
 
 g_isAddDatetime = False;
@@ -158,16 +158,20 @@ def main():
 	for line in lines:
 		ptn_nummatch = '[ \t=/\*]+?([0-9x]+)'
 		r = re.search('.+vmajor'+ptn_nummatch, line)
-		if (r): vmajor = int(r.group(1), 0)
+		if (r): 
+			vmajor = int(r.group(1), 0)
 
 		r = re.search('.+vminor'+ptn_nummatch, line)
-		if (r): vminor = int(r.group(1), 0)
+		if (r): 
+			vminor = int(r.group(1), 0)
 
 		r = re.search('.+vbuild'+ptn_nummatch, line)
-		if (r): vbuild = int(r.group(1), 0)
+		if (r): 
+			vbuild = int(r.group(1), 0)
 
 		r = re.search('.+vextra'+ptn_nummatch, line)
-		if (r): vbuild = int(r.group(1), 0)
+		if (r): 
+			vextra = int(r.group(1), 0)
 
 		if sig_vlinear:
 			r = re.search('.+'+sig_vlinear+ptn_nummatch, line)
