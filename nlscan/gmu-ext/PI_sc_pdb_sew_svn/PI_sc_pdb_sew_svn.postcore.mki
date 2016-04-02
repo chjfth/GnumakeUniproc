@@ -59,8 +59,6 @@ pycmd_symstore = scalacon-symstore.py\
   --dir-store=$(gmi_SCPSS_SYMSTORE_TARGET_DIR)\
   --product-name="$(gmi_SCPSS_PRODUCT_NAME)"\
   --product-ver="$(if $(gmi_SCPSS_PRODUCT_VER),$(gmi_SCPSS_PRODUCT_VER),not-set)"\
-  --pattern-include="*.pdb"\
-  --pattern-exclude="*.lib.pdb/vc?0.pdb/vc??0.pdb"\
   --tmpdir=$(_gmi_SCPSS_tmpdir)\
   $(if $(gmi_SCPSS_ALLOW_EMPTY_SCAN),--allow-empty-scan)
 

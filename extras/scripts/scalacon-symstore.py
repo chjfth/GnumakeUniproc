@@ -66,7 +66,7 @@ SYMSTORE: Number of files ignored = 0
 
 --pattern-include=<ptinc>
 	[可选]
-	告知要扫描哪些类型的文件。若不指定，相当于指定了 *.pdb/*.exe/*.dll/*.sys 。
+	告知要扫描哪些类型的文件。若不指定，相当于指定了 *.pdb/*.exe/*.dll/*.sys (gar_ptinc 初值)。
 	文件类型基于“通配符”，内部用 fnmatch 实现。比如 * 表示匹配0个或多个任意字符，? 表示匹配单个字符。
 	通配符描述的是文件名，而非带目录前缀的文件路径。比如，不能用 vc80/*.pdb 来指定仅查找处于 vc80 子目录中的 *.pdb。
 	若要指定多组通配符，则用 / 分隔开。如，扫描所有 dll 和 pdb，则指定 --pattern-include=*.dll/*.pdb
@@ -131,7 +131,7 @@ g_prodv = 'Unknown-prodver'
 g_tmpdir = '.'
 g_maxretry = 3
 
-gar_ptinc = ['*.pdb', '*.exe', '*.dll', '*.sys']
+gar_ptinc = ['*.pdb', '*.exe', '*.dll', '*.sys', '*.ocx']
 	# gar means global array.
 gar_ptexc = ['vc?0.pdb', 'vc??0.pdb', '*.lib.pdb*'] 
 	# Exclude those vc60.pdb, vc80.pdb, vc100.pdb .
