@@ -1141,12 +1141,14 @@ def main():
 	
 	if '--datetime-co' in opts:
 		g_dtco = opts['--datetime-co']
+		print 'Scalacon info: User assigned PDB-sewing datetime is: "%s"'%(g_dtco)
 	else:
 		try:
 			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_time(g_ds_list)
 		except scalacon_svn_op.SvnopErr as e:
 			Logp('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)
+		print 'Scalacon info: Auto determined PDB-sewing datetime is: "%s"'%(g_dtco)
 
 	if '--svn-use-export' in opts:
 		g_svn_use_export = True

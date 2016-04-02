@@ -48,22 +48,6 @@ rem set CURDIR=%CD%
 rem set CURDIR_fs=%CURDIR:\=/%
 	rem Not used now.
 
-REM Set releasing-datetime for this SDK (gmu_SC_CHECKOUT_DATETIME):
-REM If gmu_SC_CHECKOUT_DATETIME have value, use it, otherwise, I think the best bet is
-REM using current time. 
-REM gmu_SC_CHECKOUT_DATETIME is used later in PDB-sewing. 
-set datetimecmd=date_ +"%%Y-%%m-%%d %%H:%%M:%%S"
-if "%gmu_SC_CHECKOUT_DATETIME%" == "" (
-	REM Note: Place less CMD commands here, so to avoid delayed-expansion format like !foobar! .
-	for /F "usebackq delims=" %%i IN (`%datetimecmd%`) DO set gmu_SC_CHECKOUT_DATETIME=%%i
-)
-if "%gmu_SC_CHECKOUT_DATETIME%" == "" (
-	echo Cannot get current datetime! Perhaps you do not have GNUWin32 date_.exe . Install GMU to get one.
-	exit /b 1
-)
-:echo gmu_SC_CHECKOUT_DATETIME=%gmu_SC_CHECKOUT_DATETIME% (debug)
-
-
 REM CMD_GETSDKIN is optional, but most SDK should have it.
 if not "%CMD_GETSDKIN%" == "" (
 	%CMD_GETSDKIN%
@@ -76,17 +60,16 @@ if not "%CMD_GETSDKIN%" == "" (
 @echo on
 call umaketime %*
 
-if ERRORLEVEL 1 exit /b 1
+@if ERRORLEVEL 1 exit /b 1
 
-@echo off
 cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
 
-if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
+@if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
 	set GF_DIR=gf
 ) else (
 	set GF_DIR=%gmu_ud_OUTPUT_ROOT%
 )
 cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
-REM -- In theory the filenames may not be building_list.gmu.txt, but for simplicity, I just use the default.
+@REM -- In theory the filenames may not be building_list.gmu.txt, but for simplicity, I just use the default.
 
 

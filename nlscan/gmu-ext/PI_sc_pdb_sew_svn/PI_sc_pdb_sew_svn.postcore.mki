@@ -32,17 +32,14 @@ ifeq (,$(strip $(gmi_SCPSS_list_REPOSIE_TABLE_SVNURL)))
   gmi_SCPSS_list_REPOSIE_TABLE_SVNURL = $(if $(NLSSVN),$(NLSSVN),https://nlssvn.dev.nls/svnreps)/makingsys/GnumakeUniproc/trunk/nlscan/reposie-nlssvn.txt
 endif
 
-ifeq (,$(strip $(gmu_SC_CHECKOUT_DATETIME)))
-  $(error !Error from PI_sc_pdb_sew_svn: You must assign a valid gmu_SC_CHECKOUT_DATETIME value, so that\
- we can arrange an exact SVN export/checkout datetime for you)
-endif
-
 ########
+
+gmu_SC_CHECKOUT_DATETIME_s = $(strip $(gmu_SC_CHECKOUT_DATETIME))
 
 pycmd_ssindex = scalacon-ssindex-svn.py\
   --dir-pdb=$(gmi_SCPSS_ud_PDB)\
   --dirs-source=$(subst $(_GmuSpace),$(_GmuComma),$(gmi_SCPSS_ud_list_source))\
-  --datetime-co="$(gmu_SC_CHECKOUT_DATETIME)"\
+  $(if $(gmu_SC_CHECKOUT_DATETIME_s),--datetime-co="$(gmu_SC_CHECKOUT_DATETIME_s)")\
   --svnhost-table=$(gmi_SCPSS_SVNHOST_TABLE)\
   --dir-reposie-table="$(_gmi_SCPSS_tmpdir)" $(if $(gmi_SCPSS_ALLOW_LOOSY_REPOSIE),--loosy-reposie-table)\
   --svn-use-export\
