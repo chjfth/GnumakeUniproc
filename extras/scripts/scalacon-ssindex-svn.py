@@ -1145,7 +1145,7 @@ def main():
 	else:
 		try:
 			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list)
-		except scalacon_svn_op.SvnopErr as e:
+		except scalacon_svn_op.SvnopError as e:
 			Logp('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)
 		print 'Scalacon info: Auto determined PDB-sewing datetime is: "%s"'%(g_dtco)
