@@ -156,7 +156,7 @@ def svn_diff_timestamp(rootdir, epsec):
 	try:
 		xml = subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		raise SvnopError('Unexpected result executing: %s'%s(cmd))
+		raise SvnopError('Unexpected result executing: %s'%(cmd))
 
 	"""
 If no difference found, output is:
