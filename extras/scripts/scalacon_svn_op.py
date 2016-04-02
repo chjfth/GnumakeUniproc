@@ -2,31 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 """
-本程序为了解决这样一个问题：
+Big functions:
+* scalacon_find_sandbox_freezing_time
 
-当需要对一个本地目录中的 pdb 进行 PDB-sewing 时(实现于 scalacon-ssindex-svn.py)，如何选取 
---datetime-co 的值(dtco)，之前要手动指定，比较累人，现在要利用此程序自动确定 dtco 。
-
-本程序扫描 --dirs-source 指明的一组本地目录(每个目录对应一个 svn sandbox，逗号分隔)，
-来确定一个最终的 dtco 。操作步骤如下：
-
-一, 检查所有 --dirs-source 指明的目录，确定不存在已修改但未提交的状态。
-
-二，递归扫描所有沙箱目录，找出具有新时间戳的那个文件，将此时间戳往上取整秒，
-	暂定其为 dtco (dtco_candidate)。 
-	注意：是找出所有沙箱中最大时间戳，而非逐个沙箱确定最大时间戳。
-
-三，比对沙箱当前状态 与 服务器在 dtco_candidate 时间点的状态(svn diff -r )，
-	* 如果没有差异，则 dtco_candidate 即为最终确定的 dtco ，执行成功。
-	* 如果有差异，说明本机的 PDB 跟 dtco_candidate 时的服务器内容是不匹配的，程序退出，宣告失败。
-
-如果成功，将时间戳写出 stdout ，退出码为 0 。
-如果失败，错误信息将写出 stderr 。
-
-本程序通过 exit(error_text) 的方式来告知调用者执行失败，调用者捕获 SystemExit 来获知 error_text 。
-
-或者：以编程方式调用 scalacon_find_svn_localtime() 来得到 svn datetime 字符串。
-
+Error is raise with SvnopError.
 """
 
 import os
@@ -40,9 +19,17 @@ import traceback
 version = '1.2'
 
 class SvnEntry: pass
+	# scalacon_find_sandbox_freezing_time 内部使用。
 	# 写到一半发现其实用不着收集所有各个 svn entry 的信息。用 svn diff -r <datetime> 就能进行
 	# 本地文件跟服务器内容的差异判断。
 	# 既然写了就先放着，今后可能有用。
+
+class SvnopError(Exception):
+	def __init__(self, errmsg):
+		self.errmsg = errmsg
+	def __str__(self):
+		return self.errmsg
+
 
 def log_stderr(s):
 	sys.stderr.write(s+"\n")
@@ -54,18 +41,17 @@ def svn_check_local_modification(rootdir):
 	try:
 		subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		exit('The directory "%s" is not an svn sandbox.'%s(rootdir))
+		raise SvnopError('The directory "%s" is not an svn sandbox.'%s(rootdir))
 
 	cmd = 'svn status -q ' + rootdir
 	try:
 		mls_modfiles = subprocess.check_output(cmd) # mls: multiline-string
 	except subprocess.CalledProcessError as cpe:
-		exit('Unexpected result executing "%s"'%(cmd))
+		raise SvnopError('Unexpected result executing "%s"'%(cmd))
 
 	if mls_modfiles:
 		return True
 	else:
-		# If no modifications found, stdout will be empty, and exit code is 0
 		return False
 		
 
@@ -113,7 +99,7 @@ def svn_find_latest_timestamp(rootdir, dentry):
 	try:
 		xml = subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		exit('The directory "%s" is not an svn sandbox.'%s(rootdir))
+		raise SvnopError('The directory "%s" is not an svn sandbox.'%s(rootdir))
 
 	max_revision = 1
 	max_date = ''
@@ -153,15 +139,15 @@ def svn_epsec_from_iso8601(dt_str):
     #return dt + datetime.timedelta(microseconds=us)
     return calendar.timegm(dt)+1
 
-def svn_update_to_epsec(rootdir, epsec):
+def svn_update_to_epsec(rootdir, epsec): # not used in this program
 	tm = gmtime(epsec)
 	utc8601 = tm.strftime("%Y-%m-%dT%H:%M:%SZ")
 	cmd = 'svn update -r {%s} %s'%(utc8601, rootdir)
-	print ">>> Running: %s"%(cmd)
+#	print ">>> Running: %s"%(cmd)
 	try:
 		subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		exit('Unexpected result executing: "%s"'%s(cmd))
+		raise SvnopError('Unexpected result executing: "%s"'%s(cmd))
 
 def svn_diff_timestamp(rootdir, epsec):
 	tm = time.gmtime(epsec)
@@ -170,7 +156,7 @@ def svn_diff_timestamp(rootdir, epsec):
 	try:
 		xml = subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		exit('Unexpected result executing: %s'%s(cmd))
+		raise SvnopError('Unexpected result executing: %s'%s(cmd))
 
 	"""
 If no difference found, output is:
@@ -215,11 +201,50 @@ def svn_timezone_string():
 	
 	return s
 
-def scalacon_find_svn_localtime(dirs_source):
+def scalacon_find_sandbox_freezing_epsec(dirs_source):
+	return scalacon_find_sandbox_freezing_time(dirs_source)[0]
+
+def scalacon_find_sandbox_freezing_utcstr(dirs_source):
+	return scalacon_find_sandbox_freezing_time(dirs_source)[1]
+
+def scalacon_find_sandbox_freezing_localstr(dirs_source):
+	return scalacon_find_sandbox_freezing_time(dirs_source)[2]
+
+def scalacon_find_sandbox_freezing_time(dirs_source):
+	"""
+	本函数用于解决这样一个问题：
+
+	当需要对一个本地目录中的 pdb 进行 PDB-sewing 时(实现于 scalacon-ssindex-svn.py)，如何选取 
+	--datetime-co 的值(dtco)，之前要手动指定，比较累人，现在要利用此程序自动确定 dtco 。
+
+	本程序扫描 --dirs-source 指明的一组本地目录(每个目录对应一个 svn sandbox，逗号分隔)，
+	来确定一个最终的 dtco 。操作步骤如下：
+
+	一, 检查所有 --dirs-source 指明的目录，确定不存在已修改但未提交的状态。
+
+	二，递归扫描所有沙箱目录，找出具有新时间戳的那个文件，将此时间戳往上取整秒，
+		暂定其为 dtco (dtco_candidate)。 
+		注意：是找出所有沙箱中最大时间戳，而非逐个沙箱确定最大时间戳。
+
+	三，比对沙箱当前状态 与 服务器在 dtco_candidate 时间点的状态(svn diff -r )，
+		* 如果没有差异，则 dtco_candidate 即为最终确定的 dtco ，执行成功。
+		* 如果有差异，说明本机的 PDB 跟 dtco_candidate 时的服务器内容是不匹配的，程序退出，宣告失败。
+
+	如果成功，将时间戳写出 stdout ，退出码为 0 。
+	如果失败，错误信息将写出 stderr 。
+
+	本程序通过 raise SvnopError(error_text) 的方式来告知调用者执行失败。
+
+	或者：以编程方式调用 scalacon_find_sandbox_freezing_time() 来得到 svn datetime 字符串。
+
+	"""
+	
+	# This function will contact svn server internally.
+	
 	# Check that there is no local sandbox modification.
 	for rootdir in dirs_source:
 		if svn_check_local_modification(rootdir):
-			exit('Your sandbox "%s" has local modifications.'%(rootdir))
+			raise SvnopError('Your sandbox "%s" has local modifications.'%(rootdir))
 	
 	sandboxes = {}
 		# sandboxes['D:/w/myproj'] is again a dict.
@@ -233,8 +258,11 @@ def scalacon_find_svn_localtime(dirs_source):
 		if epsec>epsec_latest:
 			epsec_latest = epsec
 
+	tmutc = time.gmtime(epsec_latest)
+	timestr_utc = time.strftime('%Y-%m-%dT%H:%M:%SZ', tmutc)
+	#
 	tmlocal = time.localtime(epsec_latest)
-	timestrlocal = time.strftime('%Y-%m-%d %H:%M:%S', tmlocal)
+	timestr_local = time.strftime('%Y-%m-%d %H:%M:%S', tmlocal)
 
 	# Check whether sandbox content matches server's at epsec_latest time point.
 	for rootdir in dirs_source:
@@ -242,20 +270,20 @@ def scalacon_find_svn_localtime(dirs_source):
 		if changed_files:
 			errmsg = 'The latest files in your sandboxes has (local) timestamp %s, '\
 			'but local content does not exactly match server content.\n'\
-				'Different files are:\n  %s'%(timestrlocal, '\n  '.join(changed_files))
-			exit(errmsg)
+				'Different files are:\n  %s'%(timestr_local, '\n  '.join(changed_files))
+			raise SvnopError(errmsg)
 	
-	ret = timestrlocal +' '+ svn_timezone_string()
-	return ret
+	localstr_with_timezone = timestr_local +' '+ svn_timezone_string()
+	return epsec_latest, timestr_utc, timestr_local
 	
 
 if __name__ == '__main__':
 	dirs_source = [os.path.abspath(dir) for dir in sys.argv[1].split(',')]
 	try:
-		ret = scalacon_find_svn_localtime(dirs_source)
-		print 'Determined svn datetime is: %s'%(ret)
-	except SystemExit as e:
-		log_stderr(e.code) # e.code is the error string from exit().
+		epsec, utc, local = scalacon_find_sandbox_freezing_time(dirs_source)
+		print 'Determined svn datetime is: epsec=%d / utc=%s / local=%s'%(epsec, utc, local)
+	except SvnopError as e:
+		log_stderr(e.errmsg)
 		exit(4)
 	except:
 		exc_string = traceback.format_exc()
