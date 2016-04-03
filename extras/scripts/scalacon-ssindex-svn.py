@@ -695,12 +695,12 @@ def CalTrack_by_svninfo(cookie):
 	return t
 
 def TimeStampForVar8(s):
-	# s sample: "2011-08-29 08:30:00"
-	# output sampel: "20110829.083030"
+	# s sample: "2016-04-03 08:30:00"
+	# output sample: "20160403.083000+0800"
 	s = s.replace('-', '')
 	s = s.replace(':', '')
 	s = s.replace(' ', '.')
-	return s
+	return s + scalacon_svn_op.svn_timezone_string_local()
 
 def Sew1Cookie(cookie):
 	# Return a track line(a line of text in pdb SRCSRV stream) for cookie
@@ -721,6 +721,7 @@ def Sew1Cookie(cookie):
 
 	if t:
 		g_nTracksSewed += 1
+		timezone_str = scalacon_svn_op.svn_timezone_string_local()
 
 		# concatenate track properties into a track line
 		s = cookie # %var1%
@@ -729,7 +730,7 @@ def Sew1Cookie(cookie):
 		s += '*'+t.Reposie # %var4%
 		s += '*'+t.Branchie # %var5%
 		s += '*'+t.Innard # %var6%
-		s += '*'+g_dtco      # %var7%
+		s += '*'+g_dtco+' '+timezone_str  # %var7%
 		s += '*'+TimeStampForVar8(g_dtco) # %var8%
 		return s
 	
@@ -976,7 +977,7 @@ def Sew1Pdb(pdbpath):
 	tracks_all = tracks_self + '\n' + tracks_pick
 	
 	srcsrv_stream_text = SRCSRV_stream_template.format(
-		datetime=g_dtco,
+		datetime = g_dtco + scalacon_svn_op.svn_timezone_string_local(),
 		tracks=tracks_all,
 		svncmd='SRCSRVCMD_EXPORT' if g_svn_use_export else 'SRCSRVCMD_CHECKOUT'
 		)
@@ -1004,45 +1005,62 @@ def Sew1Pdb(pdbpath):
 	except subprocess.CalledProcessError as cpe:
 		Logp( "%s\n"%cpe.output )
 
-	""" True case of a generated SRCSRV stream. You can view it by running ``pdbstr -r -p:IUartBasic.pdb -s:srcsrv''
+	""" True case of a generated SRCSRV stream. You can view it by running ``pdbstr -r -p:XXX.pdb -s:srcsrv''
 	This is named srcsrv_stream_text or sstream_text below.
 	
-	SRCSRV: ini ------------------------------------------------
-	VERSION=1
-	INDEXVERSION=2
-	VERCTRL=Subversion
-	DATETIME=2011-09-21 16:21:21
-	SRCSRV: variables ------------------------------------------
-	SvnHostId=%var2%
-	SvnRootUrl=%var3%
-	SvnReposie=%var4%
-	SvnBranchie=%var5%
-	SvnInnard=%var6%
-	SvnCoTimeStamp=%var7%
-	SvnCoTsCompact=%var8%
-	PirLocal=%SvnCoTsCompact%/%SvnHostId%/%SvnReposie%
-	DirLocal=%targ%/%PirLocal%
-	SvnCoCmd=svn.exe co %SvnRootUrl%/%SvnReposie%/%SvnBranchie%@"{%SvnCoTimeStamp%}" "%fnbksl%(%DirLocal%)"
-	SvnExportCmd=svn.exe export --force %SvnRootUrl%/%SvnReposie%/%SvnBranchie%@"{%SvnCoTimeStamp%}" "%fnbksl%(%DirLocal%)"
-	SRCSRVTRG=%fnbksl%(%DirLocal%/%SvnInnard%)
-	SRCSRVCMD_CHECKOUT=cmd /c %SvnCoCmd% && echo %SvnCoCmd% > "%fnbksl%(%DirLocal%/_svncmd.txt)"
-	SRCSRVCMD_EXPORT=cmd /c %SvnExportCmd% && echo %SvnExportCmd% > "%fnbksl%(%DirLocal%/_svncmd.txt)"
-	SRCSRVCMD=%SRCSRVCMD_EXPORT%
-	SRCSRV: source files ---------------------------------------
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\mswin\uartbasic_create.cpp*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/mswin/UartBasic_create.cpp*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\include\iuartbasic\iuartbasic_mswin_spi.h*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/include/IUartBasic/IUartBasic_mswin_spi.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\commonlib\common-include\commdefs.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*dev*commdefs.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\include\iuartbasic\iuartbasic.h*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/include/IUartBasic/IUartBasic.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\include\uartbasic_win.h*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/include/UartBasic_win.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\mswin\uartbasic_win.cpp*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/mswin/UartBasic_win.cpp*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\commonlib\common-include\mswin\mswinclarify.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*dev*mswin/mswinClarify.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\mswin\iuartbasic-winver.h*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/mswin/iuartbasic-winver.h*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\iuartbasic_common.cpp*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/IUartBasic_common.cpp*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\c_iuartbasic.cpp*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/C_IUartBasic.cpp*2011-09-21 16:21:21*20110921.162121
-	d:\nlsbuild\nlssdk\nlssdk-v0.3\msvc-sdk\nlssdk-msvc-v0.3-src\isyslib\iuartbasic\libsrc\include\iuartbasic\c_iuartbasic.h*nlssvn*https://nlssvn/svnreps*Isyslib/IUartBasic*dev*libsrc/include/IUartBasic/C_IUartBasic.h*2011-09-21 16:21:21*20110921.162121
-	SRCSRV: end ------------------------------------------------
+SRCSRV: ini ------------------------------------------------
+VERSION=1
+INDEXVERSION=2
+VERCTRL=Subversion
+DATETIME=2016-04-03 10:39:31+0800
+SRCSRV: variables ------------------------------------------
+SvnHostId=%var2%
+SvnRootUrl=%var3%
+SvnReposie=%var4%
+SvnBranchie=%var5%
+SvnInnard=%var6%
+SvnCoTimeStamp=%var7%
+SvnCoTsCompact=%var8%
+PirLocal=%SvnCoTsCompact%/%SvnHostId%/%SvnReposie%
+DirLocal=%targ%/%PirLocal%
+SvnCoCmd=svn.exe co %SvnRootUrl%/%SvnReposie%/%SvnBranchie%@"{%SvnCoTimeStamp%}" "%fnbksl%(%DirLocal%)"
+SvnExportCmd=svn.exe export --force %SvnRootUrl%/%SvnReposie%/%SvnBranchie%@"{%SvnCoTimeStamp%}" "%fnbksl%(%DirLocal%)"
+SRCSRVTRG=%fnbksl%(%DirLocal%/%SvnInnard%)
+SRCSRVCMD_CHECKOUT=cmd /c %SvnCoCmd% && echo %SvnCoCmd% > "%fnbksl%(%DirLocal%/_svncmd.txt)"
+SRCSRVCMD_EXPORT=cmd /c %SvnExportCmd% && echo %SvnExportCmd% > "%fnbksl%(%DirLocal%/_svncmd.txt)"
+SRCSRVCMD=%SRCSRVCMD_EXPORT%
+SRCSRV: source files ---------------------------------------
+p:\b\mm_snprintf-4.3.0-1\libsrc\msvc\mm_psfunc.cpp*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/msvc/mm_psfunc.cpp*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\mm_psfunc.h*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/mm_psfunc.h*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\_do_not_edit\mm_snprintfa.cpp*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/_do_not_edit/mm_snprintfA.cpp*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\internal.h*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/internal.h*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\msvc\ps_tstrdef.h*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/msvc/ps_Tstrdef.h*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\sdkin\include\ps_tchar.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TCHAR.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\mm_snprintf-4.3.0-1\sdkin\include\ps_tchar-msvc.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TCHAR-msvc.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\include\mm_snprintf.h*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/include/mm_snprintf.h*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\_do_not_edit\mm_snprintfw.cpp*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/_do_not_edit/mm_snprintfW.cpp*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\libsrc\internal.cpp*nlssvn*https://nlssvn/svnreps*CommonLib/mm_snprintf*trunk*libsrc/internal.cpp*2016-04-03 10:39:31 +0800*20160403.103931+0800
+p:\b\mm_snprintf-4.3.0-1\sdkin\include\dlope.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/DlOpe.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+
+p:\b\common-include-c2.1\include\_minmax_.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/_MINMAX_.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ps_tchar-msvc.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TCHAR-msvc.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\tscalablearray.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/TScalableArray.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ensureoverride.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/EnsureOverride.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\object_align.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/object_align.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ensureclnup_common.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/EnsureClnup_common.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\commdefs.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/commdefs.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ps_tchar-gcc.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TCHAR-gcc.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\listnodeopease.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ListnodeOpEase.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ps_tchar.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TCHAR.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\dlope.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/DlOpe.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ps_typedecl.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/ps_TypeDecl.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\tscawithlocalbuf.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/TScaWithLocalBuf.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\ensureclnup.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/EnsureClnup.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+p:\b\common-include-c2.1\include\flat_embed_obj.h*nlssvn*https://nlssvn/svnreps*CommonLib/common-include*trunk*include/flat_embed_obj.h*2016-04-02 18:39:39 +0800*20160402.183939+0800
+SRCSRV: end ------------------------------------------------
 	"""
 	
+	# Append "[scalacon]sdkout-doth-localroot=<doth-dir>" to .sstream.txt to serve SDK user's .h-PDB-sewing.
 	if g_save_sstreams_dir:
 		if g_sdkout_hdir:
 			sdkout_hdir_text = '\n[scalacon]sdkout-doth-localroot='+ g_sdkout_hdir.replace('/', '\\') + '\n'

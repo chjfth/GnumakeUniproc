@@ -188,7 +188,7 @@ If difference found, output is like:
 	
 	return changed_files
 
-def svn_timezone_string():
+def svn_timezone_string_local():
 	tzsec = time.timezone
 	if tzsec<=0:
 		tzsec = -tzsec
@@ -273,7 +273,7 @@ def scalacon_find_sandbox_freezing_time(dirs_source):
 				'Different files are:\n  %s'%(timestr_local, '\n  '.join(changed_files))
 			raise SvnopError(errmsg)
 	
-	localstr_with_timezone = timestr_local +' '+ svn_timezone_string()
+	localstr_with_timezone = timestr_local +' '+ svn_timezone_string_local()
 	return epsec_latest, timestr_utc, timestr_local
 	
 
