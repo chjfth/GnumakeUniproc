@@ -247,7 +247,9 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	能够在 SDK 用户端发生。运行机理有些复杂，见我的 Evernote 笔记
 	http://www.evernote.com/l/ABX8Qv7Jw_hJWLh8VONL4PlSynpG-eK56gA/
 	如果不提供，则略过相关动作。
-
+	.
+	参数值应该是一个实际存在的目录，可表达为相对目录或绝对目录，相对目录相对于执行者的
+	当前工作目录。
 
 --logfile=<logfile>
 	[可选]

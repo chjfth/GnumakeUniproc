@@ -35,13 +35,20 @@ def log_stderr(s):
 	sys.stderr.write(s+"\n")
 
 def svn_ensure_no_local_modification(rootdir):
+	
+	if not os.path.exists(rootdir):
+		raise SvnopError('"%s" does not exist.'%(rootdir))
+
+	if not os.path.isdir(rootdir):
+		raise SvnopError('"%s" is not a directory.'%(rootdir))
+	
 	# Note: We use 'svn info' here because it fails a non-sandbox directory,
 	# while 'svn status' does not report error, even for a non-existing directory.
 	cmd = 'svn info ' + rootdir
 	try:
 		subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
-		raise SvnopError('The directory "%s" is not an svn sandbox.'%s(rootdir))
+		raise SvnopError('The directory "%s" is not an svn sandbox, or access to that directory is forbidden.'%(rootdir))
 
 	cmd = 'svn status -q --xml ' + rootdir
 	try:
