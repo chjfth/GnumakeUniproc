@@ -260,7 +260,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 
 --whistle
 	[可选]
-
+	只显示较少的信息。基本上只显示已被成功处理的 .pdb 文件。
 """
 
 import sys
@@ -340,6 +340,8 @@ g_sdkin_hdir = ''
 
 g_dict_doth_mapping = {}
 
+g_iswhistle = False
+
 ErrNoFileProcessed = 9
 
 #g_svnhosttable = {}
@@ -387,8 +389,9 @@ def Log(s):
 	if g_logfile:
 		g_logfile.write(s+'\n')
 
-def Logp(s):
-	print s
+def Logp(s, whistle_do=False):
+	if (not g_iswhistle) or whistle_do:
+		print s
 	if g_logfile:
 		g_logfile.write(s+'\n')
 
@@ -878,7 +881,8 @@ cidvers=vc80ppc
 def cherry_pick_srcsrv_tracks(pdbpath):
 	
 	global g_nCherryPicks 
-	print '  Sstream cherry picking for %s ...'%(pdbpath)
+	if not g_iswhistle:
+		print '  -- Sstream cherry picking ...'
 	sstracks_all_dict = {} # use python dict as a easy duplication eliminator
 	
 	try:
@@ -898,7 +902,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 					for filename in filenames:
 						if filename.endswith('.sstream.txt'):
 							sstream_filepath = os.path.join(dirpath, filename)
-							print '  > picking from %s'%(sstream_filepath)
+#							print '  > picking from %s'%(sstream_filepath)
 							append_sstracks_from_streamstxt(sstracks_all_dict, sstream_filepath)
 							g_nCherryPicks += 1
 		else:
@@ -930,6 +934,8 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 
 def Sew1Pdb(pdbpath):
 	pdbpath = os.path.abspath(pdbpath) # pdb filepath
+	if not g_iswhistle:
+		print 'PDB-sewing: %s'%(pdbpath)
 	
 	srctool_cmd = '%s -r "%s"'%(srctool_exename, pdbpath)
 	Log("\nStart sewing PDB: %s"%pdbpath)
@@ -987,7 +993,8 @@ def Sew1Pdb(pdbpath):
 			tracks_self += t+'\n'
 			ntrack+=1
 
-	if ntrack==0 and not g_pick_cherries:
+	if tracks_self.strip()=='' and tracks_pick.strip()=='':
+		print '-- Nothing to sew for this file.'
 		return True # Do nothing more and return
 
 	tracks_all = tracks_self + '\n' + tracks_pick
@@ -1095,6 +1102,11 @@ SRCSRV: end ------------------------------------------------
 	global g_nPdbsSewed
 	g_nPdbsSewed +=1
 
+	if g_iswhistle:
+		print 'PDB-sewed : %s'%(pdbpath)
+	else:
+		print '  -- Sewed.' # pdbpath displayed when start sewing this pdbpath
+		
 	return True
 
 
@@ -1111,7 +1123,8 @@ def ScanAndSew():
 		for folder in folders:
 			exc_matches = filename_match_patterns(folder, g_dirpdb_excludes)
 			if exc_matches:
-				print 'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], folder) #debug
+				if not g_iswhistle:
+					print 'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], folder) #debug
 				folders.remove(folder)
 		
 		# In files, search for *.pdb but not *.lib.pdb
@@ -1150,6 +1163,7 @@ def main():
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
 	global g_dirpdb_excludes, g_pdb_excludes
+	global g_iswhistle
 
 	reqopts = ['dir-pdb=', 'dirs-source=' ]
 	optopts = [ 'dir-pdb-exclude-pattern=','pdb-exclude-pattern', 'datetime-co=', 
@@ -1159,7 +1173,7 @@ def main():
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
 		'sdkout-doth-localroot=', 'sdkin-doth-localroot=',
-		'allow-empty-scan', 'version'] # optional arguments
+		'allow-empty-scan', 'whistle', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
 
@@ -1193,6 +1207,7 @@ def main():
 		g_dtco = opts['--datetime-co']
 		print 'Scalacon info: User assigned PDB-sewing datetime is: "%s"'%(g_dtco)
 	else:
+		Logp('Contacting svn server to determine appropriate PDB-sewing datetime...', True)
 		try:
 			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list)
 		except scalacon_svn_op.SvnopError as e:
@@ -1259,6 +1274,9 @@ def main():
 		g_sdkin_hdir  = os.path.abspath(opts['--sdkin-doth-localroot'])
 	
 	is_allow_empty_scan = True if '--allow-empty-scan' in opts else False
+	
+	if '--whistle' in opts:
+		g_iswhistle = True
 	
 	if '--logfile' in opts:
 		fnlog = opts['--logfile']
