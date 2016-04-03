@@ -71,9 +71,12 @@ def sync_windows_rc(ofn_rc):
 	"""
 	ofn_rc: .rc filename
 	"""
+	is_replaced = False
+		
 	of_rc = open(ofn_rc, 'r+');
 	if not of_rc:
 		print 'Cannot open file %s for modification!'%(of_rc)
+		exit(1)
 
 	lines = of_rc.readlines()
 	for i in range(0, len(lines)): 
@@ -87,7 +90,10 @@ def sync_windows_rc(ofn_rc):
 			lines[i])
 
 		substyle2 = r'\1"%d.%d.%d.%d%s%s\\0"'%(
-			vmajor,vminor,vbuild,vextra, 
+			vmajor,
+			vminor,
+			vbuild,
+			vextra, 
 			' (%s %d)'%(sig_vlinear, vlinear) if vlinear else '',
 			' (%s)'%(datestr) if g_isAddDatetime else '')
 		lines[i] = re.sub(
@@ -99,9 +105,12 @@ def sync_windows_rc(ofn_rc):
 
 		if (line_old != lines[i]):
 			print 'Replaced %s(%d): %s'%(ofn_rc, i+1, lines[i])
+			is_replaced = True
 
-	#print "Lines: %d" % (len(lines)) # Debug
-	#for line in lines: print line,
+	if not is_replaced:
+		print 'Already synced.'
+
+	#print "Lines: %d" % (len(lines)) #debug
 
 	of_rc.truncate(0)
 	of_rc.seek(0) 
@@ -182,5 +191,5 @@ def main():
 		sync_windows_rc(ofn_rc)
 
 if __name__ == '__main__':
-    ret = main()
-    exit(ret)
+    main()
+    exit(0)

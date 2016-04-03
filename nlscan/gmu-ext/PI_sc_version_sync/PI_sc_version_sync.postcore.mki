@@ -1,6 +1,6 @@
 
 version_sync_pycmd = scalacon-version-sync.py \
-	$(if $(gmi_SCVS_add_current_datetime),--add-datetime) --sig-vlinear=nls_revision --input=$< $@
+	$(if $(gmi_SCVS_add_current_datetime),--add-datetime) --sig-vlinear=nls_revision --input=$1 $@
 	#[2011-02-24]NOTE: Currently, spaces in $$< and $$@ will cause problem!
 
 define _gmi_scvs_GenSyncRuleL0
@@ -10,9 +10,9 @@ define _gmi_scvs_GenSyncRuleL0
   ifeq ($$(_tmp),)
     $$(error !Error from PI_sc_version_sync: You assign $1 as a source file(in gmi_SCVS_upp_list_SYNC), but that file does not exist)
   endif
-  $2: $1
+  $2: gmu_ut_Always
 	@echo "PI_sc_version_sync executing command: $$(version_sync_pycmd)"
-	@$$(call gmuf_ScriptCmd,$$(version_sync_pycmd))
+	@$$(call gmuf_ScriptCmd,$$(call version_sync_pycmd,$1))
 endef
 
 _gmi_scvs_GenCopyRuleL1 = $(eval $(call _gmi_scvs_GenSyncRuleL0,$(word 1,$(call split,|,$1)),$(wordlist 2,999,$(call split,|,$1))))
