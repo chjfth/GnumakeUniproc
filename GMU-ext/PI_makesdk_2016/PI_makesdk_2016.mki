@@ -122,14 +122,12 @@ ifndef gmb_ignore_build_source
 	# mc: multiple compiler build of lib source
 endif
 
-ifndef gmb_ignore_uxm
-  gmu_uv_list_ALL_SUBPRJ += cpuxm
-  cpuxm_Makefile = __Makefile-cpuxm
+gmu_uv_list_ALL_SUBPRJ += cpuxm
+cpuxm_Makefile = __Makefile-cpuxm
 	# cpuxm: copy user examples
 
-  gmu_uv_list_ALL_SUBPRJ += vbuxm
-  vbuxm_Makefile = __Makefile-vbuxm
-endif
+gmu_uv_list_ALL_SUBPRJ += vbuxm
+vbuxm_Makefile = __Makefile-vbuxm
 
 
 _p_cidver_mapping_ini := $(gmb_thisrepo)/cidver-mapping.ini

@@ -63,15 +63,25 @@ call umaketime %*
 
 @if ERRORLEVEL 1 exit /b 1
 
-@echo on
+@echo off
+
 cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
+if ERRORLEVEL 1 (
+	echo Error executing: cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
+)
 
 @if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
 	set GF_DIR=gf
 ) else (
 	set GF_DIR=%gmu_ud_OUTPUT_ROOT%
 )
+
 cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
 @REM -- In theory the filenames may not be building_list.gmu.txt, but for simplicity, I just use the default.
+if ERRORLEVEL 1 (
+	echo Error executing: cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
+)
 
-
+echo.
+echo ////////// SCALACON MAKE-SDK SUCCESS //////////
+echo.

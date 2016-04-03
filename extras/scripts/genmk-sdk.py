@@ -237,7 +237,7 @@ pycmd:=genmk-sdk-cpuxm.py --gmb_syncto=%(copyto)s %(f_buildsdk_ini)s
 .PHONY: cpuxm
 cpuxm:
 	@echo '$(pycmd)'
-	@$(call gmuf_ScriptCmd,$(pycmd))
+	@$(call gmuf_ScriptCmd,$(pycmd)) # copying an example tree is difficult to write in Bash commands, so I use Python to so this.
 include $(gmu_DIR_GNUMAKEUNIPROC)/pattern1-container.mks
 """ % locals()
 	fh = open('__Makefile-cpuxm', 'w')
@@ -367,11 +367,10 @@ endif
 	fhmc.write(mkfMc_content)
 	fhmc.close()
 
-	if IniInfo['global']['examples_dir']:
-		GenMakefile_cpuxm(prjname, gmb_syncto, fConfig) # generate file __Makefile-cpuxm
+	GenMakefile_cpuxm(prjname, gmb_syncto, fConfig) # generate file __Makefile-cpuxm
 
-		# Prepare makefile statement for building user examples in their SDK output dir.
-		GenMakefile_vbuxm(prjname) # generate file __Makefile-vbuxm
+	# Prepare makefile statements for building user examples in their SDK output dir.
+	GenMakefile_vbuxm(prjname) # generate file __Makefile-vbuxm
 
 
 def ExtractIniInfo(iniobj):

@@ -73,7 +73,6 @@ def CopyExamples():
 
 def main():
 	global opts, examples_dir, examples_copyto, gmb_syncto;
-	fConfig = '' # the config file(in INI format)
 	
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', ['gmb_syncto=', 'version'])
 	opts = dict(optlist)
@@ -91,40 +90,42 @@ def main():
 		print 'No input file! This program requires an INI file input.'
 		return 1;
 
-	fConfig = os.path.abspath(arglist[0]) # the INI filepath
+	inipath = os.path.abspath(arglist[0])
 
 	# Open config file(INI) 
 	config = ConfigParser.ConfigParser()
 	try:
-		readret = config.read(fConfig)
+		readret = config.read(inipath)
 	except(MissingSectionHeaderError):
-		print "Error: %s seem not to be a valid configuration file."%(fConfig)
+		print "Error: %s seem not to be a valid configuration file."%(inipath)
 		return 2
 
 	if not readret:
-		print 'Error: The config file %s does not exist or cannot be opened.'%(fConfig)
+		print 'Error: The config file %s does not exist or cannot be opened.'%(inipath)
 		return 3
 
 #	try:
 #		sdkname = config.get('global', 'sdkname')
 #	except:
-#		print 'Error: In %s, no \'sdkname\' defined in [global] section.'%(fConfig)
+#		print 'Error: In %s, no \'sdkname\' defined in [global] section.'%(inipath)
 #		return 4
 
 	try:
 		examples_dir = config.get('global', 'examples_dir')
 		if not os.path.isabs(examples_dir):
 			# Consider examples_dir relative to the INI file, now get its abspath for later use.
-			examples_dir = os.path.join(os.path.split(fConfig)[0], examples_dir)
+			examples_dir = os.path.join(os.path.split(inipath)[0], examples_dir)
 			examples_dir = os.path.abspath(examples_dir)
 	except:
 		examples_dir = ''
+		print 'Scalacon info: No example project(makefiles) in %s .'%(inipath)
+		pass
 
 	if examples_dir:
 		try:
 			examples_copyto = config.get('global', 'examples_copyto')
 		except:
-			print 'Error: In "%s", you assign values for examples_dir, but does not assign examples_copyto yet.'%(fConfig)
+			print 'Error: In "%s", you assign values for examples_dir, but does not assign examples_copyto yet.'%(inipath)
 
 		# Create necessary output dir.
 		if not os.path.isdir(gmb_syncto):
