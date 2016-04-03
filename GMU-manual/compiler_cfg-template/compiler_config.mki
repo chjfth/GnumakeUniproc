@@ -146,7 +146,7 @@ else
 	# For linuxgcc: ?
 
   gmp_CFLAGS_CODE_GEN_preset += 
-	# For msvc:     /O2
+	# For msvc:     /O2 /Oy-
 	# For linuxgcc: -O2
 
   gmp_LINKFLAGS_preset +=
