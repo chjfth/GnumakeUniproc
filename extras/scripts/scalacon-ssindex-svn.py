@@ -36,6 +36,18 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	[必须]
 	指出在哪个目录中搜索 pdb 。
 
+--dir-pdb-exclude-pattern=<dpexc1>,<dpexc2>
+	[可选]
+	指出符合哪些通配符模式的目录不用扫描。多个目录用逗号分开。
+	例：
+		--dir-pdb-exclude-pattern=*sdkin*,*temp*
+
+--pdb-exclude-pattern=<ptexc1>,<ptexc2>
+	[可选] 
+	指出符合哪些通配符模式的文件名不用扫描。多个目录用逗号分开。
+	.
+	默认会排除 vc?0.pdb, vc??0.pdb 。
+
 --dirs-source=<ds>,<ds>
 	[必须]
 	指出仅考虑对那个目录中的源文件作 sew 动作。
@@ -246,6 +258,9 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	指定此参数时，允许 --dir-pdb 指定的目录不存在，或其中没有发现 PDB 文件。
 	默认不启用此参数，未扫描到 PDB 文件会报错，退出码非零。
 
+--whistle
+	[可选]
+
 """
 
 import sys
@@ -268,6 +283,8 @@ version = "1.2"
 opts = {}
 
 g_dirpdb = ''
+g_dirpdb_excludes = []
+g_pdb_excludes = ['vc?0.pdb', 'vc??0.pdb', '*.lib.pdb*']
 g_ds_list = []
 g_dtco = ''
 g_drt = ''
@@ -773,7 +790,6 @@ def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
 		# Check for possible [scalacon]sdkout-doth-localroot=<dir> (would appear at end of the .sstream.txt) 
 		# for magical .h PDB-sewing.
 		r = re.search(r'\n\[scalacon\]sdkout-doth-localroot=(.+)', sstream)
-#		print '@@@@@@@@@@@@@[%s] r=%s'%(sstreamtxt, r) #debug-zzz
 		picked_hdir = r.group(1) if r else ''
 			# Sample: picked_hdir=d:\w\CommonLib\common-include
 #		print '>>>[debug]>>> picked_hdir=%s'%(picked_hdir) #debug
@@ -1082,15 +1098,25 @@ SRCSRV: end ------------------------------------------------
 	return True
 
 
+def filename_match_patterns(filename, patterns):
+	matches = filter(lambda p:fnmatch.fnmatch(filename,p), patterns)
+	return matches
+
 def ScanAndSew():
 	"""
 	[2016-03-06] For .lib.pdb, 'srctool -r' shows nothing(Microsoft did it deliberately), 
 	so we don't have to bother with *.lib.pdb .
 	"""
 	for root, folders, files in os.walk(g_dirpdb):
+		for folder in folders:
+			exc_matches = filename_match_patterns(folder, g_dirpdb_excludes)
+			if exc_matches:
+				print 'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], folder) #debug
+				folders.remove(folder)
+		
 		# In files, search for *.pdb but not *.lib.pdb
 		for file in files:
-			if fnmatch.fnmatch(file, '*.pdb') and not fnmatch.fnmatch(file, '*.lib.pdb'):
+			if fnmatch.fnmatch(file, '*.pdb') and not filename_match_patterns(file, g_pdb_excludes):
 				global g_nPdbsFound
 				g_nPdbsFound += 1
 				Sew1Pdb(root+'/'+file)
@@ -1123,9 +1149,10 @@ def main():
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
+	global g_dirpdb_excludes, g_pdb_excludes
 
 	reqopts = ['dir-pdb=', 'dirs-source=' ]
-	optopts = [ 'datetime-co=', 
+	optopts = [ 'dir-pdb-exclude-pattern=','pdb-exclude-pattern', 'datetime-co=', 
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
 		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
@@ -1146,6 +1173,11 @@ def main():
 	g_dirpdb = opts['--dir-pdb']
 	g_ds_list = opts['--dirs-source'].split(',')
 	g_ds_list = [os.path.abspath(d) for d in g_ds_list if d] # remove empty ones
+
+	if '--dir-pdb-exclude-pattern' in opts:
+		g_dirpdb_excludes = opts['--dir-pdb-exclude-pattern'].split(',')
+	if '--pdb-excludes' in opts:
+		g_pdb_excludes = opts['--pdb-exclude-pattern'].split(',')
 
 	if '--dir-reposie-table' in opts:
 		g_drt = opts['--dir-reposie-table']
