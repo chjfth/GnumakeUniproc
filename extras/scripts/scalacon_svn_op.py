@@ -34,7 +34,7 @@ class SvnopError(Exception):
 def log_stderr(s):
 	sys.stderr.write(s+"\n")
 
-def svn_check_local_modification(rootdir):
+def svn_ensure_no_local_modification(rootdir):
 	# Note: We use 'svn info' here because it fails a non-sandbox directory,
 	# while 'svn status' does not report error, even for a non-existing directory.
 	cmd = 'svn info ' + rootdir
@@ -43,17 +43,57 @@ def svn_check_local_modification(rootdir):
 	except subprocess.CalledProcessError as cpe:
 		raise SvnopError('The directory "%s" is not an svn sandbox.'%s(rootdir))
 
-	cmd = 'svn status -q ' + rootdir
+	cmd = 'svn status -q --xml ' + rootdir
 	try:
-		mls_modfiles = subprocess.check_output(cmd) # mls: multiline-string
+		xml = subprocess.check_output(cmd) # mls: multiline-string
 	except subprocess.CalledProcessError as cpe:
 		raise SvnopError('Unexpected result executing "%s"'%(cmd))
 
-	if mls_modfiles:
-		return True
-	else:
-		return False
-		
+	"""Output is like:
+<?xml version="1.0" encoding="UTF-8"?>
+<status>
+<target path=".">
+	<entry path="examples\all-examples.umk">
+		<wc-status props="none"
+		   item="modified"
+		   revision="39">
+			<commit revision="29">
+				<author>chj</author>
+				<date>2016-03-30T07:42:13.969999Z</date>
+			</commit>
+		</wc-status>
+	</entry>
+	<entry path="get-sdkin.ini">
+	<wc-status item="modified" revision="39" props="none">
+	<commit revision="39">
+	<author>chj</author>
+	<date>2016-04-02T14:58:39.913161Z</date>
+	</commit>
+	</wc-status>
+	</entry>
+	
+	<entry path="make-sdk\make-on-windows\_scalacon.gmulog.txt">
+		<wc-status item="unversioned" props="none">
+		</wc-status>
+	</entry>
+</target>
+</status>
+"""
+	changed_list = []
+	for r in re.finditer(r'<entry\s+path="(.+?)">(.+?)</entry>', xml, re.DOTALL):
+		entry = r.group(1) # entry is a filepath
+		inner = r.group(2)
+		if inner.find('item="unversioned"')==-1:
+			changed_list.append(entry)
+	
+	if changed_list:
+		raise SvnopError(
+			'Your sandbox "%s" has local modifications. Changed entries are:\n  %s'%(
+			rootdir,
+			'\n  '.join(changed_list))
+			)
+
+	
 
 def svn_find_latest_timestamp(rootdir, dentry):
 	"""
@@ -243,8 +283,7 @@ def scalacon_find_sandbox_freezing_time(dirs_source):
 	
 	# Check that there is no local sandbox modification.
 	for rootdir in dirs_source:
-		if svn_check_local_modification(rootdir):
-			raise SvnopError('Your sandbox "%s" has local modifications.'%(rootdir))
+		svn_ensure_no_local_modification(rootdir) # if not, SvnopError is raised.
 	
 	sandboxes = {}
 		# sandboxes['D:/w/myproj'] is again a dict.
