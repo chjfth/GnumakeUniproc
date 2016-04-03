@@ -59,6 +59,8 @@ if not "%CMD_GETSDKIN%" == "" (
 
 @echo on
 set gmu_WRAPPER_EXISTED=1
+REM -- this is important to get correct umaketime exit code.
+
 call umaketime %*
 
 @if ERRORLEVEL 1 exit /b 1
@@ -68,6 +70,7 @@ call umaketime %*
 cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
 if ERRORLEVEL 1 (
 	echo Error executing: cp_ %SCALACON_LOGFILE% %gmb_thisrepo%/%gmb_dirname_sdkout%
+	exit /b 1
 )
 
 @if "%gmu_ud_OUTPUT_ROOT%" == "" ( 
@@ -80,7 +83,18 @@ cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
 @REM -- In theory the filenames may not be building_list.gmu.txt, but for simplicity, I just use the default.
 if ERRORLEVEL 1 (
 	echo Error executing: cp_ %GF_DIR%/_building_list.gmu.txt  %gmb_thisrepo%/%gmb_dirname_sdkout%
+	exit /b 1
 )
+
+set file7z=%gmb_sdkname%-%DATE%.7z
+set cmd7z=7z a %gmb_thisrepo%/%file7z% %gmb_thisrepo%/%gmb_dirname_sdkout% %gmb_thisrepo%/websymbols
+%cmd7z% 2>&1 > 7z.log
+if ERRORLEVEL 1 (
+	echo Error executing: %cmd7z%
+)
+
+echo.
+echo Generated SDK package %file7z% .
 
 echo.
 echo ////////// SCALACON MAKE-SDK SUCCESS //////////
