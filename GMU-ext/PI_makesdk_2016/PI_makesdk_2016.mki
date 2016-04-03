@@ -54,7 +54,7 @@ $(call gmuf_AnounceExportEnvvar,gmb_dirname_sdkout=$(strip $(gmb_dirname_sdkout)
 gmb_syncto := $(call gmuf_GetAbsPathByRela_soc,$(gmb_thisrepo)/$(gmb_dirname_sdkout))
 $(call gmuf_AnounceExportEnvvar,gmb_syncto=$(gmb_syncto))
 
-$(call gmuf_AnounceExportEnvvar,gmb_run_example_on_compiler_vers=$(gmb_run_example_on_compiler_vers))
+$(call gmuf_AnounceExportEnvvar,gmb_run_example_on_cidvers=$(gmb_run_example_on_cidvers))
 
 $(call gmuf_AnounceExportEnvvar,gmi_SYDO_SHOW_COPY_CMD=1)
 $(call gmuf_AnounceExportEnvvar,gmp_RELEASE_WANT_DBG_SYMBOLS=1)

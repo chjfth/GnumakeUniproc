@@ -89,7 +89,7 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     ifneq (,$(strip %(copydlls)s))
       gmp_USER_POST_TARGETS += COPYDLLS_%(refname)s
     endif
-    ifeq (1,$(call gmuf_IsWordInSet,$(%(uxm_cidver_var)s),$(gmb_run_example_on_compiler_vers)))
+    ifeq (1,$(call gmuf_IsWordInSet,$(%(uxm_cidver_var)s),$(gmb_run_example_on_cidvers)))
     ifeq (run1,run$(strip %(isrunverify)s))
       gmp_USER_POST_TARGETS += RUN_%(refname)s
       cmd_%(refname)s := %(runcmd)s
