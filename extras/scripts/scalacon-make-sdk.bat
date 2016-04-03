@@ -86,15 +86,18 @@ if ERRORLEVEL 1 (
 	exit /b 1
 )
 
-set file7z=%gmb_sdkname%-%DATE%.7z
-set cmd7z=7z a %gmb_thisrepo%/%file7z% %gmb_thisrepo%/%gmb_dirname_sdkout% %gmb_thisrepo%/websymbols
+set datetime=%DATE:-=%.%TIME::=%
+set datetime=%datetime:~0,15%
+set file7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
+set file7z=%file7z:/=\%
+echo.
+echo Generating SDK package %file7z% ...
+
+set cmd7z=7z a %file7z% %gmb_thisrepo%\%gmb_dirname_sdkout% %gmb_thisrepo%\websymbols
 %cmd7z% 2>&1 > 7z.log
 if ERRORLEVEL 1 (
 	echo Error executing: %cmd7z%
 )
-
-echo.
-echo Generated SDK package %file7z% .
 
 echo.
 echo ////////// SCALACON MAKE-SDK SUCCESS //////////
