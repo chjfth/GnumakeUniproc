@@ -128,6 +128,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	比如：svnhosttable 内容如下：
 
 		nlssvn	https://nlssvn/svnreps
+		nlssvn	https://nlssvn.dev.nls/svnreps
 		chjsvn	http://chjsvn.dev.nls
 
 	作用是，当我们用 svn info 查出一个源码文件的 URL 为 https://nlssvn/svnreps/Isyslib/IUartBasic/dev/libsrc/mswin/UartBasic_win.cpp ，
@@ -356,6 +357,11 @@ nlssvnrooturl='https://nlssvn/svnreps'
 srctool_exename = 'srctool-wdk7'
 	# WDK7's  'srctool -r' returns 0 on success.
 	# WDK10's 'srctool -r' returns count of source files printed, so 0 means error.
+
+nlssvn_default_host_table_content="""
+nlssvn https://nlssvn/svnreps
+nlssvn https://nlssvn.dev.nls/svnreps
+"""
 
 
 SRCSRV_stream_template="""
@@ -1335,11 +1341,11 @@ def main():
 				Logp( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
 				exit(1)
 	else:
-		svnhosttable_buf = 'nlssvn https://nlssvn/svnreps'
+		svnhosttable_buf = nlssvn_default_host_table_content
 
 	Log( "SVN host table has content:\n%s\n"%(svnhosttable_buf) )
 
-	entries = svnhosttable_buf.splitlines()
+	entries = filter(None, svnhosttable_buf.splitlines()) # filter to remove blank lines
 	""" entries sample:
 	nlssvn	https://nlssvn/svnreps
 	chjsvn	http://chjsvn.dev.nls:88

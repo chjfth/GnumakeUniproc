@@ -8,4 +8,4 @@ if "%1" == "" (
 set dirsandbox=%1
 
 @echo on
-scalacon-ssindex-svn.py --dir-pdb=%dirsandbox% --dirs-source=%dirsandbox% --svn-use-export --loosy-reposie-table --pick-sstreams-dirs=sdkin --sdkin-doth-localroot=sdkin/include --dir-pdb-exclude-pattern=*cache*,sdkin
+scalacon-ssindex-svn.py --dir-pdb=%dirsandbox% --dirs-source=%dirsandbox% --svn-use-export --loosy-reposie-table --pick-sstreams-dirs=sdkin --sdkin-doth-localroot=sdkin/include --dir-pdb-exclude-pattern=*cache*,sdkin --whistle
