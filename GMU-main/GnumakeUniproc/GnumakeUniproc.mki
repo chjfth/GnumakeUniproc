@@ -1276,10 +1276,12 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "_AllDecoSubprjnames += $(SubprjEvPrjname)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo -e "#################### {$${SubPrj}} end ####################\n" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		done
+	@echo "ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "ifneq (\$$(call gmuf_CountNonDupWords,$(gmu_uv_list_ALL_SUBPRJ_s)),\$$(call gmuf_CountNonDupWords,\$$(_AllDecoSubprjnames)))" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "  \$$(info !GMU!Error: Some of your sub-projects share duplicate final GMU project names, which is not allowed. Your subprjs are listed below:)" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "  \$$(foreach r,$(gmu_uv_list_ALL_SUBPRJ_s),\$$(eval \$$(call _gmufe_ShowSubprj_refname_prjname,\$$r)))" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "  \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst)
+	@echo "endif" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo "endif" >> $(_p_mki_SubprjAttr_shsubst)
 	@echo -n "" > $(_p_SubprjsAttrMade) # touch it
 
