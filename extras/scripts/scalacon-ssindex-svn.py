@@ -319,13 +319,16 @@ g_nPdbsFound = 0
 	# Just counts filename-matching PDBs found, not necessarily sewed with valid tracks.
 
 class CSvnHostinfo:
-	def __init__(self, rooturl):
-		self.rooturl = rooturl
+	def __init__(self, rooturls):
+		self.rooturls = rooturls # is a rooturl list
 		self.reposie_table = {}
+		self.rooturl_prefer = ''
+	def add_rooturl(self, rooturl):
+		self.rooturls.append(rooturl)
 
 g_reposietable = {}
 	# This table maps svnhostid to a CSvnHostinfo class object.
-	#  .rooturl is the SVN base url for that SVN host.
+	#  .rooturls's each element is the SVN base url for that SVN host.
 	#  .reposie-table is table content from reposie-<svnhostid>.txt
 
 g_save_sstreams_dir = ''
@@ -484,14 +487,18 @@ def ComparePathStr(s1, s2):
 class Track: pass
 
 def MatchSvnHostId(svnurl):
-	for svnhost in g_reposietable.keys():
-		if svnurl.find(g_reposietable[svnhost].rooturl)==0 :
-			return svnhost
+	for svnhostid in g_reposietable:
+		# g_reposietable[svnhostid] is a CSvnHostinfo object.
+		for rooturl in g_reposietable[svnhostid].rooturls:
+			if svnurl.startswith(rooturl):
+				g_reposietable[svnhostid].rooturl_prefer = rooturl
+				return svnhostid
 	return ''
 
 def GetSvnRootUrl(svnhostid):
+	assert g_reposietable[svnhostid].rooturl_prefer
 	if svnhostid in g_reposietable:
-		return g_reposietable[svnhostid].rooturl
+		return g_reposietable[svnhostid].rooturl_prefer
 	else:
 		return ''
 
@@ -1357,7 +1364,10 @@ def main():
 	for e in entries:
 		svnhostid = e.split()[0]
 		svnrooturl = e.split()[1]
-		g_reposietable[svnhostid] = CSvnHostinfo(svnrooturl)
+		if svnhostid in g_reposietable:
+			g_reposietable[svnhostid].add_rooturl(svnrooturl)
+		else:
+			g_reposietable[svnhostid] = CSvnHostinfo([svnrooturl])
 
 
 	b = ScanAndSew()

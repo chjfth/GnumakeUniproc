@@ -199,7 +199,8 @@ def svn_update_to_epsec(rootdir, epsec): # not used in this program
 def svn_diff_timestamp(rootdir, epsec):
 	tm = time.gmtime(epsec)
 	utc8601 = time.strftime("%Y-%m-%dT%H:%M:%SZ", tm)
-	cmd = 'svn diff --summarize --xml -r {%s} "%s"'%(utc8601, rootdir)
+	cmd = 'svn diff --summarize --xml -r "{%s}" "%s"'%(utc8601, rootdir)
+#	print '===%s==='%(cmd) #debug
 	try:
 		xml = subprocess.check_output(cmd)
 	except subprocess.CalledProcessError as cpe:
@@ -228,10 +229,26 @@ If difference found, output is like:
    item="deleted">desktop.ini</path>
 </paths>
 </diff>
+
+#### >>> But strangely, svn 1.9.2-win32 will report fake "modified" item for a sandbox root, like this:
+<diff>
+<paths>
+<path
+   item="none"
+   props="modified"
+   kind="dir">D:\b\wx31</path>
+</paths>
+</diff>
+# -- I explicitly check for this and ignore it.
+#### <<<
 """
 	changed_files = []
-	for r in re.finditer(r'<path\s+(?:.+?)>(.+?)</path>', xml, re.DOTALL):
-		changed_files.append(r.group(1))
+	for r in re.finditer(r'<path\s+(?:.*?)item="(.+?)"(?:.*?)>(.+?)</path>', xml, re.DOTALL):
+		item_propval = r.group(1)
+		changed_entry = r.group(2)
+		
+		if item_propval!="none":
+			changed_files.append(changed_entry)
 	
 	return changed_files
 
