@@ -606,6 +606,7 @@ def DissectSvnRemain(svnhostid, urm):
 		""" sample:
 		('Isyslib/IUartBasic' , 'dev' , 'libsrc/mswin/UartBasic_win.cpp')
 		"""
+	input_svnurl = GetSvnRootUrl(svnhostid) +'/'+ urm
 
 	# reposie definition not found in reposie table
 	if g_allow_loosy_reposie:
@@ -628,19 +629,19 @@ def DissectSvnRemain(svnhostid, urm):
 		else:
 			if fntable:
 				Logpe(
-					"Error: Expected reposie table file '%s' is empty or cannot be opened, and reposie cannot be deduced from loosy method,\n"
-					"- for SVN root URL: %s\n"
-					"- default branchie: %s\n" \
-						%(fntable, svnrooturl, g_dftbr)
-					)
+					"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loosy method,\n"
+					"- svnurl input     : %s\n"
+					"- svnurl root part : %s\n"
+					"- default branchie : %s\n"	%(
+					input_svnurl, svnrooturl, g_dftbr))
 				exit(3)
 			else:
 				Logpe(
 					"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loosy method,\n"
-					"- for SVN root URL: %s\n"
-					"- default branchie: %s\n" \
-						%(svnrooturl, g_dftbr)
-					)
+					"- svnurl input     : %s\n"
+					"- svnurl root part : %s\n"
+					"- default branchie : %s\n" %(
+					input_svnurl, svnrooturl, g_dftbr))
 				exit(3)
 	else:
 		# Since not g_allow_loosy_reposie, we have to assert error.
