@@ -415,6 +415,13 @@ def Logp(s, whistle_do=False):
 	if g_logfile:
 		g_logfile.write(s+'\n')
 
+def Logpe(s):
+	Logp(s, True)
+
+def Logp_whistle(s):
+	Logp(s, True)
+
+
 def MyMakeDir(dir):
 	if os.path.isdir(dir):
 		return True
@@ -586,7 +593,7 @@ def DissectSvnRemain(svnhostid, urm):
 		# Check if branchie match that in the urm, assert error if not
 		reposie_branchie_expect = reposie+'/'+branchie+'/'
 		if urm.find(reposie_branchie_expect)!=0 : # not match
-			Logp("Error: gpbr env(%s) indicates the URL should start with %s/%s , "
+			Logpe("Error: gpbr env(%s) indicates the URL should start with %s/%s , "
 				"however, svn info tells %s/%s ." % (
 				gpbr if gpbr else 'null',
 				svnrooturl, reposie_branchie_expect,
@@ -620,7 +627,7 @@ def DissectSvnRemain(svnhostid, urm):
 			return (reposie, branchie, innard)
 		else:
 			if fntable:
-				Logp(
+				Logpe(
 					"Error: Expected reposie table file '%s' is empty or cannot be opened, and reposie cannot be deduced from loosy method,\n"
 					"- for SVN root URL: %s\n"
 					"- default branchie: %s\n" \
@@ -628,7 +635,7 @@ def DissectSvnRemain(svnhostid, urm):
 					)
 				exit(3)
 			else:
-				Logp(
+				Logpe(
 					"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loosy method,\n"
 					"- for SVN root URL: %s\n"
 					"- default branchie: %s\n" \
@@ -637,7 +644,7 @@ def DissectSvnRemain(svnhostid, urm):
 				exit(3)
 	else:
 		# Since not g_allow_loosy_reposie, we have to assert error.
-		Logp(
+		Logpe(
 			"Error: No reposie definition can be found in file %s ,\n"
 			"- for SVN root URL: %s\n"
 			"- SVN remain parts: %s\n" \
@@ -671,7 +678,7 @@ def CalTrack_by_svninfo(cookie):
 	try:
 		svninfo = subprocess.check_output(svninfo_cmd, stderr=subprocess.STDOUT)
 	except WindowsError:
-		Logp("Error: 'svn info' execution fail! Perhaps svn.exe is not in your PATH.")
+		Logpe("Error: 'svn info' execution fail! Perhaps svn.exe is not in your PATH.")
 		exit(2)
 	except subprocess.CalledProcessError as cpe:
 		Log("Warning: '%s' returns error code %d. 'svn info' output:\n%s\n"%\
@@ -703,8 +710,8 @@ def CalTrack_by_svninfo(cookie):
 		svnurl= r.group(1).strip() # svnurl is '\r' terminated, strange
 		Log(svninfo)
 	else:
-		Logp("Error: 'svn info' output unexpected. Cannot find 'URL:' line in the output.")
-		Logp("'svn info' output is:\n%s\n"%(svninfo))
+		Logpe("Error: 'svn info' output unexpected. Cannot find 'URL:' line in the output.")
+		Logpe("'svn info' output is:\n%s\n"%(svninfo))
 		exit(2)
 
 	""" svnurl sample:
@@ -713,7 +720,7 @@ def CalTrack_by_svninfo(cookie):
 
 	svnhostid = MatchSvnHostId(svnurl)
 	if not svnhostid:
-		Logp( "Error: Cannot find matching SVN host id for '%s' whose SVN URL is '%s' ,"
+		Logpe( "Error: Cannot find matching SVN host id for '%s' whose SVN URL is '%s' ,"
 			"-- your svn host table does not provide matching info for that SVN URL."%(cookie, svnurl) )
 		exit(5)
 
@@ -809,7 +816,7 @@ def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
 			r'SRCSRV: source files ---+\n(.+)SRCSRV: end ---',
 			sstream, re.DOTALL) # let (.+) match multiple lines
 		if not r:
-			Logp( 'Unexpected: No "SRCSRV: source files" section found in %s. Skipped.\n'%(filename_pick) )
+			Logpe( 'Unexpected: No "SRCSRV: source files" section found in %s. Skipped.\n'%(filename_pick) )
 			exit(12)
 		
 		sstracks = r.group(1)
@@ -867,7 +874,7 @@ def get_pick_sstreams_dirs():
 		return g_pick_sstreams_dirs.split(",")
 	
 	if not g_pick_sstreams_dirs_from_ini:
-		Logp( 'Error: You request sstreams picking, but does not provide picking dirs.' )
+		Logpe( 'Error: You request sstreams picking, but does not provide picking dirs.' )
 		exit(13)
 	
 	"""
@@ -945,12 +952,12 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 						# break // just go on and pick from all dirs
 				
 				if not sstracks:
-					Logp( 'Error: You assign %s in --pick-cherries, but %s.sstream.txt cannot be found.'%(cherry, cherry) )
+					Logpe( 'Error: You assign %s in --pick-cherries, but %s.sstream.txt cannot be found.'%(cherry, cherry) )
 					exit(11)
 
 	except IOError:
 		# PENDING: Wish a more elegant way to know the error file.
-		Logp( "Error: IOError on %s."%(sstream_filepath) )
+		Logpe( "Error: IOError on %s."%(sstream_filepath) )
 		exit(10)
 
 	return '\n'.join(sstracks_all_dict.keys())
@@ -967,10 +974,10 @@ def Sew1Pdb(pdbpath):
 	try:
 		srclist_ = subprocess.check_output(srctool_cmd)
 	except WindowsError:
-		Logp("Error: '%s -r' execution fail! Perhaps %s.exe is not in your PATH."%(srctool_exename, srctool_exename))
+		Logpe("Error: '%s -r' execution fail! Perhaps %s.exe is not in your PATH."%(srctool_exename, srctool_exename))
 		exit(1)
 	except subprocess.CalledProcessError as cpe:
-		Logp("Error: '%s' returns: %s\n"%(srctool_cmd, cpe.output))
+		Logpe("Error: '%s' returns: %s\n"%(srctool_cmd, cpe.output))
 		exit(1)
 
 	srclist = srclist_.split()
@@ -1036,7 +1043,7 @@ def Sew1Pdb(pdbpath):
 		fstream.write(srcsrv_stream_text)
 		fstream.close()
 	else:
-		Logp( "Error: Cannot create a temp file to store SRCSRV stream." )
+		Logpe( "Error: Cannot create a temp file to store SRCSRV stream." )
 		exit(4)
 
 	Log( "SRCSRV stream tracks: %d. SRCSRV stream is:\n%s\n"%(ntrack, srcsrv_stream_text) )
@@ -1047,10 +1054,10 @@ def Sew1Pdb(pdbpath):
 	try:
 		subprocess.check_output(pdbstr_cmd, stderr=subprocess.STDOUT)
 	except WindowsError:
-		Logp("Error: 'pdbstr' execution fail! Perhaps pdbstr.exe is not in your PATH. You should install Debugging Tools for Windows to obtain it.")
+		Logpe("Error: 'pdbstr' execution fail! Perhaps pdbstr.exe is not in your PATH. You should install Debugging Tools for Windows to obtain it.")
 		exit(4)
 	except subprocess.CalledProcessError as cpe:
-		Logp( "%s\n"%cpe.output )
+		Logpe( "%s\n"%cpe.output )
 
 	""" True case of a generated SRCSRV stream. You can view it by running ``pdbstr -r -p:XXX.pdb -s:srcsrv''
 	This is named srcsrv_stream_text or sstream_text below.
@@ -1235,11 +1242,11 @@ def main():
 		g_dtco = opts['--datetime-co']
 		print 'Scalacon info: User assigned PDB-sewing datetime is: "%s"'%(g_dtco)
 	else:
-		Logp('Contacting svn server to determine appropriate PDB-sewing datetime...', True)
+		Logp_whistle('Contacting svn server to determine appropriate PDB-sewing datetime...')
 		try:
 			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list)
 		except scalacon_svn_op.SvnopError as e:
-			Logp('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
+			Logpe('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)
 		print 'Scalacon info: Auto determined PDB-sewing datetime is: "%s"'%(g_dtco)
 
@@ -1264,13 +1271,13 @@ def main():
 		if '--pick-sstreams-dir-sdkin' in opts:
 			g_pick_sstreams_dir_sdkin = opts['--pick-sstreams-dir-sdkin']
 		else:
-			Logp( 'Error: You assign --pick-sstreams-dirs-from-ini but missing --pick-sstreams-dir-sdkin .' )
+			Logpe( 'Error: You assign --pick-sstreams-dirs-from-ini but missing --pick-sstreams-dir-sdkin .' )
 			exit(1)
 	elif '--pick-sstreams-dirs' in opts:
 		g_pick_sstreams_dirs = opts['--pick-sstreams-dirs']
 
 	if g_pick_cherries and not (g_pick_sstreams_dirs or g_pick_sstreams_dirs_from_ini):
-		Logp('Error: You assign --pick-cherries but no --pick-sstreams-dirs. You have to fix it.')
+		Logpe('Error: You assign --pick-cherries but no --pick-sstreams-dirs. You have to fix it.')
 		exit(1)
 
 	if '--src-mapping-from-ini' in opts:
@@ -1348,10 +1355,10 @@ def main():
 				svn_cat_cmd = "svn cat %s"%(fnSvnhostTable)
 				svnhosttable_buf = subprocess.check_output(svn_cat_cmd)
 			except WindowsError:
-				Logp( "Error: '%s' execution fail! Probably you don't have svn.exe in your PATH."%(svn_cat_cmd) )
+				Logpe( "Error: '%s' execution fail! Probably you don't have svn.exe in your PATH."%(svn_cat_cmd) )
 				exit(1)
 			except subprocess.CalledProcessError as cpe:
-				Logp( "Error: '%s' execution fail, exit code is %d. Output is:\n%s"%(
+				Logpe( "Error: '%s' execution fail, exit code is %d. Output is:\n%s"%(
 					svn_cat_cmd, cpe.returncode , cpe.output) )
 		else:
 			# Process fnSvnhostTable as local file.
@@ -1360,7 +1367,7 @@ def main():
 				svnhosttable_buf = ftable.read()
 				ftable.close()
 			except:
-				Logp( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
+				Logpe( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
 				exit(1)
 	else:
 		svnhosttable_buf = nlssvn_default_host_table_content
@@ -1373,7 +1380,7 @@ def main():
 	chjsvn	http://chjsvn.dev.nls:88
 	"""
 	if len(entries)==0:
-		Logp( "Error: SVN host table has no entries." )
+		Logpe( "Error: SVN host table has no entries." )
 		exit(1)
 
 	for e in entries:
