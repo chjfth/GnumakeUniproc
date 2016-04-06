@@ -814,6 +814,29 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 	return daction
 
 
+def store_vcX0_version_hint(localdir):
+	content = """cidver and Visual C++ version relation:
+vc60  = Visual C++ 6.0 (1998)
+vc71  = Visual C++.NET 2003
+vc80  = Visual C++ 2005
+vc90  = Visual C++ 2008
+vc100 = Visual C++ 2010
+vc110 = Visual C++ 2012
+vc120 = Visual C++ 2013
+vc140 = Visual C++ 2015
+"""
+	dir_cidvers = os.path.join(localdir, 'cidvers')
+	hint_filepath = os.path.join(dir_cidvers, 'vcX0.version-hint.txt')
+	if os.path.exists(hint_filepath):
+		return
+		
+	existing_cidvers = os.listdir(dir_cidvers)
+	for cidver in existing_cidvers:
+		if cidver.startswith('vc'):
+			open(hint_filepath, 'w').write(content)
+			return
+
+
 def do_getsdks():
 	iniobj = ConfigParser.ConfigParser()
 	global g_cidvers_restrict
@@ -907,7 +930,10 @@ def do_getsdks():
 #					print 'Make read-only:', root+os.sep+file #debug
 					os.chmod(root+ '/' +file, stat.S_IREAD)
 	
+		store_vcX0_version_hint(localdir)
+	
 	return 0
+
 
 def main():
 	global optdict, g_ini_filepath, g_ini_dir, g_isforce
