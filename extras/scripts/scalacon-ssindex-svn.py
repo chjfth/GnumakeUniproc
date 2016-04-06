@@ -520,7 +520,7 @@ def GetSvnRootUrl(svnhostid):
 
 def DissectSvnRemain(svnhostid, urm):
 	"""
-	Currently, the func not allow to fail, may allow in future
+	Currently, this function is not allow to fail, may allow in future.
 	"""
 	svnrooturl = GetSvnRootUrl(svnhostid)
 
@@ -536,6 +536,7 @@ def DissectSvnRemain(svnhostid, urm):
 	>>> urm sample:
 
  	Isyslib/IUartBasic/dev/libsrc/mswin/UartBasic_win.cpp
+ 	Isyslib/IUartBasic/trunk/libsrc/mswin/UartBasic_win.cpp
 
 	"""
 
@@ -580,7 +581,6 @@ def DissectSvnRemain(svnhostid, urm):
 			# rtable will have reposie(e.g. 'Isyslib/IUartBasic') as index and
 			# a tuple as corresponding value.
 			# tuple[0] is gpbr (null if it does not appear in reposie table file)
-
 
 	for reposie in rtable.keys():
 		# Skip this entry if t[0] does not match start of urm
@@ -647,12 +647,10 @@ def DissectSvnRemain(svnhostid, urm):
 		# Since not g_allow_loosy_reposie, we have to assert error.
 		Logpe(
 			"Error: No reposie definition can be found in file %s ,\n"
-			"- for SVN root URL: %s\n"
-			"- SVN remain parts: %s\n" \
-			%(fntable,
-			svnrooturl,
-			urm
-			))
+			"- svnurl input    : %s\n"
+			"- svnurl root part: %s\n"
+			"- SVN remain parts: %s\n"%(
+			input_svnurl, svnrooturl, urm))
 		exit(3)
 
 
