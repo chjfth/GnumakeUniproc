@@ -200,6 +200,14 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	如果当前处理的 pdb 有 cherry-picking 行为，那么，针对此 pdb 的 save-sstream 动作生成的
 	.sstream.txt 将包含 cherry-picking 的内容。
 
+--sstreams-filename-suffix=<ssfx>
+	[可选] 
+	配合 --save-sstreams-dir 使用，在生成 .sstreams.txt 文件时，在主文件名上添加 ssfx 后缀。
+	比如，
+		--sstreams-filename-suffix=-Debug
+	则对于 foobar.pdb 将生成 foobar-Debug.sstreams.txt 。
+	
+
 --pick-sstreams-dirs-from-ini=<inipath>
 --pick-sstreams-dir-sdkin=<dirsdkin>
 	[可选] since v1.2. 此两选项需一起使用方有效。
@@ -332,6 +340,7 @@ g_reposietable = {}
 	#  .reposie-table is table content from reposie-<svnhostid>.txt
 
 g_save_sstreams_dir = ''
+g_sstreams_filename_suffix = ''
 g_pick_cherries = ''
 g_pick_sstreams_dirs = ''
 g_pick_sstreams_dirs_from_ini = ''
@@ -1155,12 +1164,14 @@ def ScanAndSew():
 def save_sstream_as_file(sstream_text, pdbpath):
 	# Save the sstream text, we'll use it creatively for static .libs.
 	pdbdir, pdbfilename = os.path.split(pdbpath)
-	sstream_stemname = pdbfilename.rstrip(".pdb").rstrip(".lib")
+	sstream_stemname = re.sub(r'(\.pdb|\.lib+)$', '', pdbfilename) # strip any .pdb, .lib suffix
+	sstream_stemname += g_sstreams_filename_suffix
 
 	if g_save_sstreams_dir[0]=='!':
-		save_filepath = "%s/%s/%s.sstream.txt"%(pdbdir, g_save_sstreams_dir[1:], sstream_stemname)
+		# typically, g_save_sstreams_dir='!..' which means generate .sstreams.txt in parent folder of .pdb
+		save_filepath = r"%s\%s\%s.sstream.txt"%(pdbdir, g_save_sstreams_dir[1:], sstream_stemname)
 	else:
-		save_filepath = g_save_sstreams_dir
+		save_filepath = os.path.join(g_save_sstreams_dir, sstream_stemname+'.sstream.txt')
 
 	save_filepath = os.path.abspath(save_filepath)
 
@@ -1173,7 +1184,8 @@ def save_sstream_as_file(sstream_text, pdbpath):
 def main():
 	global opts, g_dirpdb, g_ds_list, g_dtco, g_drt, g_dftbr, g_allow_loosy_reposie
 	global g_logfile, g_svn_use_export
-	global g_save_sstreams_dir, g_pick_cherries, g_pick_sstreams_dirs
+	global g_save_sstreams_dir, g_sstreams_filename_suffix
+	global g_pick_cherries, g_pick_sstreams_dirs
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
@@ -1184,7 +1196,8 @@ def main():
 	optopts = [ 'dir-pdb-exclude-pattern=','pdb-exclude-pattern', 'datetime-co=', 
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
-		'save-sstreams-dir=', 'pick-cherries=', 'pick-sstreams-dirs=', 
+		'save-sstreams-dir=', 'sstreams-filename-suffix=',
+		'pick-cherries=', 'pick-sstreams-dirs=', 
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
 		'sdkout-doth-localroot=', 'sdkin-doth-localroot=',
@@ -1238,6 +1251,8 @@ def main():
 
 	if '--save-sstreams-dir' in opts:
 		g_save_sstreams_dir = opts['--save-sstreams-dir']
+	if '--sstreams-filename-suffix' in opts:
+		g_sstreams_filename_suffix = opts['--sstreams-filename-suffix']
 
 	if '--pick-cherries' in opts:
 		g_pick_cherries = opts['--pick-cherries']
