@@ -813,12 +813,10 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 			else:
 				action.uplocal = False
 		
-		print ' %sCachestatus: %s %s'%(
+		print ' %sCachestatus: %s'%(
 			cache_state_asterisk, 
 			str_cache_status,
-			'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
 			)
-		
 		print ' %sLocaldir need update: %s %s'%(
 			'*' if action.uplocal else ' ',
 			'yes' if action.uplocal else 'no', 
