@@ -86,22 +86,33 @@ if ERRORLEVEL 1 (
 	exit /b 1
 )
 
-set mydate=%DATE:/=%
-set mydate=%mydate:-=%
-set mydate=%mydate:~0,8%
-set mytime=%TIME::=%
-set mytime=%mytime:~0,6%
-set datetime=%mydate%.%mytime%
+REM set mydate=%DATE:/=%
+REM set mydate=%mydate:-=%
+REM set mydate=%mydate:~0,8%
+REM set mytime=%TIME::=%
+REM set mytime=%mytime:~0,6%
+REM set datetime=%mydate%.%mytime%
+REM -- That is not guaranteed to work for various date-time format settings(from Control Panel)
+REM    so use date_.exe instead.
 
-set file7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
-rem set file7z=%file7z:/=\%
+set datetimecmd=date_ +"%%Y%%m%%d.%%H%%M%%S"
+REM -- note: One %% represent a single % in date_'s parameter.
+for /F "usebackq delims=" %%i IN (`%datetimecmd%`) DO set datetime=%%i
+
+set filepath7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
+set _7zlog=7z.log
+%_7zlog%
+if exist %_7zlog% del %_7zlog%
+
 echo.
-echo Generating SDK package %file7z% ...
+echo Generating SDK package %filepath7z% ...
 
-set cmd7z=7z a %file7z% %gmb_thisrepo%\%gmb_dirname_sdkout% %gmb_thisrepo%\websymbols
-%cmd7z%
+set cmd7z=7z a %filepath7z% %gmb_thisrepo%/%gmb_dirname_sdkout% %gmb_thisrepo%/websymbols
+
+%cmd7z% 2>&1 > %_7zlog%
 if ERRORLEVEL 1 (
 	echo Error executing: %cmd7z%
+	echo See 7z.exe output message in %_7zlog%
 	exit /b 1
 )
 
