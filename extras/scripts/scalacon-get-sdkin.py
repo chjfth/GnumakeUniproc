@@ -788,26 +788,41 @@ def sdkbin_check_all_local_status(iniobj, ini_dir):
 		
 		cached_svndt = check_cached_svndatetime_1refname(dsection, sdk_refname)
 		if cached_svndt==dsection[IK_svndatetime]:
-			daction[sdk_refname].upcache = False
+			action.upcache = False
 			str_cache_status = 'match'
+			cache_state_asterisk = ' '
 		elif cached_svndt=='not_exist':
+			action.upcache = True
 			str_cache_status = 'not exist'
+			cache_state_asterisk = '*'
 		else:
+			action.upcache = True
 			str_cache_status = 'not match(was %s)'%(cached_svndt)
+			cache_state_asterisk = '*'
 		
 		mlocal_sigfile = get_mlocal_sigfile_1refname(localdir, sdk_refname)
-		
+
+		uplocal_reason = [] # may contain multiple reasons
 		if action.upcache==True:
 			action.uplocal = True
+			uplocal_reason.append('cache updated')
 		else:
 			if is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
 				action.uplocal = True
+				uplocal_reason.append('%s updated'%(os.path.split(g_ini_filepath)[1]))
 			else:
 				action.uplocal = False
 		
-		print '  Cache status: %s , Localdir need update: %s.'%(
+		print ' %sCachestatus: %s %s'%(
+			cache_state_asterisk, 
 			str_cache_status,
-			'yes' if action.uplocal else 'no' 
+			'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
+			)
+		
+		print ' %sLocaldir need update: %s %s'%(
+			'*' if action.uplocal else ' ',
+			'yes' if action.uplocal else 'no', 
+			'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
 			)
 		print '.'
 
