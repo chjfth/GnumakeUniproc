@@ -86,17 +86,23 @@ if ERRORLEVEL 1 (
 	exit /b 1
 )
 
-set datetime=%DATE:-=%.%TIME::=%
-set datetime=%datetime:~0,15%
+set mydate=%DATE:/=%
+set mydate=%mydate:-=%
+set mydate=%mydate:~0,8%
+set mytime=%TIME::=%
+set mytime=%mytime:~0,6%
+set datetime=%mydate%.%mytime%
+
 set file7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
-set file7z=%file7z:/=\%
+rem set file7z=%file7z:/=\%
 echo.
 echo Generating SDK package %file7z% ...
 
 set cmd7z=7z a %file7z% %gmb_thisrepo%\%gmb_dirname_sdkout% %gmb_thisrepo%\websymbols
-%cmd7z% 2>&1 > 7z.log
+%cmd7z%
 if ERRORLEVEL 1 (
 	echo Error executing: %cmd7z%
+	exit /b 1
 )
 
 echo.
