@@ -109,7 +109,7 @@ echo Generating SDK package %filepath7z% ...
 
 set cmd7z=7z a %filepath7z% %gmb_thisrepo%/%gmb_dirname_sdkout% %gmb_thisrepo%/websymbols
 
-%cmd7z% 2>&1 > %_7zlog%
+%cmd7z% %_7zlog% 2>&1
 if ERRORLEVEL 1 (
 	echo Error executing: %cmd7z%
 	echo See 7z.exe output message in %_7zlog%
