@@ -38,15 +38,47 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 
 --dir-pdb-exclude-pattern=<dpexc1>,<dpexc2>
 	[可选]
-	指出符合哪些通配符模式的目录不用扫描。多个目录用逗号分开。
+	指出符合哪些通配符模式的目录名,目录路径不用扫描。多个目录用逗号分开。
 	例：
 		--dir-pdb-exclude-pattern=*sdkin*,*temp*
+		--dir-pdb-exclude-pattern=*sdkin*,*dll*/*Dbg.pdb
+	如果 dpexc 中不带路径分隔符（正反斜杠），则针对单个（单级）目录名匹配，
+	如果 dpexc 中带有路径分隔符，则会针对整个绝对路径进行匹配，但注意匹配
+	部分不包括文件名。
 
 --pdb-exclude-pattern=<ptexc1>,<ptexc2>
 	[可选] 
 	指出符合哪些通配符模式的文件名不用扫描。多个目录用逗号分开。
 	.
 	默认会排除 vc?0.pdb, vc??0.pdb 。
+
+--dir-pdb-include-pattern=<dpinc1>,<dpinc2>
+	[可选] 
+	默认为空，将处理所有不在 exclude 模式中的目录名，目录路径。
+	加了此参数后，仅处理符合这些 pattern 的目录，同时，符合 exclude 模式的目录仍会被排除，
+	即，include 和 exclude 的效果是叠加的。
+	.
+	dpinc 可以是单级目录名形式（无正反斜杠的），也可以是多级目录形式（带整反斜杠的）。
+	但注意：其“匹配含义”跟 exclude 的有所不同。
+	比如传入， 
+		--dir-pdb-include-pattern=*Dbg
+	而你有 pdb 文件
+		d:\mywork\vs-output\x64Dbg\foobar.pdb
+	则 foobar.pdb 是满足要求的，因为 x64Dbg 符合目录名模式； 
+	vs-output 不符合 *Dbg 模式并不要紧，因为 foobar.pdb 并非直接处在 vs-output 中。
+	同理，对于多级目录形式的 dpinc ，匹配要求也仅针对紧挨着文件的的相应那几级目录，
+	而非目录层级的任意部分。
+	这个特性跟 --dir-pdb-exclude-pattern 不同，dpexc 一旦匹配，就不会再深入其子目录扫描 pdb。
+
+--pdb-include-pattern=<ptinc1>,<ptinc2>
+	[可选] 
+	默认为空，将处理所有不在 exclude 模式中的文件。
+	加了此参数后，仅处理符合这些 pattern 的文件，符合 exclude 模式的文件仍会被排除。
+	.
+	--pdb-include-pattern 和 --dirpdb-include-pattern 是“与”的关系，即，若两者同时指定，
+	则目录名模式和文件名模式必须同时满足。
+	.
+	提示， ptinc 模式值必须以 .pdb 结尾，否则，即使匹配到了也没有意义。
 
 --dirs-source=<ds>,<ds>
 	[必须]
@@ -294,8 +326,14 @@ version = "1.2"
 opts = {}
 
 g_dirpdb = ''
-g_dirpdb_excludes = []
+
+g_dirpdb_excludes_solo = []  # solo matches a single-level of dirname
+g_dirpdb_excludes_multi = [] # multi matches more than one level of dirname
 g_pdb_excludes = ['vc?0.pdb', 'vc??0.pdb', '*.lib.pdb*']
+g_dirpdb_includes_solo = []
+g_dirpdb_includes_multi = []
+g_pdb_includes = []
+
 g_ds_list = []
 g_dtco = ''
 g_drt = ''
@@ -1144,25 +1182,90 @@ def filename_match_patterns(filename, patterns):
 	matches = filter(lambda p:fnmatch.fnmatch(filename,p), patterns)
 	return matches
 
+def dirpath_match_tail_patterns(dirpath, patterns):
+	r""" Example:
+	dirpath = r'd:\abc\def\xyz'
+		pattern = r'*e*\xy*' , match = yes
+		pattern = r'*b*\de*' , match = no
+		pattern = r'*y*' , match = yes
+		pattern = r'd:\abc\def\xyz' , match = yes
+	"""
+	matches = []
+	dirpath = os.path.normpath(dirpath)
+	for pattern in patterns:
+		pattern = os.path.normpath(pattern)
+		pattern_sep_count = pattern.count('\\')
+		if pattern_sep_count>dirpath.count('\\'):
+			continue
+		
+		if pattern_sep_count>0:
+			r = re.search(r'(\\[^\\]+){%d}$'%(pattern_sep_count), dirpath)
+			assert r
+			body = r.group(0)
+			head = dirpath[:0-len(body)]
+				# Example:
+				# dirpath = r'd:\abc\def\xyz'
+				# pattern = r'a*\d*\x*'
+				# body = r'\def\xyz'
+				# head = r'd:\abc'
+		else:
+			body = ''
+			head = dirpath;
+			
+		r = re.search(r'[^\\]+$', head)
+		neck = r.group(0)
+			# neck = 'abc'
+		if fnmatch.fnmatch(neck+body, pattern):
+			matches.append(pattern)
+		else:
+			continue
+	return matches
+
 def ScanAndSew():
 	"""
 	[2016-03-06] For .lib.pdb, 'srctool -r' shows nothing(Microsoft did it deliberately), 
 	so we don't have to bother with *.lib.pdb .
 	"""
-	for root, folders, files in os.walk(g_dirpdb):
+	for dirpath, folders, files in os.walk(g_dirpdb):
 		for folder in folders:
-			exc_matches = filename_match_patterns(folder, g_dirpdb_excludes)
+			exc_matches = filename_match_patterns(folder, g_dirpdb_excludes_solo)
 			if exc_matches:
-				if not g_iswhistle:
-					print 'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], folder) #debug
 				folders.remove(folder)
+				Logp_whistle(
+					'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], folder))
+			
+			dirchk = os.path.join(dirpath, folder)
+			exc_matches = dirpath_match_tail_patterns(dirchk, g_dirpdb_excludes_multi)
+			if exc_matches:
+				folders.remove(folder)
+				Logp_whistle(
+					'dir-pdb-exclude-pattern (%s) matches "%s".'%(exc_matches[0], dirchk))
 		
 		# In files, search for *.pdb but not *.lib.pdb
 		for file in files:
-			if fnmatch.fnmatch(file, '*.pdb') and not filename_match_patterns(file, g_pdb_excludes):
-				global g_nPdbsFound
-				g_nPdbsFound += 1
-				Sew1Pdb(root+'/'+file)
+			
+			if not file.endswith('.pdb'):
+				continue
+			
+			if g_pdb_includes:
+				if not filename_match_patterns(file, g_pdb_includes):
+					continue # not matching, skipped
+			
+			if filename_match_patterns(file, g_pdb_excludes):
+				continue
+			
+			if g_dirpdb_includes_solo:
+				parent_dirname = os.path.split(dirpath)[1]
+				if not filename_match_patterns(parent_dirname, g_dirpdb_includes_solo):
+					continue
+			
+			if g_dirpdb_includes_multi:
+				if not dirpath_match_tail_patterns(dirpath, g_dirpdb_includes_multi):
+					continue
+			
+			global g_nPdbsFound
+			g_nPdbsFound += 1
+			Sew1Pdb( os.path.join(dirpath,file) )
 
 	return True
 
@@ -1195,11 +1298,14 @@ def main():
 	global g_pick_sstreams_dirs_from_ini, g_pick_sstreams_dir_sdkin
 	global g_srcmapping_pdb, g_srcmapping_svn
 	global g_sdkout_hdir, g_sdkin_hdir
-	global g_dirpdb_excludes, g_pdb_excludes
+	global g_dirpdb_excludes_solo, g_dirpdb_excludes_multi, g_pdb_excludes
+	global g_dirpdb_includes_solo, g_dirpdb_includes_multi, g_pdb_includes
 	global g_iswhistle
 
 	reqopts = ['dir-pdb=', 'dirs-source=' ]
-	optopts = [ 'dir-pdb-exclude-pattern=','pdb-exclude-pattern', 'datetime-co=', 
+	optopts = [ 'dir-pdb-exclude-pattern=', 'pdb-exclude-pattern=', 
+		'dir-pdb-include-pattern=', 'pdb-include-pattern=', 
+		'datetime-co=', 
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
 		'save-sstreams-dir=', 'sstreams-filename-suffix=',
@@ -1218,14 +1324,30 @@ def main():
 	if not AssertMissingOpt(reqopts):
 		return 1
 
-	g_dirpdb = opts['--dir-pdb']
+	g_dirpdb = os.path.abspath(opts['--dir-pdb'])
+
 	g_ds_list = opts['--dirs-source'].split(',')
-	g_ds_list = [os.path.abspath(d) for d in g_ds_list if d] # remove empty ones
+	g_ds_list = [os.path.abspath(d) for d in g_ds_list if d] 
+		# remove empty ones, and normalize to abspath.
+	
+	print 'g_dirpdb=%s'%(g_dirpdb)
+	print 'g_ds_list', g_ds_list
 
 	if '--dir-pdb-exclude-pattern' in opts:
-		g_dirpdb_excludes = opts['--dir-pdb-exclude-pattern'].split(',')
-	if '--pdb-excludes' in opts:
+		excludes = map(lambda ptn:os.path.normpath(ptn), opts['--dir-pdb-exclude-pattern'].split(','))
+			# VS 2010+ IDE $(SolutionDir), $(OutDir) all ends with back-slashes, and
+			# normpath() will strip trailing redundant (back)slashes, good!
+		g_dirpdb_excludes_solo = filter(lambda ptn:ptn.find(os.sep)==-1, excludes)
+		g_dirpdb_excludes_multi = filter(lambda ptn:ptn.find(os.sep)>=0, excludes)
+	if '--pdb-exclude-pattern' in opts:
 		g_pdb_excludes = opts['--pdb-exclude-pattern'].split(',')
+
+	if '--dir-pdb-include-pattern' in opts:
+		excludes = map(lambda ptn:os.path.normpath(ptn), opts['--dir-pdb-include-pattern'].split(','))
+		g_dirpdb_includes_solo = filter(lambda ptn:ptn.find(os.sep)==-1, excludes)
+		g_dirpdb_includes_multi = filter(lambda ptn:ptn.find(os.sep)>=0, excludes)
+	if '--pdb-include-pattern' in opts:
+		g_pdb_includes = opts['--pdb-include-pattern'].split(',')
 
 	if '--dir-reposie-table' in opts:
 		g_drt = opts['--dir-reposie-table']
