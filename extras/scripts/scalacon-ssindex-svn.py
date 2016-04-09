@@ -1333,8 +1333,8 @@ def main():
 	g_ds_list = [os.path.abspath(d) for d in g_ds_list if d] 
 		# remove empty ones, and normalize to abspath.
 	
-	print 'g_dirpdb=%s'%(g_dirpdb)
-	print 'g_ds_list', g_ds_list
+#	print 'g_dirpdb=%s'%(g_dirpdb) #debug
+#	print 'g_ds_list', g_ds_list #debug
 
 	if '--dir-pdb-exclude-pattern' in opts:
 		excludes = map(lambda ptn:os.path.normpath(ptn), opts['--dir-pdb-exclude-pattern'].split(','))
