@@ -525,6 +525,9 @@ def AssertMissingOpt(reqopts):
 		if not opt in opts:
 			print 'Error: No %s option assigned.'%(opt)
 			return False
+		if not opts[opt]:
+			print 'Error: Your %s= option has empty value'%(opt)
+			return False
 	return True
 
 def ComparePathStr(s1, s2):
