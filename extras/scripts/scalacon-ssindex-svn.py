@@ -1346,9 +1346,9 @@ def main():
 		g_pdb_excludes = opts['--pdb-exclude-pattern'].split(',')
 
 	if '--dir-pdb-include-pattern' in opts:
-		excludes = map(lambda ptn:os.path.normpath(ptn), opts['--dir-pdb-include-pattern'].split(','))
-		g_dirpdb_includes_solo = filter(lambda ptn:ptn.find(os.sep)==-1, excludes)
-		g_dirpdb_includes_multi = filter(lambda ptn:ptn.find(os.sep)>=0, excludes)
+		includes = map(lambda ptn:os.path.normpath(ptn), opts['--dir-pdb-include-pattern'].split(','))
+		g_dirpdb_includes_solo = filter(lambda ptn:ptn.find(os.sep)==-1, includes)
+		g_dirpdb_includes_multi = filter(lambda ptn:ptn.find(os.sep)>=0, includes)
 	if '--pdb-include-pattern' in opts:
 		g_pdb_includes = opts['--pdb-include-pattern'].split(',')
 

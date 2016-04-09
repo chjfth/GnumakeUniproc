@@ -9,7 +9,7 @@ if "%1" == "" (
 set dirsandbox=%1
 REM Now strip its trailing backslash, so that --sdkin-doth-localroot does not get double slashes.
 set tail=%dirsandbox:~-1%
-if %tail% == \ set dirsandbox=%dirsandbox:~,-1%
+if "%tail%" == "\" ( set dirsandbox=%dirsandbox:~,-1% )
 
 
 shift
