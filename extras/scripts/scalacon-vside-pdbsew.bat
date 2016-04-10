@@ -4,7 +4,8 @@ setlocal
 set batdir=%~dp0
 set batdir=%batdir:~0,-1%
 
-if "%2" == "" (
+REM Here, "%~2" must have ~ , otherwise, spaces in %2 will cause error.
+if "%~2" == "" (
 	echo Missing parameters. 
 	echo   %~n0 ^<vs-solutiondir^> ^<pdb-dir^> [pdb-name-pattern]
 	echo Note:
@@ -39,7 +40,7 @@ REM Draw svn.exe, srctool.exe into PATH, and don't need other disturbing things 
 PATH=%batdir%;%batdir%\pdbsew;%svnexe_dir%
 
 set dirsandbox=%dir_vssln%
-set final_pycmd=scalacon-ssindex-svn.py --dir-pdb="%dirsandbox%" --dirs-source="%dirsandbox%" --svn-use-export --loosy-reposie-table --pick-sstreams-dirs="%dirsandbox%\sdkin" --sdkin-doth-localroot="%dirsandbox%\sdkin\include" --dir-pdb-exclude-pattern=*cache*,sdkin --dir-pdb-include-pattern="%dir_pdb%" %pdb_name_pattern_param%
+set final_pycmd=scalacon-ssindex-svn.py --dir-pdb="%dirsandbox%" --dirs-source="%dirsandbox%" --svn-use-export --loosy-reposie-table --pick-sstreams-dirs="%dirsandbox%\sdkin" --sdkin-doth-localroot="%dirsandbox%\sdkin\include" --dir-pdb-exclude-pattern=*cache*,sdkin --dir-pdb-include-pattern="%dir_pdb%" %pdb_name_pattern_param% %VSIDE_PDBSEW_EXTRA_OPTIONS%
 
 @echo on
 echo %final_pycmd%

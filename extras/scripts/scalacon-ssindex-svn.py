@@ -102,6 +102,11 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	服务器的此时间点内容跟本地内容是否完全一致，若不一致则宣告失败。
 	这种自动选择机制应该是很可靠的，因此建议自动选择而非手动指定，手动指定仅用于开发试验。
 
+--devtest-pdbsew-allow-sandbox-modification (无参数)
+	[默认不启用此参数]
+	仅在开发测试过程使用。默认行为禁止对有本地修改的 sandbox 进行 PDB-sewing , 
+	此选项会旁路掉这个检查。
+
 --dir-reposie-table=<drt>
 	[必须] 但指定了 --loosy-reposie-table 的情况下可选。
 	这个参数跟陈军给 NLSCAN SVN server 设计的目录结构有极大关系。
@@ -304,6 +309,7 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 --whistle
 	[可选]
 	只显示较少的信息。基本上只显示已被成功处理的 .pdb 文件。
+	
 """
 
 import sys
@@ -1308,7 +1314,7 @@ def main():
 	reqopts = ['dir-pdb=', 'dirs-source=' ]
 	optopts = [ 'dir-pdb-exclude-pattern=', 'pdb-exclude-pattern=', 
 		'dir-pdb-include-pattern=', 'pdb-include-pattern=', 
-		'datetime-co=', 
+		'datetime-co=', 'devtest-pdbsew-allow-sandbox-modification',
 		'svn-use-export', 'logfile=', 'default-branchie=',
 		'svnhost-table=', 'dir-reposie-table=', 'loosy-reposie-table', 
 		'save-sstreams-dir=', 'sstreams-filename-suffix=',
@@ -1368,7 +1374,9 @@ def main():
 	else:
 		Logp_whistle('Contacting svn server to determine appropriate PDB-sewing datetime...')
 		try:
-			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list)
+			allow_local_mod = '--devtest-pdbsew-allow-sandbox-modification' in opts
+			g_dtco = scalacon_svn_op.scalacon_find_sandbox_freezing_localstr(g_ds_list, 
+				allow_sandbox_modification=allow_local_mod)
 		except scalacon_svn_op.SvnopError as e:
 			Logpe('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)

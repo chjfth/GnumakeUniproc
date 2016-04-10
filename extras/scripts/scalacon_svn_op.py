@@ -34,8 +34,8 @@ class SvnopError(Exception):
 def log_stderr(s):
 	sys.stderr.write(s+"\n")
 
-def svn_ensure_no_local_modification(rootdir):
-	
+
+def check_svn_sandbox(rootdir):
 	if not os.path.exists(rootdir):
 		raise SvnopError('"%s" does not exist.'%(rootdir))
 
@@ -50,6 +50,8 @@ def svn_ensure_no_local_modification(rootdir):
 	except subprocess.CalledProcessError as cpe:
 		raise SvnopError('The directory "%s" is not an svn sandbox, or access to that directory is forbidden.'%(rootdir))
 
+
+def svn_ensure_no_local_modification(rootdir):
 	cmd = 'svn status -q --xml ' + rootdir
 	try:
 		xml = subprocess.check_output(cmd) # mls: multiline-string
@@ -265,16 +267,16 @@ def svn_timezone_string_local():
 	
 	return s
 
-def scalacon_find_sandbox_freezing_epsec(dirs_source):
-	return scalacon_find_sandbox_freezing_time(dirs_source)[0]
+def scalacon_find_sandbox_freezing_epsec(dirs_source, **args):
+	return scalacon_find_sandbox_freezing_time(dirs_source, **args)[0]
 
-def scalacon_find_sandbox_freezing_utcstr(dirs_source):
-	return scalacon_find_sandbox_freezing_time(dirs_source)[1]
+def scalacon_find_sandbox_freezing_utcstr(dirs_source, **args):
+	return scalacon_find_sandbox_freezing_time(dirs_source, **args)[1]
 
-def scalacon_find_sandbox_freezing_localstr(dirs_source):
-	return scalacon_find_sandbox_freezing_time(dirs_source)[2]
+def scalacon_find_sandbox_freezing_localstr(dirs_source, **args):
+	return scalacon_find_sandbox_freezing_time(dirs_source, **args)[2]
 
-def scalacon_find_sandbox_freezing_time(dirs_source):
+def scalacon_find_sandbox_freezing_time(dirs_source, **args):
 	"""
 	本函数用于解决这样一个问题：
 
@@ -302,12 +304,23 @@ def scalacon_find_sandbox_freezing_time(dirs_source):
 	或者：以编程方式调用 scalacon_find_sandbox_freezing_time() 来得到 svn datetime 字符串。
 
 	"""
-	
+	#
 	# This function will contact svn server internally.
+	#
+	
+	try:
+		allow_sandbox_modification = args['allow_sandbox_modification']
+		# enable this only for testing purpose
+	except KeyError:
+		allow_sandbox_modification = False
+	
+	for rootdir in dirs_source:
+		check_svn_sandbox(rootdir)
 	
 	# Check that there is no local sandbox modification.
-	for rootdir in dirs_source:
-		svn_ensure_no_local_modification(rootdir) # if not, SvnopError is raised.
+	if not allow_sandbox_modification:
+		for rootdir in dirs_source:
+			svn_ensure_no_local_modification(rootdir) # if not, SvnopError is raised.
 	
 	sandboxes = {}
 		# sandboxes['D:/w/myproj'] is again a dict.
@@ -328,13 +341,14 @@ def scalacon_find_sandbox_freezing_time(dirs_source):
 	timestr_local = time.strftime('%Y-%m-%d %H:%M:%S', tmlocal)
 
 	# Check whether sandbox content matches server's at epsec_latest time point.
-	for rootdir in dirs_source:
-		changed_files = svn_diff_timestamp(rootdir, epsec)
-		if changed_files:
-			errmsg = 'The latest files in your sandboxes has (local) timestamp %s, '\
-			'but local content does not exactly match server content.\n'\
-				'Different files are:\n  %s'%(timestr_local, '\n  '.join(changed_files))
-			raise SvnopError(errmsg)
+	if not allow_sandbox_modification:
+		for rootdir in dirs_source:
+			changed_files = svn_diff_timestamp(rootdir, epsec_latest)
+			if changed_files:
+				errmsg = 'The latest files in your sandboxes has (local) timestamp %s, '\
+				'but local content does not exactly match server content.\n'\
+					'Different files are:\n  %s'%(timestr_local, '\n  '.join(changed_files))
+				raise SvnopError(errmsg)
 	
 	localstr_with_timezone = timestr_local +' '+ svn_timezone_string_local()
 	return epsec_latest, timestr_utc, timestr_local
