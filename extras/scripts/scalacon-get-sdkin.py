@@ -7,6 +7,12 @@
 --ini=<ini-filepath>
 	[必须] 描述外来 SDK 的 ini 文件。
 
+--use-svn-checkout
+	[可选] 
+	使用 svn checkout 而非 svn export 来抓取服务器内容。
+	checkout 比 export 会消耗多一倍的磁盘空间，但好处在于中途发生网络中断后可以
+	svn cleanup 后续传。
+
 --force
 	[可选]
 	强制模式。意思是，对于每一条外来 SDK 描述，先将其指示的本地目录清空。
@@ -15,6 +21,8 @@
 	.
 	如果不用 --force, 则不作任何清空动作，且，处理每一个 SDK 条目时，若
 	本地目录已经存在（不管里面的内容如何）就跳过服务端抓取动作。
+	.
+	--force 同时暗示非交互操作。
 
 --self=[<dir-sdkout>]
 	[可选]
@@ -35,6 +43,7 @@
 		--sdkbin-limit=x64
 		--sdkbin-limit=*x64
 	来只取 [sdkin.foo-vc100x64] 小节指定的内容。
+	在 --force 操作时可以用此选项挑出部分 sdk refname 来更新。
 	
 --simulate
 	[可选]
@@ -156,6 +165,8 @@ g_isforce = False
 g_is_do_self = False
 g_is_only_self = False
 g_self_dir_param = ''
+
+g_is_svn_checkout = False
 
 g_cidvers_restrict = []
 
@@ -669,7 +680,10 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 	# step 1.
 	if tmp_svndatetime != ini_svndatetime:
 		# Grab svn server content into .new folder first.
-		svncmd = 'svn export --force "%s@{%s}" "%s"'%(svnurl, ini_svndatetime, dir_refname_new)
+		svncmd = 'svn %s --force "%s@{%s}" "%s"'%( 
+			'checkout' if g_is_svn_checkout else 'export',
+			svnurl, ini_svndatetime, dir_refname_new
+			)
 		print "Running cmd: \n  " + svncmd
 		
 		sys.stdout.flush(); 
@@ -1068,12 +1082,12 @@ def do_getsdks():
 def main():
 	global optdict, g_ini_filepath, g_ini_dir, g_isforce
 	global g_is_do_self, g_is_only_self, g_self_dir_param
-	global g_sdkbin_limits
+	global g_is_svn_checkout, g_sdkbin_limits
 	global g_is_simulate
 
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', 
 		['force', 'ini=', 'self=', 'get-all', 'simulate', 
-		'sdkbin-limit=',
+		'use-svn-checkout', 'sdkbin-limit=',
 		'version'])
 	optdict = dict(optlist)
 	
@@ -1094,6 +1108,9 @@ def main():
 		
 	if '--force' in optdict:
 		g_isforce = True
+		
+	if '--use-svn-checkout' in optdict:
+		g_is_svn_checkout = True
 
 	if '--self' in optdict:
 		g_is_do_self = True
