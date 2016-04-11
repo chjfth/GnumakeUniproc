@@ -410,7 +410,7 @@ ErrNoFileProcessed = 9
 nlssvnhostid='nlssvn'
 nlssvnrooturl='https://nlssvn/svnreps'
 
-srctool_exename = 'srctool-wdk7'
+srctool_exename = 'srctool-wdk7.exe'
 	# WDK7's  'srctool -r' returns 0 on success.
 	# WDK10's 'srctool -r' returns count of source files printed, so 0 means error.
 
@@ -1018,7 +1018,10 @@ def Sew1Pdb(pdbpath):
 	Log("\nStart sewing PDB: %s"%pdbpath)
 
 	try:
-		srclist_ = subprocess.check_output(srctool_cmd)
+		srclist_ = scalacon_svn_op.subprocess_checkoutput_pdbsew_env(srctool_cmd)
+	except scalacon_svn_op.SvnopError as e:
+		Logpe('PDB-sewing execution error! Reason is:\n%s'%(e.errmsg))
+		exit(1)
 	except WindowsError:
 		Logpe("Error: '%s -r' execution fail! Perhaps %s.exe is not in your PATH."%(srctool_exename, srctool_exename))
 		exit(1)
@@ -1098,9 +1101,12 @@ def Sew1Pdb(pdbpath):
 	pdbstr_cmd = 'pdbstr -w -p:"%s" -i:"%s" -s:srcsrv'%(pdbpath, fnstream)
 	Log( "Embedding SRCSRV stream into %s ..."%pdbpath )
 	try:
-		subprocess.check_output(pdbstr_cmd, stderr=subprocess.STDOUT)
+		scalacon_svn_op.subprocess_checkoutput_pdbsew_env(pdbstr_cmd)
+	except scalacon_svn_op.SvnopError as e:
+		Logpe('pdbstr execution error! Reason is:\n%s'%(e.errmsg))
+		exit(1)
 	except WindowsError:
-		Logpe("Error: 'pdbstr' execution fail! Perhaps pdbstr.exe is not in your PATH. You should install Debugging Tools for Windows to obtain it.")
+		Logpe("Error: 'pdbstr' execution fail! Perhaps pdbstr.exe is not in your PATH.")
 		exit(4)
 	except subprocess.CalledProcessError as cpe:
 		Logpe( "%s\n"%cpe.output )

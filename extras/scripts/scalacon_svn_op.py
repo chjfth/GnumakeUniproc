@@ -2,10 +2,13 @@
 # -*- coding: UTF-8 -*-
 
 """
-Big functions:
-* scalacon_find_sandbox_freezing_time
+For all functions here, Error is raise with SvnopError.
 
-Error is raise with SvnopError.
+User functions:
+* scalacon_find_sandbox_freezing_time
+* get_PATH_for_pdbsewing
+* subprocess_checkoutput_pdbsew_env
+
 """
 
 import os
@@ -353,6 +356,51 @@ def scalacon_find_sandbox_freezing_time(dirs_source, **args):
 	localstr_with_timezone = timestr_local +' '+ svn_timezone_string_local()
 	return epsec_latest, timestr_utc, timestr_local
 	
+
+def find_file_in_paths(filename, pathstr):
+	paths = pathstr.split(os.pathsep)
+	for onedir in paths:
+		if os.path.exists( os.path.join(onedir, filename) ):
+			return onedir
+	return None
+
+def get_PATH_for_pdbsewing(dirstart, exe_chk='srctool-wdk7.exe'):
+	"""
+	This function returns the PATH string(can be assigned to PATH env-var later) that contains
+	necessary EXEs to execute PDB-sewing. 
+	
+	dirstart is typically: D:\GMU\GMU-main\umake_cmd\wincmd
+	"""
+
+	# First, search for svn.exe's PATH.
+	svn_at_dir = find_file_in_paths('svn.exe', os.environ['PATH'])
+	if not svn_at_dir:
+		raise SvnopError('svn.exe cannot be found in your PATH env-var.')
+
+	# Second, add pdbsew sub-folder into PATH
+	pdbsew_exe_at_dir = os.path.join(dirstart, 'pdbsew')
+	exepath_chk = os.path.join(pdbsew_exe_at_dir, exe_chk)
+	if not os.path.isfile( exepath_chk ):
+		raise SvnopError('Required executable file cannot be found: %s'%(exepath_chk))
+	
+	return os.pathsep.join([dirstart, pdbsew_exe_at_dir, svn_at_dir])
+
+
+def subprocess_checkoutput_pdbsew_env(shcmd, **args):
+	dir_thispy = os.path.dirname(__file__)
+	newpaths = get_PATH_for_pdbsewing(dir_thispy)
+	if not newpaths:
+		raise SvnopError('Error: pdbsew executables are not found inside %s'%(dir_thispy))
+		
+#	print ">>> newpaths=%s"%(newpaths) #debug
+#	print ">>> shcmd  =%s"%(shcmd) #debug
+
+	newenv = dict(os.environ)
+	newenv['PATH'] = newpaths
+
+	return subprocess.check_output(shcmd, shell=True, env=newenv, **args)
+		# Caller of subprocess_checkoutput_pdbsew_env() should catch subprocess.CalledProcessError as well. 
+
 
 if __name__ == '__main__':
 	dirs_source = [os.path.abspath(dir) for dir in sys.argv[1].split(',')]

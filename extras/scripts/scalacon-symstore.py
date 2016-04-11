@@ -142,6 +142,23 @@ ErrNoFileProcessed = 9
 
 f_ssinput = 'ssinput.txt'
 
+def find_file_in_paths(filename, pathstr):
+	paths = pathstr.split(os.pathsep)
+	for onedir in paths:
+		if os.path.exists( os.path.join(onedir, filename) ):
+			return onedir
+	return None
+
+dir_pys = find_file_in_paths('scalacon-symstore.py', os.getenv('PATH'))
+if not dir_pys:
+	sys.stderr.write('Error: scalacon-symstore.py cannot be found in your PATH. You should install GMU 0.100+ to get that.\n')
+	exit(1)
+sys.path.append(dir_pys)
+
+import scalacon_svn_op # this resides in dir_pys
+
+
+
 def AssertMissingOpt(reqopts, is_print_errmsg=True):
 	global opts
 	# reqopts can be '--xxx=' or '--xxx'
@@ -189,7 +206,10 @@ def CallSymstore_with_filelist(in_pathlist, retry=0):
 		}
 	try:
 		print symstore_cmd
-		subprocess.check_output(symstore_cmd, stderr=subprocess.STDOUT)
+		scalacon_svn_op.subprocess_checkoutput_pdbsew_env(symstore_cmd)
+	except scalacon_svn_op.SvnopError as e:
+		Logpe('symstore execution error! Reason is:\n%s'%(e.errmsg))
+		exit(1)
 	except WindowsError:
 		print "Error: symstore.exe not exist!"
 		exit(4)
