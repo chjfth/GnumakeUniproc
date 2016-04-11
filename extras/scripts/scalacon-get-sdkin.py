@@ -26,9 +26,15 @@
 	[可选]
 	取 sdkin 和 sdkout 。即使用了 --self ， --get-all 也生效。
 
---simulate or -s
+--sdkbin-limit=<refname1>,<refname2>
 	[可选]
-	模拟运行，不进行实际的本地文件操作，仅显示需要进行的动作。
+	限定仅取特定的某些 refname （不需要 sdkin. 和 self. 前缀）。
+	此参数指出的 refname 必须是 INI 中存在的。
+	用途： INI 中有两个小节 [sdkin.foo-vc100] [sdkin.foo-vc100x64] ，默认会全取这两个小节。
+	但如果某个用户工程只想编 64-bit 的程序，那么他可以在 get-sdkin.bat 中指定
+		--sdkbin-limit=foo-vc100x64 
+	来只取 [sdkin.foo-vc100x64] 小节指定的内容。
+	
 
 === >>> INI 格式范例
 
@@ -149,6 +155,8 @@ g_self_dir_param = ''
 
 g_cidvers_restrict = []
 
+g_sdkbin_limit = []
+
 #g_is_simulate = False
 
 DIRNAME_CACHE = '.sdkbin-cache'
@@ -169,6 +177,13 @@ IK_svnurl = 'svnurl'
 IK_localdir = 'localdir'
 
 g_required_subdir_in_sdkin = ['include', 'cidvers' ]
+
+class GetsdkError(Exception):
+	def __init__(self, errmsg):
+		self.errmsg = errmsg
+	def __str__(self):
+		return self.errmsg
+
 
 def cachedirs(sdk_refname):
 	assert os.path.isabs(g_ini_dir)
@@ -293,7 +308,7 @@ def copytree_overwrite(src, dest, ignore=None):
 		force_copyfile(src, dest)
 
 
-def pick_sections(iniobj, g_ini_dir):
+def enume_sections(iniobj, g_ini_dir):
 	sdknames = iniobj.sections()
 	for section in sdknames:
 		if section.startswith('self.') and not g_is_do_self:
@@ -763,68 +778,123 @@ class Action:
 		self.upcache = True # whether update $/sdkbin-cache/<sdk_refname>
 		self.uplocal = True # whether update $/sdkin for current <sdk_refname>
 
-def sdkbin_check_all_local_status(iniobj, ini_dir):
+def pick_sdk_refnames(iniobj, ini_dir):
 	# Check all refname's status, check for errors and print the summary.
-	
+	# Return user-picked refnames via daction dict.
+	daction = {} # dict of Action, daction[sdk_refname]=Action()
+		
 	# check required INI key:
-	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, ini_dir):
+	for section, dsection, sdk_refname, localdir in enume_sections(iniobj, ini_dir):
 		for ik_required in [IK_svndatetime, IK_svnurl, IK_localdir]:
 			if not ik_required in dsection:
-				print 'Scalacon Error: INI section [%s] missing %s= .'%(section, ik_required)
-				exit(30)
-
-	daction = {} # dict of Action, daction[sdk_refname]=Action()
+				raise('Scalacon Error: INI section [%s] missing %s= .'%(section, ik_required))
 	
-	# print summary:
-	print "The following SDK repos are being requested:"
-	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, ini_dir):
-		action = Action()
-		daction[sdk_refname] = action
-		
-		print '[%s] refname="%s"'%(section, sdk_refname)
-		print "  svndatetime: %s"%(dsection[IK_svndatetime])
-		print "  svnurl     : %s"%(dsection[IK_svnurl])
-		print "  localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
-		
-		cached_svndt = check_cached_svndatetime_1refname(dsection, sdk_refname)
-		if cached_svndt==dsection[IK_svndatetime]:
-			action.upcache = False
-			str_cache_status = 'match'
-			cache_state_asterisk = ' '
-		elif cached_svndt=='not_exist':
-			action.upcache = True
-			str_cache_status = 'not exist'
-			cache_state_asterisk = '*'
-		else:
-			action.upcache = True
-			str_cache_status = 'not match(was %s)'%(cached_svndt)
-			cache_state_asterisk = '*'
-		
-		mlocal_sigfile = get_mlocal_sigfile_1refname(localdir, sdk_refname)
+	picked_refnames = []
+		# If empty, it means user cares for all refnames.
+		# If non-empty, it means user only cares for those refnames.
+	
+	is_interactive = not g_isforce
+	is_need_update = False
+	
+	while True:
+		daction = {}
+		all_refnames = []
+		# print summary:
+		print "The following SDK repos are being requested:"
+		for section, dsection, sdk_refname, localdir in enume_sections(iniobj, ini_dir):
 
-		uplocal_reason = [] # may contain multiple reasons
-		if action.upcache==True:
-			action.uplocal = True
-			uplocal_reason.append('cache updated')
-		else:
-			if is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
-				action.uplocal = True
-				uplocal_reason.append('%s updated'%(os.path.split(g_ini_filepath)[1]))
+			all_refnames.append(sdk_refname)
+
+			if is_interactive:
+				if picked_refnames and (not sdk_refname in picked_refnames):
+					continue # skip this refname
+			
+			action = Action()
+			daction[sdk_refname] = action
+			
+			print '[%s] refname="%s"'%(section, sdk_refname)
+			print "  svndatetime: %s"%(dsection[IK_svndatetime])
+			print "  svnurl     : %s"%(dsection[IK_svnurl])
+			print "  localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
+			
+			cached_svndt = check_cached_svndatetime_1refname(dsection, sdk_refname)
+			if cached_svndt==dsection[IK_svndatetime]:
+				action.upcache = False
+				str_cache_status = 'match'
+				cache_state_asterisk = ' '
+			elif cached_svndt=='not_exist':
+				action.upcache = True
+				str_cache_status = 'not exist'
+				cache_state_asterisk = '*'
 			else:
-				action.uplocal = False
-		
-		print ' %sCachestatus: %s'%(
-			cache_state_asterisk, 
-			str_cache_status,
-			)
-		print ' %sLocaldir need update: %s %s'%(
-			'*' if action.uplocal else ' ',
-			'yes' if action.uplocal else 'no', 
-			'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
-			)
-		print '.'
+				action.upcache = True
+				str_cache_status = 'not match(was %s)'%(cached_svndt)
+				cache_state_asterisk = '*'
+			
+			mlocal_sigfile = get_mlocal_sigfile_1refname(localdir, sdk_refname)
 
-	return daction
+			uplocal_reason = [] # may contain multiple reasons
+			if action.upcache==True:
+				action.uplocal = True
+				uplocal_reason.append('cache updated')
+			else:
+				if is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
+					action.uplocal = True
+					uplocal_reason.append('%s updated'%(os.path.split(g_ini_filepath)[1]))
+				else:
+					action.uplocal = False
+			
+			print ' %sCachestatus: %s'%(
+				cache_state_asterisk, 
+				str_cache_status,
+				)
+			print ' %sLocaldir need update: %s %s'%(
+				'*' if action.uplocal else ' ',
+				'yes' if action.uplocal else 'no', 
+				'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
+				)
+			print '.'
+			
+			if action.uplocal:
+				is_need_update = True
+		
+		if is_interactive:
+			def get_answer():
+				while True:
+					a = raw_input('The above SDKs will be updated. Is it OK?[Yes/No/Reset/(filter)]')
+					if a in ['Y','y']:
+						return 'y'
+					elif a in ['N','n']:
+						return 'n'
+					elif a in ['R','r']:
+						return 'r'
+					elif len(a)>1:
+						pattern = a
+						picked_olds = picked_refnames if picked_refnames else all_refnames
+						picked_news = filter(lambda refname:fnmatch.fnmatch(refname,pattern), picked_refnames)
+						if picked_news:
+							return picked_news
+						else:
+							print 'The filter word("%s") matches nothing. Try again.'%(pattern)
+							print
+					else:
+						print 'Invalid input. Valid are single letter y,n,r or more than one letter as filter word, or .'
+						print
+			a = get_answer()
+			if type(a)==type(''):
+				if a=='y':
+					return daction
+				elif a=='n':
+					print 'You answered No. Now quit.'
+					exit(2)
+				elif a=='r':
+					picked_refnames = []
+			else:
+				picked_refnames = a
+		
+		else: # non-interactive
+			return daction
+
 
 
 def store_vcX0_version_hint(localdir):
@@ -883,18 +953,20 @@ def do_getsdks():
 		print 'Scalacon Error: The INI file "%s" does not exist or cannot be opened.'%(g_ini_filepath)
 		exit(1)
 	
-	daction = sdkbin_check_all_local_status(iniobj, g_ini_dir)
-	print
-	if (not g_isforce) and sum([daction[r].uplocal for r in daction])>0:
-		a = raw_input('Your SDK binary needs update. Do it now?[Y/n]')
-		if not a in ['Y', 'y']:
-			print 'You answered No. Now quit.'
-			exit(0)
-
-	for section, dsection, sdk_refname, localdir in pick_sections(iniobj, g_ini_dir):
+	daction = pick_sdk_refnames(iniobj, g_ini_dir) # may do interactive work inside
+		# For any picked refname, daction[refname] is an Action object.
+	assert daction
+	
+	for section, dsection, sdk_refname, localdir in enume_sections(iniobj, g_ini_dir):
 		dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
 	
-		action = daction[sdk_refname] # info collected by sdkbin_check_all_local_status
+		if g_sdkbin_limit and (not sdk_refname in g_sdkbin_limit):
+			continue
+		
+		if not sdk_refname in daction:
+			continue
+	
+		action = daction[sdk_refname] # info collected by pick_sdk_refnames
 	
 		if action.upcache:
 			print '[%s]Creating cache in %s ...'%(section, dircache_this_refname)
@@ -951,11 +1023,11 @@ def do_getsdks():
 def main():
 	global optdict, g_ini_filepath, g_ini_dir, g_isforce
 	global g_is_do_self, g_is_only_self, g_self_dir_param
-#	global g_is_simulate
 
-	optlist,arglist = getopt.getopt(sys.argv[1:], 's', 
-		['force', 'ini=', 'self=', 'get-all', 'simulate', 'version']
-		)
+	optlist,arglist = getopt.getopt(sys.argv[1:], '', 
+		['force', 'ini=', 'self=', 'get-all', 'simulate', 
+		'sdkbin-limit=',
+		'version'])
 	optdict = dict(optlist)
 	
 	if '--version' in optdict:
@@ -970,6 +1042,9 @@ def main():
 		sys.stderr.write('Error: You need to assign an INI file describing the SDKs to get(--ini=xxx.ini).\n')
 		return 1
 		
+	if '--sdkbin-limit' in optdict:
+		g_sdkbin_limit = optdict['--sdkbin-limit'].split(',')
+		
 	if '--force' in optdict:
 		g_isforce = True
 
@@ -982,9 +1057,6 @@ def main():
 		g_is_do_self = True
 		g_is_only_self = False
 
-#	if ('--simulate' in optdict) or ('-s' in optdict):
-#		g_is_simulate = True
-
 	ret = do_getsdks()
 	
 	if ret==0:
@@ -994,5 +1066,9 @@ def main():
 	
 
 if __name__ == '__main__':
-    ret = main()
-    exit(ret)
+	thispy = os.path.basename(__file__)
+	try:
+		ret = main()
+	except GetsdkError as e:
+		sys.stderr.write('%s error: '+e.errmsg+'\n')
+	exit(ret)
