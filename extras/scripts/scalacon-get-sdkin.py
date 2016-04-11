@@ -26,20 +26,24 @@
 	[可选]
 	取 sdkin 和 sdkout 。即使用了 --self ， --get-all 也生效。
 
---sdkbin-limit=<refname1>,<refname2>
+--sdkbin-limit=<filter1>,<filter2>
 	[可选]
 	限定仅取特定的某些 refname （不需要 sdkin. 和 self. 前缀）。
-	此参数指出的 refname 必须是 INI 中存在的。
 	用途： INI 中有两个小节 [sdkin.foo-vc100] [sdkin.foo-vc100x64] ，默认会全取这两个小节。
-	但如果某个用户工程只想编 64-bit 的程序，那么他可以在 get-sdkin.bat 中指定
+	但如果某个用户工程只想编 64-bit 的程序，那么他可以在 get-sdkin.bat 中指定(任一种):
 		--sdkbin-limit=foo-vc100x64 
+		--sdkbin-limit=x64
+		--sdkbin-limit=*x64
 	来只取 [sdkin.foo-vc100x64] 小节指定的内容。
 	
+--simulate
+	[可选]
+	模拟网络失败的情况。此选项供本程序开发者调试用。
 
 === >>> INI 格式范例
 
 [DEFAULT]
-NLSSVN=https://nlssvn/svnreps
+NLSSVN=https://nlssvn.dev.nls/svnreps
 gmb_dirname_sdkin=sdkin
 gmb_dirname_sdkout=sdkout
 
@@ -155,9 +159,9 @@ g_self_dir_param = ''
 
 g_cidvers_restrict = []
 
-g_sdkbin_limit = []
+g_sdkbin_limits = []
 
-#g_is_simulate = False
+g_is_simulate = False
 
 DIRNAME_CACHE = '.sdkbin-cache'
 
@@ -673,7 +677,11 @@ def fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir):
 			# Without this flush, when piping the screen output to tee, I see "svn export"'s output 
 			# come out BEFORE the print content above.
 	
-		ret = subprocess.check_call(shlex.split(svncmd))
+		if g_is_simulate:
+			raise GetsdkError('[Simulate] Network failure on svn command: %s'%(svncmd))
+		else:
+			ret = subprocess.check_call(shlex.split(svncmd))
+		
 		open(fp_svndatetime_tmp, 'wb').write(ini_svndatetime)
 
 	# step 2.
@@ -773,6 +781,22 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 	
 	return True # True: cache->localdir sync should be carried out.
 
+
+def sdk_refname_match_list(refnames, patterns):
+	refname_matches = []
+	for refname in refnames:
+		for pattern in patterns:
+			if ('*' in pattern) or ('?' in pattern):
+				if fnmatch.fnmatch(refname, pattern):
+					refname_matches.append(refname)
+					break
+			else:
+				if refname.find(pattern)>=0:
+					refname_matches.append(refname)
+					break
+	return refname_matches
+
+
 class Action:
 	def __init__(self):
 		self.upcache = True # whether update $/sdkbin-cache/<sdk_refname>
@@ -794,14 +818,18 @@ def pick_sdk_refnames(iniobj, ini_dir):
 		# If non-empty, it means user only cares for those refnames.
 	
 	is_interactive = not g_isforce
-	is_need_update = False
+	is_all_ready = True # assume init True
 	
 	while True:
 		daction = {}
 		all_refnames = []
 		# print summary:
 		print "The following SDK repos are being requested:"
+		idx = 0
 		for section, dsection, sdk_refname, localdir in enume_sections(iniobj, ini_dir):
+
+			if g_sdkbin_limits and (not sdk_refname_match_list([sdk_refname], g_sdkbin_limits)):
+				continue
 
 			all_refnames.append(sdk_refname)
 
@@ -811,11 +839,14 @@ def pick_sdk_refnames(iniobj, ini_dir):
 			
 			action = Action()
 			daction[sdk_refname] = action
-			
-			print '[%s] refname="%s"'%(section, sdk_refname)
-			print "  svndatetime: %s"%(dsection[IK_svndatetime])
-			print "  svnurl     : %s"%(dsection[IK_svnurl])
-			print "  localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
+
+			idx += 1
+			idxshow = "(%d)"%(idx)
+				
+			print '%-4s[%s] refname="%s"'%(idxshow, section, sdk_refname)
+			print "    svndatetime: %s"%(dsection[IK_svndatetime])
+			print "    svnurl     : %s"%(dsection[IK_svnurl])
+			print "    localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
 			
 			cached_svndt = check_cached_svndatetime_1refname(dsection, sdk_refname)
 			if cached_svndt==dsection[IK_svndatetime]:
@@ -836,29 +867,33 @@ def pick_sdk_refnames(iniobj, ini_dir):
 			uplocal_reason = [] # may contain multiple reasons
 			if action.upcache==True:
 				action.uplocal = True
-				uplocal_reason.append('cache updated')
+				uplocal_reason.append('cache will update')
 			else:
 				if is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
 					action.uplocal = True
-					uplocal_reason.append('%s updated'%(os.path.split(g_ini_filepath)[1]))
+					uplocal_reason.append('%s changed'%(os.path.basename(g_ini_filepath)))
 				else:
 					action.uplocal = False
 			
-			print ' %sCachestatus: %s'%(
+			print '  %s Cachestatus: %s'%(
 				cache_state_asterisk, 
 				str_cache_status,
 				)
-			print ' %sLocaldir need update: %s %s'%(
+			print  '  %s Localdir need update: %s %s'%(
 				'*' if action.uplocal else ' ',
 				'yes' if action.uplocal else 'no', 
 				'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
 				)
 			print '.'
-			
+
 			if action.uplocal:
-				is_need_update = True
+				is_all_ready = False
 		
-		if is_interactive:
+		
+		if all_refnames==[]: # user command line passed in bad limit-patterns
+			raise GetsdkError('No matching SDK refnames found. You probably gave wrong --sdkbin-limit=<patterns> .')
+
+		if is_interactive and not is_all_ready:
 			def get_answer():
 				while True:
 					a = raw_input('The above SDKs will be updated. Is it OK?[Yes/No/Reset/(filter)]')
@@ -871,15 +906,22 @@ def pick_sdk_refnames(iniobj, ini_dir):
 					elif len(a)>1:
 						pattern = a
 						picked_olds = picked_refnames if picked_refnames else all_refnames
-						picked_news = filter(lambda refname:fnmatch.fnmatch(refname,pattern), picked_refnames)
+						picked_news = sdk_refname_match_list(picked_olds, [pattern])
 						if picked_news:
+							print
+							print 'OK. SDK repo refname filtered.'
+							print
 							return picked_news
 						else:
-							print 'The filter word("%s") matches nothing. Try again.'%(pattern)
+							print
+							print "The filter word('%s') matches nothing. Try again."%(pattern)
 							print
 					else:
-						print 'Invalid input. Valid are single letter y,n,r or more than one letter as filter word, or .'
-						print
+						print 'Invalid input. Valid are single letter y,n,r or more than one letter as filter word.'
+						print 'Examples:'
+						print '   vc100'
+						print '  *x64'
+						print '   *dev*'
 			a = get_answer()
 			if type(a)==type(''):
 				if a=='y':
@@ -888,6 +930,9 @@ def pick_sdk_refnames(iniobj, ini_dir):
 					print 'You answered No. Now quit.'
 					exit(2)
 				elif a=='r':
+					print
+					print 'OK. SDK repo refname reset.'
+					print
 					picked_refnames = []
 			else:
 				picked_refnames = a
@@ -960,7 +1005,7 @@ def do_getsdks():
 	for section, dsection, sdk_refname, localdir in enume_sections(iniobj, g_ini_dir):
 		dir_sdkcache, dircache_this_refname = cachedirs(sdk_refname)[:2]
 	
-		if g_sdkbin_limit and (not sdk_refname in g_sdkbin_limit):
+		if g_sdkbin_limits and (not sdk_refname_match_list([sdk_refname], g_sdkbin_limits)):
 			continue
 		
 		if not sdk_refname in daction:
@@ -1023,6 +1068,8 @@ def do_getsdks():
 def main():
 	global optdict, g_ini_filepath, g_ini_dir, g_isforce
 	global g_is_do_self, g_is_only_self, g_self_dir_param
+	global g_sdkbin_limits
+	global g_is_simulate
 
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', 
 		['force', 'ini=', 'self=', 'get-all', 'simulate', 
@@ -1043,7 +1090,7 @@ def main():
 		return 1
 		
 	if '--sdkbin-limit' in optdict:
-		g_sdkbin_limit = optdict['--sdkbin-limit'].split(',')
+		g_sdkbin_limits = optdict['--sdkbin-limit'].split(',')
 		
 	if '--force' in optdict:
 		g_isforce = True
@@ -1057,6 +1104,9 @@ def main():
 		g_is_do_self = True
 		g_is_only_self = False
 
+	if '--simulate' in optdict:
+		g_is_simulate = True
+
 	ret = do_getsdks()
 	
 	if ret==0:
@@ -1067,8 +1117,11 @@ def main():
 
 if __name__ == '__main__':
 	thispy = os.path.basename(__file__)
+	errprefix = '%s error: '%(thispy)
 	try:
 		ret = main()
 	except GetsdkError as e:
-		sys.stderr.write('%s error: '+e.errmsg+'\n')
+		sys.stderr.write(errprefix + e.errmsg + '\n')
+		exit(1)
+	
 	exit(ret)
