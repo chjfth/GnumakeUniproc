@@ -856,8 +856,8 @@ def pick_sdk_refnames(iniobj, ini_dir):
 
 			idx += 1
 			idxshow = "(%d)"%(idx)
-				
-			print '%-4s[%s] refname="%s"'%(idxshow, section, sdk_refname)
+			print '%-4s'%(idxshow)
+			print '    [%s] refname="%s"'%(section, sdk_refname)
 			print "    svndatetime: %s"%(dsection[IK_svndatetime])
 			print "    svnurl     : %s"%(dsection[IK_svnurl])
 			print "    localdir   : %s"%( os.path.join(ini_dir, dsection[IK_localdir]))
@@ -889,7 +889,7 @@ def pick_sdk_refnames(iniobj, ini_dir):
 				else:
 					action.uplocal = False
 			
-			print '  %s Cachestatus: %s'%(
+			print '  %s Cache status: %s'%(
 				cache_state_asterisk, 
 				str_cache_status,
 				)
@@ -898,11 +898,11 @@ def pick_sdk_refnames(iniobj, ini_dir):
 				'yes' if action.uplocal else 'no', 
 				'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
 				)
-			print '.'
 
 			if action.uplocal:
 				is_all_ready = False
 		
+		print
 		
 		if all_refnames==[]: # user command line passed in bad limit-patterns
 			raise GetsdkError('No matching SDK refnames found. You probably gave wrong --sdkbin-limit=<patterns> .')
