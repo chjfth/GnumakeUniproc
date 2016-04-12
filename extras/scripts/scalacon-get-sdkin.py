@@ -910,7 +910,7 @@ def pick_sdk_refnames(iniobj, ini_dir):
 		if is_interactive and not is_all_ready:
 			def get_answer():
 				while True:
-					a = raw_input('The above SDKs will be updated. Is it OK?[Yes/No/Reset/(filter)]')
+					a = raw_input('The above SDKs will be updated. Is it OK? [Yes/No/Reset/(filter)] ')
 					if a in ['Y','y']:
 						return 'y'
 					elif a in ['N','n']:
