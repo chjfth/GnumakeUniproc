@@ -190,6 +190,7 @@ SUFFIX_OLD = '.old'
 IK_svndatetime = 'svndatetime'
 IK_svnurl = 'svnurl'
 IK_localdir = 'localdir'
+IK_comment = 'comment'
 
 g_required_subdir_in_sdkin = ['include', 'cidvers' ]
 
@@ -898,6 +899,11 @@ def pick_sdk_refnames(iniobj, ini_dir):
 				'yes' if action.uplocal else 'no', 
 				'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
 				)
+
+			try: 
+				print '    Comment: %s'%(dsection[IK_comment])
+			except KeyError:
+				pass
 
 			if action.uplocal:
 				is_all_ready = False
