@@ -166,7 +166,7 @@ Section "Necessary executables for GnumakeUniproc" NeceExes
 
 SectionEnd
 
-Section "MinGW compiler(2.0) with gcc-3.2" MinGW
+Section /o "MinGW compiler(2.0) with gcc-3.2" MinGW
   SetOverwrite try
   !insertmacro CopyASubdir ${dirname_MinGW}
 SectionEnd
