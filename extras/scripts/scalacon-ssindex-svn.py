@@ -306,10 +306,11 @@ track: 一个轨道。一个轨道是 pdb 中、SRCSRV 流中、SRCSRV 小结下
 	指定此参数时，允许 --dir-pdb 指定的目录不存在，或其中没有发现 PDB 文件。
 	默认不启用此参数，未扫描到 PDB 文件会报错，退出码非零。
 
---whistle
-	[可选]
-	只显示较少的信息。基本上只显示已被成功处理的 .pdb 文件。
-	
+--verbose=<0|1|2>
+	[可选] 默认为 1 级。
+	0 级： 只显示较少的信息。基本上只显示已被成功处理的 .pdb 文件。
+	2 级： 会显示 doth-mapping 冲突信息。
+
 """
 
 import sys
@@ -399,7 +400,7 @@ g_sdkin_hdir = ''
 
 g_dict_doth_mapping = {}
 
-g_iswhistle = False
+g_verbose_level = 1
 
 ErrNoFileProcessed = 9
 
@@ -454,7 +455,7 @@ def Log(s):
 		g_logfile.write(s+'\n')
 
 def Logp(s, whistle_do=False):
-	if (not g_iswhistle) or whistle_do:
+	if g_verbose_level>0 or whistle_do:
 		print s
 	if g_logfile:
 		g_logfile.write(s+'\n')
@@ -463,6 +464,7 @@ def Logpe(s):
 	Logp(s, True)
 
 def Logp_whistle(s):
+	# means Log this info even g_verbose_level=0
 	Logp(s, True)
 
 
@@ -833,6 +835,9 @@ def Sew1Cookie(cookie):
 	
 	elif g_dict_doth_mapping:
 		assert g_sdkin_hdir
+			# Sample: 
+			# g_sdkin_hdir = r'D:\wx3-samples\sdkin\include'
+			# cookie =       r'd:\wx3-samples\sdkin\include\wx\event.h'
 		sdkin_hdir_bsl = g_sdkin_hdir.replace('/', '\\').lower() # bsl: back-slash
 		# magical .h PDB-sewing processing
 		cookie_l = cookie.lower()
@@ -840,10 +845,7 @@ def Sew1Cookie(cookie):
 		if cookie_l.startswith(sdkin_hdir_bsl):
 			cookie_tail = cookie_l[len(sdkin_hdir_bsl):]
 			if cookie_tail in g_dict_doth_mapping:
-				
-#				if len(g_dict_doth_mapping[cookie_tail])>1: #debug
-#					print "###CONFLICT on cookie(%s), ['%s']=%s"%(cookie, cookie_tail, g_dict_doth_mapping[cookie_tail])
-				assert len(g_dict_doth_mapping[cookie_tail])==1
+				check_doth_mapping_tail_conflict(cookie, cookie_tail)
 				s = cookie + '*' + g_dict_doth_mapping[cookie_tail][0]
 #				print '>>>[debug]>>> h-PDB-sewing=%s'%(s) #debug
 				return s
@@ -852,6 +854,27 @@ def Sew1Cookie(cookie):
 	else:
 		return ''
 
+def check_doth_mapping_tail_conflict(cookie, cookie_tail):
+	count = len(g_dict_doth_mapping[cookie_tail])
+	if count==1:
+		return
+	if g_verbose_level<2:
+		return
+	print "  ##Warning: Doth-mapping conflict on cookie tail: %s"%(cookie_tail)
+	print "  ##Current cookie: %s"%(cookie)
+	print "  ##Conflicting sewing info list (count=%d):\n    %s"%(
+		count, 
+		'\n    '.join(g_dict_doth_mapping[cookie_tail])
+		)
+	"""Sample output:
+  ##Warning: Doth-mapping conflict on cookie tail: \wx\event.h
+  ##Current cookie: d:\wx3-samples\sdkin\include\wx\event.h
+  ##Conflicting sewing info list (count=2):
+    nlssvn*https://nlssvn/svnreps*alien/wxwidgets/3.1.0*trunk*include/wx/event.h*2016-04-06 17:07:48 +0800*20160406.170748+0800
+    nlssvn*https://nlssvn/svnreps*alien/wxwidgets/3.1.0*trunk*include/wx/event.h*2016-04-11 12:31:49 +0800*20160411.123149+0800
+"""
+	# Such conflicts are not fatal.
+	# For why this happens, see my comment http://www.evernote.com/l/ABX8Qv7Jw_hJWLh8VONL4PlSynpG-eK56gA/
 
 def append_sstracks_from_streamstxt(ssdict, sstreamtxt):
 	# This function modifies ssdict(a python dict) object.
@@ -958,7 +981,7 @@ cidvers=vc80ppc
 def cherry_pick_srcsrv_tracks(pdbpath):
 	
 	global g_nCherryPicks 
-	if not g_iswhistle:
+	if g_verbose_level>0:
 		print '  -- Sstream cherry picking ...'
 	sstracks_all_dict = {} # use python dict as a easy duplication eliminator
 	
@@ -1011,7 +1034,7 @@ def cherry_pick_srcsrv_tracks(pdbpath):
 
 def Sew1Pdb(pdbpath):
 	pdbpath = os.path.abspath(pdbpath) # pdb filepath
-	if not g_iswhistle:
+	if g_verbose_level>0:
 		print 'PDB-sewing: %s'%(pdbpath)
 	
 	srctool_cmd = '%s -r "%s"'%(srctool_exename, pdbpath)
@@ -1185,7 +1208,7 @@ SRCSRV: end ------------------------------------------------
 	global g_nPdbsSewed
 	g_nPdbsSewed +=1
 
-	if g_iswhistle:
+	if g_verbose_level==0:
 		print 'PDB-sewed : %s'%(pdbpath)
 	else:
 		print '  -- Sewed.' # pdbpath displayed when start sewing this pdbpath
@@ -1315,7 +1338,7 @@ def main():
 	global g_sdkout_hdir, g_sdkin_hdir
 	global g_dirpdb_excludes_solo, g_dirpdb_excludes_multi, g_pdb_excludes
 	global g_dirpdb_includes_solo, g_dirpdb_includes_multi, g_pdb_includes
-	global g_iswhistle
+	global g_verbose_level
 
 	reqopts = ['dir-pdb=', 'dirs-source=' ]
 	optopts = [ 'dir-pdb-exclude-pattern=', 'pdb-exclude-pattern=', 
@@ -1328,7 +1351,7 @@ def main():
 		'pick-sstreams-dirs-from-ini=', 'pick-sstreams-dir-sdkin=',
 		'src-mapping-pdb=', 'src-mapping-svn=', 'src-mapping-from-ini=',
 		'sdkout-doth-localroot=', 'sdkin-doth-localroot=',
-		'allow-empty-scan', 'whistle', 'version'] # optional arguments
+		'allow-empty-scan', 'verbose=', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
 
@@ -1450,8 +1473,8 @@ def main():
 	
 	is_allow_empty_scan = True if '--allow-empty-scan' in opts else False
 	
-	if '--whistle' in opts:
-		g_iswhistle = True
+	if '--verbose' in opts:
+		g_verbose_level = int(opts['--verbose'])
 	
 	if '--logfile' in opts:
 		fnlog = opts['--logfile']
