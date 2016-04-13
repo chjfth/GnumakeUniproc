@@ -100,7 +100,7 @@ def svn_ensure_no_local_modification(rootdir):
 	
 	if changed_list:
 		raise SvnopError(
-			'Your sandbox "%s" has local modifications. Changed entries are:\n  %s'%(
+			'Your sandbox "%s" has some files modified but not yet committed to svn server:\n  %s'%(
 			rootdir,
 			'\n  '.join(changed_list))
 			)
