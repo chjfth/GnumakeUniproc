@@ -101,7 +101,6 @@ for /F "usebackq delims=" %%i IN (`%datetimecmd%`) DO set datetime=%%i
 
 set filepath7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
 set _7zlog=7z.log
-%_7zlog%
 if exist %_7zlog% del %_7zlog%
 
 echo.
@@ -109,7 +108,7 @@ echo Generating SDK package %filepath7z% ...
 
 set cmd7z=7z a %filepath7z% %gmb_thisrepo%/%gmb_dirname_sdkout% %gmb_thisrepo%/websymbols
 
-%cmd7z% %_7zlog% 2>&1
+%cmd7z% > %_7zlog% 2>&1
 if ERRORLEVEL 1 (
 	echo Error executing: %cmd7z%
 	echo See 7z.exe output message in %_7zlog%
