@@ -97,7 +97,9 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     endif
     endif
   else
-    $(info Scalacon info: Example-makefile "%(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s" is skipped for umkvariant(%(umkvariant)s) because you did not tell GMU to build its libraries.)
+    ifeq (1,$(gmu_isFirstLoad)) # so, only display this info once
+      $(info Scalacon info: From example-section [%(section_name)s], Example-makefile "%(dirSdkOut)s/%(examples_copyto)s/%(f_Makefile)s" is skipped for umkvariant(%(umkvariant)s) because you did not tell GMU to build its libraries.)
+    endif
   endif # Check $(_list_cidcver_used) to filter out "not-used [cid,cver]"
 #
 define copy1sdkin_dll_%(refname)s
