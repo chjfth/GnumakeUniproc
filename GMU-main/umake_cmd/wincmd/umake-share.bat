@@ -36,12 +36,17 @@ if "%gmu_WRAPPER_EXISTED%" == "" (
 
 
 
-set tmpbatdir=%~dp0%
-set gmu_DIR_ROOT_bs=%tmpbatdir:\GMU-main\umake_cmd\wincmd\=%
+set tmpbatdir_=%~dp0%
+set gmu_DIR_ROOT_bs=%tmpbatdir_:\GMU-main\umake_cmd\wincmd\=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
 
-REM PATH=%tmpbatdir%;%PATH% // This is unnecessary, because %tmpbatdir% must have been in the PATH, otherwise umake.bat cannot be reached.
+REM PATH=%tmpbatdir_%;%PATH% // This is unnecessary, because %tmpbatdir_% must have been in the PATH, otherwise umake.bat cannot be reached.
+
+if "%gmu_DONT_USE_GOODIES%" == "" (
+REM	We defaultly 
+	call %tmpbatdir_%gmu-goody.bat
+)
 
 call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 
