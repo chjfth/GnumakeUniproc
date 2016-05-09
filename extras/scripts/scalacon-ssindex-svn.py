@@ -415,9 +415,11 @@ srctool_exename = 'srctool-wdk7.exe'
 	# WDK7's  'srctool -r' returns 0 on success.
 	# WDK10's 'srctool -r' returns count of source files printed, so 0 means error.
 
-nlssvn_default_host_table_content="""
+svn_default_host_table_content="""
 nlssvn https://nlssvn/svnreps
 nlssvn https://nlssvn.dev.nls/svnreps
+rdsvr3 https://RDsvr3/svn
+rdsvr3 https://RDsvr3.dev.nls/svn
 """
 
 
@@ -1531,7 +1533,7 @@ def main():
 				Logpe( "Error: Cannot open svn host table file '%s' ."%(fnSvnhostTable) )
 				exit(1)
 	else:
-		svnhosttable_buf = nlssvn_default_host_table_content
+		svnhosttable_buf = svn_default_host_table_content
 
 	Log( "SVN host table has content:\n%s\n"%(svnhosttable_buf) )
 
