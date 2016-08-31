@@ -2,7 +2,7 @@
 setlocal
 if "%1" == "" (
 	echo Please assign a local svn sandbox directory as parameter. 
-	echo If you use Scalacon 2016 style SDK, there should an "sdkin" sub-directory inside.
+	echo If you use Scalacon 2016 style SDK, and you have "D:\myprj\sdkin", you should assign "D:\myprj" .
 	exit /b 1
 )
 
