@@ -1,4 +1,17 @@
-[2016-05-09] setup-gmu-v0.100-pre20.exe
+[2016-09-07] v0.100
+1. r1296-1300,1303-1304,1311
+	A long wished feature, finally gets implemented. When gmu_INTERACTIVE_ERROR_RETRY=1 is set in env, on subprj make error, GMU will prompt you whether you want to retry making the sub-project. So, an error deep from a very large project tree can be retried on the spot without re-launching umake from the root project, great time saver. User can also choose to ignore the failed sub-project. gmupath.bat will set gmu_INTERACTIVE_ERROR_RETRY=1 for you.
+2. r1359,1381 (gmu_WRAPPER_EXISTED)
+	Add a long missing feature: umake*.bat now report meaningful exit code. 0 on success, non-zero on failure. 
+	[Linux Implementation pending.]
+3. r1318,1399
+	An improvement: When some sub-projects have conflict(duplicate) final prjnames, explicitly check for error and assert failure. 
+4. r1353
+	When gmu_DO_SHOW_VERBOSE=1, output a blank line between each C/C++ compile line, better visual effect on console.
+5. Many updates to support Scalacon 2016.
+
+TODO: Quick start guide should be updated to use Microsoft Visual C++ (was MinGW).
+
 
 [2016-01-08] v0.99
 
