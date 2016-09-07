@@ -78,6 +78,10 @@ SYMSTORE: Number of files ignored = 0
 	要求扫描 *.pdb 但排除 *.lib.pdb ，则参数可写为：
 		--pattern-include=*.pdb --pattern-exclude=*.lib.pdb
 
+--pattern-exclude-dir=<ptexc>
+	[可选]
+	告知要排除的目录名通配符。
+
 --tmpdir=<tmpdir>
 	[可选]
 	存放临时文件的目录。若不提供，就用当前目录。
@@ -135,6 +139,8 @@ gar_ptinc = ['*.pdb', '*.exe', '*.dll', '*.sys', '*.ocx']
 	# gar means global array.
 gar_ptexc = ['vc?0.pdb', 'vc??0.pdb', '*.lib.pdb*'] 
 	# Exclude those vc60.pdb, vc80.pdb, vc100.pdb .
+
+gar_ptexc_dir = []
 
 g_allow_empty_scan = False
 
@@ -304,18 +310,25 @@ def DoStart():
 		files_qualify = []
 		for pt in gar_ptinc:
 			files_qualify.extend(fnmatch.filter(files, pt))
-		# Filter-out through each pattern in gar_ptexc[]
+		# Filter-out(reject) through each pattern in gar_ptexc[]
 		files = files_qualify
 		for pt in gar_ptexc:
 			files = [f for f in files if not fnmatch.fnmatch(f, pt)]
 		pickouts += [os.path.abspath(os.path.join(root, f)) for f in files]
-		# Turn these paths into abspath is a must! because ``symstore /o'' will show abs path any way.
+		# Turning these paths into abspath is a must! because ``symstore /o'' will show abs path any way.
 		# Sample symstore line:
 		#
 		#	SYMSTORE MESSAGE: Copying E:\temp\aq_pattern_match\make-sdk\sdk-msvc-all\nlssdk\vc80\lib\aq_pattern_match_D.lib.pdb to h:/temp/tssstore\aq_pattern_match_D.lib.pdb\58D6FA4540704316A6DCB5683EC64684\aq_pattern_match_D.lib.pdb [Force: T, Compress: F]
 		#
 		# --although the paths in ssinput.txt is relative path.
-		# Storing abspath in ssinput.txt benefit us comparing our input path with symstore's feedback.
+		# Storing abspath in ssinput.txt benefits us on comparing our input path with symstore's feedback.
+		
+		# Filter-out(reject) unwanted dir names.
+		for pt in gar_ptexc_dir:
+			### folders = [f for f in folders if not fnmatch.fnmatch(f, pt)] # You CANNOT do this, which will generate a new folder object instead of operating on the original one used for yield.
+			for f in folders:
+				if fnmatch.fnmatch(f, pt):
+					folders.remove(f)
 
 	npickout = len(pickouts)
 	if npickout==0 :
@@ -355,13 +368,13 @@ def SetWildcardList(param):
 	return list
 
 def main():
-	global opts, g_dscan, g_dstore, g_prodn, g_prodv, gar_ptinc, gar_ptexc
+	global opts, g_dscan, g_dstore, g_prodn, g_prodv, gar_ptinc, gar_ptexc, gar_ptexc_dir
 	global g_tmpdir, g_maxretry
 	global g_allow_empty_scan
 
 	reqopts = ['dir-scan=', 'dir-store=']
 	optopts = ['3tier-symstore', 'product-name=', 'product-ver=',
-		'pattern-include=', 'pattern-exclude=', 'tmpdir=', 'max-retry=', 
+		'pattern-include=', 'pattern-exclude=', 'pattern-exclude-dir=', 'tmpdir=', 'max-retry=', 
 		'allow-empty-scan', 'version'] # optional arguments
 	optlist,arglist = getopt.getopt(sys.argv[1:], '', reqopts+optopts)
 	opts = dict(optlist)
@@ -394,6 +407,9 @@ def main():
 
 	if '--pattern-exclude' in opts:
 		gar_ptexc = SetWildcardList(opts['--pattern-exclude'])
+		
+	if '--pattern-exclude-dir' in opts:
+		gar_ptexc_dir = SetWildcardList(opts['--pattern-exclude-dir'])
 
 	if '--allow-empty-scan' in opts:
 		g_allow_empty_scan = True
