@@ -420,7 +420,7 @@ nlssvn https://nlssvn/svnreps
 nlssvn https://nlssvn.dev.nls/svnreps
 rdsvr3 https://RDsvr3/svn
 rdsvr3 https://RDsvr3.dev.nls/svn
-"""
+""" # Please keep the first column(e.g. rdsvr3) small case.
 
 
 SRCSRV_stream_template="""
@@ -557,8 +557,9 @@ def MatchSvnHostId(svnurl):
 	for svnhostid in g_reposietable:
 		# g_reposietable[svnhostid] is a CSvnHostinfo object.
 		for rooturl in g_reposietable[svnhostid].rooturls:
-			if svnurl.startswith(rooturl):
-				g_reposietable[svnhostid].rooturl_prefer = rooturl
+			rooturl_s = rooturl.lower() # s: small case
+			if svnurl.lower().startswith(rooturl_s):
+				g_reposietable[svnhostid].rooturl_prefer = rooturl_s
 				return svnhostid
 	return ''
 
