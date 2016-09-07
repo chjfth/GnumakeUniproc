@@ -30,7 +30,7 @@ if "%DIR_MY_SYMBOL_STORE%" == "" (
 )
 
 echo on
-call scalacon-sandbox-pdbsew %batdir%\..
+call scalacon-sandbox-pdbsew %batdir%
 @echo off
 if ERRORLEVEL 1 (
     exit /b 1
