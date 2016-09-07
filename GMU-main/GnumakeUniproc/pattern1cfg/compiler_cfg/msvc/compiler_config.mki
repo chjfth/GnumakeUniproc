@@ -12,7 +12,7 @@
 # ---- make variables recognized by this mki -----
 # gmp_bc_DEBUG: (bool) Build with debugging info (default is not defined)
 # gmp_bc_UNICODE: (bool) Build with unicode string (default is not defined)
-# gmp_bc_WIN64: (bool) AMD64, (not IA-64) (default is not defined)
+# gmp_bc_WIN64: (bool) AMD64, (not IA-64) (default is not defined) ([2016-09-07] deprecated??)
 # gmp_bc_CRT_STATIC_LIB:
 #	null(default): use CRT as DLL(dynamic linking)
 #	non-null:      use CRT as static library
@@ -21,15 +21,17 @@
 #	EXE_GUI
 #	LIB
 #	DLL
+#	SYS
 #
 #	* bc_ means build-config.
 
 # The following gmp_COMPILER_VER_msvc value is recognize to construct different default 
 # compiler options(if not set, default to vc60):
 # * vc60 // Visual studio 98
-# * vc70 // Visual studio .NET 2002
 # * vc71 // Visual studio .NET 2003
-# * vc80 // Visual studio .NET 2005
+# * vc80 // Visual studio 2005
+# * vc90 // Visual studio 2008
+# * vc100 // Visual studio 2010 
 
 # [2007-01-15] Use gmp_up_WINDLL_MODULE_DEF_FROM_ROOT to assign what def(module definition) file to 
 # use when linking the DLL. Note: gmp_up_WINDLL_MODULE_DEF_FROM_ROOT, as its name implies, 
@@ -44,7 +46,7 @@
 #
 # ----- NOTE 3 -----
 #	After the user has included this mki in his makefile, those make-vars 
-# requried for GnumakeUniproc.mki(e.g. gmu_u_CXX_CMD, gmu_u_LINK_CMD) may have been given
+# required for GnumakeUniproc.mki(e.g. gmu_u_CXX_CMD, gmu_u_LINK_CMD) may have been given
 # some value, therefore do not use = to overwrite them , but using += to append 
 # to them if you want to suppliment more compiler options or linker options.
 
@@ -60,7 +62,7 @@
 # In other word, if you just add, say, --imp to link command bypassing GMU's knowledge, 
 # the output import-lib still can result in
 # having that suffix, whereas the link-output-name reported by _gmu_ut_GetPrjAttr
-# will not -- that causes the parent project fail to find this project's output.
+# will not -- that causes the parent project fail to find sub-project's output.
 #
 # Special Note: Current implementation requires that 
 # * User has done his gmu_DECO_SUFFIX_LINK_OUTPUT before this mki is included, otherwise
@@ -87,7 +89,7 @@ _MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(g
 	# { 
 	#	It is XXX.lib.pdb
 	# }
-	# else // gmp_bc_IMAGE_TYPE==EXE/DLL etc
+	# else // gmp_bc_IMAGE_TYPE==EXE/DLL/SYS etc
 	# {
 	#   If gmp_msvc_WANT_WACKY_PDBNAME is null(the default), XXX.lib/XXX.dll/XXX.exe will have name XXX.pdb .
 	#   If gmp_msvc_WANT_WACKY_PDBNAME is not null, XXX.lib/XXX.dll/XXX.exe will have .pdb appended to form the pdb name, e.g. aq_autotest.exe.pdb .
@@ -156,6 +158,32 @@ endif
 
 #^^^^^^^ gmp_bc_DEBUG ^^^^^^^^^
 
+
+# target-kernel  .........
+
+ifeq ($(_msvc_isTargetKrnl),1)
+
+  # There are some special compiler options for kernel code(kernel driver).
+  # (affects both LIB and SYS)
+
+  cfc_for_Debug_defs =   /DDBG=1
+  cfc_for_Release_defs = /DDBG=0
+	
+  ifeq ($(_msvc_isTargetX64),1)
+    gmp_CFLAGS_MACRO_DEFS_preset += /D_AMD64_
+  endif
+	
+  gmp_CFLAGS_CODE_GEN_preset += /Gz # For x86, use __stdcall by default (no harm for x64 compiler).
+  
+  gmp_CFLAGS_CODE_GEN_preset += /Gm- /GS- /Gy /fp:precise 
+  
+  gmp_CFLAGS_MACRO_DEFS_preset += /D_DDK_ /D_WIN32_WINNT=0x0601
+
+endif
+	
+# target-kernel ^^^^^^^^^^
+
+
 #....... gmp_bc_IMAGE_TYPE ........
 
 gmp_LINKFLAGS_preset += /nologo
@@ -223,8 +251,19 @@ define _gmp_LINK_CMD_EXE_GUI
 	$(gmu_exe_LINK) /subsystem:windows /out:"$@" $(gmp_LINKFLAGS_FOR_ANY_EXE) $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
 endef
 ###### (EXE ALL) ######
-_msvc_LINK_OUTPUT_pdb_EXE += $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
-gmp_LINKFLAGS_FOR_ANY_EXE += /PDB:"$(_msvc_LINK_OUTPUT_pdb_EXE)"
+_msvc_LINK_OUTPUT_pdb_EXE = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+gmp_LINKFLAGS_FOR_ANY_EXE = /PDB:"$(_msvc_LINK_OUTPUT_pdb_EXE)"
+
+
+###### SYS(kernel driver) ######
+_msvc_LINK_OUTPUT_pdb_SYS = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
+gmp_LINKFLAGS_FOR_SYS = /PDB:"$(_msvc_LINK_OUTPUT_pdb_SYS)"
+define _gmp_LINK_CMD_SYS
+	@$(_gmpf_bcfShowLibrariesToLink)
+	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK),$(_p_objliblist))
+	$(gmu_exe_LINK) /subsystem:native /driver /nodefaultlib $(gmp_LINKFLAGS_FOR_SYS) /out:"$@" $(_gmp_LINKFLAGS_final) @$(_p_objliblist)
+endef
+
 
 # <<<<<<<<<<<<<< predefine some gmp_XXX commands 
 
@@ -268,8 +307,7 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'DLL'
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_DLL)
 
-else
-ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
+else ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
 
   gmp_Gp_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
@@ -278,8 +316,7 @@ ifneq (,$(findstring $(gmp_bc_IMAGE_TYPE),EXE_CUI EXE))
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_CUI)
 
-else
-ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
+else ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
 
   gmp_Gp_EXE_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
 
@@ -288,9 +325,25 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
 
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_GUI)
 
-endif # EXE_GUI
-endif # EXE_CUI or EXE
-endif # DLL
+else ifeq '$(gmp_bc_IMAGE_TYPE)' 'SYS' # Windows kernel driver
+
+  gmp_LINKFLAGS_FOR_SYS += /entry:$(if $(gmp_KMDF_DRIVER),FxDriverEntry,DriverEntry)
+
+  ifeq ($(_msvc_isTargetX64),1)
+    gmp_LINKFLAGS_FOR_SYS += /MACHINE:X64
+  else
+    gmp_LINKFLAGS_FOR_SYS += /MACHINE:X86
+  endif
+
+  gmp_Gp_SYS_OUTPUT = $(gmu_Gp_LINK_OUTPUT)
+
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(_msvc_LINK_OUTPUT_pdb_SYS)
+  gmp_MSVC_Gp_LINK_OUTPUT_pdb_SYS = $(gmp_MSVC_Gp_LINK_OUTPUT_pdb)
+
+  gmu_u_LINK_CMD = $(_gmp_LINK_CMD_SYS)
+
+endif # EXE/DLL/SYS
+
 endif # LIB
 
 #^^^^^^^^ gmp_bc_IMAGE_TYPE ^^^^^^^^
@@ -307,7 +360,8 @@ gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
 
 # ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
 
-gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
+ifneq ($(_msvc_isTargetKrnl),1)
+  gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
 	kernel32 user32 gdi32 comdlg32 advapi32 shell32 ShLwApi uuid \
 	winspool ole32 oleaut32 odbc32 odbccp32 \
 	ws2_32 NetAPI32 \
@@ -317,6 +371,15 @@ gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
 	)
 	#	[2006-11-30] Yes, don't use = here, because pattern1-inc-custom-it.mki 
 	# may add some more libs to gmp_bc_SYSLIBS which precedes this statement.
+else 
+  gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
+    WdfDriverEntry WdfLdr wmilib ntoskrnl hal ntstrsafe ksecdd BufferOverflowK wdmsec \
+    )
+  ifneq ($(_msvc_isTargetX64),1)
+    gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,int64 exsup)
+  endif
+endif
+
 
 gmp_bc_syslib_GUI = user32 gdi32 comdlg32
 gmp_bc_syslib_WIN_SYS = winspool shell32 advapi32 ole32 oleaut32

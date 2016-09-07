@@ -7,6 +7,10 @@ endif
 gmp_G_COMPILER_ID_VER = $(gmp_COMPILER_ID)$(gmp_COMPILER_VER_msvc)
 
 
+_msvc_isTargetX64 = $(if $(call gmuf_IsSubString,x64,$(gmp_COMPILER_VER_msvc)),1,)
+	
+_msvc_isTargetKrnl = $(if $(call gmuf_IsSuffixWith,$(gmp_COMPILER_VER_msvc),_krnl),1,)
+
 
 _msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc60 := $(if $(_msvc_vc60ver),1,)
@@ -88,6 +92,7 @@ _msvc_env_vars := $(filter INCLUDE LIB MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(ca
 
 
 ifeq (1,$(_gmu_isUmakeTargetReqCompiler))
+
   # Check whether the env-vars for running Visual C++ command line compiler are OK.
   ifeq '' '$(filter INCLUDE,$(_msvc_env_vars))'
     $(error !GMP!Error: Env-var `INCLUDE' not defined! Please setup the Visual C++ compiler environment first)
@@ -96,13 +101,22 @@ ifeq (1,$(_gmu_isUmakeTargetReqCompiler))
   ifeq '' '$(filter LIB,$(_msvc_env_vars))'
     $(error !GMP!Error: Env-var `LIB' not defined! Please setup the Visual C++ compiler environment first)
   endif
-  ifeq '' '$(filter MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(_msvc_env_vars))'
-    $(error !GMP!Error: Neither MSVSDIR, MSVCDir, MSVCVer nor VCINSTALLDIR is defined! Please setup the Visual C++ compiler environment first)
-      #[2007-03-11] VS2005 sets env-var VCINSTALLDIR, not MSVCDir.
+
+  ifneq ($(_msvc_isTargetKrnl),1) # user layer app
+    ifeq '' '$(filter MSVSDIR MSVCDIR MSVCVER VCINSTALLDIR,$(_msvc_env_vars))'
+      $(error !GMP!Error: Neither MSVSDIR, MSVCDir, MSVCVer nor VCINSTALLDIR is defined! Please setup the Visual C++ compiler environment first)
+        #[2007-03-11] VS2005 sets env-var VCINSTALLDIR, not MSVCDir.
+    endif
+  else
+    # Kernel code
+    # TODO. maybe check DRIVER_INC_PATH
   endif
+
 endif
 
 _gmu_isystem_DIRS_WRAP_QUOTES = $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
+
+
 
 
 gmu_ud_list_SYS_HEADER += 
