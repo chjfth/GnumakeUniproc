@@ -1,5 +1,8 @@
 @echo off
 setlocal
+
+REM This bat is called by sew-and-store.bat .
+
 if "%1" == "" (
 	echo Please assign a local svn sandbox directory as parameter. 
 	echo If you use Scalacon 2016 style SDK, and you have "D:\myprj\sdkin", you should assign "D:\myprj" .
