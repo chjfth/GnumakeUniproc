@@ -679,22 +679,15 @@ def DissectSvnRemain(svnhostid, urm):
 			innard = urm[pos+len(_br_):]
 			return (reposie, branchie, innard)
 		else:
-			if fntable:
-				Logpe(
-					"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loosy method,\n"
-					"- svnurl input     : %s\n"
-					"- svnurl root part : %s\n"
-					"- default branchie : %s\n"	%(
-					input_svnurl, svnrooturl, g_dftbr))
-				exit(3)
-			else:
-				Logpe(
-					"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loosy method,\n"
-					"- svnurl input     : %s\n"
-					"- svnurl root part : %s\n"
-					"- default branchie : %s\n" %(
-					input_svnurl, svnrooturl, g_dftbr))
-				exit(3)
+			#if fntable: ... (old code)
+			Logpe(
+				"Error: Expected reposie table directory not assigned, and reposie cannot be deduced from loose method,\n"
+				"- svnurl input     : %s\n"
+				"- svnurl root part : %s\n"
+				"- default branchie : %s\n" %(
+				input_svnurl, svnrooturl, g_dftbr))
+			Logpe("Solution: You should create a 'trunk' directory inside your SVN path.\n")
+			exit(3)
 	else:
 		# Since not g_allow_loosy_reposie, we have to assert error.
 		Logpe(
