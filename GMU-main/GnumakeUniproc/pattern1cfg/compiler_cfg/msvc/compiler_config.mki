@@ -280,7 +280,8 @@ ifeq '$(gmp_bc_IMAGE_TYPE)' 'LIB'
   define gmu_u_LINK_CMD
 	@echo "$(gmp_ALL_TO_LINK_FOR_LIB)" > $(gmu_Gd_PRJ_GMUTMP)/_ObjsForThisLib.gmp.lst
 	@$(call _cmd_write_objliblist,$(gmp_ALL_TO_LINK_FOR_LIB),$(_p_objliblist))
-	$(gmu_exe_LIB) /nologo /out:"$@" @$(_p_objliblist)
+	$(if $(_msvc_isTargetKrnl),link /lib,$(gmu_exe_LIB)) /nologo /out:"$@" @$(_p_objliblist)
+	  # WDK7 does not provide lib.exe, I have to use `link /lib` instead.
   endef
 
   gmp_MSVC_Gp_LINK_OUTPUT_pdb = $(call _MsvcPdbNameToGen,$(gmu_Gp_LINK_OUTPUT))
