@@ -1405,7 +1405,7 @@ def main():
 		except scalacon_svn_op.SvnopError as e:
 			Logpe('Scalacon Error: Cannot determine PDB-sewing svn datetime. Error reason is:\n%s'%(e.errmsg))
 			exit(1)
-		print 'Scalacon info: Auto determined PDB-sewing datetime is: "%s"'%(g_dtco)
+		print 'Scalacon info: Auto determined PDB-sewing local datetime is: "%s"'%(g_dtco)
 
 	if '--svn-use-export' in opts:
 		g_svn_use_export = True
