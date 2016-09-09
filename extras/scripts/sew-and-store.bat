@@ -32,6 +32,7 @@ echo on
 call scalacon-sandbox-pdbsew %batdir%
 @echo off
 if ERRORLEVEL 1 (
+	echo !!! Error occurred !!!
     exit /b 1
 )
 echo.
@@ -40,23 +41,33 @@ echo on
 scalacon-symstore.py --dir-scan=%batdir% --dir-store=%dir_symstore_here% --3tier-symstore --product-name=%PRODUCT_NAME% --pattern-exclude-dir=symstore/.sdkbin-cache/sdkin*/sdkout*
 @echo off
 if ERRORLEVEL 1 (
+	echo !!! Error occurred !!!
     exit /b 1
 )
 echo.
 
-if "%DIR_MY_SYMBOL_STORE%" == "" goto DO_ZIP
+if "%DIR_MY_SYMBOL_STORE%" == "" (
+	echo Env-var DIR_MY_SYMBOL_STORE is empty, will not merge symstore.
+	goto DO_ZIP
+)
 
 echo Will merge symbol store %dir_symstore_here% -^> %DIR_MY_SYMBOL_STORE%
+
+for %%x in (scalacon-symstore.py) do set tmp_pypath=%%~$PATH:x
+set dir_gmucmd=%tmp_pypath:\scalacon-symstore.py=%
+
 echo on
-symstore add /r /f %dir_symstore_here% /s %DIR_MY_SYMBOL_STORE% /t %PRODUCT_NAME%
+%dir_gmucmd%\pdbsew\symstore add /r /f %dir_symstore_here% /s %DIR_MY_SYMBOL_STORE% /t %PRODUCT_NAME%
 @echo off
 if ERRORLEVEL 1 (
+	echo !!! Error occurred !!!
 	exit /b 1
 )
 
 
 :DO_ZIP
-set path7z=%batdir%\symstore-%PRODUCT_NAME%.7z
+for /F "usebackq delims=" %%i IN (`date_ +%%Y%%m%%d_%%H%%M%%S`) DO set dtstr=%%i
+set path7z=%batdir%\symstore-%PRODUCT_NAME%-%dtstr%.7z
 if exist "%path7z%" del "%path7z%"
 
 pushd %dir_symstore_here%
