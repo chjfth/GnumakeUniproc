@@ -11,6 +11,8 @@ _msvc_isTargetX64 = $(if $(call gmuf_IsSubString,x64,$(gmp_COMPILER_VER_msvc)),1
 	
 _msvc_isTargetKrnl = $(if $(call gmuf_IsSuffixWith,$(gmp_COMPILER_VER_msvc),_krnl),1,)
 
+_msvc_isWDK7APP = $(if $(call gmuf_IsSuffixWith,$(gmp_COMPILER_VER_msvc),_wdk7app),1,)
+
 
 _msvc_vc60ver := $(filter vc60%,$(gmp_COMPILER_VER_msvc))
 _msvc_IsUsing_vc60 := $(if $(_msvc_vc60ver),1,)
