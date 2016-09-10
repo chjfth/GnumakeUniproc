@@ -9,7 +9,8 @@ REM
 REM If you run this bat with no parameter, basedir is your current working directory.
 REM If you explicitly assign a parameter, it will be become basedir.
 REM
-REM Note: Your basedir should be an SVN sandbox for PDB-sewing to work..
+REM Note: Your basedir should be an SVN sandbox for PDB-sewing to work, and only 
+REM source files(.c/.cpp./h. etc) *within* the basedir are recognized for sewing.
 REM
 REM Additionally, you can set env-var 
 REM		DIR_MY_SYMBOL_STORE=D:\MySymbols
