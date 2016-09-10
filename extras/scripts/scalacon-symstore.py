@@ -91,7 +91,7 @@ SYMSTORE: Number of files ignored = 0
 
 --max-retry=<maxretry>
 	[可选]
-    指出允许 symstore 可以重试几次。默认为 3 次。0 表示不重试。
+    指出允许 symstore 可以重试几次。默认为 0。0 表示不重试。
     当用 symstore 处理一个很大的源目录，且存储目标是网络共享文件夹时，失败比较可能
     会发生，因此我设计了代码让 symstore 能够重试。当然每次重试会导致生成一个
     新的 symstore ID。
@@ -133,7 +133,7 @@ g_prodn = 'Unknown-prodname'
 g_prodv = 'Unknown-prodver'
 
 g_tmpdir = '.'
-g_maxretry = 3
+g_maxretry = 0
 
 gar_ptinc = ['*.pdb', '*.exe', '*.dll', '*.sys', '*.ocx']
 	# gar means global array.
@@ -342,7 +342,8 @@ def DoStart():
 	retry = 0
 	while remain:
 		retry+=1
-		if retry>g_maxretry: break
+		if retry>g_maxretry: 
+			break
 		ss_id_end, remain = CallSymstore_with_filelist(remain, retry)
 
 	if retry>g_maxretry :
