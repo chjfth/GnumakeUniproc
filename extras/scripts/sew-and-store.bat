@@ -61,7 +61,7 @@ for %%x in (scalacon-symstore.py) do set tmp_pypath=%%~$PATH:x
 set dir_gmucmd=%tmp_pypath:\scalacon-symstore.py=%
 
 echo on
-%dir_gmucmd%\pdbsew\symstore add /r /f %dir_symstore_here% /s %DIR_MY_SYMBOL_STORE% /t %PRODUCT_NAME%
+%dir_gmucmd%\pdbsew\symstore add /r /f %dir_symstore_here% /s %DIR_MY_SYMBOL_STORE% /t %PRODUCT_NAME% /d symstore-merge.log
 @echo off
 if ERRORLEVEL 1 (
 	echo !!! Error occurred !!!
