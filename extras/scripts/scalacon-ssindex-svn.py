@@ -1566,7 +1566,7 @@ def main():
 			if g_nPdbsFound==0:
 				Logp( prompt+"No matching PDBs found in input directory '%s' ."%(g_dirpdb))
 			elif g_nSourceFilesFound==0:
-				Logp( prompt+"For all scanned PDBs, no associating source files is found in '%s' ."%(g_ds))
+				Logp( prompt+"For all scanned PDBs, no associating source files is found in '%s' ."%(g_ds_list))
 			else:
 				Logp( prompt+"No valid tracks are sewed into any found PDB. "
 					"Probably, no source files associated with your PDBs are in any svn sandbox, "
