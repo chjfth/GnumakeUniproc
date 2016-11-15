@@ -31,15 +31,16 @@ REM: Remove this dir to make a clean output so that it can be copied to our real
 echo Removing old in-place symstore directory %dir_symstore_here%
 rd /s /q %dir_symstore_here%
 
-
-echo on
-call scalacon-sandbox-pdbsew %basedir%
-@echo off
-if ERRORLEVEL 1 (
-	echo !!! Error occurred !!!
-    exit /b 1
+if "%SKIP_SEWING%" == "" (
+	echo on
+	call scalacon-sandbox-pdbsew %basedir%
+	@echo off
+	if ERRORLEVEL 1 (
+		echo !!! Error occurred !!!
+	    exit /b 1
+	)
+	echo.
 )
-echo.
 
 echo on
 scalacon-symstore.py --dir-scan=%basedir% --dir-store=%dir_symstore_here% --3tier-symstore --product-name=%PRODUCT_NAME% --pattern-exclude-dir=symstore/.sdkbin-cache/sdkin*/sdkout*
