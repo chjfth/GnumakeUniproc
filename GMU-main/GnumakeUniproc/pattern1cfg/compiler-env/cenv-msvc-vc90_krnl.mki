@@ -1,0 +1,37 @@
+ifndef __cenv_msvc_vc90_krnl_env_included_
+__cenv_msvc_vc90_krnl_env_included_ := 1
+
+# For WDK710 (bundled with Visual C++ 9.0 SP1 x86 compiler)
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc90_krnl))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc90_krnl is not defined, so I cannot find WDK710 compiler)
+endif
+
+
+_vc90_krnl_val_INCLUDE = $1/inc/api;$1/inc/crt;$1/inc/ddk;$1/inc/wdf/kmdf/1.9;
+_vc90_krnl_val_LIB = $1/lib/win7/i386;$1/lib/wdf/kmdf/i386/1.9;
+_vc90_krnl_val_PATH = $1/bin/x86;$1/bin/x86/x86;$(subst \,/,$(PATH))
+	# Values of the above three are allowed to have spaces.
+	# $1: WDK install dir(root-dir)
+
+
+in_gmpf_LoadCenv_msvc_vc90_krnl = \
+	gmp_COMPILER_VER_msvc=vc90_krnl \
+	MSVSDir="$1" \
+	INCLUDE="$(_vc90_krnl_val_INCLUDE)" \
+	LIB="$(_vc90_krnl_val_LIB)" \
+	PATH="$(_vc90_krnl_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc90_krnl = $(call in_gmpf_LoadCenv_msvc_vc90_krnl,$(gmp_CENV_ROOT_msvc_vc90_krnl))
+
+define def_ExportCenv_vc90_krnl
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc90_krnl)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc90_krnl_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc90_krnl_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc90_krnl_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc90_krnl = $(eval $(call def_ExportCenv_vc90_krnl,$(gmp_CENV_ROOT_msvc_vc90_krnl)))
+
+endif
