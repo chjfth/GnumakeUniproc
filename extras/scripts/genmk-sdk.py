@@ -268,7 +268,7 @@ def GenOneSubprj_in_mc(idx, compiler_id, cidver, planets_cid, planets_cidver='')
     gmu_uv_list_ALL_SUBPRJ += %(refname)s
     %(refname)s_Makefile := %(Makefile_1c)s
     %(refname)s_MakeVarDefines := gmp_COMPILER_ID=%(compiler_id)s gmp_COMPILER_VER_%(compiler_id)s=%(cidver)s \
-      gmb_planets=$(call _get_specific_gmb_planets,%(compiler_id)s,%(cidver)s,%(planets_cid)s,%(planets_cidver)s) \
+      gmb_planets="$(call _get_specific_gmb_planets,%(compiler_id)s,%(cidver)s,%(planets_cid)s,%(planets_cidver)s)" \
       gmb_cidver=%(cidver)s $(gmpf_LoadCenv_%(compiler_id)s_%(cidver)s)
     $(shell echo "%(compiler_id)s,%(cidver)s" >> _cidcver_used.gmu.txt)
   endif
