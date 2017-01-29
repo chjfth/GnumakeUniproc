@@ -380,7 +380,7 @@ ifneq ($(_msvc_isTargetKrnl),1)
 	# may add some more libs to gmp_bc_SYSLIBS which precedes this statement.
 else 
   gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,\
-    WdfDriverEntry WdfLdr wmilib ntoskrnl hal ntstrsafe ksecdd BufferOverflowK wdmsec \
+    WdfDriverEntry WdfLdr RtlVer wmilib ntoskrnl hal ntstrsafe ksecdd BufferOverflowK wdmsec \
     )
   ifneq ($(_msvc_isTargetX64),1)
     gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,int64 exsup)
@@ -392,6 +392,7 @@ gmp_bc_syslib_GUI = user32 gdi32 comdlg32
 gmp_bc_syslib_WIN_SYS = winspool shell32 advapi32 ole32 oleaut32
 gmp_bc_syslib_DATABASE = odbc32 odbccp32
 gmp_bc_syslib_NETWORK = ws2_32
+
 
 # x64 SDK does not have the following libs:
 # RichEd20.lib (VS2005 VS2008)
