@@ -83,7 +83,7 @@ include $(gmu_DIR_GNUMAKEUNIPROC)/$(_dirDefaultCompilerCfg)/bc_deco-mswin.mki
 
 ################################################################################
 
-_MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(gmp_bc_IMAGE_TYPE),LIB),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
+_MsvcPdbNameToGen = $(if $(strip $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(gmp_bc_IMAGE_TYPE),LIB)),$1.pdb,$(call gmuf_ChangeFilenameExt,$1,pdb))
 	# Get the pdb name to generate:
 	# If gmp_bc_IMAGE_TYPE==LIB, 
 	# { 
@@ -97,8 +97,10 @@ _MsvcPdbNameToGen = $(if $(gmp_msvc_WANT_WACKY_PDBNAME)$(call _IsStringEqual,$(g
 
 ################################################################################
 
-gmp_CFLAGS_CODE_GEN_preset += /GR# Enable RTTI
-gmp_CFLAGS_CODE_GEN_preset += /EHsc# exception handling
+gmp_CFLAGS_CODE_GEN_preset += $(if $(call _IsStringEqual,$(gmp_bc_IMAGE_TYPE),SYS),,/GR /EHsc)
+	# KrnlMode: /Gz: default to __stdcall (add later)
+	# UserMode: /GR, Enable RTTI for usermode; /EHsx, enable exception handling
+
 ifneq (,$(gmp_bc_DEBUG))
   gmp_CFLAGS_CODE_GEN_preset += $(if $(isAboveVC7),/RTC1)# Detect 64-bit portability
 endif
@@ -170,7 +172,9 @@ ifeq ($(_msvc_isTargetKrnl),1)
   cfc_for_Release_defs = /DDBG=0
 	
   ifeq ($(_msvc_isTargetX64),1)
-    gmp_CFLAGS_MACRO_DEFS_preset += /D_AMD64_
+    gmp_CFLAGS_MACRO_DEFS_preset += /D_AMD64_ # WDK7 wdm.h explicitly requires this
+  else
+    gmp_CFLAGS_MACRO_DEFS_preset += /D_X86_   # WDK7 wdm.h explicitly requires this
   endif
 	
   gmp_CFLAGS_CODE_GEN_preset += /Gz # For x86, use __stdcall by default (no harm for x64 compiler).
@@ -327,6 +331,8 @@ else ifeq '$(gmp_bc_IMAGE_TYPE)' 'EXE_GUI'
   gmu_u_LINK_CMD = $(_gmp_LINK_CMD_EXE_GUI)
 
 else ifeq '$(gmp_bc_IMAGE_TYPE)' 'SYS' # Windows kernel driver
+
+  gmp_CFLAGS_MACRO_DEFS += /DUNICODE /D_UNICODE
 
   gmp_LINKFLAGS_FOR_SYS += /entry:$(if $(gmp_KMDF_DRIVER),FxDriverEntry,DriverEntry)
 
