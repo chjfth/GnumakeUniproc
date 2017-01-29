@@ -115,7 +115,8 @@ gmp_DECO_DEBUG_FOR_LINK_OUTPUT =
 ############################################################################
 gmu_ud_SRC_ROOT = <root-dir-for-your-source>
 
-dirThisRepo = ../.. # use this to represent your source-code repo root (suggest)
+dirThisRepo = ../..
+	# use this to represent your source-code repo root (suggest)
 
 ############################################################################
 # GMU-var: gmu_up_list_SRC_FROM_ROOT
@@ -148,7 +149,7 @@ gmu_up_list_SRC_FROM_ROOT += <source-file-list>
 #	1. They'll be passed to the compiler through ``-I <dir1> -I <dir2> ...'' .
 #	2. They'll be passed to `$(gmu_GCC_M_PREFIX)gcc -M' in favor of generating hdepend files.
 ############################################################################
-gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> ...
+gmu_ud_list_PRJ_HEADER += # <dir1> <dir2> $(dirThisRepo)/...
 	# Don't write ``-I'' in this var; -I will be prependded automatically.
 
 #gmp_CFLAGS_INCLUDES += # $(addprefix -I,<dir1> <dir2> ...)
