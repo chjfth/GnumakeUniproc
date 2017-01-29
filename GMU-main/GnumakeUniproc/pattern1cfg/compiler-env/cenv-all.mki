@@ -1,6 +1,9 @@
 ifndef __cenv-all_mki_included_
 __cenv-all_mki_included_ := 1
 
+# // This file is old-style, not used since 2016
+# // New style is from those cenv-<ComplerId>-<cidver>.mki .
+
 # All cenv-<compiler-id>-<compiler-ver>.mki in this directory get included.
 
 
