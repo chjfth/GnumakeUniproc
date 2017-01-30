@@ -36,7 +36,7 @@ _temp :=
 ############################################################################
 ############################################################################
 ifndef gmi_RCVC_DONT_WANT_AUTO_RC_HDEP
-	# NOTE! Only when this var defined will .res auto-hdepend take effect!
+	# NOTE! This var suppress .res auto-hdepend generation.
 
 ifeq (,$(gmu_NO_GEN_HDEPEND))
 
