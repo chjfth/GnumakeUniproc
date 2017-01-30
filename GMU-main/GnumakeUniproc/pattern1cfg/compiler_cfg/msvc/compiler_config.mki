@@ -130,7 +130,7 @@ else
 endif
 
 #                                  ........ gmp_bc_UNICODE ........
-ifneq (,$(gmp_bc_UNICODE))
+ifneq (,$(gmp_bc_UNICODE)$(_msvc_isTargetKrnl))
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Unicode_defs)
 else # MBCS 
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Mbcs_defs)
@@ -169,7 +169,7 @@ ifeq ($(_msvc_isTargetKrnl),1)
   # (affects both LIB and SYS)
 
   cfc_for_Debug_defs =   /DDBG=1
-  cfc_for_Release_defs = /DDBG=0
+  cfc_for_Release_defs = # /DDBG=0
 	
   ifeq ($(_msvc_isTargetX64),1)
     gmp_CFLAGS_MACRO_DEFS_preset += /D_AMD64_ # WDK7 wdm.h explicitly requires this
@@ -181,7 +181,8 @@ ifeq ($(_msvc_isTargetKrnl),1)
   
   gmp_CFLAGS_CODE_GEN_preset += /Gm- /GS- /Gy /fp:precise 
   
-  gmp_CFLAGS_MACRO_DEFS_preset += /D_DDK_ /D_WIN32_WINNT=0x0601
+  gmp_CFLAGS_MACRO_DEFS_preset += /D_DDK_ 
+  	# /D_WIN32_WINNT=0x0501 # set this at your Makefile.
 
 endif
 	

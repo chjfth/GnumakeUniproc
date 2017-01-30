@@ -1,0 +1,26 @@
+
+
+stinf_InfFilenameFromInputInx = $(call gmuf_ChangeFilenameExt,$(notdir $1),inf)
+stinf_InfFilepathFromInputInx = $(gmu_Gd_LINK_OUTPUT)/$(call stinf_InfFilenameFromInputInx,$1)
+
+stinf_Gp_list_inf = $(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(call stinf_InfFilepathFromInputInx,$v))
+
+
+stinf_ARCH = $(if $(_msvc_isTargetX64),AMD64,x86)
+
+
+define InxToInfRule
+$$(call stinf_InfFilepathFromInputInx,$1): $$(gmu_ud_SRC_ROOT)/$1
+	@echo "Generate $$(call stinf_InfFilenameFromInputInx,$1) from $$< ..."
+	@$(CP_) "$$<" "$$@_"
+	stampinf -f "$$(subst /,\,$$@_)" -a $$(stinf_ARCH) -v $$(gmi_STINF_INF_VERSION) -k 1.9
+	@$(MV_) "$$@_" "$$@"
+endef
+
+
+$(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(eval $(call InxToInfRule,$v)))
+
+
+.PHONY: stinf_GenerateInfs
+stinf_GenerateInfs: $(stinf_Gp_list_inf)
+
