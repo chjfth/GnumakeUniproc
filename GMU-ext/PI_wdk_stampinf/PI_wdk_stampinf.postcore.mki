@@ -9,16 +9,20 @@ stinf_Gp_list_inf = $(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(call stinf_
 stinf_ARCH = $(if $(_msvc_isTargetX64),AMD64,x86)
 
 
-define InxToInfRule
+define MakeStatementFor1Inf
+
+gmi_SYDO_up_list_SYNC_INF += $$(call stinf_InfFilepathFromInputInx,$1)# Used with PI_sync_devoutput
+
 $$(call stinf_InfFilepathFromInputInx,$1): $$(gmu_ud_SRC_ROOT)/$1
 	@echo "Generate $$(call stinf_InfFilenameFromInputInx,$1) from $$< ..."
 	@$(CP_) "$$<" "$$@_"
 	stampinf -f "$$(subst /,\,$$@_)" -a $$(stinf_ARCH) -v $$(gmi_STINF_INF_VERSION) -k 1.9
 	@$(MV_) "$$@_" "$$@"
-endef
+
+endef # MakeStatementFor1Inf
 
 
-$(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(eval $(call InxToInfRule,$v)))
+$(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(eval $(call MakeStatementFor1Inf,$v)))
 
 
 .PHONY: stinf_GenerateInfs

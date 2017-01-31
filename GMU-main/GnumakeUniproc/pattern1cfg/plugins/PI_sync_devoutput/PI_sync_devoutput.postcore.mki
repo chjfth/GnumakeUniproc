@@ -4,6 +4,8 @@
 gmi_SYDO_up_list_SYNC_HEADERS += $(gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT)
     # gmi_SYDO_up_list_SYNC_HEADER_FROM_ROOT is the old name of gmi_SYDO_up_list_SYNC_HEADERS(GMU v0.93 and prior).
     # We do this so that the old name can still be valid.
+# Makevars for old version compatibility  <<<<<<
+
 ifneq (,$(gmi_SYDO_ud_SYNC_HEADER_ROOT))
   gmi_SYDO_ud_SYNC_HEADER_FROM = $(gmi_SYDO_ud_SYNC_HEADER_ROOT)
 endif
@@ -23,7 +25,10 @@ ifneq (,$(gmi_SYDO_ud_SYNC_EXE_TO))
   gmi_SYDO_up_list_SYNC_EXE += $(gmp_Gp_EXE_OUTPUT)
     # todo: add only if not added yet.
 endif
-# Makevars for old version compatibility  <<<<<<
+ifneq (,$(gmi_SYDO_ud_SYNC_SYS_TO))
+  gmi_SYDO_up_list_SYNC_SYS += $(gmp_Gp_SYS_OUTPUT)
+    # todo: add only if not added yet.
+endif
 
 
 
