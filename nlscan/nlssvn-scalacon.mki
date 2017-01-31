@@ -90,5 +90,21 @@ else # ... some other gmp_COMPILER_ID processing ...
 endif # ifeq, $(gmp_COMPILER_ID)=xxx
 
 
+define _gmpf_IncludeCenv
+ifeq (1,$$(_isNowNotGmuGetPrjAttr))
+  # $1: compiler-id ; $2: cidver
+  tmp_cenvmki := $$(firstword $$(wildcard $$(patsubst %,%/compiler-env/cenv-$1-$2.mki,$(gmp_ud_list_CUSTOM_COMPILER_CFG) $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg)))
+    # find the first cenv-<cid>-<ver>.mki file which contains the compiler-env-vars
+  ifeq (,$$(tmp_cenvmki))
+    $$(error For compiler-id,compiler-ver pair '$1,$2', no cenv-$1-$2.mki file can be found in $(gmp_ud_list_CUSTOM_COMPILER_CFG)/compiler-env or $(gmu_DIR_GNUMAKEUNIPROC)/pattern1cfg/compiler-env)
+  else
+    include $$(tmp_cenvmki)
+  endif
+endif
+endef
+
+gmpf_IncludeCenv = $(eval $(call _gmpf_IncludeCenv,$1,$2))
+
+
 
 endif # ifndef __nlssvn-scalacon-mki-included__
