@@ -1,5 +1,6 @@
 ifndef __PLUGIN_WINRES_LOADED
 __PLUGIN_WINRES_LOADED = 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
 _pluginId_use_winres_msvc := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: RCVC
@@ -55,4 +56,5 @@ gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,$(gmp_bc_syslib_GUI))
 gmi_RCVC_Gp_list_RES = $(_RCVC_REQRES_TO_LINK)
 
 
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 endif #__PLUGIN_WINRES_LOADED

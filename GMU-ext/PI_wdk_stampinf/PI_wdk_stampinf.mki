@@ -1,5 +1,6 @@
 ifndef __PI_wdk_stampinf__loaded
 __PI_wdk_stampinf__loaded := 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
 _pluginId_wdk_stampinf := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: STINF
@@ -47,4 +48,5 @@ gmp_USER_POST_TARGETS += stinf_GenerateInfs
 #gmi_RCVC_Gp_list_RES = $(_RCVC_REQRES_TO_LINK)
 
 
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 endif #__PLUGIN_WINRES_LOADED

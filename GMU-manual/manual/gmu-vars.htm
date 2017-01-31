@@ -642,9 +642,10 @@
     <p>This is also useful for normal GnumakeUniproc users.</p></td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
-    <td align="center">&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>gmu_ud_list_STARTUP_REMOVE_DIRS</td>
+    <td align="center">I</td>
+    <td><p>Lists what directories should be removed on startup of a GMU make process. If some directory cannot be removed, GMU will assert error and stop.</p>
+    <p>User should use&nbsp;+=&nbsp;to append to this list instead of using&nbsp;=&nbsp;to overwrite this list.</p></td>
   </tr>
   <tr>
     <td>gmu_GCC_M_PREFIX</td>
@@ -721,12 +722,6 @@
     <td>&nbsp;</td>
     <td align="center">&nbsp;</td>
     <td>&nbsp;</td>
-  </tr>
-  <tr>
-    <td>gmu_up_list_STARTUP_CLEAR_FILES</td>
-    <td align="center">I</td>
-    <td><p>Tells what files should be cleared(and file modification time updated to current time) just when a build process starts. </p>
-    <p>User should use <code>+=</code> to append to this list instead of using <code>=</code> to overwrite this list. </p></td>
   </tr>
 </table>
 <h2><a name="Pattern1%20defined%20gmuvars"></a>Pattern1 defined gmuvars(gmp_<i>XXX</i>) </h2>
