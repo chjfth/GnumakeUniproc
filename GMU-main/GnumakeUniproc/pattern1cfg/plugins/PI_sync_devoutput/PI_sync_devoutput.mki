@@ -33,6 +33,13 @@ _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 #
 # A special case: When (1) is null and (3) is an absolute filepath, (3) will be copied to (2).
 
+# Tips:
+#
+#	It is suggested to set those gmi_SYDO_ud_SYNC_XXX_TO vars as env-var, so that you don't
+# have to set them every time on make's command line. Or, let the parent project decide
+# what gmi_SYDO_ud_SYNC_XXX_TO should be. -- Yes, gmi_SYDO_ud_SYNC_XXX_TO is a matter of
+# the project's "user", not the project itself.
+
 #User input variables:
 
 # gmi_SYDO_ud_SYNC_HEADER_ROOT (old)
@@ -60,12 +67,6 @@ _pluginId_sync_devoutput := $(gmpv_ThisPluginId)
 	# overwriting fails due to no-force, then cp command will fail causing make to stop.
 	# This can be used if you don't want to overwrite read-only target files.
 
-# Tips:
-#
-#	It is suggested to set those gmi_SYDO_ud_SYNC_XXX_TO vars as env-var, so that you don't
-# have to set them every time on make's command line. Or, let the parent project decide
-# what gmi_SYDO_ud_SYNC_XXX_TO should be. -- Yes, gmi_SYDO_ud_SYNC_XXX_TO is a matter of
-# the project's "user", not the project itself.
 
 gmi_SYDO_CopyDirStruct_HEADER = 1
 	# When "HEADER" is used as placeholder, it is treated specially, i.e. always copy recursively.
