@@ -130,7 +130,7 @@ else
 endif
 
 #                                  ........ gmp_bc_UNICODE ........
-ifneq (,$(gmp_bc_UNICODE)$(_msvc_isTargetKrnl))
+ifneq (,$(gmp_bc_UNICODE))
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Unicode_defs)
 else # MBCS 
   gmp_CFLAGS_MACRO_DEFS_preset += $(cfc_chr_Mbcs_defs)
