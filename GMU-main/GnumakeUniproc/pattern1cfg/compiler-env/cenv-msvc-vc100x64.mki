@@ -15,7 +15,7 @@ _vc100x64_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin/x86_amd64;$1/VC/b
 
 
 in_gmpf_LoadCenv_msvc_vc100x64 = \
-	gmp_COMPILER_VER_msvc=vc100x64 \
+	gmp_COMPILER_ID=msvc gmp_COMPILER_VER_msvc=vc100x64 \
 	MSVSDir="$1" \
 	INCLUDE="$(_vc100x64_val_INCLUDE)" \
 	LIB="$(_vc100x64_val_LIB)" \

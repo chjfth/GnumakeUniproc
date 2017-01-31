@@ -23,7 +23,7 @@ _vc60_val_PATH = $(if $2,$2/Bin;$2/Bin/WinNT;)$1/Common/msdev98/bin;$1/VC98/bin;
 
 
 in_gmpf_LoadCenv_msvc_vc60 = \
-	gmp_COMPILER_VER_msvc=vc60 \
+	gmp_COMPILER_ID=msvc gmp_COMPILER_VER_msvc=vc60 \
 	MSVSDir="$1" MSSdk="$2" \
 	INCLUDE="$(_vc60_val_INCLUDE)" \
 	LIB="$(_vc60_val_LIB)" \

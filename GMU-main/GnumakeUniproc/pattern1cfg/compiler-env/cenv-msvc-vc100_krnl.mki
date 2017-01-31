@@ -9,14 +9,14 @@ endif
 
 _vc100_krnl_val_INCLUDE = $2/inc/api;$2/inc/crt;$2/inc/ddk;$2/inc/wdf/kmdf/1.9;
 _vc100_krnl_val_LIB = $2/lib/wxp/i386;$2/lib/wdf/kmdf/i386/1.9;
-_vc100_krnl_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin;$1/Bin;$2/bin/x86;$(subst \,/,$(PATH))
+_vc100_krnl_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin;$1/Bin;$2/bin/x86;$2/bin/selfsign;$(subst \,/,$(PATH))
 	# Values of the above three are allowed to have spaces.
 	# $1: VS2010 dir
 	# $2: WDK710 install dir(root-dir)
 
 
 in_gmpf_LoadCenv_msvc_vc100_krnl = \
-	gmp_COMPILER_VER_msvc=vc100_krnl \
+	gmp_COMPILER_ID=msvc gmp_COMPILER_VER_msvc=vc100_krnl \
 	MSVSDir="$1" \
 	INCLUDE="$(_vc100_krnl_val_INCLUDE)" \
 	LIB="$(_vc100_krnl_val_LIB)" \

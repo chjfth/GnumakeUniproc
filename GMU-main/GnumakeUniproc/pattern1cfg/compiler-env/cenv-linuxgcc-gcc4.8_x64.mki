@@ -31,7 +31,7 @@ endif
 _linuxgcc_gcc4_8_x64_val_PATH = $1/bin;$(subst \,/,$(PATH))
 
 in_gmpf_LoadCenv_linuxgcc_gcc4.8_x64 = \
-	gmp_COMPILER_VER_linuxgcc=gcc4.8_x64 \
+	gmp_COMPILER_ID=linuxgcc gmp_COMPILER_VER_linuxgcc=gcc4.8_x64 \
 	gmp_GCC_PREFIX=x86_64-pc-linux-gnu- \
 	PATH="$(_linuxgcc_gcc4_8_x64_val_PATH)"
 

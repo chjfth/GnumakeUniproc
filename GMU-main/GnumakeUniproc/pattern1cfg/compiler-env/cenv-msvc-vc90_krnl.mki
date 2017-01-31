@@ -16,7 +16,7 @@ _vc90_krnl_val_PATH = $1/bin/x86;$1/bin/x86/x86;$(subst \,/,$(PATH))
 
 
 in_gmpf_LoadCenv_msvc_vc90_krnl = \
-	gmp_COMPILER_VER_msvc=vc90_krnl \
+	gmp_COMPILER_ID=msvc gmp_COMPILER_VER_msvc=vc90_krnl \
 	MSVSDir="$1" \
 	INCLUDE="$(_vc90_krnl_val_INCLUDE)" \
 	LIB="$(_vc90_krnl_val_LIB)" \
