@@ -1,0 +1,39 @@
+ifndef __cenv_msvc_vc100_krnl_env_included_
+__cenv_msvc_vc100_krnl_env_included_ := 1
+
+# For VS2010+WDK710 x86 compiling of kernel code
+
+ifeq (,$(gmp_CENV_ROOT_msvc_vc100_krnl))
+  $(error !GMP!Error: gmp_CENV_ROOT_msvc_vc100_krnl is not defined, so I cannot find VS2010 compiler and WDK710)
+endif
+
+_vc100_krnl_val_INCLUDE = $2/inc/api;$2/inc/crt;$2/inc/ddk;$2/inc/wdf/kmdf/1.9;
+_vc100_krnl_val_LIB = $2/lib/wxp/i386;$2/lib/wdf/kmdf/i386/1.9;
+_vc100_krnl_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin;$1/Bin;$2/bin/x86;$(subst \,/,$(PATH))
+	# Values of the above three are allowed to have spaces.
+	# $1: VS2010 dir
+	# $2: WDK710 install dir(root-dir)
+
+
+in_gmpf_LoadCenv_msvc_vc100_krnl = \
+	gmp_COMPILER_VER_msvc=vc100_krnl \
+	MSVSDir="$1" \
+	INCLUDE="$(_vc100_krnl_val_INCLUDE)" \
+	LIB="$(_vc100_krnl_val_LIB)" \
+	PATH="$(_vc100_krnl_val_PATH)"
+
+gmpf_LoadCenv_msvc_vc100_krnl = \
+	$(call in_gmpf_LoadCenv_msvc_vc100_krnl,$(gmp_CENV_ROOT_msvc_vc100_krnl)/compilers/VS2010,$(gmp_CENV_ROOT_msvc_vc100_krnl)/WDK710)
+
+define def_ExportCenv_vc100_krnl
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc100_krnl)
+  $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
+  $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc100_krnl_val_INCLUDE))
+  $(call gmuf_AnounceExportEnvvar,LIB := $(_vc100_krnl_val_LIB))
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_vc100_krnl_val_PATH))
+endef
+
+gmpf_ExportCenv_msvc_vc100_krnl = \
+	$(eval $(call def_ExportCenv_vc100_krnl,$(gmp_CENV_ROOT_msvc_vc100_krnl)/compilers/VS2010,$(gmp_CENV_ROOT_msvc_vc100_krnl)/WDK710))
+
+endif
