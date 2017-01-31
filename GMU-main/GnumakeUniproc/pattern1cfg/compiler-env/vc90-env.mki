@@ -1,6 +1,9 @@
 ifndef __vc90-env_included_
 __vc90-env_included_ := 1
 
+##############################################################################
+# NOTE: This file is out-dated, please use cenv-msvc-vc90.mki instead.
+##############################################################################
 
 # For Visual C++ 9.0 (VS2008) 32-bit
 
