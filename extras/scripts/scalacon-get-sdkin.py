@@ -1077,7 +1077,7 @@ def do_getsdks():
 		if action.uplocal:
 			print '[%s]Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir) #!!!
-			print '[%s]Stored localdir: %s'%(section, localdir)
+			print '[%s]Stored in localdir: %s'%(section, localdir)
 			print
 	
 			# Make the exported "include"(.h) files read-only. 
