@@ -157,7 +157,7 @@ import ConfigParser # INI op
 import re
 import fnmatch
 
-version = "1.2"
+version = "1.3"
 optdict = {}
 g_ini_filepath = '' # the config file(in INI format)
 g_ini_dir = ''
