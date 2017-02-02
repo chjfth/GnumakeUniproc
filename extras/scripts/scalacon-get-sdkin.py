@@ -522,6 +522,7 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	for subdir in g_required_subdir_in_sdkin:
 		if subdir=='cidvers':
 			continue # cidvers\vc60, cidvers\vc80 etc will be copied later with special action
+		print '  Storing subdir "%s"'%(subdir)
 		copytree_overwrite(
 			os.path.join(dir_refname, subdir),
 			os.path.join(localdir, subdir))
@@ -530,6 +531,8 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	skips = []
 	count = 0
 	ordered_vcidvers = sorted(mapping.keys())
+	if ordered_vcidvers:
+		print '  Storing subdir "cidvers":'
 	for virtual_cidver in ordered_vcidvers:
 		
 		if g_cidvers_restrict and (not virtual_cidver in g_cidvers_restrict):
@@ -579,7 +582,7 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 	fp_refname_done = os.path.join(localdir, FN_PATTERN_REFNAME_DONE%(sdk_refname))
 	open(fp_refname_done, 'wb') # yes, create an empty file
 	
-	# Generate in dir_refname a copy of FN_CACHED_GET_SDKIN_INI, for later remov-old-file's correct cidver-mapping behavior. 
+	# Generate in dir_refname a copy of FN_CACHED_GET_SDKIN_INI, for later remove-old-file's correct cidver-mapping behavior. 
 	inipath_copy = os.path.join( dir_refname, FN_CACHED_GET_SDKIN_INI )
 	shutil.copyfile(g_ini_filepath, inipath_copy)
 	
@@ -884,7 +887,10 @@ def pick_sdk_refnames(iniobj, ini_dir):
 				action.uplocal = True
 				uplocal_reason.append('cache will update')
 			else:
-				if is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
+				if not os.path.exists(mlocal_sigfile):
+					action.uplocal = True
+					uplocal_reason.append("missing localdir signature '%s'"%(os.path.basename(mlocal_sigfile)))
+				elif is_A_older_than_B(mlocal_sigfile, g_ini_filepath): # special: A(mlocal_sigfile) is consider older if not exist
 					action.uplocal = True
 					uplocal_reason.append('%s changed'%(os.path.basename(g_ini_filepath)))
 				else:
@@ -897,7 +903,7 @@ def pick_sdk_refnames(iniobj, ini_dir):
 			print  '  %s Localdir need update: %s %s'%(
 				'*' if action.uplocal else ' ',
 				'yes' if action.uplocal else 'no', 
-				'(reason: %s)'%(' '.join(uplocal_reason)) if uplocal_reason else ''
+				'(reason: %s)'%(';'.join(uplocal_reason)) if uplocal_reason else ''
 				)
 
 			try: 
@@ -1034,7 +1040,7 @@ def do_getsdks():
 		action = daction[sdk_refname] # info collected by pick_sdk_refnames
 	
 		if action.upcache:
-			print '[%s]Creating cache in %s ...'%(section, dircache_this_refname)
+			print '[%s]Creating cache in "%s" ...'%(section, dircache_this_refname)
 			fetch_sdkcache_1refname(section, dsection, sdk_refname, localdir) #!!!
 		
 		# verify the cache is refreshed, otherwise assert fail.
@@ -1045,7 +1051,7 @@ def do_getsdks():
 		assert dsection[IK_svndatetime] == cached_svndatetime
 
 		go_on_sync = True
-			# I will be false if user cancels it inside clean_old_local_by_old_refname().
+			# It will be false if user cancels it inside clean_old_local_by_old_refname().
 		
 		# Now we are going to clean up the old files in $/sdkin according to refname.old's content
 		if action.upcache:
@@ -1071,6 +1077,7 @@ def do_getsdks():
 		if action.uplocal:
 			print '[%s]Syncing cache to localdir ...'%(section)
 			sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir) #!!!
+			print '[%s]Stored localdir: %s'%(section, localdir)
 			print
 	
 			# Make the exported "include"(.h) files read-only. 
