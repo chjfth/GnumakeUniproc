@@ -9,7 +9,7 @@ endif
 
 _vc100x64_krnl_val_INCLUDE = $2/inc/api;$2/inc/crt;$2/inc/ddk;$2/inc/wdf/kmdf/1.9;
 _vc100x64_krnl_val_LIB = $2/lib/win7/amd64;$2/lib/wdf/kmdf/amd64/1.9;
-_vc100x64_krnl_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin/x86_amd64;$1/VC/bin;$1/Bin;$2/bin/amd64;$2/bin/selfsign;$(subst \,/,$(PATH))
+_vc100x64_krnl_val_PATH = $1/Common7/IDE;$1/Common7/Tools;$1/VC/bin/x86_amd64;$1/VC/bin;$1/Bin;$2/bin/x86;$2/bin/selfsign;$(subst \,/,$(PATH))
 	# Values of the above three are allowed to have spaces.
 	# $1: VS2010 dir
 	# $2: WDK710 install dir(root-dir)
