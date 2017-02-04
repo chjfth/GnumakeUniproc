@@ -10,7 +10,7 @@ endif
 
 _vc90x64_krnl_val_INCLUDE = $1/inc/api;$1/inc/crt;$1/inc/ddk;$1/inc/wdf/kmdf/1.9;
 _vc90x64_krnl_val_LIB = $1/lib/win7/amd64;$1/lib/wdf/kmdf/amd64/1.9;
-_vc90x64_krnl_val_PATH = $1/bin/amd64;$1/bin/x86;$1/bin/x86/amd64;$(subst \,/,$(PATH))
+_vc90x64_krnl_val_PATH = $1/bin/x86/amd64;$1/bin/amd64;$1/bin/x86;$(subst \,/,$(PATH))
 	# Values of the above three are allowed to have spaces.
 	# $1: WDK install dir(root-dir)
 
