@@ -12,11 +12,11 @@ if [ "$?" != 0 ]; then
 	exit 1
 fi
 
-./export-nlscan.sh https://nlssvn/svnreps/makingsys
-if [ "$?" != 0 ]; then
-	echo "SVN export failed!!"
-	exit 1
-fi
+#./export-nlscan.sh https://nlssvn/svnreps/makingsys
+#if [ "$?" != 0 ]; then
+#	echo "SVN export failed!!"
+#	exit 1
+#fi
 
 echo All exports success.
 
