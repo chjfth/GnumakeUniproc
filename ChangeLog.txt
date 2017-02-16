@@ -1,3 +1,10 @@
+[2017-02-16] v0.101
+1. r1468-
+	Support building Windows kernel driver with VS2010 SP1+WDK7.1 . Driver building is identified by a "_krnl" suffix in gmp_COMPILER_VER_msvc, for example: gmp_COMPILER_VER_msvc=vc100x64_krnl, gmp_COMPILER_VER_msvc=vc100_krnl .
+2. r1481
+	New gmu var: gmu_ud_list_STARTUP_REMOVE_DIRS
+
+
 [2016-09-07] v0.100
 1. r1296-1300,1303-1304,1311
 	A long wished feature, finally gets implemented. When gmu_INTERACTIVE_ERROR_RETRY=1 is set in env, on subprj make error, GMU will prompt you whether you want to retry making the sub-project. So, an error deep from a very large project tree can be retried on the spot without re-launching umake from the root project, great time saver. User can also choose to ignore the failed sub-project. gmupath.bat will set gmu_INTERACTIVE_ERROR_RETRY=1 for you.
