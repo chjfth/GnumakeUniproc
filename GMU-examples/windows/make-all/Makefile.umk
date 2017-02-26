@@ -13,7 +13,7 @@ ifndef gmu_PRJ_NAME
 endif
 
 gmu_uv_list_ALL_SUBPRJ = dllfromlib dll-2libs \
-	MFC-with-pch CopyPathExt-all \
+	MFC-with-pch \
 	KeyView2_ansi KeyView2_unicode \
 
 dir_windows = ..
@@ -25,8 +25,8 @@ dll-2libs_Makefile = $(dir_windows)/dll-from-lib/dll-2libs/Makefile.umk
 MFC-with-pch_Makefile = $(dir_windows)/MFC-with-pch/Makefile.umk
 	# where the sub-project's makefile resides
 
-# CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/Makefile.umk
-	# This project fails on VC8+. Error on IContextMenu3 etc.
+CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/Makefile.umk
+	# This project fails on VC8+. Error on IContextMenu3 etc. Just set it aside.
 
 
 KeyView2_ansi_Makefile = $(dir_windows)/KeyView2/Makefile.umk
