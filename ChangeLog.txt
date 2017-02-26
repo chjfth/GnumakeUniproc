@@ -1,8 +1,10 @@
-[2017-02-16] v0.101
+[2017-02-26] v0.101
 1. r1468-
 	Support building Windows kernel driver with VS2010 SP1+WDK7.1 . Driver building is identified by a "_krnl" suffix in gmp_COMPILER_VER_msvc, for example: gmp_COMPILER_VER_msvc=vc100x64_krnl, gmp_COMPILER_VER_msvc=vc100_krnl .
 2. r1481
 	New gmu var: gmu_ud_list_STARTUP_REMOVE_DIRS
+3. r1492
+	Conceptual correction: Rename gmu_WRAPPER_EXISTED to TEEBAT_WRAPPER_EXISTED .
 
 
 [2016-09-07] v0.100
