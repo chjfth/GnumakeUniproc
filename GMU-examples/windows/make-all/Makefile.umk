@@ -25,7 +25,8 @@ dll-2libs_Makefile = $(dir_windows)/dll-from-lib/dll-2libs/Makefile.umk
 MFC-with-pch_Makefile = $(dir_windows)/MFC-with-pch/Makefile.umk
 	# where the sub-project's makefile resides
 
-CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/Makefile.umk
+# CopyPathExt-all_Makefile = $(dir_windows)/CopyPathExt/make-all-variant/Makefile.umk
+	# This project fails on VC8+. Error on IContextMenu3 etc.
 
 
 KeyView2_ansi_Makefile = $(dir_windows)/KeyView2/Makefile.umk
