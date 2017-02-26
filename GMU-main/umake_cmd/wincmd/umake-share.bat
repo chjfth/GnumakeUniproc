@@ -9,10 +9,10 @@ REM My elegant teebat solution, auto-log whole .bat output to tee when this .bat
 REM So,
 REM * If you are the end-user calling this .bat, gmu_LOG_OUTPUT_FILENAME will be generated with the 
 REM   same content on screen.
-REM * If you are using another wrapper bat to run this bat, you should set gmu_WRAPPER_EXISTED=1
+REM * If you are using another wrapper bat to run this bat, you should set TEEBAT_WRAPPER_EXISTED=1
 REM   so that this .bat does not use tee. In other word, your wrapper bat use tee.
 
-if "%gmu_WRAPPER_EXISTED%" == "" (
+if "%TEEBAT_WRAPPER_EXISTED%" == "" (
 
 	if exist %gmu_LOG_OUTPUT_FILENAME_bak% del %gmu_LOG_OUTPUT_FILENAME_bak%
 	if exist %gmu_LOG_OUTPUT_FILENAME_bak% (
@@ -27,7 +27,7 @@ if "%gmu_WRAPPER_EXISTED%" == "" (
 	)
 	
 	REM Now call self with tee.
-	set gmu_WRAPPER_EXISTED=1
+	set TEEBAT_WRAPPER_EXISTED=1
 	call %0 %* 2>&1 | mtee %gmu_LOG_OUTPUT_FILENAME%
 	REM By using pipe on the above CMD line, we cannot be sure of %0's exit code,
 	REM because ERRORLEVEL may indicate %0's exit code or tee's exit code. So we just exit with 0.

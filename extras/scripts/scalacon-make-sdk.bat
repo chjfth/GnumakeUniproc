@@ -58,7 +58,7 @@ if not "%CMD_GETSDKIN%" == "" (
 ) 
 
 @echo on
-set gmu_WRAPPER_EXISTED=1
+set TEEBAT_WRAPPER_EXISTED=1
 REM -- this is important to get correct umaketime exit code.
 
 call umaketime %*
