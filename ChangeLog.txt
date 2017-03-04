@@ -1,5 +1,7 @@
 [2017-XX-XX]
 BUG: gmp_FLAGS_INCLUDES now renames back to gmp_CFLAGS_INCLUDES (otherwise PI_use_pch_msvc fails)
+PENDING: Quick start guid update.
+PENDING: VS2010 cannot run cleanly(=run without install) in Windows 10.
 
 [2017-02-26] v0.101
 1. r1468-
@@ -30,7 +32,7 @@ TODO: Quick start guide should be updated to use Microsoft Visual C++ (was MinGW
 1. r1178-1179,...
 	Overhaul of GMU installer, easier to deploy and run (Windows & Linux)
 	* No need to pre-set gmu_DIR_ROOT env-vars in order to run umake. umake works as long as its directory is listed in PATH.
-	* Excute lgmv from shell now shows exactly what will be seen when umake is run. That is, lgmv & umake share their gmu-vars definition from _gmuenv.bat / _gmuenv.sc .
+	* Execute lgmv from shell now shows exactly what will be seen when umake is run. That is, lgmv & umake share their gmu-vars definition from _gmuenv.bat / _gmuenv.sc .
 	* If you want gmu_ vars in his env explicitly, you just run gmppath.bat or source gmppath.sc .
 2. Windows installation improvement 
 	* Totally abandon storing gmu_XXX env-vars in registry, because, since 0.99, actual gmu-vars are fetched live when umake is launched -- nothing to do with what has been in the env-var table. 
