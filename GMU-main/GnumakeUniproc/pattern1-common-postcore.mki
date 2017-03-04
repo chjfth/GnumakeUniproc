@@ -18,12 +18,5 @@ endif
 
 
 
-# Gmu var FIXes:
-
-gmp_CFLAGS_INCLUDES += $(gmp_FLAGS_INCLUDES)
-	# Now make gmp_FLAGS_INCLUDES and gmp_CFLAGS_INCLUDES synonym, due to a ten-years-old bug from r439.
-
-
-
 endif
 

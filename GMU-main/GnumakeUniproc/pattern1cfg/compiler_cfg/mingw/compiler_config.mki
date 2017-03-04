@@ -168,10 +168,10 @@ endif # LIB
 
 # ................................................
 
-gmp_FLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
+gmp_CFLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
 
-gmu_u_CC_CMD =  $(gmu_exe_CC)  -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $(<cfinal_to_compiler)
-gmu_u_CXX_CMD = $(gmu_exe_CXX) -c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) -o "$@" $(<cfinal_to_compiler)
+gmu_u_CC_CMD =  $(gmu_exe_CC)  -c $(_gmp_CFLAGS_final) $(gmp_CFLAGS_INCLUDES) -o "$@" $(<cfinal_to_compiler)
+gmu_u_CXX_CMD = $(gmu_exe_CXX) -c $(_gmp_CFLAGS_final) $(gmp_CFLAGS_INCLUDES) -o "$@" $(<cfinal_to_compiler)
 
 # ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).
 

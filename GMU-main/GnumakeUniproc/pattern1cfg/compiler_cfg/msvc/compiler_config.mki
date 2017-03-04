@@ -358,11 +358,11 @@ endif # LIB
 
 # ................................................
 
-gmp_FLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
+gmp_CFLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append include-directories 
 
 _vc60_compilee_path_tweak = $(if $(gmu_DO_PASS_FULLPATH_TO_COMPILER),$(subst /,\\,$1),$1)
 
-gmu_u_CC_CMD = $(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) /Fo"$@" \
+gmu_u_CC_CMD = $(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_CFLAGS_INCLUDES) /Fo"$@" \
 	$(if $(_msvc_IsUsing_vc60),$(call _vc60_compilee_path_tweak,$(<cfinal_to_compiler)),$(<cfinal_to_compiler))
 gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
 

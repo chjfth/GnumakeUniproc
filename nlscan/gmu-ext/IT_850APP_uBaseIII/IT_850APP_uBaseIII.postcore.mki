@@ -52,7 +52,7 @@ endef
 ########## >>> Dependency rule: The emu-exe requires Emu850.cpp to be compiled and linked.
 ifeq (msvc,$(gmp_COMPILER_ID))
 
-Compile_emu850_cpp = $(gmu_u_CXX_CMD) #$(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_FLAGS_INCLUDES) /Fo"$@" $<
+Compile_emu850_cpp = $(gmu_u_CXX_CMD)
 
 p_Emu850obj = $(gmu_Gd_OBJ_OUTPUT)/Emu850.obj
 

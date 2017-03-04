@@ -10,11 +10,11 @@ _gmu_isystem_DIRS_WRAP_QUOTES = $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
 	# and these will be passed to ``gcc -M`` telling those are VC++ system header directories.
 
 
-gmp_FLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER))
+gmp_CFLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER))
 	# [Recommended] Using $(gmu_ud_list_PRJ_HEADER) enables GMU's auto-hdepend facility.
 
 # [Required] gmu_u_CC_CMD, .c compile command
-gmu_u_CC_CMD = cl /nologo /c /Zi $(gmp_FLAGS_INCLUDES) /Fo"$(patsubst $(CURDIR)/%,./%,$@)" $<
+gmu_u_CC_CMD = cl /nologo /c /Zi $(gmp_CFLAGS_INCLUDES) /Fo"$(patsubst $(CURDIR)/%,./%,$@)" $<
 
 # [Required] gmu_u_CXX_CMD, .cpp compile command
 gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
