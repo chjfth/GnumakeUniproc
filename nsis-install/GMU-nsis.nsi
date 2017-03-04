@@ -45,7 +45,7 @@ Var isChecked_AddMingwPath ; Keep it null, so that D:\GMU\MinGW2\bin does not go
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "GnumakeUniproc"
-!define GMU_VER "0.101"
+!define GMU_VER "0.102"
 !define PRODUCT_VERSION "${GMU_VER}"
 !define PRODUCT_PUBLISHER "Jimm Chen (chjfth@gmail.com)"
 !define PRODUCT_WEB_SITE "http://gnumakeuniproc.sourceforge.net"

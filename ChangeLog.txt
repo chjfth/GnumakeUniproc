@@ -1,3 +1,6 @@
+[2017-XX-XX]
+BUG: gmp_FLAGS_INCLUDES now renames back to gmp_CFLAGS_INCLUDES (otherwise PI_use_pch_msvc fails)
+
 [2017-02-26] v0.101
 1. r1468-
 	Support building Windows kernel driver with VS2010 SP1+WDK7.1 . Driver building is identified by a "_krnl" suffix in gmp_COMPILER_VER_msvc, for example: gmp_COMPILER_VER_msvc=vc100x64_krnl, gmp_COMPILER_VER_msvc=vc100_krnl .
