@@ -10,10 +10,10 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 # User input vars:
 #	gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT = (must) 
 		# the header file used for precompiling (passed as /Yc 's argument)
-		# Of course, if this header file or files included by this file changes, 
+		# Of course, if [this header file] or [files included by this file] changes, 
 		# the .pch file will be regenerated before compiling any source that
 		# includes this header file.
-		# Normally, this is set to StdAfx.h .
+		# Conventionally, this file is named StdAfx.h .
 
 #	gmi_PCHVC_up_HEADER_FOR_PCH_IN_YOUR_SRC = (optional) # the header name as appeared in 
 		# the `#include "..."' statements in your source file, if you do not
@@ -26,17 +26,20 @@ gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_
 #	gmi_PCHVC_up_list_SRC_DEPPCH_FROM_ROOT = (optional)
 #	gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT = (optional)
 	#	These two vars control which source files should use pch and which should not.
-	# The first, gmi_PCHVC_up_list_SRC_DEPPCH_FROM_ROOT(abbr. srcDepPch) tells which source files
+	#
+	# First, gmi_PCHVC_up_list_SRC_DEPPCH_FROM_ROOT(abbr. srcDepPch) tells which source files
 	# should use pch. If null, it is as if all $(gmu_up_list_SRC_FROM_ROOT) is listed in.
-	# The second, gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT(abbr. srcDontDep) is used to exclude
+	#
+	# Second, gmi_PCHVC_up_list_SRC_DONT_DEPPCH_FROM_ROOT(abbr. srcDontDep) is used to exclude
 	# some source files listed in srcDepPch from using pch. If some file in srcDontDep
 	# is not listed in srcDepPch, that file is just ignored, no error asserted.
+	#
 	#	In most cases when pch is prefered, source files requiring pch is the majority, 
 	# then you'd like to take this strategy: Let srcDepPch be null, and list those minor
 	# files that don't use precompiled header into srcDontDep.
 
 # User's NOTE:
-#	If you want to add your own compiler flags for a project and that flags effect
+#	If you want to add your own compiler flags for a project and that flags affect
 # code generation, you must have it appear in gmp_CFLAGS_CODE_GEN_ALL
 #	gmp_CFLAGS_CODE_GEN_ALL += $(gmp_CFLAGS_CODE_GEN) $(gmp_CXXFLAGS_CODE_GEN) $(gmp_CFLAGS_MACRO_DEFS) $(gmp_CFLAGS_INCLUDES)
 # -- because this plugin use $(gmp_CFLAGS_CODE_GEN_ALL) as compiler flags when precompiling. 
