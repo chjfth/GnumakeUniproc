@@ -36,7 +36,7 @@ if "%SKIP_SEWING%" == "" (
 	call scalacon-sandbox-pdbsew %basedir%
 	@echo off
 	if ERRORLEVEL 1 (
-		echo !!! Error occurred !!!
+		echo !!! Error occurred calling scalacon-sandbox-pdbsew.bat !!!
 	    exit /b 1
 	)
 	echo.
@@ -46,7 +46,7 @@ echo on
 scalacon-symstore.py --dir-scan=%basedir% --dir-store=%dir_symstore_here% --3tier-symstore --product-name=%PRODUCT_NAME% --pattern-exclude-dir=symstore/.sdkbin-cache/sdkin*/sdkout*
 @echo off
 if ERRORLEVEL 1 (
-	echo !!! Error occurred !!!
+	echo !!! Error occurred calling scalacon-symstore.py !!!
     exit /b 1
 )
 echo.
@@ -65,7 +65,7 @@ echo on
 %dir_gmucmd%\pdbsew\symstore add /r /f %dir_symstore_here% /s %DIR_MY_SYMBOL_STORE% /t %PRODUCT_NAME% /d symstore-merge.log
 @echo off
 if ERRORLEVEL 1 (
-	echo !!! Error occurred !!!
+	echo !!! Error occurred calling symstore.exe !!!
 	exit /b 1
 )
 

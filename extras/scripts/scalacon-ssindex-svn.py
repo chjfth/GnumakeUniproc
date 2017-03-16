@@ -632,7 +632,7 @@ def DissectSvnRemain(svnhostid, urm):
 			rtable[reposie] = (gpbr, branchie)
 			# rtable will have reposie(e.g. 'Isyslib/IUartBasic') as index and
 			# a tuple as corresponding value.
-			# tuple[0] is gpbr (null if it does not appear in reposie table file)
+			# tuple[0] is gpbr_xxx (null if it does not appear in reposie table file)
 
 	for reposie in rtable.keys():
 		# Skip this entry if t[0] does not match start of urm
