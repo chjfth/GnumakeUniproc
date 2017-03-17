@@ -2,11 +2,17 @@
 setlocal
 
 call :CheckPath ret symstore.exe
+if not "%ret%" == "" goto STEP2
+  
+PATH=D:\GMU\GMU-main\umake_cmd\wincmd\pdbsew;%PATH%
+
+call :CheckPath ret symstore.exe
 if "%ret%" == "" (
   echo Error: symstore.exe is not in your PATH.
   exit /b 1
 )
 
+:STEP2
 
 if "%4" == "" (
   echo %~n0 ^<pdb-local-dir^> ^<pdb-remote-dir^> ^<product-name^> ^<product-ver^> %5 %6 %7 %8 %9
