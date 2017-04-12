@@ -1,7 +1,7 @@
-[2017-XX-XX]
-BUG: gmp_FLAGS_INCLUDES now renames back to gmp_CFLAGS_INCLUDES (otherwise PI_use_pch_msvc fails)
-PENDING: Quick start guid update.
-PENDING: VS2010 cannot run cleanly(=run without install) in Windows 10.
+[2017-04-12] v0.102
+BUG FIX: gmp_FLAGS_INCLUDES now renames back to gmp_CFLAGS_INCLUDES (otherwise PI_use_pch_msvc fails)
+PENDING: Quick start guide update.
+PENDING: VS2010 cannot run cleanly(=run without install) in Windows 8/10.
 
 [2017-02-26] v0.101
 1. r1468-
