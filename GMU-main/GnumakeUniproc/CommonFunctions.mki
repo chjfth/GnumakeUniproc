@@ -145,6 +145,12 @@ gmuf_ConcateWithChars = $(if $(strip $1),$(call _gmuf_addc,$1,$2))
 	# Output:
 	#	11|22|33
 
+gmuf_shell_exec = $(shell $1 2>/dev/null 1>&2; echo $$?)
+	# $1 is that shell command line to execute; sub-process exit-code is returned as make-var.
+gmu_EXEC_SUCC_0 = 0
+	# ifeq ($(gmu_EXEC_SUCC_0),$(call gmuf_shell_exec,mycmd param1 param2))
+	#   # Do sth with success.
+	# endif
 
 _MkdirIfNotExist = $(if $(wildcard $1),,$(MD_) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
