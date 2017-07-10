@@ -47,9 +47,10 @@ ifeq (,$(strip $(_stmd_ExtNames)))
 endif
 
 
-ifeq (,$(gmi_STMD_DO_NOT_SIGN))
-gmp_USER_POST_TARGETS += stmd_tgt_SignTheseFiles
-endif
+gmp_USER_POST_TARGETS += gmit_STMD_SignTheseFiles
+	# Note: Don't change the name gmit_STMD_SignTheseFiles in future, because user may rely on 
+	# this target-name to ensure that they can do something AFTER code-signing. 
+	# For example, UFCOM needs to do code-signing first, then zip the code-signed directory. 
 
 
 

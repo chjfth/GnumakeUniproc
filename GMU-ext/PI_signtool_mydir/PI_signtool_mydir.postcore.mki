@@ -48,45 +48,16 @@ endef # stmd_MakeTarget_1Candidate
 $(foreach f,$(_stmd_Candidates),$(eval $(call stmd_MakeTarget_1Candidate,$f)))
 
 
-.PHONY: stmd_tgt_SignTheseFiles
-stmd_tgt_SignTheseFiles: $(stmd_list_SignTargets)
-	@echo "Code signing done for gmuprj $(gmu_G_Final_PrjName) ."
-	
+.PHONY: gmit_STMD_SignTheseFiles
+ifeq (,$(gmi_STMD_DO_NOT_SIGN))
+gmit_STMD_SignTheseFiles: $(stmd_list_SignTargets)
+	@echo "Code signing done for gmuprj $(gmu_G_Final_PrjName)."
+else
+gmit_STMD_SignTheseFiles: 
+	@echo "Code signing disabled for gmuprj $(gmu_G_Final_PrjName) due to gmi_STMD_DO_NOT_SIGN=1."
+endif
+
 
 ##############################################################################
 endif # ifeq (1,$(gmu_postcore_isSubPrjDone))
 ##############################################################################
-
-
-
-ifeq (1,0)
-
-stinf_InfFilenameFromInputInx = $(call gmuf_ChangeFilenameExt,$(notdir $1),inf)
-stinf_InfFilepathFromInputInx = $(gmu_Gd_LINK_OUTPUT)/$(call stinf_InfFilenameFromInputInx,$1)
-
-stinf_Gp_list_inf = $(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(call stinf_InfFilepathFromInputInx,$v))
-
-
-stinf_ARCH = $(if $(_msvc_isTargetX64),AMD64,x86)
-
-
-define MakeStatementFor1Inf
-
-gmi_SYDO_up_list_SYNC_INF += $$(call stinf_InfFilepathFromInputInx,$1)# Used with PI_sync_devoutput
-
-$$(call stinf_InfFilepathFromInputInx,$1): $$(gmu_ud_SRC_ROOT)/$1
-	@echo "Generate $$(call stinf_InfFilenameFromInputInx,$1) from $$< ..."
-	@$(CP_) "$$<" "$$@_"
-	stampinf -f "$$(subst /,\,$$@_)" -a $$(stinf_ARCH) -v $$(gmi_STINF_INF_VERSION) -k 1.9
-	@$(MV_) "$$@_" "$$@"
-
-endef # MakeStatementFor1Inf
-
-
-$(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(eval $(call MakeStatementFor1Inf,$v)))
-
-
-.PHONY: stinf_GenerateInfs
-stinf_GenerateInfs: $(stinf_Gp_list_inf)
-
-endif # (1,0)
