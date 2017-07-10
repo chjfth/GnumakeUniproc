@@ -19,9 +19,7 @@ _pluginId_wdk_stampinf := $(gmpv_ThisPluginId)
 # Note: stampinf's '-a x86' or '-a AMD64' is determined automatically via $(_msvc_isTargetX64)
 
 
-ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_wdk_stampinf),postcore)
-endif
 
 
 ifeq (,$(strip $(gmi_STINF_up_list_inx_FROM_ROOT)))
@@ -33,20 +31,7 @@ gmp_USER_POST_TARGETS += stinf_GenerateInfs
 
 
 #gmif_RCVC_RC_to_RES = $(patsubst %.rc,$(gmu_Gd_OBJ_OUTPUT)/%.res,$1)
-#
-#_RCVC_RCdotD_extn = rc.d
-#
-#_RCVC_REQRES_TO_LINK = $(call gmif_RCVC_RC_to_RES,$(gmi_RCVC_up_list_WINRC_FROM_ROOT))
-#gmp_RCVC_Gp_RES = $(_RCVC_REQRES_TO_LINK)
-#
-#_RCVC_p_HDEPEND_FOR_WINRC = $(_RCVC_REQRES_TO_LINK:.res=.$(_RCVC_RCdotD_extn))
-#
-#gmu_up_list_EXTRA_OBJ_TO_LINK_2 += $(_RCVC_REQRES_TO_LINK)
-#
-#gmp_bc_SYSLIBS += $(call gmpf_MakeUpSysLibsToLink,$(gmp_bc_syslib_GUI))
-#
-#gmi_RCVC_Gp_list_RES = $(_RCVC_REQRES_TO_LINK)
-
+#...
 
 endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
-endif #__PLUGIN_WINRES_LOADED
+endif #__PI_wdk_stampinf__loaded
