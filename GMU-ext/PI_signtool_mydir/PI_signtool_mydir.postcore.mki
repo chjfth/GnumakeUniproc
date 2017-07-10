@@ -40,6 +40,7 @@ SignTgt.$1: # Make a copy and sign that copy, finally move the signed copy back.
 	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" /as /fd sha256 $(signtool_param_SHA2_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
   endif
 	@$(CP_) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F) $1
+	@$$(call gmpf_AddCustomActionCount,Code-signed-$$(call gmuf_GetExtName,$1))
 
 endef # stmd_MakeTarget_1Candidate
 
