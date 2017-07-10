@@ -151,6 +151,7 @@ gmu_EXEC_SUCC_0 = 0
 	# ifeq ($(gmu_EXEC_SUCC_0),$(call gmuf_shell_exec,mycmd param1 param2))
 	#   # Do sth with success.
 	# endif
+gmuf_IsShellExecSuccess = $(call _IsStringEqual,$(gmu_EXEC_SUCC_0),$(call gmuf_shell_exec,$1))
 
 _MkdirIfNotExist = $(if $(wildcard $1),,$(MD_) $1)
 gmuf_MkdirIfNotExist = $(_MkdirIfNotExist)
@@ -355,7 +356,7 @@ gmuf_GetStartupDir = $(if $(gmu_ud_STARTUP_DIR),$(gmu_ud_STARTUP_DIR),$(CURDIR))
 	#[2009-03-06] TEMP: not considering cygwin yet
 
 _IsNotVerbose = $(call _IsStringEqual,0,$(gmu_DO_SHOW_VERBOSE))
-_IsVerboseLevel1 = $(call _IsStringEqual,2,$(gmu_DO_SHOW_VERBOSE))$(call _IsStringEqual,1,$(gmu_DO_SHOW_VERBOSE))
+_IsVerboseLevel1 = $(if $(call _IsStringEqual,2,$(gmu_DO_SHOW_VERBOSE))$(call _IsStringEqual,1,$(gmu_DO_SHOW_VERBOSE)),1)
 _IsVerboseLevel2 = $(call _IsStringEqual,2,$(gmu_DO_SHOW_VERBOSE))
 _DoVerbose1 = $(if $(call _IsVerboseLevel1),$1,)
 _DoVerbose2 = $(if $(call _IsVerboseLevel2),$1,)
@@ -768,6 +769,8 @@ _gmu_SHCMD_ALERT_ERROR = $(if $(strip $(gmu_SHCMD_ALERT_ERROR)),$(gmu_SHCMD_ALER
 	# Used when gmu_INTERACTIVE_ERROR_RETRY=1
 
 _gmufe_ShowSubprj_refname_prjname = $$(info $$(_GmuSpace2)[$1] $$($1_Upjname) , $$($1_Prjname))
+
+gmu_postcore_isSubPrjDone = $(if $(strip $(gmu_uv_list_ALL_SUBPRJ)),$(if $(_gmu_isFirstMakeRestart),,1),1)
 
 
 endif # ifndef _CommonFunctions_included 
