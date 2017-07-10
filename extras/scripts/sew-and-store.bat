@@ -29,7 +29,9 @@ set dir_symstore_here=%basedir%\symstore
 
 REM: Remove this dir to make a clean output so that it can be copied to our real symbol server
 echo Removing old in-place symstore directory %dir_symstore_here%
-rd /s /q %dir_symstore_here%
+if exist %dir_symstore_here% (
+	rd /s /q %dir_symstore_here%
+)
 
 if "%SKIP_SEWING%" == "" (
 	echo on
