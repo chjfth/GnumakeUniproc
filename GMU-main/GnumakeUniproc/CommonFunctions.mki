@@ -296,10 +296,10 @@ gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 	# TODO: optimize with $(realpath later)
 
 _gmuf_IsWordInSet_rw = $(foreach w,$2,$(if $(call _IsStringEqual,$w,$1),$1))
-	# Check whether word $1 is word-set $2. Return $1(may be duplicate).
+	# Check whether word $1 is in word-set $2. Return $1(may be duplicate).
 
 gmuf_IsWordInSet_rw = $(firstword $(call _gmuf_IsWordInSet_rw,$1,$2))
-	# Check whether word $1 is word-set $2. Return $1 if yes, null if no.
+	# Check whether word $1 is in word-set $2. Return $1 if yes, null if no.
 	# _rw implies: return word $1.
 	#
 	# This is not the same as $(findstring ) which does not operate on word boundary
@@ -363,6 +363,9 @@ _DoVerbose2 = $(if $(call _IsVerboseLevel2),$1,)
 gmuf_IsVerboseLevel1 = $(_IsVerboseLevel1)
 gmuf_IsVerboseLevel2 = $(_IsVerboseLevel2)
 
+gmu@V1 = $(if $(_IsVerboseLevel1),,@)
+gmu@V2 = $(if $(_IsVerboseLevel2),,@)
+	# GMU 0.103, see PI_signtool_mydir.postcore.mki for example.
 
 _gmuDotList = . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 _gmuAtcList = $(subst .,@,$(_gmuDotList))

@@ -1,0 +1,91 @@
+##############################################################################
+ifeq (1,$(gmu_postcore_isSubPrjDone)) # ONLY include following code when no-subprjs or all subprjs done.
+##############################################################################
+
+signtool_param_SHA1_Timestamp = /t http://timestamp.verisign.com/scripts/timstamp.dll
+signtool_param_SHA2_Timestamp = /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /td sha256 
+
+gmif_stmd_IsSigned = $(call gmuf_IsShellExecSuccess,signtool verify /pa $1)
+
+gmif_IsSHA2Signable = $(if $(call gmuf_IsWordInSet,$(call gmuf_GetExtName,$1),$(_stmd_ExtNames_onlySHA1)),,1)
+	# $1: a filepath to be signed. Check it extname to know whether it is SHA2 signable. For example: .cat and .msi are not.
+
+_stmd_SignPromptPrefix = $(if $(call gmif_IsSHA2Signable,$1),SHA1+SHA2,SHA1)
+
+_is_singtool_verbose = $(if $(gmuf_IsVerboseLevel2),/v)
+
+_stmd_Candidates = $(foreach d,$(gmi_STMD_ud_list_TOSIGN_FROM_ROOT),\
+	$(foreach extname,$(_stmd_ExtNames),$(wildcard $d/*.$(extname)))\
+	)
+
+stmd_list_SignTargets := # to append later
+
+define stmd_MakeTarget_1Candidate
+
+ifneq (1,$$(call gmif_stmd_IsSigned,$1))
+  stmd_list_SignTargets += SignTgt.$1
+else
+  ifeq (1,$(gmuf_IsVerboseLevel2))
+    $$(info STMD: Skip already-signed: $1  [[$(gmu_postcore_isSubPrjDone)]])
+  endif
+endif
+
+.PHONY: SignTgt.$1
+SignTgt.$1: # Make a copy and sign that copy, finally move the signed copy back.
+	@echo ""
+	@echo "STMD: >>> $$(call _stmd_SignPromptPrefix,$1) Code signing $1 ..."
+	@$(CP_) $1 $$(gmu_Gd_PRJ_GMUTMP)
+	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" $(signtool_param_SHA1_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
+  ifeq (1,$$(call gmif_IsSHA2Signable,$1)) # will use '/as' to append SHA2 signnature
+	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" /as /fd sha256 $(signtool_param_SHA2_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
+  endif
+	@$(CP_) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F) $1
+
+endef # stmd_MakeTarget_1Candidate
+
+
+$(foreach f,$(_stmd_Candidates),$(eval $(call stmd_MakeTarget_1Candidate,$f)))
+
+
+.PHONY: stmd_tgt_SignTheseFiles
+stmd_tgt_SignTheseFiles: $(stmd_list_SignTargets)
+	@echo "Code signing done for gmuprj $(gmu_G_Final_PrjName) ."
+	
+
+##############################################################################
+endif # ifeq (1,$(gmu_postcore_isSubPrjDone))
+##############################################################################
+
+
+
+ifeq (1,0)
+
+stinf_InfFilenameFromInputInx = $(call gmuf_ChangeFilenameExt,$(notdir $1),inf)
+stinf_InfFilepathFromInputInx = $(gmu_Gd_LINK_OUTPUT)/$(call stinf_InfFilenameFromInputInx,$1)
+
+stinf_Gp_list_inf = $(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(call stinf_InfFilepathFromInputInx,$v))
+
+
+stinf_ARCH = $(if $(_msvc_isTargetX64),AMD64,x86)
+
+
+define MakeStatementFor1Inf
+
+gmi_SYDO_up_list_SYNC_INF += $$(call stinf_InfFilepathFromInputInx,$1)# Used with PI_sync_devoutput
+
+$$(call stinf_InfFilepathFromInputInx,$1): $$(gmu_ud_SRC_ROOT)/$1
+	@echo "Generate $$(call stinf_InfFilenameFromInputInx,$1) from $$< ..."
+	@$(CP_) "$$<" "$$@_"
+	stampinf -f "$$(subst /,\,$$@_)" -a $$(stinf_ARCH) -v $$(gmi_STINF_INF_VERSION) -k 1.9
+	@$(MV_) "$$@_" "$$@"
+
+endef # MakeStatementFor1Inf
+
+
+$(foreach v,$(gmi_STINF_up_list_inx_FROM_ROOT),$(eval $(call MakeStatementFor1Inf,$v)))
+
+
+.PHONY: stinf_GenerateInfs
+stinf_GenerateInfs: $(stinf_Gp_list_inf)
+
+endif # (1,0)

@@ -1,0 +1,57 @@
+ifndef __PI_signtool_mydir__loaded
+__PI_signtool_mydir__loaded := 1
+ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+
+_pluginId_signtool_mydir := $(gmpv_ThisPluginId)
+	# Plugin ID abbreviation: STMD
+
+# This plugin calls signtool.exe to sign EXE/DLL/SYS/CAT(signable files).
+# * Already signed files are skipped.
+
+# User input vars:
+
+# gmi_STMD_ud_list_TOSIGN_FROM_ROOT = (must)
+	# List directories containing signable files, relative to $(gmu_ud_SRC_ROOT) . 
+	# Currently, this plugin does not recurse into subdirs.
+
+# gmi_STMD_u_SIGNTOOL_CERTNAME = (must)
+	# This is the code-signing certificate name(or partial name) from Windows certificate store.
+	# It is passed to signtool.exe's /n parameter.
+
+# gmi_STMD_u_list_EXTNAME = (optional)
+	# Limit signing to these extension names. List extnames separated by spaces.
+
+# gmi_STMD_DO_NOT_SIGN = 
+	# If set to 1, code-signing action is disabled.
+
+_stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
+	exe dll sys cat msi \
+	)
+
+_stmd_ExtNames_onlySHA1 = cat msi
+
+
+gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_signtool_mydir),postcore)
+
+
+ifeq (,$(strip $(gmi_STMD_ud_list_TOSIGN_FROM_ROOT)))
+  $(error Error from PI_signtool_mydir.mki: You do not tell which directories contain files to sign(empty gmi_STMD_ud_list_TOSIGN_FROM_ROOT value))
+endif
+
+ifeq (,$(strip $(gmi_STMD_u_SIGNTOOL_CERTNAME)))
+  $(error Error from PI_signtool_mydir.mki: gmi_STMD_u_SIGNTOOL_CERTNAME must not be empty, it is the value passed to signtool's /n parameter)
+endif
+
+ifeq (,$(strip $(_stmd_ExtNames)))
+  $(error Error from PI_signtool_mydir.mki: You assign an empty gmi_STMD_u_list_EXTNAME value)
+endif
+
+
+ifeq (,$(gmi_STMD_DO_NOT_SIGN))
+gmp_USER_POST_TARGETS += stmd_tgt_SignTheseFiles
+endif
+
+
+
+endif # ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
+endif #__PI_signtool_mydir__loaded
