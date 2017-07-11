@@ -25,6 +25,17 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 # gmi_STMD_DO_NOT_SIGN = 
 	# If set to 1, code-signing action is disabled.
 
+# gmi_STMD_URL_TIMESTAMP_SHA1 =
+	# (optional)
+
+# gmi_STMD_URL_TIMESTAMP_SHA2 =
+	# (optional)
+
+stmd_UrlTimestampSHA1 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA1),$(gmi_STMD_URL_TIMESTAMP_SHA1),http://timestamp.verisign.com/scripts/timstamp.dll)
+stmd_UrlTimestampSHA2 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA2),$(gmi_STMD_URL_TIMESTAMP_SHA2),http://sha256timestamp.ws.symantec.com/sha256/timestamp)
+
+
+
 _stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
 	exe dll sys cat msi \
 	)
