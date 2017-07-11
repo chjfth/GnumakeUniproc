@@ -13,6 +13,7 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 # gmi_STMD_ud_list_TOSIGN_FROM_ROOT = (must)
 	# List directories containing signable files, relative to $(gmu_ud_SRC_ROOT) . 
 	# Currently, this plugin does not recurse into subdirs.
+	# Special note: Do NOT prefix the dirs with $(CURDIR), which will cause make-error.
 
 # gmi_STMD_u_SIGNTOOL_CERTNAME = (must)
 	# This is the code-signing certificate name(or partial name) from Windows certificate store.

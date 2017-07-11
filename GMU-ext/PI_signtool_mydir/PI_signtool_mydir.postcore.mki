@@ -26,7 +26,7 @@ ifneq (1,$$(call gmif_stmd_IsSigned,$1))
   stmd_list_SignTargets += SignTgt.$1
 else
   ifeq (1,$(gmuf_IsVerboseLevel2))
-    $$(info STMD: Skip already-signed: $1  [[$(gmu_postcore_isSubPrjDone)]])
+    $$(info STMD: Skip already-signed: $1)
   endif
 endif
 
