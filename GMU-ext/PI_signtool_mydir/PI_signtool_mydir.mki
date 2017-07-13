@@ -43,7 +43,14 @@ _stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
 _stmd_ExtNames_onlySHA1 = cat msi
 
 
+ifeq (,$(gmi_STMD_DO_NOT_SIGN))
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_signtool_mydir),postcore)
+else
+gmit_STMD_SignTheseFiles: 
+	@echo "Code signing disabled for gmuprj $(gmu_G_Final_PrjName) due to gmi_STMD_DO_NOT_SIGN=1."
+endif
+
+
 
 
 ifeq (,$(strip $(gmi_STMD_ud_list_TOSIGN_FROM_ROOT)))

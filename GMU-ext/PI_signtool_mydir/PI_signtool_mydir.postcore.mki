@@ -24,6 +24,9 @@ define stmd_MakeTarget_1Candidate
 
 ifneq (1,$$(call gmif_stmd_IsSigned,$1))
   stmd_list_SignTargets += SignTgt.$1
+  ifeq (1,$(gmuf_IsVerboseLevel2))
+    $$(info STMD: Adding signing candicate: $1)
+  endif
 else
   ifeq (1,$(gmuf_IsVerboseLevel2))
     $$(info STMD: Skip already-signed: $1)
@@ -49,13 +52,8 @@ $(foreach f,$(_stmd_Candidates),$(eval $(call stmd_MakeTarget_1Candidate,$f)))
 
 
 .PHONY: gmit_STMD_SignTheseFiles
-ifeq (,$(gmi_STMD_DO_NOT_SIGN))
 gmit_STMD_SignTheseFiles: $(stmd_list_SignTargets)
 	@echo "Code signing done for gmuprj $(gmu_G_Final_PrjName)."
-else
-gmit_STMD_SignTheseFiles: 
-	@echo "Code signing disabled for gmuprj $(gmu_G_Final_PrjName) due to gmi_STMD_DO_NOT_SIGN=1."
-endif
 
 
 ##############################################################################
