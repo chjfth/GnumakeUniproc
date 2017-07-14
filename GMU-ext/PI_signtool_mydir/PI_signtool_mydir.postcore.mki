@@ -5,6 +5,8 @@ ifeq (1,$(gmu_postcore_isSubPrjDone)) # ONLY include following code when no-subp
 signtool_param_SHA1_Timestamp = /t $(stmd_UrlTimestampSHA1)
 signtool_param_SHA2_Timestamp = /tr $(stmd_UrlTimestampSHA2) /td sha256 
 
+_stmd_ac_param = $(if $(strip $(gmi_STMD_USE_CROSS_CERT)),/ac $(gmi_STMD_USE_CROSS_CERT))
+
 gmif_stmd_IsSigned = $(call gmuf_IsShellExecSuccess,signtool verify /pa $1)
 
 gmif_IsSHA2Signable = $(if $(call gmuf_IsWordInSet,$(call gmuf_GetExtName,$1),$(_stmd_ExtNames_onlySHA1)),,1)
@@ -12,7 +14,7 @@ gmif_IsSHA2Signable = $(if $(call gmuf_IsWordInSet,$(call gmuf_GetExtName,$1),$(
 
 _stmd_SignPromptPrefix = $(if $(call gmif_IsSHA2Signable,$1),SHA1+SHA2,SHA1)
 
-_is_singtool_verbose = $(if $(gmuf_IsVerboseLevel2),/v)
+_is_singtool_verbose = $(if $(gmuf_IsVerboseLevel1),/v)
 
 _stmd_Candidates = $(foreach d,$(gmi_STMD_ud_list_TOSIGN_FROM_ROOT),\
 	$(foreach extname,$(_stmd_ExtNames),$(wildcard $d/*.$(extname)))\
@@ -40,7 +42,7 @@ SignTgt.$1: # Make a copy and sign that copy, finally move the signed copy back.
 	@$(CP_) $1 $$(gmu_Gd_PRJ_GMUTMP)
 	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" $(signtool_param_SHA1_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
   ifeq (1,$$(call gmif_IsSHA2Signable,$1)) # will use '/as' to append SHA2 signnature
-	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" /as /fd sha256 $(signtool_param_SHA2_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
+	$(gmu@V1)signtool.exe sign /n "$(gmi_STMD_u_SIGNTOOL_CERTNAME)" $(_stmd_ac_param) /as /fd sha256 $(signtool_param_SHA2_Timestamp) $(_is_singtool_verbose) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F)
   endif
 	@$(CP_) $$(gmu_Gd_PRJ_GMUTMP)/$$(@F) $1
 	@$$(call gmpf_AddCustomActionCount,Code-signed-$$(call gmuf_GetExtName,$1))

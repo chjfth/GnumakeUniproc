@@ -19,6 +19,12 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# This is the code-signing certificate name(or partial name) from Windows certificate store.
 	# It is passed to signtool.exe's /n parameter.
 
+# gmi_STMD_USE_CROSS_CERT = (optional)
+	# Assign a cross-certificate to pass as signtool's /ac param.
+	# Cross-certificates are those from  
+	# https://docs.microsoft.com/en-us/windows-hardware/drivers/install/cross-certificates-for-kernel-mode-code-signing
+	# When signing a kernel mode driver .sys, you have to use /ac foobar.cer .
+
 # gmi_STMD_u_list_EXTNAME = (optional)
 	# Limit signing to these extension names. List extnames separated by spaces.
 
