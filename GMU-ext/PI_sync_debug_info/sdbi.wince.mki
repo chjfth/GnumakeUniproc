@@ -33,14 +33,3 @@ gmi_SYDO_up_list_SYNC_DBGINFOEXE += $(gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE)
 	# gmp_MSVC_Gp_LINK_OUTPUT_pdb_LIB, gmp_MSVC_Gp_LINK_OUTPUT_pdb_DLL, gmp_MSVC_Gp_LINK_OUTPUT_pdb_EXE 
 
 
-# Historical notes:
-
-# Example: A project outputs foo.exe, then the corresponding pdb(by GMP1) will be foo.exe.pdb.
-# Copying foo.exe.pdb is enough, don't copy the VCx0.pdb since the info in VCx0.pdb
-# has been merged into foo.exe.pdb when generting an EXE/DLL. 
-# But if you're linking a static LIB(bar.lib for example), then no bar.pdb is
-# generated when linking the lib, so the VCx0.pdb is the one you should keep.
-#
-# VCx0.pdb is not a true name you'll see with GMP1. The actual name is the link output
-# followed by .pdb, e.g., foo.exe.pdb, foo.lib.pdb, foo.dll.pdb.
-

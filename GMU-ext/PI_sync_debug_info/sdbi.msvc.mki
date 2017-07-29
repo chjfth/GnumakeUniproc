@@ -48,4 +48,6 @@ gmi_SYDO_up_list_SYNC_DLL = $(gmp_Gp_DLL_OUTPUT)
 #
 # VCx0.pdb is not a true name you'll see with GMP1. The actual name is the link output
 # followed by .pdb, e.g., foo.exe.pdb, foo.lib.pdb, foo.dll.pdb.
-
+#
+# [2017-07-29] Memo: GMU 0.102 and some versions ago, foo.exe's pdb has been changed foo.pdb,
+# also, foo.dll's pdb name is foo.pdb. ONLY bar.lib's pdb name is bar.lib.pdb .
