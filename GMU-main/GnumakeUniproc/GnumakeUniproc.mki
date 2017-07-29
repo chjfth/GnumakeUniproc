@@ -156,12 +156,12 @@ endif # ifeq ($(MAKELEVEL),0)
 ifeq ($(_gmu_isFirstMakeRestart),1) # Do these only if this makefile is in his "first restart" state.
     # Clear dirs requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
     _temp := $(shell \
-    	for v in $(gmu_ud_list_STARTUP_REMOVE_DIRS); do \
+    	for v in $(gmu_ud_list_STARTUP_REMOVE_FILES) $(gmu_ud_list_STARTUP_REMOVE_DIRS); do \
     		$(RM_) -fr "$$v";\
     		if [ -a "$$v" ]; then echo "$$v"; fi;\
     	done; )
     ifneq (,$(_temp))
-      $(error !GMU!Error: Fail to remove request gmu_ud_list_STARTUP_REMOVE_DIRS: $(_temp))
+      $(error !GMU!Error: Fail to remove request files or dirs: $(_temp))
     endif
 
     # Clear files requested by user (gmu_up_list_STARTUP_CLEAR_FILES)
