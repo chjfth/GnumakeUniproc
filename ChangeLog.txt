@@ -1,3 +1,8 @@
+[2017-08-06] v0.103
+1. New plugin PI_signtool_mydir for Windows: Use a certificate in system cert-store to digital-sign EXE/DLL/SYS in a directory.
+2. Finally, there is a simplest "Hello world" GMU makefile example, at $/GMU-examples/common/hello/Makefile.umk
+
+
 [2017-04-12] v0.102
 BUG FIX: gmp_FLAGS_INCLUDES now renames back to gmp_CFLAGS_INCLUDES (otherwise PI_use_pch_msvc fails)
 PENDING: Quick start guide update.
