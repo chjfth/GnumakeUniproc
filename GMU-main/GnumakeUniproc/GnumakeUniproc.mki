@@ -351,11 +351,11 @@ endif
 define _DO_C_COMPILE
 	@$(call _DoVerbose1,echo "")
 	@$(call _MkdirIfNotExist,$(@D))
-	@echo " $(if $(gmu_exe_CC),[$(gmu_exe_CC)],C Compiling) $<"
+	@echo " $(if $(gmu_exe_CC),[$(gmu_exe_CC)],C Compiling) $(if $(_isNotBatchingCC),$<,Batching in $(call gmuf_absdir_nts,$<) ($(notdir $<)))"
 	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_CC),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_CC_CMD)
-	@$(call _AppendLogCountCompile,c)
+	@$(call _AppendLogCountCompile,$(if $(_isNotBatchingCC),c,$(call gmuf_xCountFromSameDir,$<,$(gmu_Gp_list_AllSource),c)))
 endef
 
 #	@echo "[[@=$@]]"
@@ -363,7 +363,7 @@ endef
 define _DO_CXX_COMPILE
 	@$(call _DoVerbose1,echo "")
 	@$(call _MkdirIfNotExist,$(@D))
-	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $(if $(_isNotBatchingCC),$<,Batching in $(call gmuf_absdir_nts,$<))"
+	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $(if $(_isNotBatchingCC),$<,Batching in $(call gmuf_absdir_nts,$<) ($(notdir $<)))"
 	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_CC),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_CXX_CMD)
@@ -622,8 +622,8 @@ $(call Batchmode_SrcToObj,$1): $1
 	$$(_DO_CXX_COMPILE)
 endef
 
-$(foreach c,$(gmu_Gp_list_CXX),$(eval $(call CXXtoObj_rule,$c)))
-	# 'c' sample: '../mswin/wintime.cpp'
+$(foreach x,$(gmu_Gp_list_CXX),$(eval $(call CXXtoObj_rule,$x)))
+	# 'x' sample: '../mswin/wintime.cpp'
 
 endif # _isNotBatchingCC/else # ***********
 
