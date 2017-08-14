@@ -73,6 +73,10 @@
 
 gmp_up_COMPILER_CFG_PRECORE_TO_LOAD = $(call gmpf_GetCompilerCfgPrecorePath_std,precore)
 
+gmp_I_SUPPORT_BATCHING_CC = 1
+	# This claims that this compiler-cfg supports compile-batching.
+	# To be used with gmp_DO_BATCH_COMPILE=1 .
+
 include $(gmp_Gd_COMPILER_CONFIG_USED)/compiler_const.mki
 
 
@@ -362,8 +366,12 @@ gmp_CFLAGS_INCLUDES += $(addprefix -I,$(gmu_ud_list_PRJ_HEADER)) # append includ
 
 _vc60_compilee_path_tweak = $(if $(gmu_DO_PASS_FULLPATH_TO_COMPILER),$(subst /,\\,$1),$1)
 
-gmu_u_CC_CMD = $(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_CFLAGS_INCLUDES) /Fo"$@" \
-	$(if $(_msvc_IsUsing_vc60),$(call _vc60_compilee_path_tweak,$(<cfinal_to_compiler)),$(<cfinal_to_compiler))
+gmu_u_CC_CMD = $(gmu_exe_CC) /c $(_gmp_CFLAGS_final) $(gmp_CFLAGS_INCLUDES) /Fo"$(if $(_isBatching1C),$(dir $@),$@)" \
+	$(if $(_isBatching1C),\
+	  $(call gmuf_FilterFromSameDir,$<,$(gmu_Gp_list_AllSource)),\
+	  $(if $(_msvc_IsUsing_vc60),$(call _vc60_compilee_path_tweak,$(<cfinal_to_compiler)),$(<cfinal_to_compiler))\
+	)
+	# We must use '$(dir $@)' instead of '$(call gmuf_dir_nts,$@)' bcz we need the trailing backslash. Thanks: https://stackoverflow.com/a/9550218/151453
 gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
 
 # ..... syslib categories, user should append some into gmp_bc_SYSLIBS (gmp_bc_SYSLIBS += gmp_bc_syslib_XXX).

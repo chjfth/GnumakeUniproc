@@ -54,6 +54,8 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   endif
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
+	@echo "[[@=$@]"
+	@echo "[[<=$<]"
   ifneq (,$(gmu_DO_SHOW_VERBOSE))
 	@echo "$(_pluginId_windll_from_lib): Compiling $(_WDFL_f_auto_export_stub_c) ..."
   endif

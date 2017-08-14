@@ -172,6 +172,8 @@ gmuf_DeleteFile_sh_wc = $(shell $(RM_) $1 1>&2 ; if [ "$$?" = 0 ];then echo 1; f
 gmuf_dir_nts = $(patsubst %/,%,$(dir $1))
 	# similar to $(dir ), but without trailing slash.
 
+gmuf_absdir_nts = $(call gmuf_GetAbsPathByRela_soc,$(call gmuf_dir_nts,$1))
+
 gmuf_GetExtName = $(patsubst .%,%,$(suffix $1))
 	# What the internal $(suffix) function returns has a leading dot, we reject the dot here.
 _GetExtName = $(gmuf_GetExtName)
@@ -294,6 +296,7 @@ gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
 	# Similar to gmuf_GetAbsPathByRela_so, but 'soc' means string operation from curdir. 
 	#
 	# TODO: optimize with $(realpath later)
+
 
 _gmuf_IsWordInSet_rw = $(foreach w,$2,$(if $(call _IsStringEqual,$w,$1),$1))
 	# Check whether word $1 is in word-set $2. Return $1(may be duplicate).
@@ -775,5 +778,23 @@ _gmufe_ShowSubprj_refname_prjname = $$(info $$(_GmuSpace2)[$1] $$($1_Upjname) , 
 
 gmu_postcore_isSubPrjDone = $(if $(strip $(gmu_uv_list_ALL_SUBPRJ)),$(if $(_gmu_isFirstMakeRestart),,1),1)
 
+gmuf_isFromSameDir = $(call _IsStringEqual,$(dir $1),$(dir $2))
+
+gmuf_FilterFromSameDir = $(foreach p,$2,$(if $(call gmuf_isFromSameDir,$1,$p),$p))
+	# $1: a filepath as base.
+	# $2: list of filepaths.
+	# Return a list of filepaths that are all from the same directory of the base.
+	# Example:
+	#	$(call gmuf_FilterFromSameDir,../base.cpp,../a1.c ../sub/b1.c ./foo.c ../../par.c ../samelv)
+	# Returns:
+	#	../a1.c ../samelv
+	#
+	# Example:
+	#	$(call gmuf_FilterFromSameDir,base.cpp,../a1.c ./foo.c bar.x)
+	# Returns:
+	#	./foo.c bar.x
+
+gmuf_xCountFromSameDir = $(patsubst %,$3,$(call gmuf_FilterFromSameDir,$1,$2))
+	# Used when calling _AppendLogCountCompile 
 
 endif # ifndef _CommonFunctions_included 

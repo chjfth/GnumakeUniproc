@@ -58,6 +58,12 @@ _Gp_CountSccmdFailure = $(_d_OUTPUT_ROOT_GMUTMP)/_SccmdFailure.gmu.cnt
 export gmu_Gp_COUNT_COMPILE = $(_d_OUTPUT_ROOT_GMUTMP)/_CountCompile.gmu.cnt
 _Gp_ScWorkInModuleOutput = $(_d_OUTPUT_ROOT_GMUTMP)/_ScWorkInModuleOutput.gmu.txt
 
+_isBatchingCC = $(if $(call _IsStringEqual,$(strip $(gmp_I_SUPPORT_BATCHING_CC)$(gmp_DO_BATCH_COMPILE)),11),1)
+_isNotBatchingCC = $(if $(_isBatchingCC),,1)
+
+_isBatching1C = $(if $(_isBatchingCC),$(if $(strip $(call gmuf_FilterFromSameDir,$<,$(gmu_Gp_list_AllSource))),1))
+	# Hint: This var checks $< , so it is used in compiler-cfg's gmu_u_CC_CMD definition.
+
 
 ifeq ($(MAKELEVEL),0)
 ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
@@ -352,14 +358,16 @@ define _DO_C_COMPILE
 	@$(call _AppendLogCountCompile,c)
 endef
 
+#	@echo "[[@=$@]]"
+#	@echo "[[<=$<]]"
 define _DO_CXX_COMPILE
 	@$(call _DoVerbose1,echo "")
 	@$(call _MkdirIfNotExist,$(@D))
-	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $<"
+	@echo " $(if $(gmu_exe_CXX),[$(gmu_exe_CXX)],C++ Compiling) $(if $(_isNotBatchingCC),$<,Batching in $(call gmuf_absdir_nts,$<))"
 	@$(call _gmuf_ShowCompileeFullpath,$(gmu_exe_CC),$<)
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	$(gmu_u_CXX_CMD)
-	@$(call _AppendLogCountCompile,x)
+	@$(call _AppendLogCountCompile,$(if $(_isNotBatchingCC),x,$(call gmuf_xCountFromSameDir,$<,$(gmu_Gp_list_AllSource),x)))
 endef
 
 define _DO_ASM_COMPILE
@@ -384,7 +392,15 @@ endef
 
 #################################################
 
-gmuf_SrcListToOutputList_addsuffix = $(patsubst %,$(_Gd_OBJ_OUTPUT)/%$2,$1)
+Batchmode_SrcToObj = $(patsubst $(gmu_ud_SRC_ROOT)/%,$(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ),$(basename $1))
+	# $1: the source filepath, e.g.: $(gmu_ud_SRC_ROOT)/foo.cpp
+	# Example:
+	#	$1 = ../libsrc/foo.cpp 
+	# Return:
+	#	./gf/_obj/foo.obj
+
+#gmuf_SrcListToOutputList_addsuffix = $(patsubst %,$(_Gd_OBJ_OUTPUT)/$(if $(_isBatchingCC),$(basename %),%)$2,$1) # Wrong!
+gmuf_SrcListToOutputList_addsuffix = $(patsubst %,$(_Gd_OBJ_OUTPUT)/%$2,$(if $(_isBatchingCC),$(basename $1),$1))
 	# $1: source list from source-root-dir, $2: suffix to append in output path( note: dot required )
 
 gmuf_c_to_obj = $(call gmuf_SrcListToOutputList_addsuffix,$1,.$(gmu_extn_OBJ))
@@ -413,6 +429,10 @@ gmuf_CnCXX_ListToHdepList = $(call gmuf_C_ListToHdepList,$1) $(call gmuf_CXX_Lis
 gmuf_SrcListToHdepList_FreeStyleExtn = $(call gmuf_SrcListToOutputList_addsuffix,$1,d)
 	#[2007-01-14] when improving MSVC pch plugin
 
+gmu_Gp_list_C = $(foreach _extn,$(gmu_u_list_C_EXTN),$(filter %.$(_extn),$(gmu_Gp_list_AllSource)))
+gmu_Gp_list_CXX = $(foreach _extn,$(gmu_u_list_CXX_EXTN),$(filter %.$(_extn),$(gmu_Gp_list_AllSource)))
+gmu_Gp_list_ASM = $(foreach _extn,$(gmu_u_list_ASM_EXTN),$(filter %.$(_extn),$(gmu_Gp_list_AllSource)))
+
 
 # Check whether gmu_ud_SRC_ROOT and gmu_up_list_SRC_FROM_ROOT has backslash, if so spout error
 ifeq (1,$(call gmuf_IsSubString,\,$(_gmu_ud_SRC_ROOT)))
@@ -440,7 +460,7 @@ _HDEPEND_FOR_C = $(strip $(call gmuf_C_ListToHdepList,$(gmu_up_list_SRC_FROM_ROO
 
 _REQOBJS_CXX = $(strip $(call gmuf_CXX_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT)))
 _HDEPEND_FOR_CXX = $(strip $(call gmuf_CXX_ListToHdepList,$(gmu_up_list_SRC_FROM_ROOT)))
-
+#$(info _REQOBJS_CXX==============$(_REQOBJS_CXX))
 _REQOBJS_ASM = $(strip $(call gmuf_ASM_ListToObjList,$(gmu_up_list_SRC_FROM_ROOT)))
 
 gmu_Gp_list_REQOBJS = $(_REQOBJS_C) $(_REQOBJS_CXX) $(_REQOBJS_ASM)
@@ -460,7 +480,7 @@ gmu_Gp_AllSrcListToObjList = $(call gmuf_SrcListToOutputList_addsuffix,$(gmu_up_
 	
 #gmu_Gp_list_HDEPENDS = $(_HDEPEND_FOR_C) $(_HDEPEND_FOR_CXX) # No idea whether useful for user.
 
-
+ifeq (1,$(_isNotBatchingCC)) 
 # Now, make sure gmu_Gp_list_REQOBJS contains the same file as _list_REQ_tmp.
 # If not, it means there are some unrecognized file extensions in user's source list. 
 # We'll show these unrecognized files if they exist.
@@ -473,7 +493,7 @@ ifneq (,$(strip $(_list_ExtUnrecognized))) # there will be as many spaces in $(_
   	  #You know, $(shell ...)'s output to stdout with be captured by Make if we do not redirect is to stderr.
   $(error !GMU!Error: The above source files do not have valid extension-name, valid ext-names are: $(strip $(gmu_u_list_C_EXTN) $(gmu_u_list_CXX_EXTN) $(gmu_u_list_ASM_EXTN)))
 endif
-
+endif # ifeq (1,$(_isNotBatchingCC)) 
 
 ifneq (,$(_REQOBJS_C))
 ifndef gmu_u_CC_CMD
@@ -547,6 +567,9 @@ endif # ifneq (,$(gmu_NO_GEN_HDEPEND))
 
 $(gmu_Gp_list_REQOBJS): _p_ts_HDepend = $(@:.$(gmu_extn_OBJ)=.d)# `ts' means target specific variable
 
+
+ifeq (1,$(_isNotBatchingCC))  # ***********
+
 $(_REQOBJS_C): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 	$(_GEN_HDEPEND_DOT_D)
@@ -560,6 +583,23 @@ else
 	@$(_DO_C_COMPILE)
 endif
 
+else                          # ----------- new batch style below
+
+define CtoObj_rule
+$(call Batchmode_SrcToObj,$1): $1
+	$$(_GEN_HDEPEND_DOT_D)
+	$$(call _gmuf_ExecuteShcmdList,$$(gmu_uc_elst_C_PRIOR_PROCESS))
+	$$(_DO_C_COMPILE)
+endef
+
+$(foreach c,$(gmu_Gp_list_C),$(eval $(call CtoObj_rule,$c)))
+	# 'c' sample: '../mswin/wintime.c'
+
+endif # _isNotBatchingCC/else # ***********
+
+
+ifeq (1,$(_isNotBatchingCC))  # ***********
+
 $(_REQOBJS_CXX): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 ifneq (,$(gmu_DO_SHOW_GENHDEPEND_CMD))
 	$(_GEN_HDEPEND_DOT_D)
@@ -572,6 +612,21 @@ ifneq (,$(gmu_DO_SHOW_COMPILE_CMD))
 else
 	@$(_DO_CXX_COMPILE)
 endif
+
+else                          # ----------- new batch style below
+
+define CXXtoObj_rule
+$(call Batchmode_SrcToObj,$1): $1
+	$$(_GEN_HDEPEND_DOT_D)
+	$$(call _gmuf_ExecuteShcmdList,$$(gmu_uc_elst_CXX_PRIOR_PROCESS))
+	$$(_DO_CXX_COMPILE)
+endef
+
+$(foreach c,$(gmu_Gp_list_CXX),$(eval $(call CXXtoObj_rule,$c)))
+	# 'c' sample: '../mswin/wintime.cpp'
+
+endif # _isNotBatchingCC/else # ***********
+
 
 $(_REQOBJS_ASM): $(_Gd_OBJ_OUTPUT)/%.$(gmu_extn_OBJ): $(_gmu_ud_SRC_ROOT)/%
 	$(call _gmuf_ExecuteShcmdList,$(gmu_uc_elst_ASM_PRIOR_PROCESS))
