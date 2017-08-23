@@ -136,7 +136,7 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     endif
 
     _temp := $(shell \
-    	echo "GnumakeUniproc started (GNUmake v$(MAKE_VERSION))." 1>&2 ;\
+    	echo "GnumakeUniproc started (GMU $(gmu_ver) , GNUmake v$(MAKE_VERSION))." 1>&2 ;\
     	echo "gmu_ud_OUTPUT_ROOT(%) is $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
     	$(MD_) $(_d_OUTPUT_ROOT_GMUTMP); \
     	echo -n "" >$(gmu_Gp_COUNT_COMPILE) >$(_Gp_ScWorkInModuleOutput) >$(_Gp_CountSccmdFailure) \
