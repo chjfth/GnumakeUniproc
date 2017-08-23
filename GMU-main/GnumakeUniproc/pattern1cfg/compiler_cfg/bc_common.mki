@@ -68,6 +68,7 @@ gmp_CFLAGS_CODE_GEN_ALL_preset += $(gmp_CFLAGS_CODE_GEN_preset) $(gmp_CXXFLAGS_C
 
 gmp_CFLAGS_CODE_GEN_preset += $(gmp_CFLAGS_INCLUDES)
 	#[2008-11-29] added, when building gtktetris example.
+	#[2017-08-23] Memo: This makes -I... finally go into $(gmp_CFLAGS_CODE_GEN_ALL)
 
 
 _gmp_CFLAGS_final = $(if $(strip $(_gmp_C_CXX_FLAGS_ALL)),$(_gmp_C_CXX_FLAGS_ALL),$(gmp_C_CXX_ALL_preset))
