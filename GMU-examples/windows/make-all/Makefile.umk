@@ -15,6 +15,7 @@ endif
 gmu_uv_list_ALL_SUBPRJ = dllfromlib dll-2libs \
 	MFC-with-pch \
 	KeyView2_ansi KeyView2_unicode \
+	About2 \
 
 dir_windows = ..
 
@@ -34,6 +35,8 @@ KeyView2_ansi_MakeVarDefines = gmp_bc_UNICODE=
 
 KeyView2_unicode_Makefile = $(dir_windows)/KeyView2/Makefile.umk
 KeyView2_unicode_MakeVarDefines = gmp_bc_UNICODE=1
+
+About2_Makefile = $(dir_windows)/winapi-About2/Makefile.umk
 
 
 ###### DON'T DELETE THIS FINAL include. ######
