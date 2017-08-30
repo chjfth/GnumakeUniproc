@@ -58,7 +58,7 @@ def ProcessOneFile(fname):
 	lines = fh.readlines()
 	
 	# Extract stem name from filename.
-	m = re.search(r'([^/]+).(c|cpp)$', fname, re.IGNORECASE)
+	m = re.search(r'([^/]+).(c|cpp|cxx)$', fname, re.IGNORECASE)
 	if not m:
 		print "export-tamper.py: %s is not a C/C++ file!\n"%(fname)
 		# sys.stderr.write // Sorry, stderr seems to get captured by os.popen, and I don't know how to grab that out.
