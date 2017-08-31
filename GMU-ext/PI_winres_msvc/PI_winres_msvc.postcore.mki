@@ -6,6 +6,7 @@ define _DO_WINRC_COMPILE
 	rc /fo"$@" $(gmi_RCVC_RC_FLAGS) /d gmp_COMPILER_CIDVER=$(gmp_COMPILER_VER_$(gmp_COMPILER_ID)) $<
 	$(call gmpf_AddCustomActionCount,MSVC-RC-compiled)
 endef
+	# Memo: Yes, MSDN 2008 tells us to use /d xxx instead of /D xxx to define a macro.
 
 $(_RCVC_REQRES_TO_LINK): _p_ts_HDepend = $(@:.res=.$(_RCVC_RCdotD_extn))# `ts' means target specific variable
 

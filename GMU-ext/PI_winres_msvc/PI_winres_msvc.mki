@@ -11,7 +11,12 @@ _pluginId_use_winres_msvc := $(gmpv_ThisPluginId)
 	# List the .rc files that you want to compile into .res .
 
 # gmi_RCVC_RC_FLAGS = 
-	# Flags to passed to rc.exe command
+	# Flags to passed to rc.exe command. 
+	# For example, use it to include additional .h search directory
+	# ( /I myinc /I ../../libsrc/include )
+	# Hint:
+	# $(addprefix /I ,myinc ../../libsrc/include $(NlssdkIncludeDirs))
+	
 
 # gmi_RCVC_DONT_WANT_AUTO_RC_HDEP = 
 	#(default to null)
