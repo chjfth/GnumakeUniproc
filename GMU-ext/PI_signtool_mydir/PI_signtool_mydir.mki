@@ -47,9 +47,6 @@ _stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
 	exe dll sys cat msi \
 	)
 
-_stmd_ExtNames_onlySHA1 = cat msi
-
-
 ifeq (,$(gmi_STMD_DO_NOT_SIGN))
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_signtool_mydir),postcore)
 else
