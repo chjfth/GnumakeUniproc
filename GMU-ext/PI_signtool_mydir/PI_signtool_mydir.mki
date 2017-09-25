@@ -24,6 +24,7 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# Cross-certificates are those from  
 	# https://docs.microsoft.com/en-us/windows-hardware/drivers/install/cross-certificates-for-kernel-mode-code-signing
 	# When signing a kernel mode driver .sys, you have to use /ac foobar.cer .
+	# This affects only .sys files.
 
 # gmi_STMD_u_list_EXTNAME = (optional)
 	# Limit signing to these extension names. List extnames separated by spaces.
