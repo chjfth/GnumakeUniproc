@@ -87,7 +87,7 @@ gmp_LINKER_LIB_GROUP_END = -Wl,--end-group
 #################################################################################
 
 # Category(dor): Debug-Build or Release-Build
-cfc_for_Debug_codegen = -g
+cfc_for_Debug_codegen = -g -O0
 cfc_for_Debug_defs = -D_DEBUG 
 cfc_for_Release_codegen = $(cfc_optimizeRls) $(if $(_gmp_RELEASE_WANT_DBG_SYMBOLS),-g)
 cfc_for_Relesase_defs = -DNDEBUG

@@ -82,10 +82,14 @@ gmp_LINKER_LIB_GROUP_END = -Wl,--end-group
 #################################################################################
 
 # Category(dor): Debug-Build or Release-Build
-cfc_for_Debug_codegen = -g
+cfc_for_Debug_codegen = -g -O0
 cfc_for_Debug_defs = -D_DEBUG 
-cfc_for_Release_codegen = -O2
+cfc_for_Release_codegen = $(cfc_optimizeRls) $(if $(_gmp_RELEASE_WANT_DBG_SYMBOLS),-g)
 cfc_for_Release_defs = -DNDEBUG
+
+cfc_optimizeRls = $(if $(gmp_RELEASE_CUSTOM_OPTIMIZE_OPT),$(gmp_RELEASE_CUSTOM_OPTIMIZE_OPT),\
+ $(if $(gmp_RELEASE_DONT_OPTIMIZE),-O0,-O2)\
+)
 
 # Category(chr): MBCS or Unicode
 cfc_chr_Mbcs_defs = -D_MBCS
