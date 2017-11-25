@@ -1,0 +1,50 @@
+ifndef __cenv_linuxgcc_gcc6.3_raspi_env_included_
+__cenv_linuxgcc_gcc6.3_raspi_env_included_ := 1
+
+# For Raspberry PI targeted gcc 6.3(32-bit) compiler 
+
+# Naming requirement:
+# GMU compiler-id  <cid> = linuxgcc
+# GMU compiler-ver <cver>= gcc6.3_raspi
+# 
+# This file takes one input from env-var:
+#
+#	gmp_CENV_ROOT_linuxgcc_gcc6_3_raspi    # which is gmp_CENV_ROOT_<cid>_<cver>
+#
+# This file's outputs things:
+#
+# First, a make-var, used on making subprj, refname_MakeVarDefines= 
+#	gmpf_LoadCenv_linuxgcc_gcc6.3_raspi    # which is gmpf_LoadCenv_<cid>_<cver>
+#
+#	gmpf_ExportCenv_linuxgcc_gcc6_3_raspi  # which is gmpf_ExportCenv_<cid>_<cver>
+#
+# And, for the env-var name cases, "dot" is replaced with "underscore", 4.8 becomes 4_8
+# because dot is invalid in env-var name.
+#
+# Note: the naming of the above two is a misnomer, it better says gmp_ instead of gmpf_ ,
+# because gmpf_ implies a make-function.
+
+ifeq (,$(gmp_CENV_ROOT_linuxgcc_gcc6_3_raspi))
+  $(error !GMP!Error: gmp_CENV_ROOT_linuxgcc_gcc6_3_raspi is not defined, so I cannot find gcc6.3_raspi compiler)
+endif
+
+_linuxgcc_gcc6_3_raspi_val_PATH = $1/bin;$(subst \,/,$(PATH))
+
+in_gmpf_LoadCenv_linuxgcc_gcc6.3_raspi = \
+	gmp_COMPILER_ID=linuxgcc gmp_COMPILER_VER_linuxgcc=gcc6.3_raspi \
+	gmp_GCC_PREFIX=arm-linux-gnueabihf- \
+	PATH="$(_linuxgcc_gcc6_3_raspi_val_PATH)"
+
+gmpf_LoadCenv_linuxgcc_gcc6.3_raspi = $(call in_gmpf_LoadCenv_linuxgcc_gcc6.3_raspi,$(gmp_CENV_ROOT_linuxgcc_gcc6_3_raspi))
+	# Because this is just GNU make-var, not env-var, we can use dot inside make-var name.
+
+define def_ExportCenv_linuxgcc_gcc6.3_raspi
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_linuxgcc := gcc6.3_raspi)
+  $(call gmuf_AnounceExportEnvvar,gmp_GCC_PREFIX := arm-linux-gnueabihf-)
+  $(call gmuf_AnounceExportEnvvar,PATH := $(_linuxgcc_gcc6_3_raspi_val_PATH))
+endef
+
+gmpf_ExportCenv_linuxgcc_gcc6_3_raspi = $(eval $(call def_ExportCenv_linuxgcc_gcc6.3_raspi,$(gmp_CENV_ROOT_linuxgcc_gcc6_3_raspi)))
+
+
+endif
