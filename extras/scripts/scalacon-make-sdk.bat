@@ -61,6 +61,21 @@ if not "%CMD_GETSDKIN%" == "" (
 set TEEBAT_WRAPPER_EXISTED=1
 @REM -- this is important to get correct umaketime exit code.
 
+REM set mydate=%DATE:/=%
+REM set mydate=%mydate:-=%
+REM set mydate=%mydate:~0,8%
+REM set mytime=%TIME::=%
+REM set mytime=%mytime:~0,6%
+REM set datetime=%mydate%.%mytime%
+REM -- That is not guaranteed to work for various date-time format settings(from Control Panel)
+REM    so use date_.exe instead.
+
+set datetimecmd=date_ +"%%Y%%m%%d.%%H%%M%%S%%z"
+REM -- note: One %% represent a single % in date_'s parameter.
+for /F "usebackq delims=" %%i IN (`%datetimecmd%`) DO set datetime=%%i
+
+echo Scalacon build start time: %datetime%
+
 call umaketime %*
 
 @if ERRORLEVEL 1 exit /b 1
@@ -86,18 +101,6 @@ if ERRORLEVEL 1 (
 	exit /b 1
 )
 
-REM set mydate=%DATE:/=%
-REM set mydate=%mydate:-=%
-REM set mydate=%mydate:~0,8%
-REM set mytime=%TIME::=%
-REM set mytime=%mytime:~0,6%
-REM set datetime=%mydate%.%mytime%
-REM -- That is not guaranteed to work for various date-time format settings(from Control Panel)
-REM    so use date_.exe instead.
-
-set datetimecmd=date_ +"%%Y%%m%%d.%%H%%M%%S"
-REM -- note: One %% represent a single % in date_'s parameter.
-for /F "usebackq delims=" %%i IN (`%datetimecmd%`) DO set datetime=%%i
 
 set filepath7z=%gmb_thisrepo%/%gmb_sdkname%-%datetime%.7z
 set _7zlog=7z.log
