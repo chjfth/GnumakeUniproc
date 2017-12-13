@@ -535,9 +535,10 @@ def sync_sdkcache_to_sdklocal(section, dsection, sdk_refname, localdir):
 		print '  Storing subdir "cidvers":'
 	for virtual_cidver in ordered_vcidvers:
 		
-		if g_cidvers_restrict and (not virtual_cidver in g_cidvers_restrict):
-			skips.append(virtual_cidver)
-			continue
+		if g_cidvers_restrict:
+		    if not [ptn for ptn in g_cidvers_restrict if fnmatch.fnmatch(virtual_cidver, ptn)]:
+				skips.append(virtual_cidver)
+				continue
 		
 		real_cidver = mapping[virtual_cidver][0]
 		dir_src = os.path.join(dir_refname, 'cidvers', real_cidver)
@@ -980,6 +981,9 @@ vc120 = Visual C++ 2013
 vc140 = Visual C++ 2015
 """
 	dir_cidvers = os.path.join(localdir, 'cidvers')
+	if not os.path.isdir(dir_cidvers):
+		return # ignore this
+	
 	hint_filepath = os.path.join(dir_cidvers, 'vcX0.version-hint.txt')
 	if os.path.exists(hint_filepath):
 		return
@@ -1087,7 +1091,7 @@ def do_getsdks():
 #					print 'Make read-only:', root+os.sep+file #debug
 					os.chmod(root+ '/' +file, stat.S_IREAD)
 	
-		store_vcX0_version_hint(localdir)
+	store_vcX0_version_hint(localdir)
 	
 	return 0
 
