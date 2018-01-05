@@ -8,8 +8,9 @@
 # 2. Copy precompiled make-gmu executable to $DIR_GMU_BIN. 
 
 
-DIR_GMU_MAIN="${0%/*}"
+DIR_GMU_MAIN=$(\cd `dirname "$0"` && pwd)
 	# So install-exe.sh must be placed in GMU-main directory
+	# and DIR_GMU_MAIN will be an aboslute dir-path
 
 DIR_GMU=${DIR_GMU_MAIN%/*}
 	# the parent dir
