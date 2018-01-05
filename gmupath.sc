@@ -15,7 +15,16 @@ tmpdirgmu=$tmpdirgmu/extras/scripts:$tmpdirgmu/GMU-main/umake_cmd/bashcmd
 PATH=$tmpdirgmu:$PATH
 
 echo "From ${BASH_SOURCE} export env-var:"
-echo "    gv1=$gv1"
-echo "    gv2=$gv2"
-echo "And your PATH is prepended with: \"$tmpdirgmu\""
+echo "    gv1='$gv1'"
+echo "    gv2='$gv2'"
+echo ""
+
+echo "Your PATH is prepended with:"
+echo "    $tmpdirgmu"
+echo ""
+
+echo "In order to build programs with Scalacon, gmp_COMPILER_VER_linuxgcc should be defined in your environment. For example:"
+echo "    export gmp_COMPILER_VER_linuxgcc=gcc4.8_i686"
+echo "    export gmp_COMPILER_VER_linuxgcc=gcc4.8_x64"
+echo "    export gmp_COMPILER_VER_linuxgcc=gcc6.3_raspi"
 
