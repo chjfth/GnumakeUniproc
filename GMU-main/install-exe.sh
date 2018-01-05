@@ -40,5 +40,9 @@ fi
 
 echo ""
 echo "GMU installed OK!"
-echo "Remember to add 'source $DIR_GMU/gmupath.sc' to your .bashrc in order to execute umake commands."
-echo ""
+echo 'Remember to add'
+echo ''
+echo '    source $DIR_GMU/gmupath.sc
+echo ''
+echo 'to your .bashrc in order to execute umake commands.'
+echo ''
