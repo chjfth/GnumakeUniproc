@@ -5,7 +5,7 @@
 #
 # Things done in this script:
 # 1. Compile and copy the gmuXXX programs to $DIR_GMU_BIN
-# 2. Copy precompiled make-gmu executable to $DIR_GMU_BIN. 
+# 2. Copy precompiled gmu-make executable to $DIR_GMU_BIN. 
 
 
 DIR_GMU_MAIN=$(\cd `dirname "$0"` && pwd)
@@ -31,10 +31,10 @@ for OnePrg in $GMU_PRGS; do
 done
 
 
-cmd="cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/make-gmu $DIR_GMU_BIN"
+cmd="cp $DIR_GMU_MAIN/umake_cmd/make-linux-x86/gmu-make $DIR_GMU_BIN"
 echo "$cmd"
 if  ! $cmd ; then
-	echo "Cannot copy make-gmu executable!"
+	echo "Cannot copy gmu-make executable!"
 	exit 1
 fi
 

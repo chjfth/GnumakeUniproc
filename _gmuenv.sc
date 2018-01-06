@@ -13,9 +13,9 @@ if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
 	return 1
 fi
 
-# Check if make-gmu can be executed. If so, let umake use it(by overriding gmu_MAKE_EXE)
-if $gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd/make-gmu --version > /dev/null; then
-	export gmu_MAKE_EXE=make-gmu
+# Check if gmu-make can be executed. If so, let umake use it(by overriding gmu_MAKE_EXE)
+if $gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd/gmu-make --version > /dev/null; then
+	export gmu_MAKE_EXE=gmu-make
 fi
 
 # [2009-12-19] GNU make uses /bin/sh as default command shell, and GMU requires 

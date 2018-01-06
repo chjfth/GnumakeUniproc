@@ -17,7 +17,7 @@ source $gmu_DIR_ROOT/_gmuenv.sc
 #	gmu_LOG_OUTPUT_FILENAME=_gmulog.txt
 #	gmu_DIR_ROOT=/home/chj/w/GMU
 #	gmu_SUPPRESS_INCLUDE_NOT_FOUND_WARNING=1
-#	gmu_MAKE_EXE=make-gmu
+#	gmu_MAKE_EXE=gmu-make
 #	gmu_DO_SHOW_LINK_CMD=1
 #	gmu_DIR_GNUMAKEUNIPROC=/home/chj/w/GMU/GMU-main/GnumakeUniproc
 #	gmu_ver=0.99

@@ -36,22 +36,28 @@ if "%TEEBAT_WRAPPER_EXISTED%" == "" (
 
 
 
-set tmpbatdir_=%~dp0%
-set gmu_DIR_ROOT_bs=%tmpbatdir_:\GMU-main\umake_cmd\wincmd\=%
+set thisbatdir_=%~dp0%
+set thisbatdir=%thisbatdir_:~0,-1%
+set gmu_DIR_ROOT_bs=%thisbatdir:\GMU-main\umake_cmd\wincmd\=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
 
-REM PATH=%tmpbatdir_%;%PATH% // This is unnecessary, because %tmpbatdir_% must have been in the PATH, otherwise umake.bat cannot be reached.
+set PATH=%thisbatdir%;%PATH% 
+REM -- This is wise! It serves a great purpose: 
+REM    umake.bat's path(= %thisbatdir%) can be put at tail of your PATH env at usually time.
+REM    However, as soon as umake.bat is launched, %thisbatdir% is elevated to head of PATH, 
+REM    so GMU will always run its own-bundled executables(like sh.exe cat.exe sed.exe).
 
 if "%gmu_DONT_USE_GOODIES%" == "" (
 REM	We defaultly 
-	call %tmpbatdir_%gmu-goody.bat
+	call %thisbatdir\%gmu-goody.bat
 )
 
 call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 
 
-IF "%gmu_MAKE_EXE%" == "" set gmu_MAKE_EXE=make
+IF "%gmu_MAKE_EXE%" == "" set gmu_MAKE_EXE=gmu-make
+REM -- We use the executable name gmu-make.exe explicitly so not to conflict with make.exe from various gcc cross toolchains.
 
 REM A special processing since GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
 REM If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
