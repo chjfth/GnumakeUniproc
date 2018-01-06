@@ -28,7 +28,7 @@ if "%TEEBAT_WRAPPER_EXISTED%" == "" (
 	
 	REM Now call self with tee.
 	set TEEBAT_WRAPPER_EXISTED=1
-	call %0 %* 2>&1 | mtee %gmu_LOG_OUTPUT_FILENAME%
+	call %0 %* 2>&1 | tee %gmu_LOG_OUTPUT_FILENAME%
 	REM By using pipe on the above CMD line, we cannot be sure of %0's exit code,
 	REM because ERRORLEVEL may indicate %0's exit code or tee's exit code. So we just exit with 0.
 	exit /b 0 

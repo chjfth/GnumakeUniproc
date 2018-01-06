@@ -4,7 +4,7 @@ setlocal
 set SCALACON_LOGFILE=_scalacon.gmulog.txt
 set SCALACON_LOGFILE_bak=%SCALACON_LOGFILE%.bak
 
-REM My elegant teebat solution, auto-log whole .bat output to tee(mtee) when this .bat is the root bat. 
+REM My elegant teebat solution, auto-log whole .bat output to tee when this .bat is the root bat. 
 REM So,
 REM * If you are the end-user calling this .bat, SCALACON_LOGFILE will be generated with the 
 REM   same content on screen.
@@ -27,7 +27,7 @@ if "%SCALACON_WRAPPER_EXISTED%" == "" (
 
 	set SCALACON_WRAPPER_EXISTED=1
 
-	call %0 %* 2>&1 | mtee %SCALACON_LOGFILE%
+	call %0 %* 2>&1 | tee %SCALACON_LOGFILE%
 	REM By using pipe on the above CMD line, we cannot be sure of %0's exit code,
 	REM because ERRORLEVEL may indicate %0's exit code or tee's exit code. So we just exit with 0.
 	exit /b 0 
