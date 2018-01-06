@@ -38,7 +38,7 @@ if "%TEEBAT_WRAPPER_EXISTED%" == "" (
 
 set thisbatdir_=%~dp0%
 set thisbatdir=%thisbatdir_:~0,-1%
-set gmu_DIR_ROOT_bs=%thisbatdir:\GMU-main\umake_cmd\wincmd\=%
+set gmu_DIR_ROOT_bs=%thisbatdir:\GMU-main\umake_cmd\wincmd=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
 
