@@ -130,9 +130,9 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     	#[2006-12-05] For reason why an extra subshell in `if' statement, see IMNOTE1.
     
     # Check whether the gmuXXX programs exist. (no longer required!)
-    _temp := $(shell gmuCountChar $(gmu_DIR_GNUMAKEUNIPROC)/2b.mark) # 2b.mark should be exactly two bytes
+    _temp := $(shell gmuCountChar $(gmu_DIR_GNUMAKEUNIPROC)/2b.mark)# 2b.mark should be exactly two bytes
     ifneq (2,$(_temp))
-      $(error !GMU!Error: The critical program `gmuCountChar' does not exist or not work as expected. I cannot work)
+      $(error !GMU!Error: The critical program gmuCountChar does not exist or not work as expected. I cannot work)
     endif
 
     _temp := $(shell \

@@ -1546,7 +1546,7 @@ _gmp_LINKFLAGS_final = $(if $(strip $(gmp_LINKFLAGS)),$(gmp_LINKFLAGS),$(gmp_LIN
   <li>根工程(RP)第一次用 <code>_gmu_ut_GetPrjAttr</code> 试图取子工程属性时其实已经是在一个“中间子 make”（_MakeSubPrjs.gmu.mk）中进行了，因此那种 bug 影响不了这里。</li>
   <li>根工程(RP)第二次想取子工程属性的动作确是在 MAKELEVEL=0 环境下发出，但这时是通过 cached 方法取得的，因此用不到 <code>_gmu_ut_GetPrjAttr</code> 方式，那个 bug 也影响不到这里，这样看起来就不需 gmuExtractVarDefines 了。</li>
 </ul>
-<p>那天就想到了删除 gmuExtractVarDefines 。但为了保险起见，加了如下黑体。若确实用不着 gmuExtractVarDefines，那么黑体中的 <code>$(error )</code> 就永远不会装上。 </p>
+<p>那天就想到了删除 gmuExtractVarDefines 。但为了保险起见，加了如下黑体。若确实用不着 gmuExtractVarDefines，那么黑体中的 <code>$(error )</code> 就永远不会撞上。 </p>
 <pre>		echo "ifndef _isInCheckoutPhase" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifeq (,\$$(wildcard $(SubprjEvMakefile)))" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _tmp := \$$(call gmuf_OutputInfo_e,You assign sub-project {$${SubPrj}} makefile as\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\nBut that makefile does not exist. \$$(if \$$(gmu_DO_CHECKOUT),,Did you forget to run with gmu_DO_CHECKOUT=1 ?))" >> $(_p_mki_SubprjAttr_shsubst) ;\
