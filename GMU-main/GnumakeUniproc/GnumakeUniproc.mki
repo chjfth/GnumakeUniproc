@@ -129,10 +129,10 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     endif
     	#[2006-12-05] For reason why an extra subshell in `if' statement, see IMNOTE1.
     
-    # Check whether the gmuXXX programs exist.
-    _temp := $(shell gmuExtractVarDefines "v1=1")
-    ifneq (v1=1,$(_temp))
-      $(error !GMU!Error: The critical program `gmuExtractVarDefines' does not exist or not work as expected. I cannot work)
+    # Check whether the gmuXXX programs exist. (no longer required!)
+    _temp := $(shell gmuCountChar $(gmu_DIR_GNUMAKEUNIPROC)/2b.mark) # 2b.mark should be exactly two bytes
+    ifneq (2,$(_temp))
+      $(error !GMU!Error: The critical program `gmuCountChar' does not exist or not work as expected. I cannot work)
     endif
 
     _temp := $(shell \
@@ -1277,16 +1277,14 @@ $(SubPrj)_SCCMD = $(call _CheckSccmdForSubprj,$(SubPrj))\n\
 		echo "    \$$(error !GMU!Error occured. See error reason above)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "  ifeq (\$$(call _IsOlderThanBuildStart,$(_SubprjEv_pAttrCache)).\$$(gmu_NO_MAKE_SUBPRJS),1.)" >> $(_p_mki_SubprjAttr_shsubst) ;\
-		echo "    _tmp_MakeOpts := $(shell gmuExtractVarDefines "$(MAKEFLAGS)" )" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,    **** Fetching PrjAttr for {$(SubprjEvPrjRefname)} )" >> $(_p_mki_SubprjAttr_shsubst) ;)\
 		$(call _DoVerbose2,echo "    _info := \$$(call gmuf_OutputInfo,         Queried-makefile: $(SubprjEvMakefile))" >> $(_p_mki_SubprjAttr_shsubst) ;)\
   echo "          ifeq (\$${MAKELEVEL},0)" >> $(_p_mki_SubprjAttr_shsubst) ;\
-  echo "            \$$(error !!!!!!!!!!!!!!!!!!!! BAD! Got MAKELEVEL=0 HERE!!!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
+  echo "            \$$(error !!!!! BAD! Got MAKELEVEL=0 HERE !!!!!)" >> $(_p_mki_SubprjAttr_shsubst) ;\
   echo "          endif" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    _gmu_FetchSubprjAttr := \$$(shell \
 			\$$(call _export_MakevarDefs,$(SubprjEvMakeVarDefines)) \$${MAKE} _gmu_ut_GetPrjAttr -C \$$(dir $(SubprjEvMakefile)) -f \$$(notdir $(SubprjEvMakefile)) \
-			_p_PrjAttrOutput=\$$(_p_AttrOutput_$${SubPrj}) --no-print-directory \
-			\$$(if \$$(call _IsStringEqual,\$${MAKELEVEL},0),\$$(_tmp_MakeOpts),) 1>&2 \
+			_p_PrjAttrOutput=\$$(_p_AttrOutput_$${SubPrj}) --no-print-directory 1>&2 \
 			&& echo PrevCmdSuccess ) " >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "    ifneq (\$$(strip \$$(_gmu_FetchSubprjAttr)),PrevCmdSuccess)" >> $(_p_mki_SubprjAttr_shsubst) ;\
 		echo "      _tmp := \$$(call gmuf_OutputInfo_e,Your sub-project {$${SubPrj}} makefile\n    $(SubprjEvMakefile)\n  =>\n    \$$(call gmuf_GetAbsPathByRela_so,\$$(CURDIR),$(SubprjEvMakefile))\ndoes not behave correctly for target \`_gmu_ut_GetPrjAttr')" >> $(_p_mki_SubprjAttr_shsubst) ;\
