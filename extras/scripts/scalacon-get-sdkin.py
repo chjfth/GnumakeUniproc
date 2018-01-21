@@ -1107,11 +1107,12 @@ def create_linuxgcc_symlink(localdir):
 	# * whether current system is 32-bit or 64-bit
 	# * The 4.8 is the smallest version number we found. That is if gcc_4.8_x64 and gcc_6.3_x64
 	#   are both found, we'll use gcc_4.8_x64 .
-	cidver_ptn = 'gcc*_x64' if ('x86_64' in os.uname()) else 'gcc*_x86'
+	cidver_ptn = 'gcc*_x64' if ('x86_64' in os.uname()) else 'gcc*_i686'
 	dir_cidvers = os.path.join(localdir, 'cidvers')
 	subdirs = os.listdir(dir_cidvers)
 	gcc_subdirs = fnmatch.filter(subdirs, cidver_ptn)
 	if not gcc_subdirs:
+		print "Info: In '%s', no subdir matches pattern '%s', so skip linuxgcc symlink creation."%(dir_cidvers, cidver_ptn)
 		return
 	
 	def cmp_verstr(v1, v2):
@@ -1186,7 +1187,7 @@ def main():
 	ret = do_getsdks()
 	
 	if ret==0:
-		print "Success."
+		print "[Success]"
 	
 	return ret
 	
