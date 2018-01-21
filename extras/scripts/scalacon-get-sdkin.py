@@ -156,8 +156,9 @@ import stat
 import ConfigParser # INI op
 import re
 import fnmatch
+from distutils.version import LooseVersion, StrictVersion
 
-version = "1.3"
+version = "1.4"
 optdict = {}
 g_ini_filepath = '' # the config file(in INI format)
 g_ini_dir = ''
@@ -748,7 +749,6 @@ def clean_old_local_by_old_refname(section, dsection, dir_refname_old, localdir,
 	# We use the existence of the <refname>.old directory as "transaction signature".
 	
 	# Note: dir_refname_old may end in ".old" or not, according to calling context.
-								#	absdir_refname = os.path.join(g_ini_dir, DIRNAME_CACHE, dir_refname_old)  # zzz wrong!
 	
 	if not os.path.exists( dir_refname_old ):
 		return True # go on sync
@@ -1091,9 +1091,51 @@ def do_getsdks():
 #					print 'Make read-only:', root+os.sep+file #debug
 					os.chmod(root+ '/' +file, stat.S_IREAD)
 	
-	store_vcX0_version_hint(localdir)
+	if os.name=='nt':
+		store_vcX0_version_hint(localdir)
+	elif os.name=='posix': # Linux or MAC
+		create_linuxgcc_symlink(localdir)
 	
 	return 0
+
+def create_linuxgcc_symlink(localdir):
+	# When running on Linux, we create a symlink called $/sdkin/cidvers/linuxgcc pointing to
+	#	$/sdkin/cidvers/gcc4.8_i686
+	# or
+	#	$/sdkin/cidvers/gcc4.8_x64
+	# according to 
+	# * whether current system is 32-bit or 64-bit
+	# * The 4.8 is the smallest version number we found. That is if gcc_4.8_x64 and gcc_6.3_x64
+	#   are both found, we'll use gcc_4.8_x64 .
+	cidver_ptn = 'gcc*_x64' if ('x86_64' in os.uname()) else 'gcc*_x86'
+	dir_cidvers = os.path.join(localdir, 'cidvers')
+	subdirs = os.listdir(dir_cidvers)
+	gcc_subdirs = fnmatch.filter(subdirs, cidver_ptn)
+	if not gcc_subdirs:
+		return
+	
+	def cmp_verstr(v1, v2):
+		# Compare version string: https://stackoverflow.com/a/11887885
+		# For example: 4.12 > 4.8 > 4.1.2
+		# So we cannot simply compare by float() them.
+		if StrictVersion(v1)==StrictVersion(v2):
+			return 0
+		elif StrictVersion(v1)<StrictVersion(v2):
+			return -1
+		else:
+			return 1
+	
+	gcc_dirs_sorted = sorted(gcc_subdirs, cmp_verstr, lambda x:re.sub(r'gcc([0-9.]+)_x64', r'\1', x))
+	symlink_target = gcc_dirs_sorted[0]
+	
+	symlink_source = os.path.join(dir_cidvers,'linuxgcc')
+	
+	if os.path.islink(symlink_source):
+		os.remove(symlink_source)
+	
+	if not os.path.exists(symlink_source):
+		print 'Creating symlink in localdir: linuxgcc -> %s'%(symlink_target)
+		os.symlink( symlink_target, symlink_source ) # memo: no need to add dir-prefix for symlink_target
 
 
 def main():
