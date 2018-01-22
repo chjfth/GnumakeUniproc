@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>FindEmptyDir example readme</title>
+
+<style type="text/css">
+.fws {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 0em;
+    margin-right: 0em;
+    background-color: #e6e6e6;
+}
+
+H1 {
+	font-family: Verdana, Arial, sans-serif; 
+}
+H2 {
+	color: #000066;
+	font-family: Verdana, Arial, sans-serif; 
+}
+H3 {
+	font-family: Verdana, Arial, sans-serif; 
+	color: #6600dd;
+	font-size: 120%
+}
+H4 {
+	color: #660000;
+	font-family: Verdana, Arial, sans-serif; 
+}
+
+.hint {
+	font-size: 90%;
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.footnoteb {
+    border: #777777 1px solid;
+	color: #404040;
+	font-size: 90%;
+    padding: 0.5em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.c-comment { color:#009900; }
+.c-string { color:#990099; }
+
+SUP { color:#3366FF; }
+
+TT { color:#000066; }
+
+CODE { color:#660000; }
+
+</style>
+</head>
+
+<body>
+
+<H1 align="center">oneshot demo project</H1>
+<p>[2015-12-08] created </p>
+<h3>Summary</h3>
+<p>This example project demonstrates how to write your own  <u>custom compiler config</u> for your GMU-based makefile.</p>
+<p>You need custom compiler config if you are dealing with an embedded device project, where the compiler and compiing options are so unique. For example, using xgcc to build a eCos based program. </p>
+<p>Here, we will use Visual C++ (any version) as an example, and once you get the idea, you should experience no difficulty modifying it to work with xgcc and eCos. </p>
+<p>Key steps:</p>
+<ol>
+	<li>Prepare a file named compiler_config.mki which holds your compiler-config makefile statements.</li>
+	<li>When calling umake, passing a gmp_COMPILER_ID value as the name of your &quot;compiler&quot;.</li>
+</ol>
+<h3>Detail </h3>
+<p>Sample compiler-config.mki in this directory is explained here. </p>
+<p>Your startup makefile <tt>Makefile.umk</tt> include <tt>pattern1.mks</tt> at its final line; this <tt>pattern1.mks</tt> will search for <tt>compiler_config.mki</tt> in current directory(<code>$(CURIR)</code>), and if found, it will be used as compiler-config, instead of using global compiler-config files provided by GMU. </p>
+<p>You need to define some key GMU variables inside <tt>compiler_config.mki</tt> as follows.</p>
+<table width="100%" border="1">
+	<tr>
+		<th width="20%" scope="col">Required GMU vars </th>
+		<th width="80%" scope="col">Meaning</th>
+	</tr>
+	<tr>
+		<td>gmu_u_CC_CMD</td>
+		<td><p>C file compiler command line for a file. </p>
+			<ul>
+				<li><code>$&lt;</code> represent input C file path.</li>
+				<li><code>$@</code> represent corresponding object file path. </li>
+			</ul>
+		<p>You have to use them in your compiler command. GMU engine provides you the content of <code>$&lt;</code> and <code>$@</code> . </p>
+		<p>For example: the actual value of <code>$@</code> for one compiler command may be</p>
+		<pre class="fws">D:/w/GMU/GMU-examples/oneshot/msvc-exe/gf/oneshot-vcexe_myvc/_obj/foobar.c.obj</pre>
+		<p>and your compiler command should accurately generate object file at that very path location. In other word, in case you generate your obj file at <tt>D:/w/GMU/GMU-examples/oneshot/msvc-exe/foobar.obj</tt> , the linker command later will not be able to find it, because GMU does not know you have put your obj at that location. </p>
+		<p>So, in our Visual C++ example, <code>&quot;$@&quot;</code> is passed to the compiler <code>/Fo</code> option. </p></td>
+	</tr>
+	<tr>
+		<td>gmu_u_CXX_CMD</td>
+		<td><p>C++ file compiler command line for a file. </p>
+		<p>In many cases, you can set it to be the same as gmu_u_CC_CMD . </p></td>
+	</tr>
+	<tr>
+		<td>gmu_u_LINK_CMD</td>
+		<td><p>Linker command to generate final output. </p>
+			<ul>
+				<li><code>$(gmu_Gp_list_REQOBJS)</code> contains object file paths you need to link to your EXE. GMU engine generates its content for you.</li>
+				<li><code>$(gmu_Gp_list_SUBPRJ_TO_LINK)</code> contains  sub-projects output(foobar.lib etc) that should be linked -- in case you have subprojects.</li>
+				<li><code>$@</code> represents the EXE output path. This path is also determined by GMU engine for you.</li>
+			</ul>
+		<p>For the same reason, your custom linker command should output EXE file  exactly at the location told by <code>$@</code>, otherwise, when GMU is next run, timestamp-based dependency checking will fail because GMU does not know where your casual EXE location is, and the bad result is: each time umake is run, your linker command will get executed again and again. </p>
+		<p>So, in our Visual C++ example, <code>&quot;$@&quot;</code> is passed to the linker <code>/out:</code> option. </p></td>
+	</tr>
+</table>
+<p>Remember: Run umake with <code>gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> to know the actual compiler and linker command so that you can verify you do it right. </p>
+<p>&nbsp;</p>
+<p>-- </p>
+</body>
+
+</html>
