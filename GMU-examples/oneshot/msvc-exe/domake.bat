@@ -1,8 +1,8 @@
 @echo off
+REM Use setlocal so that 'myvc' does not affect user's environment
 setlocal
-	REM Use setlocal so that 'myvc' does not affect user's environment
 
-REM Set gmp_COMPILER_ID to anything you like
+REM Set gmp_COMPILER_ID to anything you like, it just cannot be empty as required by GMU.
 set gmp_COMPILER_ID=myvc
 
 

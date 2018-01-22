@@ -9,7 +9,7 @@ gmu_extn_OBJ = obj
 
 INCLUDE += $(Include) $(include) # This is required because make's var is case sensitive.
 _gmu_isystem_DIRS_WRAP_QUOTES = $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
-	# This is special for MSVC. It will generate 
+	# [Optional] This is special for MSVC. It will generate 
 	#	-isystem "C:/Program Files (x86)/Microsoft Visual Studio/VC/include" -isystem "..."
 	# and these will be passed to ``gcc -M`` telling those are VC++ system header directories.
 
