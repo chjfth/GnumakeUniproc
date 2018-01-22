@@ -1,7 +1,11 @@
 
-gmu_exe_CC = cl
-gmu_exe_CXX = cl
-	# the above two are optional, just compiler name hint
+gmu_exe_CC = my.cl
+gmu_exe_CXX = my.cl
+	# [Optional] the above two are optional, just compiler name hint
+
+gmu_extn_OBJ = obj
+	# [Optional] Set object file extension name. 
+	# For Visual C++, object name is conventionally xxx.obj . If not set, it will be xxx.o .
 
 INCLUDE += $(Include) $(include) # This is required because make's var is case sensitive.
 _gmu_isystem_DIRS_WRAP_QUOTES = $(call gmpf_gccM_DesectPathList,$(INCLUDE),;)
@@ -15,6 +19,11 @@ gmp_CFLAGS_INCLUDES += $(addprefix -I ,$(gmu_ud_list_PRJ_HEADER))
 
 # [Required] gmu_u_CC_CMD, .c compile command
 gmu_u_CC_CMD = cl /nologo /c /Zi $(gmp_CFLAGS_INCLUDES) /Fo"$(patsubst $(CURDIR)/%,./%,$@)" $<
+	# Memo: You can simply use
+	#	$@
+	# instead of
+	#	$(patsubst $(CURDIR)/%,./%,$@)
+	# except that you will see a very long absolute xxx.obj path on command line.
 
 # [Required] gmu_u_CXX_CMD, .cpp compile command
 gmu_u_CXX_CMD = $(gmu_u_CC_CMD)
