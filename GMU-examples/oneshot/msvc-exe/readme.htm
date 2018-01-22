@@ -66,16 +66,17 @@ CODE { color:#660000; }
 <p>[2015-12-08] created </p>
 <h3>Summary</h3>
 <p>This example project demonstrates how to write your own  <u>custom compiler config</u> for your GMU-based makefile.</p>
-<p>You need custom compiler config if you are dealing with an embedded device project, where the compiler and compiing options are so unique. For example, using xgcc to build a eCos based program. </p>
+<p>You need custom compiler config if you are dealing with an embedded device project, where the compiler and compiler options are so unique. For example, using xgcc to build a eCos based program. </p>
 <p>Here, we will use Visual C++ (any version) as an example, and once you get the idea, you should experience no difficulty modifying it to work with xgcc and eCos. </p>
 <p>Key steps:</p>
 <ol>
 	<li>Prepare a file named compiler_config.mki which holds your compiler-config makefile statements.</li>
-	<li>When calling umake, passing a gmp_COMPILER_ID value as the name of your &quot;compiler&quot;.</li>
+	<li>When calling umake, passing a <code>gmp_COMPILER_ID</code> value as the name of your &quot;compiler&quot;.</li>
 </ol>
+<p>To run this example, please run <tt>domake.bat</tt> in this directory, because GMU var <code>gmp_COMPILER_ID</code> needs to be set before calling umake. </p>
 <h3>Detail </h3>
 <p>Sample compiler-config.mki in this directory is explained here. </p>
-<p>Your startup makefile <tt>Makefile.umk</tt> include <tt>pattern1.mks</tt> at its final line; this <tt>pattern1.mks</tt> will search for <tt>compiler_config.mki</tt> in current directory(<code>$(CURIR)</code>), and if found, it will be used as compiler-config, instead of using global compiler-config files provided by GMU. </p>
+<p>Your startup makefile <tt>Makefile.umk</tt> include <tt>pattern1.mks</tt> at its final line; this <tt>pattern1.mks</tt> will search for <tt>compiler_config.mki</tt> in current directory(<code>$(CURDIR)</code>), and if found, it will be used as compiler-config, instead of using global compiler-config files provided by GMU. </p>
 <p>You need to define some key GMU variables inside <tt>compiler_config.mki</tt> as follows.</p>
 <table width="100%" border="1">
 	<tr>
@@ -84,7 +85,7 @@ CODE { color:#660000; }
 	</tr>
 	<tr>
 		<td>gmu_u_CC_CMD</td>
-		<td><p>C file compiler command line for a file. </p>
+		<td><p>Compiler command line for a C source file. </p>
 			<ul>
 				<li><code>$&lt;</code> represent input C file path.</li>
 				<li><code>$@</code> represent corresponding object file path. </li>
@@ -97,8 +98,8 @@ CODE { color:#660000; }
 	</tr>
 	<tr>
 		<td>gmu_u_CXX_CMD</td>
-		<td><p>C++ file compiler command line for a file. </p>
-		<p>In many cases, you can set it to be the same as gmu_u_CC_CMD . </p></td>
+		<td><p>Compiler command line for a C++ source file. </p>
+			<p>In many cases, you can set it to be the same as gmu_u_CC_CMD . </p></td>
 	</tr>
 	<tr>
 		<td>gmu_u_LINK_CMD</td>
@@ -113,7 +114,20 @@ CODE { color:#660000; }
 	</tr>
 </table>
 <p>Remember: Run umake with <code>gmu_DO_SHOW_COMPILE_CMD=1 gmu_DO_SHOW_LINK_CMD=1</code> to know the actual compiler and linker command so that you can verify you do it right. </p>
-<p>&nbsp;</p>
+<h3>How to diagnose a GMU variable</h3>
+<p>When writing custom compiler config, you problably need to investigate the value of GMU offered make variables(GMU vars). Here is the method. </p>
+<p>Examples:</p>
+<pre class="fws">domake.bat gmu_ut_diagnose gmu_u_DIAGNOSE_VARS=gmu_Gp_list_REQOBJS
+
+domake.bat gmu_ut_diagnose gmu_u_DIAGNOSE_VARS_LIST=gmu_Gp_list_REQOBJS
+
+domake.bat gmu_ut_diagnose gmu_u_DIAGNOSE_VARS_LIST="gmu_up_list_SRC_FROM_ROOT gmu_Gp_list_REQOBJS"
+</pre>
+<p>Use <code>gmu_u_DIAGNOSE_VARS</code> to print whole var content in one line, with [ ] surrounded. The purpose of using angle brackets is: we can see whether there are leading or trailing spaces in it.</p>
+<p>Use <code> gmu_u_DIAGNOSE_VARS_LIST</code> to print var content in multi-line form, each word displays on its own line, more eye-cozzy.</p>
+<p>You can assign multiple GMU vars to show in one umake run, but remember to surround multiple GMU var names with double-quotes on shell command line.</p>
+<p>Here is an example output of <code>gmu_ut_diagnose</code> run.  </p>
+<p><img src="gmu_ut_diagnose.png" alt="gmu_ut_diagnose screen shot" width="961" height="340"></p>
 <p>-- </p>
 </body>
 
