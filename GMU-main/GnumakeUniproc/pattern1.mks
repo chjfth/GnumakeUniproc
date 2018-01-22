@@ -1,5 +1,5 @@
 # ====== pattern1.mks , 's' means "stem". =========
-# This is the general pattern for inegrating the core layer of GnumakeUniproc(GnumakeUniproc.mki) 
+# This is the general pattern for integrating the core layer of GnumakeUniproc(GnumakeUniproc.mki) 
 # and a specific compiler, so that an program(EXE,LIB,or DLL) can be compiled and linked.
 # This "stem" chains the following things to accomplish the whole work:
 # * u_srccfg_pre.mki         (user defined)

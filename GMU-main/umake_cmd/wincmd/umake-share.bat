@@ -42,7 +42,7 @@ set gmu_DIR_ROOT_bs=%thisbatdir:\GMU-main\umake_cmd\wincmd=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
 :	gmu_DIR_ROOT will result in something like D:/GMU
 
-set PATH=%thisbatdir%;%PATH% 
+set PATH=%thisbatdir%;%PATH%
 REM -- This is wise! It serves a great purpose: 
 REM    umake.bat's path(= %thisbatdir%) can be put at tail of your PATH env at usually time.
 REM    However, as soon as umake.bat is launched, %thisbatdir% is elevated to head of PATH, 
