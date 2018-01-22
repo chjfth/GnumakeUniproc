@@ -1,10 +1,9 @@
 #include <stdio.h>
 
-#ifdef __linux__
-# include <unistd.h>
-#else
+#ifdef WIN32
 # include <direct.h>
-
+#else // for Linux or MAC
+# include <unistd.h>
 #endif
 
 #include <walkdir.h>
