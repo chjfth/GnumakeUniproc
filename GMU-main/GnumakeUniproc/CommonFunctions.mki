@@ -243,12 +243,12 @@ gmuf_WriteContentToFile = $(shell \
 	# Hint: 2>$2 must be put ahead of 1>&2 , otherwise, $1 will be dumped to console.
 
 
-_IsP1OlderThanP2_direct_sh = $(shell (if [ ! -f $1 ] || [ $1 -ot $2 ];then echo -n '1';fi))
+_IsP1OlderThanP2_direct_sh = $(shell (if [ ! -f $1 ] || [ $1 -ot $2 ];then echo '1';fi))
 	# User should ensure exist. (`sh' means usING shell's file time compare function.)
 	# Use the *_direct_sh function to avoid the GNU make's $(wildcard ) result caching problem. See my
 	# mailing list thread http://www.nabble.com/HELP!-$(wildcard-)-function-failed-very-strangely-td12964178.html and Paul Smith's answer.
 
-_IsP1OlderThanP2 = $(if $(wildcard $1),$(shell (if [ $1 -ot $2 ];then echo -n '1';fi)),1)
+_IsP1OlderThanP2 = $(if $(wildcard $1),$(shell (if [ $1 -ot $2 ];then echo '1';fi)),1)
 	# If file $1 not exist or older than $2, 1 is returned, else null value is returned.
 	# If $2 does not exist, result is undetermined(fortunately, up to 2006-07-14, $2 can only be _MainPrjBuildStart.gmu.ckt, which is unlikely absent).
 

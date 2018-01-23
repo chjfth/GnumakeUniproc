@@ -1,8 +1,9 @@
-[2018-01-22] v0.105
+[2018-01-23] v0.105
 	1. New cenv-linuxgcc-gcc6.3_raspi.mki for compiling Raspberry PI linux applications.
 	2. Windows: GMU bundled make.exe is renamed to gmu-make.exe so it less likely conflicts with other gcc cross-toolchains.
 	3. [Regression] Use GNUWin32 tee.exe instead of mtee.exe. The mtee.exe cause freeze on Win10.14393.
 	4. Remove the useless gmuExtractVarDefines executable.
+	5. Add a tiny fix so GMU can now run on macOS.
 
 [2017-10-06] v0.104
 	1. Fix PI_signtool_mydir bug. Now Windows kernel driver can be signed correctly with a cross-certificate.
