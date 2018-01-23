@@ -1,4 +1,4 @@
-# NOTE: You MUST `source' this script(should let current env modified) instead of executing it.
+# Don't run this file manually. This file will be source-d by umake-share automatically.
 
 if [ "$gmu_DIR_ROOT" = "" ]; then
 	echo "ERROR from _gmuenv.sc: Env-var gmu_DIR_ROOT not defined yet."

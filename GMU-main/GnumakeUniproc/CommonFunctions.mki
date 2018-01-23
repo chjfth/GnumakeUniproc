@@ -252,6 +252,11 @@ _IsP1OlderThanP2 = $(if $(wildcard $1),$(shell (if [ $1 -ot $2 ];then echo -n '1
 	# If file $1 not exist or older than $2, 1 is returned, else null value is returned.
 	# If $2 does not exist, result is undetermined(fortunately, up to 2006-07-14, $2 can only be _MainPrjBuildStart.gmu.ckt, which is unlikely absent).
 
+_IsOlderThanBuildStart = $(call _IsP1OlderThanP2,$1,$(gmu_p_BuildStartCkt))
+
+_IsOlderThanBuildStart_direct_sh = $(call _IsP1OlderThanP2_direct_sh,$1,$(gmu_p_BuildStartCkt))
+
+
 _GetAbsDirRelaToCurdir = $(shell ( cd $1; CmdRet=$$?; if [ $$CmdRet = 0 ];then pwd; else echo __GMU_cd_ERROR; fi; ))
 	# $1, the dir to cd to. Returns the new dir abs-path if success, cd_ERROR if fail.
 gmuf_GetAbsDirRelaToCurdir = $(_GetAbsDirRelaToCurdir)
@@ -330,10 +335,6 @@ gmuf_GetVarAssertExist = $(if $(strip $($1)),$($1),$(error Make-var '$1' does no
 
 _isNowGmuGetPrjAttr = $(call _IsStringEqual,$(MAKECMDGOALS),_gmu_ut_GetPrjAttr)
 _isNowNotGmuGetPrjAttr = $(if $(_isNowGmuGetPrjAttr),,1)
-
-_IsOlderThanBuildStart = $(call _IsP1OlderThanP2,$1,$(gmu_p_BuildStartCkt))
-
-_IsOlderThanBuildStart_direct_sh = $(call _IsP1OlderThanP2_direct_sh,$1,$(gmu_p_BuildStartCkt))
 
 gmuf_IsOlderThanBuildStart_sh = $(call _IsOlderThanBuildStart_direct_sh,$1)
 
