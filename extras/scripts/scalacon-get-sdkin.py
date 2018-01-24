@@ -1006,8 +1006,8 @@ def do_getsdks():
 		kvpairs = iniobj.items('DEFAULT')
 		dpairs = dict(kvpairs)
 		for key,value in kvpairs:
-			# Check all upper-case then lower-case key in env, for OS like Linux.
-			# This does not cope with mixed-case env-var names for simplicity, 
+			# Check all upper-case then lower-case keys against env.
+			# Code here does not cope with mixed-case env-var names for simplicity, 
 			# so user should obey this when setting env-var.
 			if key.upper() in os.environ:
 				value = os.environ[key.upper()]
@@ -1015,7 +1015,7 @@ def do_getsdks():
 				value = os.environ[key.lower()]
 			else:
 				continue
-			dpairs[key] = value
+			iniobj.set('DEFAULT', key, value) # dpairs[key] = value
 		
 		if ('cidvers_restrict' in dpairs) and (dpairs['cidvers_restrict']!='0'):
 			g_cidvers_restrict = dpairs['cidvers_restrict'].split()
