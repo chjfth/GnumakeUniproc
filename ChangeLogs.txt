@@ -3,7 +3,7 @@
 	2. Windows: GMU bundled make.exe is renamed to gmu-make.exe so it less likely conflicts with other gcc cross-toolchains.
 	3. [Regression] Use GNUWin32 tee.exe instead of mtee.exe. The mtee.exe cause freeze on Win10.14393.
 	4. Remove the useless gmuExtractVarDefines executable.
-	5. Add a tiny fix so GMU can now run on macOS.
+	5. Add a tiny fix so GMU can now run on macOS with default Apple gcc. Note that gmp_LINKER_NO_RECURSE_LIB_SEARCH=1 should be set because Apple gcc does not support -Wl,--start-group and -Wl,--end-group linker flag.
 
 [2017-10-06] v0.104
 	1. Fix PI_signtool_mydir bug. Now Windows kernel driver can be signed correctly with a cross-certificate.
