@@ -14,7 +14,7 @@ if [ ! -f "$gmu_DIR_GNUMAKEUNIPROC/GnumakeUniproc.mki" ]; then
 fi
 
 # Check if gmu-make can be executed. If so, let umake use it(by overriding gmu_MAKE_EXE)
-if $gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd/gmu-make --version > /dev/null; then
+if $gmu_DIR_ROOT/GMU-main/umake_cmd/bashcmd/gmu-make --version > /dev/null 2>&1 ; then
 	export gmu_MAKE_EXE=gmu-make
 fi
 
