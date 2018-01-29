@@ -173,7 +173,7 @@ ifeq ($(_msvc_isTargetKrnl),1)
   # (affects both LIB and SYS)
 
   cfc_for_Debug_defs =   /DDBG=1
-  cfc_for_Release_defs = # /DDBG=0
+  cfc_for_Release_defs = /DNDEBUG # $\WDK710\inc\crt\assert.h would recognize this
 	
   ifeq ($(_msvc_isTargetX64),1)
     gmp_CFLAGS_MACRO_DEFS_preset += /D_AMD64_ # WDK7 wdm.h explicitly requires this
