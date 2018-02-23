@@ -4,6 +4,7 @@
 	3. [Regression] Use GNUWin32 tee.exe instead of mtee.exe. The mtee.exe cause freeze on Win10.14393.
 	4. Remove the useless gmuExtractVarDefines executable.
 	5. Add a tiny fix so GMU can now run on macOS with default Apple gcc. Note that gmp_LINKER_NO_RECURSE_LIB_SEARCH=1 should be set because Apple gcc does not support -Wl,--start-group and -Wl,--end-group linker flag.
+	6. [Experimental] MSVC: User assigning gmp_DO_BATCH_COMPILE=1 enables compile-batching behavior. That is, c/cpp files from the same directory are compiled with only one cl.exe command, which will shorten build time. Drawback: GenHdepend(.d) files are only generated partially.
 
 [2017-10-06] v0.104
 	1. Fix PI_signtool_mydir bug. Now Windows kernel driver can be signed correctly with a cross-certificate.
