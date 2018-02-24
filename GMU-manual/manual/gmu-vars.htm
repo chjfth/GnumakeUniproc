@@ -940,11 +940,24 @@ gmp_PS_INCLUDE_SUBDIRS=wince mswin</pre>
     <p>This value is normally set to a filepath under $(<code>gmp_Gd_CUSTOM_IT_MKI_USED</code>) . </p></td>
   </tr>
   <tr>
+    <td valign="top">gmp_LINK_OUTPUT_POSTPROC_CMD</td>
+    <td align="center" valign="top">I</td>
+    <td><p>If you want to do post-processing for your link output(<code>gmu_Gp_LINK_OUTPUT</code>), you can define a canned shell command sequence with the name <code>gmp_LINK_OUTPUT_POSTPROC_CMD</code>. So, each time your link-output file is re-generated, these commands will run once. If link-output is up-to-date, these commands will not run.</p>
+      <p>An excerpt from PI_gcc_strip_lo.mki, this is used to strip the output executable file on Linux.</p>
+      <pre class="fws">define gmp_LINK_OUTPUT_POSTPROC_CMD
+	@echo "Stripping link-output: $(notdir $(gmu_Gp_LINK_OUTPUT)) ..."
+	@strip $(gmu_Gp_LINK_OUTPUT)
+endef
+</code>
+    </pre>
+  </tr>
+  <tr>
     <td valign="top">gmp_up_USER_OUTPUT_AFTER_LINK</td>
     <td align="center" valign="top">I</td>
     <td><p>If you want to do post-processing for your link output(<code>gmu_Gp_LINK_OUTPUT</code>) to generate a different output(different filename or filepath), you can define this gmuvar to your post-processing output filepath and write the rule for the post-processing commands. </p>
       <p>GMU will internally has <code>$(gmp_up_USER_OUTPUT_AFTER_LINK)</code> depend on <code>$(gmu_Gp_LINK_OUTPUT)</code>, so that you post-processing output will be taken when and only when the link output is out-of-date. </p>
       <p>NOTE: you must define this var before gmu-core. This target, however, will always be built after all sub-projects are done. </p>
+      <p>Purpose of <code>gmp_up_USER_OUTPUT_AFTER_LINK</code> is quite similar to that of <code>gmp_LINK_OUTPUT_POSTPROC_CMD</code>, but in different forms. If both exist, commands in <code>gmp_LINK_OUTPUT_POSTPROC_CMD</code> are executed first.</p>
     </td>
   </tr>
   <tr>

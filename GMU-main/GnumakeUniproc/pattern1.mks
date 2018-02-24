@@ -228,7 +228,7 @@ endif # ifneq (,$(gmu_I_AM_A_LINK_COMPONENT))
 ifneq (,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))
 $(gmp_up_USER_OUTPUT_AFTER_LINK): $(gmu_Gp_LINK_OUTPUT_ckt)
 # By defining this rule, we always have $(gmp_up_USER_OUTPUT_AFTER_LINK) built after $(gmu_Gp_LINK_OUTPUT) .
-# Note: We must use $(gmu_Gp_LINK_OUTPUT_ckt) as prerequisite instead of $(gmu_Gp_LINK_OUTPUT) .
+# Note: We must use $(gmu_Gp_LINK_OUTPUT_ckt) as prerequisite instead of $(gmu_Gp_LINK_OUTPUT), in favor of gmp_LINK_OUTPUT_POSTPROC_CMD.
 endif
 
 .PHONY: __pattern1_first_target
