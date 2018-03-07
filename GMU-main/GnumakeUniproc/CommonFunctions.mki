@@ -798,4 +798,19 @@ gmuf_FilterFromSameDir = $(foreach p,$2,$(if $(call gmuf_isFromSameDir,$1,$p),$p
 gmuf_xCountFromSameDir = $(patsubst %,$3,$(call gmuf_FilterFromSameDir,$1,$2))
 	# Used when calling _AppendLogCountCompile 
 
+define _gmuf_CheckBadwordInVar
+  # $1: bad word
+  # $2: make variable
+  # If the substring $1 appears in $2's value, spout error.
+  ifneq (,$$(findstring $1, $($2)))
+    $$(error Make-variable '$2' has bad substring ($1) in it)
+  endif
+endef
+
+gmuf_CheckBadwordInVars = $(foreach v,$2,$(eval $(call _gmuf_CheckBadwordInVar,$1,$v)))
+	# I use this gmuf to check whether <xxx> template words remains as placeholders 
+	# in GMU template makefiles(e.g. D:\w\GMU\GMU-manual\gmu-template\use-pattern1\make-exe-concise\Makefile.umk)
+
+
+
 endif # ifndef _CommonFunctions_included 
