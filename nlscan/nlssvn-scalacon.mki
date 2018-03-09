@@ -56,7 +56,7 @@ ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
 
   UserLibNameForLink_  = $(call gmpf_MakeLibName,$1)
 
-  UserLibNameForLink = $(UserLibNameForLink_UD)
+  UserLibNameForLink = $(UserLibNameForLink_UD) # just leave an old synonym 
 
 
 else ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),linuxgcc))
