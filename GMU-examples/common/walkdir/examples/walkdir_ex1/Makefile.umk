@@ -190,7 +190,7 @@ gmp_bc_SYSLIBS += # $(call gmpf_MakeUpSysLibsToLink,<sys-lib-list>)
 # GMU-var: gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL (recommended)
 #	This one is the superset of gmu_uv_list_SUBPRJ_TO_LINK. It's powerful.
 #	Not only output-images of sub-projects explicitly listed in gmu_uv_list_SUBPRJ_LINK_ALL_LEVEL 
-# will be linked by this project, but also sub-projects' of those explictly listed ones 
+# will be linked by this project, but also sub-projects' of those explicitly listed ones 
 # -- any level of sub-projects can be linked. Anyhow, there are two factors that 
 # determines whether deeper projects' outputs will be automatically linked:
 # 1. a deeper project must claim himself a link-component(gmu_I_AM_A_LINK_COMPONENT=1).
