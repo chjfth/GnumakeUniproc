@@ -87,9 +87,7 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
 
     %(uxm_dirbin_var)s := $(absdir_example_bins)/$(%(uxm_cidver_var)s)
     
-    ifneq (,$(strip %(copydlls)s))
-      gmp_USER_POST_TARGETS += COPYDLLS_%(refname)s
-    endif
+    gmp_USER_POST_TARGETS += COPYDLLS_%(refname)s
     ifeq (1,$(call gmuf_IsWordInSet,$(%(uxm_cidver_var)s),$(gmb_run_example_on_cidvers)))
     ifeq (run1,run$(strip %(isrunverify)s))
       gmp_USER_POST_TARGETS += RUN_%(refname)s
@@ -102,15 +100,12 @@ def GenOneUxm_in_vbuxm(idx, section_name, dsection):
     endif
   endif # Check $(_list_cidcver_used) to filter out "not-used [cid,cver]"
 #
-define copy1sdkin_dll_%(refname)s
-	echo "Copying DLLs(sdkin[$1]) from $(gmb_thisrepo)/$(gmb_dirname_sdkin)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"
-	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/$1* $(%(uxm_dirbin_var)s) # "$1*" results in .pdb be copied as well, just what we want.
-endef
-#
 .PHONY: COPYDLLS_%(refname)s
 COPYDLLS_%(refname)s:
-	@$(if %(uxm_is_copy_selfdll)s,echo "Copying DLLs(self) from $(gmb_syncto)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s"; $(CP_preserve_time) --force $(gmb_syncto)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s))
-	@$(foreach v,%(uxm_sdkin_dlls)s,$(call copy1sdkin_dll_%(refname)s,$v))
+	@echo "Copying DLLs from self sdkout ..."
+	$(CP_preserve_time) --force $(gmb_syncto)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s)
+	@echo "Copying DLLs from sdkin ..."
+	$(CP_preserve_time) --force $(gmb_thisrepo)/$(gmb_dirname_sdkin)/cidvers/$(%(uxm_cidver_var)s)/%(uxm_copy_binvariant)s/* $(%(uxm_dirbin_var)s)
 #
 .PHONY: RUN_%(refname)s
 RUN_%(refname)s:
@@ -128,6 +123,8 @@ RUN_%(refname)s:
 	
 	dirSdkOut = gmb_syncto
 	examples_copyto = IniInfo['global']['examples_copyto']
+
+	# Memo: dsection represents a whole INI section, so dsection['umk'] fetches umk's value in that INI section.
 
 	f_Makefile = dsection['umk']
 	
@@ -160,8 +157,6 @@ RUN_%(refname)s:
 		uxm_dirbin_var = "uxm_%d_%d_dirbin"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_dirbin
 		uxm_cidver_var = "uxm_%d_%d_cidver"%(idx_show, vidx_show) # the GNU make var-name will be sth like uxm_1_2_cidver
 		
-		uxm_is_copy_selfdll = '1' if 'self' in copydlls.split() else ''
-		uxm_sdkin_dlls = ' '.join([dllname for dllname in copydlls.split() if dllname!='self'])
 		uxm_copy_binvariant = 'bin-release' # because example-bin does not fork into bin-debug//bin-release, so I just use bin-release.
 		# // uxm_copy_binvariant = 'bin-debug' if ('d' in ud) else 'bin-release'
 		
