@@ -42,7 +42,7 @@ ifeq (1,$(call gmuf_IsWordInSet,$(gmp_COMPILER_ID),msvc wince))
 
   #NlssdkDllSearchDirs = $(NlssdkLibSearchDirs) # deprecated on 2016-03-16
 
-  UserLibNameForLink_UD = $(call gmpf_MakeLibName,$(patsubst %,%$(gmp_G_UDSuffixByBc),$1)
+  UserLibNameForLink_UD = $(call gmpf_MakeLibName,$(patsubst %,%$(gmp_G_UDSuffixByBc),$1))
 	# For $1=@(repo) :
 	# @(repo).lib , @(repo)_D.lib , @(repo)_U.lib or @(repo)_U_D.lib
 
