@@ -1,1 +1,1 @@
-finaloutput=GMU-v0.105.tar.bz2
+finaloutput=GMU-v0.106.tar.bz2

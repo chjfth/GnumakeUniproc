@@ -12,7 +12,7 @@
 
 SET gmu_DIR_GNUMAKEUNIPROC=%gmu_DIR_ROOT%/GMU-main/GnumakeUniproc
 
-SET gmu_ver=0.105
+SET gmu_ver=0.106
 
 SET gmp_ud_list_CUSTOM_MKI=%gmp_ud_list_CUSTOM_MKI% %gmu_DIR_ROOT%/GMU-ext %gmu_DIR_ROOT%/nlscan/gmu-ext
 
