@@ -113,7 +113,7 @@ gmi_SYDO_up_list_SYNC_UserOutputAL = $(notdir $(_gmp_up_USER_OUTPUT_AFTER_LINK_s
 
 
 define _GmpShowDoneUserOutputAfterLink
-  $(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),echo "[DONE(gmp_up_USER_OUTPUT_AFTER_LINK):] $(call _StripOutputRootPrefix,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))")
+  $(if $(_gmp_up_USER_OUTPUT_AFTER_LINK_s),echo "[DONE(gmp_up_USER_OUTPUT_AFTER_LINK):] $(call _SimplifyDONEPrefix,$(_gmp_up_USER_OUTPUT_AFTER_LINK_s))")
   $(if $(_gmp_USER_FREE_STYLE_TARGET_s),echo "[DONE(gmp_USER_FREE_STYLE_TARGET):] $(_gmp_USER_FREE_STYLE_TARGET_s)")
 endef
 

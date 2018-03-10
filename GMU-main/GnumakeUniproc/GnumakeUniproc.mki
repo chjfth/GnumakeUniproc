@@ -89,8 +89,8 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
 
     # Ensure $(gmu_ud_OUTPUT_ROOT) is an absolute dir
     ifeq (,$(call gmuf_IsAbsDir,$(gmu_ud_OUTPUT_ROOT)))
-      gmu_ud_OUTPUT_ROOT := $(call gmuf_GetAbsPathByRela_soc,$(gmu_ud_OUTPUT_ROOT))# Turn relative-dir to absolute-dir.
-      $(info Set absdir: gmu_ud_OUTPUT_ROOT=$(gmu_ud_OUTPUT_ROOT))
+      override gmu_ud_OUTPUT_ROOT := $(call gmuf_GetAbsPathByRela_soc,$(gmu_ud_OUTPUT_ROOT))# Turn relative-dir to absolute-dir.
+      $(info Set AbsDir: gmu_ud_OUTPUT_ROOT=$(gmu_ud_OUTPUT_ROOT))
     endif
     ifeq ($(_gmu_false),$(call gmuf_IsDirExist_sh,$(gmu_ud_OUTPUT_ROOT)))
       # Since not exist, now create the directory for user. If create fail, stop.

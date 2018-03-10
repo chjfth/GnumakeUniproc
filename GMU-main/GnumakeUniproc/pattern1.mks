@@ -238,7 +238,7 @@ __pattern1_first_target: \
 		$(if $(gmu_I_AM_A_LINK_COMPONENT),$(_p_AutoLinkListForParent) $(_p_AutoLinkPjnmForParent)) \
 		$(gmp_USER_POST_TARGETS) \
 		$(if $(_gmu_cmdopt_NowPostProc),,__pattern1_inc_project_count)
-	@echo "[DONE:] $(call _StripOutputRootPrefix,$(gmu_Gp_LINK_OUTPUT))"
+	@echo "[DONE:] $(call _SimplifyDONEPrefix,$(gmu_Gp_LINK_OUTPUT))"
 	@$(_GmpShowDoneUserOutputAfterLink)
 	@$(_Gmp1SharedFinishingCmds)
 

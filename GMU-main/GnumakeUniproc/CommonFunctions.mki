@@ -259,6 +259,10 @@ _IsOlderThanBuildStart_direct_sh = $(call _IsP1OlderThanP2_direct_sh,$1,$(gmu_p_
 
 _GetAbsDirRelaToCurdir = $(shell ( cd $1; CmdRet=$$?; if [ $$CmdRet = 0 ];then pwd; else echo __GMU_cd_ERROR; fi; ))
 	# $1, the dir to cd to. Returns the new dir abs-path if success, cd_ERROR if fail.
+	#
+	# Note: If the dir $1 does not exist, the console will print:
+	#	sh: /some/foo/bar: No such file or directory
+	# -- quite unfriendly, so using gmuf_GetAbsPathByRela_soc is preferred.
 gmuf_GetAbsDirRelaToCurdir = $(_GetAbsDirRelaToCurdir)
 
 _GetAbsPathRelaToCurdir = $(call _GetAbsDirRelaToCurdir,$(dir $1))/$(notdir $1)
@@ -270,6 +274,7 @@ gmuf_GetAbsDir = $(_GetAbsDir)
 
 gmuf_ConcatePath = $(gmuf_GetAbsPathByRela_so)
 _gmuf_GetAbsPathByRela_so = $(shell dirGo=$(strip $1); dirRel=$(strip $2); \
+	while [ $${dirRel$(_GmuSharp)./} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)./}; done; \
 	while [ $${dirRel$(_GmuSharp)../} != $${dirRel} ]; do dirRel=$${dirRel$(_GmuSharp)../}; dirGo=$${dirGo%/*}; done; \
 	if [ "$${dirRel}" = ".." ]; then echo "$${dirGo%/*}"; \
 	else \
@@ -287,13 +292,19 @@ gmuf_GetAbsPathByRela_so = $(if $(call _IsStringEqual,$2,.)$(call gmuf_IsNull,$2
 	# If $2 is an absolute dir(start with ?:/ or / ), just return $2.
 	# If $2 is a relative dir, calculate absolute dir with $1 as starting position.
 	#
+	# $(call gmuf_GetAbsPathByRela_so,/abc/def,./gf)    => /abc/def/gf
+	# $(call gmuf_GetAbsPathByRela_so,/abc/def,zz/ee)   => /abc/def/zz/ee
+	# $(call gmuf_GetAbsPathByRela_so,/abc/def,../zz/ee)    => /abc/zz/ee
+	# $(call gmuf_GetAbsPathByRela_so,/abc/def,../../zz/ee)     => /zz/ee
+	# $(call gmuf_GetAbsPathByRela_so,/abc/def/jkl,../..)       => /abc
+	#
 	# This is suitable for directory and filepath(dir+filename)
 	# LIMITATION: Don't let $2 trace back to root dir, otherwise, the behavior is wrong.
 	#   E.G. $(call gmuf_GetAbsPathByRela_so,/dir1/dir2,../..) will produce null string.
 	#
-	# Note: Currently, gmuf_GetAbsPathByRela_so misbehaves when the relative path has ./ in it,
+	# Note: Currently, gmuf_GetAbsPathByRela_so misbehaves when the relative path has mixing ./ and ../ in it,
 	# e.g. 
-	#	./dir1/abc.txt
+	#	.././../dir1/abc.txt
 	#	dir1/./abc.txt
 
 gmuf_GetAbsPathByRela_soc = $(call gmuf_GetAbsPathByRela_so,$(CURDIR),$1)
@@ -353,6 +364,15 @@ _StripOutputRootPrefix = $(patsubst $(gmu_ud_OUTPUT_ROOT)/%,\%/%,$1)
 	#if $1 does not start with `$(gmu_ud_OUTPUT_ROOT)/', $1 is returned.
 	#Implementation note: The backslash( in \%/% ) before % is used to preserve the literal meaning of the very % .
 _StripPrjOutputDirPrefix = $(patsubst $(gmu_Gd_Deco_PrjOutput)/%,!/%,$1)
+
+_FriendifyDirSlashs = $(if $(gmuf_IsEnvWindows),$(subst /,\,$1),$1)
+
+_SimplifyDONEPrefix = $(strip $(call _FriendifyDirSlashs,\
+	$(if $(call gmuf_IsPrefixWith,$1,$(CURDIR)), \
+		$(patsubst $(CURDIR)/%,./%,$1),\
+		$(call _StripOutputRootPrefix,$1)\
+	)))
+
 
 _TrimCURDIR = $(patsubst $(CURDIR)/%,%,$1)
 
@@ -496,7 +516,8 @@ gmu_p_StartupMakefile := $(_p_ThisMakefile) # Note: this is different to gmu_p_R
 gmu_d_StartupMakefile := $(call gmuf_GetDir,$(_p_ThisMakefile))
 gmu_d_StartupParent := $(call gmuf_GetParentDir,$(gmu_d_StartupMakefile))
 
-gmuf_IsAbsDir = $(if $(call _IsStringEqual,$1,$(call _GetAbsDirRelaToCurdir,$1)),1)
+gmuf_IsAbsDir = $(if $(call gmuf_IsPrefixWith,$1,/)$(call gmuf_IsSubString,:/,$1),1)
+	# Windows AbsDir( $(CURDIR) etc ) has the form D:/foo/bar
 
 _p_ThisMki = $(call gmuf_lastword,$(MAKEFILE_LIST))
 	# return the file path of current mki
@@ -735,6 +756,9 @@ gmuf_ScriptCmd = $(if $(gmuf_IsUsingWindowsCmd),cmd /C "$(subst \,\\,$1)",$1)
 	#   Without the replacement, "sh -c" will swallow them.
 	# * Replacing " to \" should not be carried out, due to the nature of``cmd /c'' !
 	
+
+gmuf_IsEnvWindows = $(if $(call gmuf_IsSubString,:,$(CURDIR)),1)
+	# For Windows env: CURDIR will be sth like: D:/foo/bar , so there will always be a colon in it.
 
 _gmpfHideSpace = $(subst $(_GmuSpace),@,$(subst \,/,$(strip $1)))
 	# Example: $1=
