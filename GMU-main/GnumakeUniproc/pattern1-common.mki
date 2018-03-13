@@ -21,6 +21,13 @@ export gmp_u_list_PLUGIN_TO_LOAD_ENV_POST
 
 unexport gmp_NOW_EXPORT
 
+### >>> make stripped internal vars, 
+# so that user is freed from the burden of ensuring no trailing spaces on these make-vars,
+# and user can leave gmu_ud_SRC_ROOT blank to represent "current directory".
+_gmu_ud_SRC_ROOT = $(if $(strip $(gmu_ud_SRC_ROOT)),$(strip $(gmu_ud_SRC_ROOT)),.)
+### <<<
+
+
 _gmp_RELEASE_WANT_DBG_SYMBOLS = $(strip $(gmp_msvc_WANT_RELEASE_PDB)$(gmp_RELEASE_WANT_DBG_SYMBOLS))
 	# Since GMU 0.99, User is recommended to assign gmp_RELEASE_WANT_DBG_SYMBOLS=1 to indicate
 	# that debugging symbols should be generated for "release" build.

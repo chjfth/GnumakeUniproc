@@ -89,7 +89,7 @@ _WDFL_p_FinalDefForDll = $(_WDFL_dirTmp_arcwd)/FinalDefForDll.def
 	# because it will be generated in $(gmu_Gd_Final_PrjOutput) -- which probably not resides within cur-dir.
 	# [2011-02-27] Wrong comment above? $(gmu_Gd_Final_PrjOutput) will decide by itself automatically whether it is a rel-dir or abs-dir!
 
-_WDFL_p_LibExportDefs_fcd = $(addprefix $(gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT))#fcd: from current dir
+_WDFL_p_LibExportDefs_fcd = $(addprefix $(_gmu_ud_SRC_ROOT)/,$(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT))#fcd: from current dir
 	# Although $(gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT) can only be one word(one file),
 	# we use $(addprefix ) instead of concatenating so that [ _WDFL_p_LibExportDefs_fcd
 	# will be null if gmi_WDFL_up_LIB_EXPORT_DEFS_FROM_ROOT is null ].

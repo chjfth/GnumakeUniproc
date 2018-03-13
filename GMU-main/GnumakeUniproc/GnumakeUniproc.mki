@@ -18,12 +18,12 @@ endif
 
 ### >>> make stripped internal vars, 
 # so that user is freed from the burden of ensuring no trailing spaces on these make-vars.
-_gmu_ud_SRC_ROOT = $(if $(strip $(gmu_ud_SRC_ROOT)),$(strip $(gmu_ud_SRC_ROOT)),.)
+#_gmu_ud_SRC_ROOT = $(if $(strip $(gmu_ud_SRC_ROOT)),$(strip $(gmu_ud_SRC_ROOT)),.)#[2018-03-13] moved to pattern1-common.mki
 ### <<<
 
 ### some GMU-var sanity check 
-$(call gmuf_CheckBadwordInVars,<,gmu_PRJ_NAME gmu_ud_SRC_ROOT, gmu_uf_LINK_OUTPUT)
-$(call gmuf_CheckBadwordInVars,>,gmu_PRJ_NAME gmu_ud_SRC_ROOT, gmu_uf_LINK_OUTPUT)
+$(call gmuf_CheckBadwordInVars,<,gmu_PRJ_NAME gmu_ud_SRC_ROOT gmu_uf_LINK_OUTPUT)
+$(call gmuf_CheckBadwordInVars,>,gmu_PRJ_NAME gmu_ud_SRC_ROOT gmu_uf_LINK_OUTPUT)
 
 
 _StartupSignatureFile = _MainPrjBuildStart.gmu.ckt

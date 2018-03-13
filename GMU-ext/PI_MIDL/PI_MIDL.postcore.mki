@@ -14,7 +14,7 @@ _list_src_on_midl_from_root = $(if $(gmi_MIDL_up_list_SRC_DEP_MIDL_FROM_ROOT),\
 		) \
 	)
 
-_list_src_on_midl = $(addprefix $(gmu_ud_SRC_ROOT)/,$(_list_src_on_midl_from_root))
+_list_src_on_midl = $(addprefix $(_gmu_ud_SRC_ROOT)/,$(_list_src_on_midl_from_root))
 
 _list_objs_on_midl = $(call gmuf_CnCXX_ListToObjList,$(_list_src_on_midl_from_root))
 

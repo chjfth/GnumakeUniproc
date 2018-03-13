@@ -36,7 +36,7 @@ ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(call gmuf_ScriptCmd,$(_SOFA_export_stub_gen_cmd))
   ifneq (,$(gmi_SOFA_COPY_AUTOSTUB_TO_DLLSRCROOT))
-	$(if $(_IsNotVerbose),@)cp $@ $(gmu_ud_SRC_ROOT)
+	$(if $(_IsNotVerbose),@)cp $@ $(_gmu_ud_SRC_ROOT)
   endif
   
   $(_SOFA_p_auto_export_stub_obj): $(_SOFA_p_auto_export_stub_c)
@@ -74,7 +74,7 @@ ifeq ($(gmi_SOFA_DO_AUTO_EXPORT),1)
   
   _SOFA_export_collect_cmd = export-collect.py --prjname=$(gmu_PRJ_NAME) --update=$@ $^
   
-  $(_SOFA_p_ExportFuncList): $(patsubst %,$(gmu_ud_SRC_ROOT)/%,$(filter %.c %.cpp,$(gmu_up_list_SRC_FROM_ROOT)))
+  $(_SOFA_p_ExportFuncList): $(patsubst %,$(_gmu_ud_SRC_ROOT)/%,$(filter %.c %.cpp,$(gmu_up_list_SRC_FROM_ROOT)))
 	@$(call _MkdirIfNotExist,$(@D))
 	@echo "$(_pluginId_so_from_a): Collect auto export file list into $(notdir $@) ..."
 	$(call _DoVerbose1,@echo "$(_SOFA_export_collect_cmd)")

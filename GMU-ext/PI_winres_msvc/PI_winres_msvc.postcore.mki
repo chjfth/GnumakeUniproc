@@ -10,7 +10,7 @@ endef
 
 $(_RCVC_REQRES_TO_LINK): _p_ts_HDepend = $(@:.res=.$(_RCVC_RCdotD_extn))# `ts' means target specific variable
 
-$(_RCVC_REQRES_TO_LINK): $(gmu_Gd_OBJ_OUTPUT)/%.res: $(gmu_ud_SRC_ROOT)/%.rc
+$(_RCVC_REQRES_TO_LINK): $(gmu_Gd_OBJ_OUTPUT)/%.res: $(_gmu_ud_SRC_ROOT)/%.rc
 ifeq (,$(_gmp_isAboveVC100))
   # GenHDepend for .rc is only supported prior to VS2010.
   # VS2010 starts using UTF-16LE encoding for afxres.rc, and mingw gcc 3.2 cannot cope with that encoding.

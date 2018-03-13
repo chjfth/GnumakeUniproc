@@ -82,8 +82,8 @@ _PCHG_GCHdotD_extn = gch.d
 
 _p_HDEPEND_FOR_PCH = $(_p_PCH_GENERATED:.gch=.$(_PCHG_GCHdotD_extn))
 
-_p_USER_HEADER_for_PCH = $(gmu_ud_SRC_ROOT)/$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
-	# Note: This dir may be relative to current dir(if $(gmu_ud_SRC_ROOT) is a relative dir).
+_p_USER_HEADER_for_PCH = $(_gmu_ud_SRC_ROOT)/$(gmi_PCHG_up_HEADER_FOR_PCH_FROM_ROOT)
+	# Note: This dir may be relative to current dir(if $(_gmu_ud_SRC_ROOT) is a relative dir).
 #_p_AbsPath_USER_HEADER_for_PCH = $(call _GetAbsPathRelaToCurdir,$(_p_USER_HEADER_for_PCH))
 
 _dir_gch_generated = $(dir $(_p_PCH_GENERATED))

@@ -10,10 +10,10 @@ $(gmu_Gp_LINK_OUTPUT): _p_WINDLL_MODULE_DEF_FromCurDir = $(_WDFL_p_FinalDefForDl
 $(gmu_Gp_LINK_OUTPUT): $(_WDFL_p_FinalDefForDll)
 
 $(_WDFL_p_FinalDefForDll): \
-		$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),$(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))\
+		$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),$(_gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT))\
 		$(gmu_Gp_list_SUBPRJ_TO_LINK)
 	@$(call _MkdirIfNotExist,$(@D))
-	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
+	@$(if $(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT),cp $(_gmu_ud_SRC_ROOT)/$(gmp_up_WINDLL_MODULE_DEF_FROM_ROOT) $@,echo "EXPORTS" > $@)
 	@for OneFile in $(patsubst %,"%/$(_WDFL_p_LibExportsDef_fpo)",$(gmuf_GetAllSubprjNameForLink)); do \
 		OneAbsPath=$${gmu_ud_OUTPUT_ROOT}/$$OneFile; \
 		if [ -f "$$OneAbsPath" ]; then cat $$OneAbsPath >> $@; fi; \
@@ -50,7 +50,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
 	@$(call _MkdirIfNotExist,$(@D))
 	@$(call gmuf_ScriptCmd,$(_WDFL_export_stub_gen_cmd))
   ifneq (,$(gmi_WDFL_COPY_AUTOSTUB_TO_DLLSRCROOT))
-	$(if $(_IsNotVerbose),@)cp $@ $(gmu_ud_SRC_ROOT)
+	$(if $(_IsNotVerbose),@)cp $@ $(_gmu_ud_SRC_ROOT)
   endif
   
   $(_WDFL_p_auto_export_stub_obj): $(_WDFL_p_auto_export_stub_c)
@@ -117,7 +117,7 @@ ifeq ($(gmi_WDFL_DO_AUTO_EXPORT),1)
   
   _wdfl_c_filter_pattern = $(addprefix %.,$(gmu_u_list_C_EXTN) $(gmu_u_list_CXX_EXTN))
   
-  $(_WDFL_p_ExportFuncList): $(patsubst %,$(gmu_ud_SRC_ROOT)/%,$(filter $(_wdfl_c_filter_pattern),$(gmu_up_list_SRC_FROM_ROOT)))
+  $(_WDFL_p_ExportFuncList): $(patsubst %,$(_gmu_ud_SRC_ROOT)/%,$(filter $(_wdfl_c_filter_pattern),$(gmu_up_list_SRC_FROM_ROOT)))
 	@$(call _MkdirIfNotExist,$(@D))
 	@echo "$(_pluginId_windll_from_lib): Collect auto export file list into $(notdir $@) ..."
 	$(call _DoVerbose1,@echo "$(_WDFL_export_collect_cmd)")

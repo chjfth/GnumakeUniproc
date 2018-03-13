@@ -13,7 +13,7 @@ define MakeStatementFor1Inf
 
 gmi_SYDO_up_list_SYNC_INF += $$(call stinf_InfFilepathFromInputInx,$1)# Used with PI_sync_devoutput
 
-$$(call stinf_InfFilepathFromInputInx,$1): $$(gmu_ud_SRC_ROOT)/$1
+$$(call stinf_InfFilepathFromInputInx,$1): $$(_gmu_ud_SRC_ROOT)/$1
 	@echo "Generate $$(call stinf_InfFilenameFromInputInx,$1) from $$< ..."
 	@$(CP_) "$$<" "$$@_"
 	stampinf -f "$$(subst /,\,$$@_)" -a $$(stinf_ARCH) -v $$(gmi_STINF_INF_VERSION) -k 1.9
