@@ -122,7 +122,7 @@ import tempfile
 import fnmatch
 #import ConfigParser
 
-version = "1.2"
+version = "1.3"
 
 opts = {}
 
@@ -237,63 +237,87 @@ def CallSymstore_with_filelist(in_pathlist, retry=0):
 
 	# Check 1: the following lines(hint: at final several lines of output):
 	"""
-	SYMSTORE: Number of files stored = <actual-number>
+	SYMSTORE: Number of files stored = 79
 	SYMSTORE: Number of errors = 0
-	SYMSTORE: Number of files ignored = 0
+	SYMSTORE: Number of files ignored = 10
 	"""
-	expect = r'SYMSTORE: Number of files stored = %d'%(len(in_pathlist))
-	m = re.search(expect, alllines)
-	if not m:
-		print "Error: Cannot find '%s' in symstore output."%expect
+	nfiles = len(in_pathlist)
+	# stored+ignored should equal nfiles. (79+10==89)
+	# [2018-03-14] For a resource-only DLL, it is counted as ignored.
+	nstored = 0; nerrors = 0; nignored = 0
+	
+	ptn = r'^SYMSTORE: Number of files stored = ([0-9]+)$'
+	m = re.search(ptn, alllines, re.MULTILINE)
+	if m:
+		nstored = int(m.group(1))
+	else:
+		print "Error: Cannot find regex '%s' in symstore output."%(ptn)
 		return -1, in_pathlist
-	expect = r'SYMSTORE: Number of errors = 0'
-	m = re.search(expect, alllines)
+		
+	ptn = r'^SYMSTORE: Number of errors = 0$'
+	m = re.search(ptn, alllines, re.MULTILINE)
 	if not m:
-		print "Error: Cannot find '%s' in symstore output."%expect
+		print "Error: Cannot find '%s' in symstore output."%(ptn)
 		return -1, in_pathlist
-	expect = r'SYMSTORE: Number of files ignored = 0'
-	m = re.search(expect, alllines)
-	if not m:
-		print "Error: Cannot find '%s' in symstore output."%expect
+	
+	ptn = r'^SYMSTORE: Number of files ignored = ([0-9]+)$'
+	m = re.search(ptn, alllines, re.MULTILINE)
+	if m:
+		nignored = int(m.group(1))
+	else:
+		print "Error: Cannot find regex '%s' in symstore output."%(ptn)
+		return -1, in_pathlist
+
+	if nstored+nignored == nfiles:
+		print "Symstore result summary: stored(%d), ignored(%d)"%(nstored, nignored)
+	else:
+		print "Error: Number of files result error. stored(%d)+ignored(%d)!=nfiles(%d)"%(nstored, nignored, nfiles)
 		return -1, in_pathlist
 
 	# Check 2: No ``error、fail、skip'' after every line of
 	#	SYMSTORE MESSAGE: Copying <some-file> to <...>
 	#
 	# scan each line in ss_output[] to check matching of each input path:
+
+	def remove_matching(onepath):
+		try:
+			in_pathlist.remove(onepath)
+		except ValueError: # Not likely to happen
+			print "Unexpected: Line %d of %s reports path %s, but that path is not in %s."%(
+				i+1, fsslog, onepath, f_ssinput
+				)
+			exit(4)
+
 	i = 0 # i is current line No.
 	while i<len(ss_output):
 		m = re.search(r'^SYMSTORE MESSAGE: Copying (.+) to', ss_output[i])
-		if not m:
-			i+=1
-			continue
-		ss_path = m.group(1) # find a matched path
-		# Check next line for "error" or "fail" .
-		err = False
-		for errword in ['error', 'fail']:
-			if ss_output[i+1].lower().find(errword)>=0 :
-				err = True
-				break
-		if err:
-			i+=2
-			continue # ignore the failed one, go on searching matched path
+		if m:
+			ss_path = m.group(1) # get the matched path
+			# Check next line for "error" or "fail", which may indicate copying operation error.
+			err = False
+			for errword in ['error', 'fail']:
+				if ss_output[i+1].lower().find(errword)>=0 :
+					err = True
+					break # error/fail text detected
+			if err:
+				i+=2
+				continue # ignore the failed one, go on searching matched path
+			
+			remove_matching(ss_path)
 
-		# good now, remove the matched path from in_pathlist
-		try:
-			in_pathlist.remove(ss_path)
-		except ValueError: # Not likely to happen
-			print "Unexpected: Line %d of %s reports path %s, but that path is not in %s."%(
-				i+1, fsslog, ss_path, f_ssinput
-				)
-			exit(4)
+		m = re.search(r'^SYMSTORE MESSAGE: Skipping file (.+) -', ss_output[i])
+		if m:
+			ss_path = m.group(1) # get the matched path
+			remove_matching(ss_path)
+
 		i+=1
 
 	# Check 3: Extract symstore id from a line like
 	#	SYMSTORE MESSAGE: Final id is 0000000011
-	expect = r'SYMSTORE MESSAGE: Final id is ([0-9]+)'
-	m = re.search(expect, alllines)
+	ptn = r'SYMSTORE MESSAGE: Final id is ([0-9]+)'
+	m = re.search(ptn, alllines)
 	if not m:
-		print "Error: Cannot find regex '%s' in symstore output"%expect
+		print "Error: Cannot find regex '%s' in symstore output"%(ptn)
 		return -1, in_pathlist
 	ss_finalid = m.group(1)
 
