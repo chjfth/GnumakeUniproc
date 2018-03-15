@@ -25,6 +25,7 @@ in_gmpf_LoadCenv_msvc_vc90x64_krnl = \
 gmpf_LoadCenv_msvc_vc90x64_krnl = $(call in_gmpf_LoadCenv_msvc_vc90x64_krnl,$(gmp_CENV_ROOT_msvc_vc90x64_krnl))
 
 define def_ExportCenv_vc90x64_krnl
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_ID := msvc)
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc90x64_krnl)
   $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
   $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc90x64_krnl_val_INCLUDE))

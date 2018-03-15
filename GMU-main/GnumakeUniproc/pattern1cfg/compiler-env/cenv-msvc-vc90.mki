@@ -31,6 +31,7 @@ in_gmpf_LoadCenv_msvc_vc90 = \
 gmpf_LoadCenv_msvc_vc90 = $(call in_gmpf_LoadCenv_msvc_vc90,$(gmp_CENV_ROOT_msvc_vc90),$(gmp_CENV_PSDK_ROOT_msvc_vc90))
 
 define def_ExportCenv_vc90
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_ID := msvc)
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc90)
   $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
   $(call gmuf_AnounceExportEnvvar,MSSdk := $2)

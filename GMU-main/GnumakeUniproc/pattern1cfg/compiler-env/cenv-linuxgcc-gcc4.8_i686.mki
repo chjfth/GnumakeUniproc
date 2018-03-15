@@ -39,6 +39,7 @@ gmpf_LoadCenv_linuxgcc_gcc4.8_i686 = $(call in_gmpf_LoadCenv_linuxgcc_gcc4.8_i68
 	# Because this is just GNU make-var, not env-var, we can use dot inside make-var name.
 
 define def_ExportCenv_linuxgcc_gcc4.8_i686
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_ID := linuxgcc)
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_linuxgcc := gcc4.8_i686)
   $(call gmuf_AnounceExportEnvvar,gmp_GCC_PREFIX := i686-pc-linux-gnu-)
   $(call gmuf_AnounceExportEnvvar,PATH := $(_linuxgcc_gcc4_8_i686_val_PATH))
