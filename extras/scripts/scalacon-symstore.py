@@ -305,10 +305,14 @@ def CallSymstore_with_filelist(in_pathlist, retry=0):
 			
 			remove_matching(ss_path)
 
-		m = re.search(r'^SYMSTORE MESSAGE: Skipping file (.+) -', ss_output[i])
+		m = re.search(r'^SYMSTORE MESSAGE: Skipping (?:file )?(.+) -', ss_output[i])
+			# Memo of the cranky symstore.exe :
+			#    Skipping file xxx.dll - not a known file type.
+			#    Skipping xxx.pdb - unsupported format.
 		if m:
 			ss_path = m.group(1) # get the matched path
 			remove_matching(ss_path)
+			# print '===skip======', ss_path # debug
 
 		i+=1
 
@@ -371,9 +375,11 @@ def DoStart():
 		ss_id_end, remain = CallSymstore_with_filelist(remain, retry)
 
 	if retry>g_maxretry :
-		print "Error: %d/%d files cannot be symstored after %d retries."%(
+		print "Error: %d/%d files cannot be symstored after %d retries:"%(
 			len(remain), npickout, g_maxretry
 			)
+		for i, file in enumerate(remain):
+			print '    [%d] %s'%(i+1, file)
 		return 3
 	else:
 		print
