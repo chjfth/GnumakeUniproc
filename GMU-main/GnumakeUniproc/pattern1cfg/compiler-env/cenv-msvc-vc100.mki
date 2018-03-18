@@ -26,7 +26,7 @@ gmpf_LoadCenv_msvc_vc100 = $(call in_gmpf_LoadCenv_msvc_vc100,$(gmp_CENV_ROOT_ms
 
 define def_ExportCenv_vc100
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_ID := msvc)
-  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc100)
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := vc100)
   $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
   $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc100_val_INCLUDE))
   $(call gmuf_AnounceExportEnvvar,LIB := $(_vc100_val_LIB))

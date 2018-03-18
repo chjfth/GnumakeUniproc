@@ -34,7 +34,7 @@ gmpf_LoadCenv_msvc_vc60 = $(call in_gmpf_LoadCenv_msvc_vc60,$(gmp_CENV_ROOT_msvc
 
 define def_ExportCenv_vc60
   $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_ID := msvc)
-  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := $(gmp_COMPILER_VER_msvc) vc60)
+  $(call gmuf_AnounceExportEnvvar,gmp_COMPILER_VER_msvc := vc60)
   $(call gmuf_AnounceExportEnvvar,MSVSDir := $1)
   $(call gmuf_AnounceExportEnvvar,MSSdk := $2)
   $(call gmuf_AnounceExportEnvvar,INCLUDE := $(_vc60_val_INCLUDE))
