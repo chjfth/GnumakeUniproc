@@ -32,6 +32,9 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 
 # gmi_STMD_DO_NOT_SIGN = 
 	# If set to 1, code-signing action is disabled.
+	# This saves time when we are in developing process and actual code-signing is not required
+	# to run everytime we do umake. 
+	# Passing gmi_STMD_DO_NOT_SIGN=1 as umake command-line is a good idea in this case.
 
 # gmi_STMD_URL_TIMESTAMP_SHA1 =
 	# (optional)
