@@ -6,7 +6,8 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: STMD
 
 # This plugin calls signtool.exe to sign EXE/DLL/SYS/CAT(signable files).
-# * Already signed files are skipped.
+# * Already signed files are skipped. (? to confirm)
+# * Does not recurse into sub-dirs currently.
 
 # User input vars:
 
@@ -27,8 +28,12 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# When signing a kernel mode driver .sys, you have to use /ac foobar.cer .
 	# This affects only .sys files.
 
-# gmi_STMD_u_list_EXTNAME = (optional)
-	# Limit signing to these extension names. List extnames separated by spaces.
+# gmi_STMD_u_list_WILDCARD_TO_SIGN = (optional)
+	# Limit signing to these filenames. List wildcards separated by spaces.
+	# If empty, all recognized files will be signed. 
+	# If not empty, only those matching filenames are signed.
+	# Example:
+	#	gmi_STMD_u_list_WILDCARD_TO_SIGN = *.exe my*.dll foobar.sys
 
 # gmi_STMD_DO_NOT_SIGN = 
 	# If set to 1, code-signing action is disabled.
@@ -46,7 +51,8 @@ stmd_UrlTimestampSHA1 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA1),$(gmi_STMD_URL_TIMES
 stmd_UrlTimestampSHA2 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA2),$(gmi_STMD_URL_TIMESTAMP_SHA2),http://sha256timestamp.ws.symantec.com/sha256/timestamp)
 
 
-
+_STMD_u_list_WILDCARD_TO_SIGN = $(strip $(gmi_STMD_u_list_WILDCARD_TO_SIGN))
+	
 _stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
 	exe dll sys cat msi \
 	)

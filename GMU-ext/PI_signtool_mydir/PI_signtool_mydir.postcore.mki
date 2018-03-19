@@ -22,8 +22,10 @@ _stmd_SignPromptPrefix = $(if $(call gmif_IsSHA2Signable,$1),SHA1+SHA2,SHA1)
 _is_singtool_verbose = $(if $(gmuf_IsVerboseLevel1),/v)
 
 _stmd_Candidates = $(foreach d,$(gmi_STMD_ud_list_TOSIGN_FROM_ROOT),\
-	$(foreach extname,$(_stmd_ExtNames),$(wildcard $d/*.$(extname)))\
-	)
+	$(if $(_STMD_u_list_WILDCARD_TO_SIGN),\
+		$(wildcard $(patsubst %,$d/%,$(_STMD_u_list_WILDCARD_TO_SIGN))),\
+		$(foreach extname,$(_stmd_ExtNames),$(wildcard $d/*.$(extname)))\
+	))
 
 stmd_list_SignTargets := # to append later
 
