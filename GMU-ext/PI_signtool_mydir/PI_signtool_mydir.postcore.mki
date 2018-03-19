@@ -21,11 +21,19 @@ _stmd_SignPromptPrefix = $(if $(call gmif_IsSHA2Signable,$1),SHA1+SHA2,SHA1)
 
 _is_singtool_verbose = $(if $(gmuf_IsVerboseLevel1),/v)
 
-_stmd_Candidates = $(foreach d,$(gmi_STMD_ud_list_TOSIGN_FROM_ROOT),\
-	$(if $(_STMD_u_list_WILDCARD_TO_SIGN),\
-		$(wildcard $(patsubst %,$d/%,$(_STMD_u_list_WILDCARD_TO_SIGN))),\
-		$(foreach extname,$(_stmd_ExtNames),$(wildcard $d/*.$(extname)))\
-	))
+_stmd_ExpandWildcards = $(wildcard $(patsubst %,$1/%,$(subst ;, ,$2)))
+	# $1: a directory(adir)
+	# $2: filename wildcard list separated by semi-colons like: *.exe;*.dll
+	# Use $(wildcard ) to fetch actual files from adir/*.exe and adir/*.dll
+
+_stmd_Candidates = $(foreach d,$(gmi_STMD_u_list_SIGNDIRS),\
+	$(if $(call gmuf_IsSubString,|,$d),\
+	 	$(call _stmd_ExpandWildcards,$(call gmuf_word1,|,$d),$(call gmuf_word2,|,$d)),\
+	 	$(call _stmd_ExpandWildcards,$d,$(_stmd_Wildcards))\
+	 )\
+	) # will expand to a list of actual filepaths to receive digital signing
+
+$(info ========$(_stmd_Candidates))
 
 stmd_list_SignTargets := # to append later
 

@@ -6,14 +6,27 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# Plugin ID abbreviation: STMD
 
 # This plugin calls signtool.exe to sign EXE/DLL/SYS/CAT(signable files).
-# * Already signed files are skipped. (? to confirm)
+# * Already signed files are skipped. 
 # * Does not recurse into sub-dirs currently.
 
 # User input vars:
 
-# gmi_STMD_ud_list_TOSIGN_FROM_ROOT = <dirlist> (must)
-	# List directories containing signable files, relative to $(gmu_ud_SRC_ROOT) . 
-	# Currently, this plugin does not recurse into subdirs.
+# gmi_STMD_u_list_SIGNDIRS = <dslist> (must)
+	# List directories containing signable files and wildcars . 
+	# A directory can be abspath(?to-confirm) or relative to $(CURDIR).
+	#
+	# Example:
+	# 	gmi_STMD_u_list_SIGNDIRS = ./dir1|*.exe;*.dll ./dir2|my*.sys ./dir3
+	#    
+	# This will sign all 
+	#		*.exe and *.dll files from ./dir1 
+	# and
+	#		my*.sys files from ./dir2
+	# and
+	#		all "singable" files from ./dirs. 
+	#
+	# "Singable" files are determined by file extname listed in $(_stmd_ExtNames)
+	#
 	# Special note: Do NOT prefix the dirs with $(CURDIR), which will cause make-error.
 	# Caution: Currently, a missing directory in <dirlist> does not cause warning.
 
@@ -27,13 +40,6 @@ _pluginId_signtool_mydir := $(gmpv_ThisPluginId)
 	# https://docs.microsoft.com/en-us/windows-hardware/drivers/install/cross-certificates-for-kernel-mode-code-signing
 	# When signing a kernel mode driver .sys, you have to use /ac foobar.cer .
 	# This affects only .sys files.
-
-# gmi_STMD_u_list_WILDCARD_TO_SIGN = (optional)
-	# Limit signing to these filenames. List wildcards separated by spaces.
-	# If empty, all recognized files will be signed. 
-	# If not empty, only those matching filenames are signed.
-	# Example:
-	#	gmi_STMD_u_list_WILDCARD_TO_SIGN = *.exe my*.dll foobar.sys
 
 # gmi_STMD_DO_NOT_SIGN = 
 	# If set to 1, code-signing action is disabled.
@@ -51,11 +57,9 @@ stmd_UrlTimestampSHA1 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA1),$(gmi_STMD_URL_TIMES
 stmd_UrlTimestampSHA2 = $(if $(gmi_STMD_URL_TIMESTAMP_SHA2),$(gmi_STMD_URL_TIMESTAMP_SHA2),http://sha256timestamp.ws.symantec.com/sha256/timestamp)
 
 
-_STMD_u_list_WILDCARD_TO_SIGN = $(strip $(gmi_STMD_u_list_WILDCARD_TO_SIGN))
-	
-_stmd_ExtNames = $(if $(gmi_STMD_u_list_EXTNAME),$(gmi_STMD_u_list_EXTNAME),\
-	exe dll sys cat msi \
-	)
+_stmd_ExtNames = exe dll sys cat msi
+_stmd_Wildcards = $(subst $(_GmuSpace),;,$(foreach e,$(_stmd_ExtNames),$(patsubst %,*.%,$e)))
+	# result in: *.exe;*.dll;*.sys;*.cat;*.msi
 
 ifeq (,$(gmi_STMD_DO_NOT_SIGN))
 gmp_up_list_PLUGIN_POSTCORE_TO_LOAD += $(call gmpf_GetPluginPostcorePath_std,$(_pluginId_signtool_mydir),postcore)
@@ -67,17 +71,14 @@ endif
 
 
 
-ifeq (,$(strip $(gmi_STMD_ud_list_TOSIGN_FROM_ROOT)))
-  $(error Error from PI_signtool_mydir.mki: You do not tell which directories contain files to sign(empty gmi_STMD_ud_list_TOSIGN_FROM_ROOT value))
+ifeq (,$(strip $(gmi_STMD_u_list_SIGNDIRS)))
+  $(error Error from PI_signtool_mydir.mki: You do not tell which directories contain files to sign(empty gmi_STMD_u_list_SIGNDIRS value))
 endif
 
 ifeq (,$(strip $(gmi_STMD_u_SIGNTOOL_CERTNAME)))
   $(error Error from PI_signtool_mydir.mki: gmi_STMD_u_SIGNTOOL_CERTNAME must not be empty, it is the value passed to signtool's /n parameter)
 endif
 
-ifeq (,$(strip $(_stmd_ExtNames)))
-  $(error Error from PI_signtool_mydir.mki: You assign an empty gmi_STMD_u_list_EXTNAME value)
-endif
 
 
 gmp_USER_POST_TARGETS += gmit_STMD_SignTheseFiles
