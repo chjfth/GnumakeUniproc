@@ -472,6 +472,15 @@ gmuf_RemoveDuplicate = $(if $(strip $1),$(call gmuf_RemoveDuplicate,$(call gmuf_
 
 gmuf_CountNonDupWords = $(words $(sort $1))
 
+gmuf_word1 = $(word 1,$(call split,$1,$2))
+gmuf_word2 = $(word 2,$(call split,$1,$2))
+gmuf_word3 = $(word 3,$(call split,$1,$2))
+gmuf_word4 = $(word 4,$(call split,$1,$2))
+	# $1: the splitting character
+	# $2: Word to split, the Word should not contain spaces
+	# Example: $(call gmuf_word1,;,*.exe;*.dll) returns *.exe
+	# Example: $(call gmuf_word2,;,*.exe;*.dll) returns *.dll
+
 # CVS/SVN path construction functions
 _MakeCvsRepsPath_Svr = $(subst --user--,$(if $($1_USER),$($1_USER),anonymous),$($1))$2
 _MakeCvsRepsPath_SvrRps = $(subst --user--,$($1_USER$(subst /,_,$2)),$($1))$2
