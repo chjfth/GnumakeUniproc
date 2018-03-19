@@ -33,7 +33,7 @@ _stmd_Candidates = $(foreach d,$(gmi_STMD_u_list_SIGNDIRS),\
 	 )\
 	) # will expand to a list of actual filepaths to receive digital signing
 
-$(info ========$(_stmd_Candidates))
+#$(info ========$(_stmd_Candidates)) #debug
 
 stmd_list_SignTargets := # to append later
 
@@ -41,12 +41,12 @@ define stmd_MakeTarget_1Candidate
 
 ifneq (1,$$(call gmif_stmd_IsSigned,$1))
   stmd_list_SignTargets += SignTgt.$1
-  ifeq (1,$(gmuf_IsVerboseLevel2))
-    $$(info STMD: Adding signing candicate: $1)
+  ifeq (1,$(gmuf_IsVerboseLevel1))
+    $$(info STMD: Will sign  : $1)
   endif
 else
-  ifeq (1,$(gmuf_IsVerboseLevel2))
-    $$(info STMD: Skip already-signed: $1)
+  ifeq (1,$(gmuf_IsVerboseLevel1))
+    $$(info STMD: Skip signed: $1)
   endif
 endif
 
