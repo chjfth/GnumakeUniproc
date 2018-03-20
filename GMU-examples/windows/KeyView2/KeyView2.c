@@ -39,6 +39,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           NULL, NULL, hInstance, NULL) ;
      
+     
+     SendMessage(hwnd, WM_SETICON, TRUE,  (LPARAM)LoadIcon(hInstance, TEXT("IDI_ICON")));
+     SendMessage(hwnd, WM_SETICON, FALSE, (LPARAM)LoadIcon(hInstance, TEXT("IDI_ICON")));
+     
      ShowWindow (hwnd, iCmdShow) ;
      UpdateWindow (hwnd) ;
      

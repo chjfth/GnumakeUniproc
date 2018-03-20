@@ -1,0 +1,28 @@
+IDI_ICON                ICON                    "keyview2.ico"
+
+1 VERSIONINFO
+FileVersion    1, 0, 0, 0
+ProductVersion 1, 0, 0, 0
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "040904E4"
+        //language ID = U.S. English, char set = Windows, Multilingual
+        {
+            VALUE "CompanyName", "Public Domain"
+            VALUE "ProductName",     "Keyview2"
+            VALUE "FileDescription", "keyview2 executable"
+            VALUE "FileVersion",    "1.0.0"
+            VALUE "ProductVersion",    "1.0.0"
+            VALUE "LegalCopyright",    "Public domain"
+            VALUE "OriginalFilename" , "KeyView2.exe"
+            VALUE "InternalName", "KeyView2.exe"
+            VALUE "Comments","Presented by public domain"
+        }
+    }
+
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0409, 1252
+    }
+}
