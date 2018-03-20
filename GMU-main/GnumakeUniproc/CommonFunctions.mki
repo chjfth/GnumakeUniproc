@@ -228,6 +228,9 @@ gmuf_Copy1File_sh = $(shell if $(CP_) --force --preserve "$1" "$2" 1>&2; then ec
 _GetFileContent_sh = $(shell if [ -f $1 ]; then cat $1; else echo "!GMU!AssertFail: $1 not exist." 1>&2 ;fi)
 gmuf_GetFileContent_sh = $(_GetFileContent_sh)
 
+gmuf_GetFileContent_shq = $(shell if [ -f $1 ]; then cat $1; fi)
+	# q: quiet if $1 does not exist
+
 gmuf_WriteContentToFile = $(shell \
 	echo "$(call _TrShcmd4echo,$1)" 2>$2 1>&2; \
 	if [ $$? = 0 ]; then echo 1; fi \

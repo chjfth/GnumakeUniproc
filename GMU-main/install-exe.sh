@@ -21,7 +21,8 @@ echo "Directory \"$DIR_GMU_BIN\" will be used for GMU binary files."
 
 DIR_GMU_BIN_SRC=$DIR_GMU_MAIN/gmu_programs
 
-GMU_PRGS="gmuAddActionWord gmuCountChar"
+# memo: If there are more programs to build, list them in GMU_PRGS and separate them with spaces.
+GMU_PRGS="gmuCountChar"
 for OnePrg in $GMU_PRGS; do
 	cmd="gcc -o $DIR_GMU_BIN/$OnePrg $DIR_GMU_BIN_SRC/$OnePrg/$OnePrg.c"
 	echo "$cmd"

@@ -142,13 +142,12 @@ ifeq (,$(_isNowGmuGetPrjAttr)) #If not doing _gmu_ut_GetPrjAttr
     _temp := $(shell \
     	echo "GnumakeUniproc started (GMU $(gmu_ver) , GNUmake v$(MAKE_VERSION))." 1>&2 ;\
     	echo "gmu_ud_OUTPUT_ROOT(%) is $(patsubst $(CURDIR)/%,./%,$(gmu_ud_OUTPUT_ROOT))" 1>&2 ;\
+    	$(RM_) $(_d_OUTPUT_ROOT_GMUTMP); \
     	$(MD_) $(_d_OUTPUT_ROOT_GMUTMP); \
-    	echo -n "" >$(gmu_Gp_COUNT_COMPILE) >$(_Gp_ScWorkInModuleOutput) >$(_Gp_CountSccmdFailure) \
-    		>$(_p_BuiltListOutput) >$(_p_BuildingListOutput) \
+    	echo -n "" >$(_p_BuiltListOutput) >$(_p_BuildingListOutput) \
     	)
+    	# Clean ./gf/_gmu_tmp directory so that others can accumulate new info from a clean state there.
     	# Clear some files in above ``echo '' command.
-    	# We should clear $(gmu_Gp_COUNT_COMPILE) whether or not the main-project has some C/C++ file to compile,
-    	#because the sub-projects will have some to compile.
 
 	_temp := $(shell if [ ! -d $(gmu_Gd_PRJ_GMUTMP) ];then $(MD_) $(gmu_Gd_PRJ_GMUTMP); fi;\
 		echo "$(_p_ThisMakefile)" > $(gmu_Gd_PRJ_GMUTMP)/_HisMakefile.gmu.Attr )

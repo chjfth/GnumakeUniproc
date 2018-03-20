@@ -4,7 +4,7 @@ define _DO_WINRC_COMPILE
 	@echo " RC compiling: $<"
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	rc /fo"$@" $(gmi_RCVC_RC_FLAGS) /d gmp_COMPILER_CIDVER=$(gmp_COMPILER_VER_$(gmp_COMPILER_ID)) $<
-	$(call gmpf_AddCustomActionCount,MSVC-RC-compiled)
+	@$(call gmpf_AddCustomActionCount,MSVC-RC-compiled)
 endef
 	# Memo: Yes, MSDN 2008 tells us to use /d xxx instead of /D xxx to define a macro.
 

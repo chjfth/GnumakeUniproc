@@ -54,15 +54,15 @@ _p_CustomActionList = $(_d_CustomActionList)/ActionList.txt
 #_ActnameToFilename = $1.gmu.cnt
 _ActnameToFilepath = $(_d_CustomActionList)/$1.gmu.cnt
 
-gmu_up_list_STARTUP_CLEAR_FILES += $(_p_CustomActionList)
+#gmu_up_list_STARTUP_CLEAR_FILES += $(_p_CustomActionList) # -- this is wrong, would cause custom-action-count to be reset on every subprj build
 
-# The function here:
-gmpf_AddCustomActionCount = $(shell \
-	gmuAddActionWord $(_p_CustomActionList) $1; \
-	$(if $(call _IsOlderThanBuildStart,$(call _ActnameToFilepath,$1)),echo -n "" > $(call _ActnameToFilepath,$1);) \
-    echo C >> $(call _ActnameToFilepath,$1)\
-    )
-	# $1: custom action name(action word). Don't use space/tab and other sensitive chars.
+# gmpf_AddCustomActionCount
+# $1: custom action name(action word). Don't use space/tab and other sensitive chars.
+define gmpf_AddCustomActionCount
+	$(call gmuf_MkdirIfNotExist,$(_d_CustomActionList))
+	$(if $(findstring $1,$(call gmuf_GetFileContent_shq,$(_p_CustomActionList))),,echo "$1" >> $(_p_CustomActionList))
+    echo C >> $(call _ActnameToFilepath,$1)
+endef
 
 # <<<<<< Custom action count functionality [2006-12-05]
 

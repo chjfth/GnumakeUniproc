@@ -45,7 +45,7 @@ define _MSVC_GEN_PCH
 	@echo " Precompiling $(_gmu_ud_SRC_ROOT)/$(gmi_PCHVC_up_HEADER_FOR_PCH_FROM_ROOT) to $(call _StripOutputRootPrefix,$@) ... "
 	@$(gmu_shcmd_DO_SHOW_PREREQ_DEFAULT)
 	cl $(gmp_CFLAGS_CODE_GEN_ALL) $(if $(_gmp_DUP_CFLAGS_INCLUDES),$(gmp_CFLAGS_INCLUDES)) /nologo /c /Yc"$(_p_AbsPath_USER_HEADER_for_PCH)" /Fp"$(_p_PCH_GENERATED)" /Fo"$(_p_PCH_GENERATED_obj)" /Fd"$(gmp_MSVC_Gp_VCx0_pdb)" $<
-	$(call gmpf_AddCustomActionCount,MSVC-PCH-generated)
+	@$(call gmpf_AddCustomActionCount,MSVC-PCH-generated)
 endef
 	#	NOTE: With VC6 compiler, we have to use an absolute path for /Yc,
 	# which is considered a limitation of the compiler. That is, if you use 
