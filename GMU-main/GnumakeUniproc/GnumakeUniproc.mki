@@ -28,6 +28,8 @@ $(call gmuf_CheckBadwordInVars,>,gmu_PRJ_NAME gmu_ud_SRC_ROOT gmu_uf_LINK_OUTPUT
 
 _StartupSignatureFile = _MainPrjBuildStart.gmu.ckt
 
+export gmu_IN_UMAKE=1
+
 unexport gmu_DECO_PREFIX_PRJ_NAME gmu_DECO_SUFFIX_PRJ_NAME gmu_DECO_PREFIX_LINK_OUTPUT gmu_DECO_SUFFIX_LINK_OUTPUT
 	# unexport them because [ user can += to these gmu-vars, but the altered value should not be seen by sub-projects ].
 

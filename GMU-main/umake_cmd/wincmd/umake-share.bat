@@ -40,7 +40,7 @@ set thisbatdir_=%~dp0%
 set thisbatdir=%thisbatdir_:~0,-1%
 set gmu_DIR_ROOT_bs=%thisbatdir:\GMU-main\umake_cmd\wincmd=%
 set gmu_DIR_ROOT=%gmu_DIR_ROOT_bs:\=/%
-:	gmu_DIR_ROOT will result in something like D:/GMU
+REM	-- gmu_DIR_ROOT will result in something like D:/GMU
 
 set PATH=%thisbatdir%;%PATH%
 REM -- This is wise! It serves a great purpose: 
@@ -59,7 +59,7 @@ call %gmu_DIR_ROOT_bs%\_gmuenv.bat
 IF "%gmu_MAKE_EXE%" == "" set gmu_MAKE_EXE=gmu-make
 REM -- We use the executable name gmu-make.exe explicitly so not to conflict with make.exe from various gcc cross toolchains.
 
-REM A special processing since GnumakeUniproc v0.98. Prefer Makefile.umk as default makefile than Makefile.
+REM A special processing since GnumakeUniproc v0.98. Prefer "Makefile.umk" as default makefile than "Makefile".
 REM If there exists Makefile.umk, I'll pass ``-f Makefile.umk`` to make executable, unless user explicitly assign ``-f xxx``.
 REM * If user provides -f xxx in command parameter, I'll pass those parameter to make .
 REM * If user does not provide -f xxx, I'll call make with all user's parameter as well as appending -f Makefile.umk as make's extra parameters.
@@ -93,12 +93,26 @@ set MV_=mv_
 set CP_=cp_
 
 
+REM If gmu_IN_UMAKE==1 (was set in GnumakeUniproc.mki), it means we are not the root GMU-makefile,
+REM so do not delete _MainPrjBuildStart.gmu.ckt .
+
+if "%gmu_IN_UMAKE%" == "1" (
+	if "%MAKELEVEL%" == "" (
+		echo "umake-share.bat ERROR: gmu_IN_UMAKE==1 but MAKELEVEL is null!"
+		exit /b 1
+	)
+)
+
+if "%gmu_IN_UMAKE%" == "1" goto LaunchMakeExe
+
 REM Delete GnumakeUniproc start-up signature file
 IF EXIST _MainPrjBuildStart.gmu.ckt DEL _MainPrjBuildStart.gmu.ckt
 IF EXIST _MainPrjBuildStart.gmu.ckt (
 	echo ERROR: Cannot delete GnumakeUniproc start-up signature file^(_MainPrjBuildStart.gmu.ckt^) in current dir. GnumakeUniproc will not work.
 	exit /b 1
 )
+
+:LaunchMakeExe
 
 %gmu_MAKE_EXE% %_F_MAKEFILE% %*
 

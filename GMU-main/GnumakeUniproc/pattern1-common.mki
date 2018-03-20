@@ -81,6 +81,7 @@ ifeq ($(MAKELEVEL),0)
 	fi
 # Write count summary to 
 	echo "$(subst $(_GmuSpace),,$(call _JoinResultCharCount,Projects: ;(update: $(_GmuComma)up-to-date: )...Containers: +,p + = R r))" >> $(_p_BuiltListOutput)
+	echo ""
   endef
 else # ^^^^ ifeq ($(MAKELEVEL),0) ^^^^
   define _GmpMakeLevel0ShowEnd
