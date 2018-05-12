@@ -242,7 +242,7 @@ ifeq (,$(gmu_u_list_C_EXTN))
   gmu_u_list_C_EXTN = c
 endif
 ifeq (,$(gmu_u_list_CXX_EXTN))
-  gmu_u_list_CXX_EXTN = cpp cc
+  gmu_u_list_CXX_EXTN = cpp cc cxx
 endif
 ifeq (,$(gmu_u_list_ASM_EXTN))
   gmu_u_list_ASM_EXTN = s
