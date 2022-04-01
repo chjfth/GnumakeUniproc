@@ -50,20 +50,20 @@ def main():
 		opts[opt[0]] = opt[1]
 
 	if '--version' in opts:
-		print 'export-stub-gen.py v%s'%(version)
-		print 'Example:'
-		print '  export-stub-gen.py --update=<upfile> 1.txt 2.txt ...'
+		print('export-stub-gen.py v%s'%(version))
+		print('Example:')
+		print('  export-stub-gen.py --update=<upfile> 1.txt 2.txt ...')
 		return 0;
 	
 	if(len(arglist)==0):
-		print 'No input file!'
+		print('No input file!')
 		return 1;
 	
 	if not '--update' in opts:
-		print 'No --update==<upfile> assigned!'
+		print('No --update==<upfile> assigned!')
 		return 2;
 
-#	print '>>>' + opts['--update']
+#	print('>>>' + opts['--update'])
 	fnupdate = opts['--update']
 	
 	fhupdate = open(fnupdate, 'w')

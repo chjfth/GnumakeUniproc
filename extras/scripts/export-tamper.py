@@ -60,7 +60,7 @@ def ProcessOneFile(fname):
 	# Extract stem name from filename.
 	m = re.search(r'([^/]+).(c|cpp|cxx)$', fname, re.IGNORECASE)
 	if not m:
-		print "export-tamper.py: %s is not a C/C++ file!\n"%(fname)
+		print("export-tamper.py: %s is not a C/C++ file!\n"%(fname))
 		# sys.stderr.write // Sorry, stderr seems to get captured by os.popen, and I don't know how to grab that out.
 		return None
 	
@@ -101,7 +101,7 @@ def ProcessOneFile(fname):
 			fh.writelines(lines)
 	
 	if not g_isMute:
-		print export_funcname
+		print(export_funcname)
 	
 	fh.close();
 
@@ -114,7 +114,7 @@ def main():
 		opts[opt[0]] = opt[1]
 
 	if '--version' in opts:
-		print 'export-tamper.py v%s'%(version)
+		print('export-tamper.py v%s'%(version))
 		return 0;
 	
 	if '--mute' in opts:
@@ -124,7 +124,7 @@ def main():
 		g_extra_prefix = opts['--extra-prefix']
 
 	if(len(arglist)==0):
-		print 'No input file!'
+		print('No input file!')
 		return 1;
 	
 	for fname in arglist:

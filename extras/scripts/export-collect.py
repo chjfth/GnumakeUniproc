@@ -40,7 +40,7 @@ def ProcessOneFile(fname, prjname, funcnames):
 	elif strret: # got some funtion name
 		funcnames.append(prjname + ':' + strret)
 	else:
-		print "Unexpected! export-tamper.py execution error!"
+		print("Unexpected! export-tamper.py execution error!")
 		exit(2)
 	
 
@@ -53,23 +53,23 @@ def main():
 		opts[opt[0]] = opt[1]
 
 	if '--version' in opts:
-		print 'export-collect.py v%s'%(version)
-		print 'Example:'
-		print '  export-collect.py --update=<upfile> foo1.c foo2.c foo3.cpp ...'
+		print('export-collect.py v%s'%(version))
+		print('Example:')
+		print('  export-collect.py --update=<upfile> foo1.c foo2.c foo3.cpp ...')
 		return 0;
 	
 	if(len(arglist)==0):
-		print 'No input file!'
+		print('No input file!')
 		return 1;
 	
 	if not '--update' in opts:
-		print 'No --update==<upfile> assigned!'
+		print('No --update==<upfile> assigned!')
 		return 2;
 	
 	if '--prjname' in opts:
 		prjname = opts['--prjname']
 
-#	print '>>>' + opts['--update']
+#	print('>>>' + opts['--update'])
 	fnupdate = opts['--update']
 	
 	fhupdate = open(fnupdate, 'w')
