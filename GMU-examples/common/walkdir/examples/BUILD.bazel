@@ -1,0 +1,17 @@
+cc_binary(
+	name = "walkdir_ex1",
+	srcs = ["walkdir_ex1/walkdir_ex1.c"],
+	copts = ["-I libsrc/include"],
+	deps = [
+	    "//libsrc:walkdir",
+	],
+)
+
+cc_binary(
+	name = "recurse_rm",
+	srcs = ["recurse_rm/recurse_rm.cpp"],
+	copts = ["-I libsrc/include"],
+	deps = [
+	    "//libsrc:walkdir",
+	],
+)

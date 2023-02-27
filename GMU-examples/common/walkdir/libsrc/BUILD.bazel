@@ -1,0 +1,13 @@
+cc_library(
+	name = "walkdir",
+	srcs = ["walkdir-extname.c", 
+		"mswin/walkdir.c", 
+		"mswin/ps_func.c" 
+		],
+	hdrs = [ 
+		"include/walkdir.h",
+		"ps_func.h"  
+	 ],
+	copts = ["-I libsrc/include"],
+	visibility = ["//examples:__pkg__"],
+)

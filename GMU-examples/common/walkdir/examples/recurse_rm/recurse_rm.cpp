@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32_WINNT)
 # include <direct.h>
 #else // for Linux or MAC
 # include <unistd.h>
