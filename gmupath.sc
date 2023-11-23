@@ -23,7 +23,7 @@ echo "Your PATH is prepended with:"
 echo "    $tmpdirgmu"
 echo ""
 
-echo "In order to build programs with Scalacon, gmp_COMPILER_VER_linuxgcc should be defined in your environment. For example:"
+echo "(optional) In order to build programs with Scalacon, gmp_COMPILER_VER_linuxgcc should be defined in your environment. For example:"
 echo "    export gmp_COMPILER_VER_linuxgcc=gcc4.8_i686"
 echo "    export gmp_COMPILER_VER_linuxgcc=gcc4.8_x64"
 echo "    export gmp_COMPILER_VER_linuxgcc=gcc6.3_raspi"

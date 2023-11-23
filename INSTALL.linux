@@ -1,31 +1,27 @@
 
-Current GnumakeUniproc version is v0.99 .
+Current GnumakeUniproc(GMU) version is v0.106 .
 
 =============================================================================
-- Install process on Linux
+- Install process on Linux (from Git repo)
 =============================================================================
 
-The brief install process described here is suitable for most Linux 
-distributions since year 2005(with Bash 3.0).
+GMU does not work on its own, it relies on GNU make and gcc/g++ for underlying
+C/C++ program compiling. To continue, make sure you have `make` and `gcc`
+already installed on your Linux machine.
 
-Assume that you've extracted GMU-xxx.tar.bz2 to ~ (i.e., there exists
-~/GMU/INSTALL.linux), then do the following:
+The following process has been verified on Ubuntu Linux 20.04, with GNU make 
+versio 4.2 and gcc version 9.4 .
 
-$ ~/GMU/install.sh                             # Prepare required executables 
-$ PATH=~/GMU/GMU-main/umake_cmd/bashcmd:$PATH  # Add umake commmands to PATH
+Actually, GMU does not need an explicit "install" process, instead, it can be 
+run on the fly. To run it, you only need to add the `umake` executable to 
+your PATH. The simple way to do this is:
+	
+	source ~/GMU/gmupath.sc
 
-If the install.sh does not spout any "Error" message, then it succeeds.
-Now, you've set up the environment to use GnumakeUniproc.
+--assuming you have cloned the repo to ~/GMU .
 
-Optional: Add command 
-
-    source ~/GMU/gmupath.sc
-
-to your login script(.bashrc) to add the PATH and get some convenient 
-GMU vars/commands(gv1, gv2, lgmv etc) in your shell environment.
-
-If you encounter errors or need more detail, refer to the install section for
-Linux user in quick start guide.
+Now, `cd` into a directory(inside GMU-examples) with Makefile.umk file in it,
+then type `umake`, GMU will start building the example programs.
 
 =============================================================================
 - Read the quick start guide
