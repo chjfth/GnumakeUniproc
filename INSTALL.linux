@@ -10,7 +10,7 @@ C/C++ program compiling. To continue, make sure you have `make` and `gcc`
 already installed on your Linux machine.
 
 The following process has been verified on Ubuntu Linux 20.04, with GNU make 
-versio 4.2 and gcc version 9.4 .
+version 4.2 and gcc version 9.4 .
 
 Actually, GMU does not need an explicit "install" process, instead, it can be 
 run on the fly. To run it, you only need to add the `umake` executable to 
